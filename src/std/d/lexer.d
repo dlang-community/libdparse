@@ -1810,6 +1810,18 @@ body
 		while (j > i && (comment[j] == ' ' || comment[j] == '\t'))
 			j--;
 		j++;
+		size_t k = i;
+		while (k < j)
+		{
+			if (comment[k] == '\n')
+			{
+				k++;
+				break;
+			}
+			k++;
+		}
+		outputRange.put(comment[i .. k]);
+		i = k;
 		if (comment[i] == '\r') i++;
 		if (comment[i] == '\n') i++;
 		while (comment[i] == ' ' || comment[i] == '\t') i++;
@@ -1842,7 +1854,7 @@ body
 				s++;
 				i++;
 			}
-			size_t k = i;
+			k = i;
 			inner: while (k < j)
 			{
 				if (comment[k] == '\n')
