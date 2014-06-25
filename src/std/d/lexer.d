@@ -1871,7 +1871,8 @@ body
 		}
 		break;
 	default:
-		assert (false, "Invalid doc comment");
+		outputRange.put(comment);
+		break;
 	}
 }
 
