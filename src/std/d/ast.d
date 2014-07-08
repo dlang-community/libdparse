@@ -1889,12 +1889,11 @@ final class LinkageAttribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        version (DIP61) mixin (visitIfNotNull!(identifier, identifierChain));
-        else mixin (visitIfNotNull!(identifier));
+        mixin (visitIfNotNull!(identifier, identifierChain));
     }
     /** */ Token identifier;
     /** */ bool hasPlusPlus;
-    version (DIP61) /** */ IdentifierChain identifierChain;
+    /** */ IdentifierChain identifierChain;
     mixin OpEquals;
 }
 

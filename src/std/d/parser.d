@@ -3465,7 +3465,7 @@ invariant() foo();
         {
             advance();
             node.hasPlusPlus = true;
-            version (DIP61) if (currentIs(tok!","))
+            if (currentIs(tok!","))
             {
                 advance();
                 node.identifierChain = parseIdentifierChain();
