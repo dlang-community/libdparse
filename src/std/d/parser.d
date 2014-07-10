@@ -6928,7 +6928,8 @@ protected:
     version (unittest) static Parser getParserForUnittest(string sourceCode,
         string testName)
     {
-        auto r = byToken(cast(ubyte[]) sourceCode);
+        auto r = getTokensForParser(cast(ubyte[]) sourceCode, LexerConfig(),
+            new StringCache(StringCache.defaultBucketCount));
 
         CAllocator allocator = new ParseAllocator();
         enum numBytes = __traits(classInstanceSize, Parser);
