@@ -2166,7 +2166,8 @@ unittest
 {
 	import std.stdio;
 	auto source = cast(ubyte[]) q{ import std.stdio;}c;
-	auto tokens = byToken(source);
+	auto tokens = getTokensForParser(source, LexerConfig(),
+		new StringCache(StringCache.defaultBucketCount));
 	assert (tokens.map!"a.type"().equal([tok!"import", tok!"identifier", tok!".",
 		tok!"identifier", tok!";"]));
 }
