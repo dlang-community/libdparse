@@ -47,11 +47,11 @@ enum IndentStyle
 /**
  *
  */
-void format(Sink)(Sink sink, Module mod, bool useTabs = false,
+void format(Sink, T)(Sink sink, T node, bool useTabs = false,
     IndentStyle style = IndentStyle.allman, uint indentWith = 4)
 {
     Formatter!Sink formatter = new Formatter!(Sink)(sink, useTabs, style, indentWith);
-    formatter.format(mod);
+    formatter.format(node);
 }
 
 ///
@@ -68,18 +68,18 @@ class Formatter(Sink)
     {
         this.sink = sink;
         this.useTabs = useTabs;
-        this.indentWidth = indentWidth;
         this.style = style;
+        this.indentWidth = indentWidth;
     }
 
-	///
+    ///
     void format(const AddExpression addExpression)
     {
         debug(verbose) writeln("AddExpression");
         mixin(binary("addExpression"));
     }
 
-	///
+    ///
     void format(const AliasDeclaration aliasDeclaration, const Attribute[] attrs = null)
     {
         debug(verbose) writeln("AliasDeclaration");
@@ -374,8 +374,7 @@ class Formatter(Sink)
 
         with(assertExpression)
         {
-            newThing(What.expr);
-            put("assert(");
+            put("assert (");
             format(assertion);
             if (message)
             {
@@ -514,7 +513,7 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("BodyStatement");
 
-        onNewline();
+        newline();
         put("body");
         format(bodyStatement.blockStatement);
     }
@@ -551,7 +550,7 @@ class Formatter(Sink)
     void format(const BaseClassList baseClassList)
     {
         debug(verbose) writeln("BaseClassList");
-		put(" : ");
+        put(" : ");
         foreach(count, item; baseClassList.items)
         {
             format(item);
@@ -855,7 +854,7 @@ class Formatter(Sink)
         if (constraint.expression)
         {
             indent();
-            onNewline();
+            newline();
             put("if(");
             format(constraint.expression);
             put(")");
@@ -953,7 +952,7 @@ class Formatter(Sink)
                 string r;
                 foreach(c, d; s)
                     r ~= (c > 0 ? "else " : "") ~ "if (" ~ d ~ ") { format(" ~ d ~ ", attributes); }";
-                   return r;
+                return r;
             }
 
             mixin(mix(possibleDeclarations));
@@ -1044,7 +1043,7 @@ class Formatter(Sink)
             put("(");
             format(deprecated_.assignExpression);
             put(")");
-            newline();
+            newlineIndent();
         }
     }
 
@@ -1081,7 +1080,7 @@ class Formatter(Sink)
             put("do");
             if (statementNoCaseNoDefault) format(statementNoCaseNoDefault);
             space();
-            put("while(");
+            put("while (");
             format(expression);
             put(");");
         }
@@ -1091,7 +1090,7 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("EnumBody");
 
-        onNewline();
+        newline();
         startBlock();
         foreach(count, member; enumBody.enumMembers)
         {
@@ -1154,7 +1153,7 @@ class Formatter(Sink)
 
         with(enumMember)
         {
-            onNewline();
+            newline();
             if (type) format(type);
             format(name);
             if (assignExpression)
@@ -1265,7 +1264,7 @@ class Formatter(Sink)
 
         if (expressionStatement.expression)
             format(expressionStatement.expression);
-          put(";");
+        put(";");
     }
 
     void format(const FinalSwitchStatement finalSwitchStatement)
@@ -1297,7 +1296,7 @@ class Formatter(Sink)
         with(forStatement)
         {
             newThing(What.other);
-            put("for(");
+            put("for (");
             if (initialization) format(initialization);
             else put(";");
             space();
@@ -1331,7 +1330,7 @@ class Formatter(Sink)
             if (type) put(tokenRep(type));
             else assert(false);
 
-            put("(");
+            put(" (");
             if (foreachTypeList) format(foreachTypeList);
             else if (foreachType) format(foreachType);
 
@@ -1613,7 +1612,7 @@ class Formatter(Sink)
             bool isAuto = identifier != tok!"" && !type;
             bool isAssign = isAuto || type;
 
-            put("if(");
+            put("if (");
 
             if (isAuto) put("auto ");
             if (type)
@@ -1642,7 +1641,7 @@ class Formatter(Sink)
                     elseStatement.statement.statementNoCaseNoDefault &&
                     elseStatement.statement.statementNoCaseNoDefault.ifStatement)
                 {
-                    // this is to stop automatic newline
+                    // this is to stop automatic newlineIndent
                     format(elseStatement.statement.statementNoCaseNoDefault.ifStatement);
                 }
                 else
@@ -1707,14 +1706,14 @@ class Formatter(Sink)
             else if (singleImports.length > 1)
             {
                 indent();
-                newline();
+                newlineIndent();
                 foreach(count, imp; singleImports)
                 {
                     format(imp);
                     if (count < singleImports.length - 1)
                     {
                         put(", ");
-                        newline();
+                        newlineIndent();
                     }
                 }
                 outdent();
@@ -1772,8 +1771,6 @@ class Formatter(Sink)
     void format(const InStatement inStatement)
     {
         debug(verbose) writeln("InStatement");
-
-        onNewline();
         put("in");
         format(inStatement.blockStatement);
     }
@@ -1910,7 +1907,7 @@ class Formatter(Sink)
         foreach(count, pair; keyValuePairs.keyValuePairs)
         {
             format(pair);
-            if (count < keyValuePairs.keyValuePairs.length - 1)
+            if (count + 1 < keyValuePairs.keyValuePairs.length)
                 put(", ");
         }
     }
@@ -1978,7 +1975,7 @@ class Formatter(Sink)
         bool hasPlusPlus;
         **/
 
-        put("extern(");
+        put("extern (");
         format(linkageAttribute.identifier);
         if (linkageAttribute.hasPlusPlus)
             put("++");
@@ -2023,7 +2020,7 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("MixinExpression");
 
-        put("mixin(");
+        put("mixin (");
         format(mixinExpression.assignExpression);
         put(")");
     }
@@ -2084,8 +2081,8 @@ class Formatter(Sink)
         put("module ");
         format(moduleDeclaration.moduleName);
         put(";");
-        newline();
-        newline();
+        newlineIndent();
+        newlineIndent();
     }
 
     void format(const MulExpression mulExpression)
@@ -2206,11 +2203,10 @@ class Formatter(Sink)
         BlockStatement blockStatement;
         **/
 
-        onNewline();
         put("out");
         if (stmnt.parameter != tok!"")
         {
-            put("(");
+            put(" (");
             format(stmnt.parameter);
             put(")");
         }
@@ -2555,7 +2551,7 @@ class Formatter(Sink)
                 return;
             }
 
-            onNewline();
+            newlineIndent();
             if (caseStatement) format(caseStatement);
             else if (caseRangeStatement) format(caseRangeStatement);
             else if (defaultStatement) format(defaultStatement);
@@ -2570,7 +2566,7 @@ class Formatter(Sink)
 
         with(statementNoCaseNoDefault)
         {
-            if (!blockStatement) onNewline();
+            if (!blockStatement) newlineIndent();
 
             enum stmnts = TypeTuple!(
                 "labeledStatement",
@@ -3365,7 +3361,7 @@ class Formatter(Sink)
         Expression expression;
         **/
 
-        put("typeid(");
+        put("typeid (");
         idExpr.type ? format(idExpr.type) : format(idExpr.expression);
         put(")");
     }
@@ -3379,7 +3375,7 @@ class Formatter(Sink)
         Token return_;
         **/
 
-        put("typeof(");
+        put("typeof (");
         typeofExpr.expression ? format(typeofExpr.expression) : format(typeofExpr.return_);
         put(")");
     }
@@ -3542,7 +3538,7 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("VersionCondition");
 
-        put("version(");
+        put("version (");
         format(versionCondition.token);
         put(")");
     }
@@ -3568,7 +3564,7 @@ class Formatter(Sink)
         **/
 
         newThing(What.other);
-        put("while(");
+        put("while (");
         format(stmt.expression);
         put(")");
         maybeIndent(stmt.declarationOrStatement);
@@ -3584,7 +3580,7 @@ class Formatter(Sink)
         **/
 
         space();
-        put("with(");
+        put("with (");
         format(stmt.expression);
         put(")");
         format(stmt.statementNoCaseNoDefault);
@@ -3596,7 +3592,7 @@ class Formatter(Sink)
         mixin(binary("xorExpression", "^"));
     }
 
-	Sink sink;
+    Sink sink;
 
 private:
 
@@ -3618,13 +3614,23 @@ private:
     {
         if (!indentLevel) return;
         auto i = getIndent();
-        sink.put(i);
-        lineLength += i.length;
+        put(i);
     }
 
     string getIndent()
     {
-        return useTabs ? iota(indentLevel).map!(a => "\t").join : iota(indentLevel*indentWidth).map!(a => " ").join;
+        if (useTabs)
+        {
+            char[] c = new char[indentLevel];
+            c[] = '\t';
+            return cast(string) c;
+        }
+        else
+        {
+            char[] c = new char[indentLevel * indentWidth];
+            c[] = ' ';
+            return cast(string) c;
+        }
     }
 
     enum What
@@ -3650,18 +3656,24 @@ private:
         with(What) {
 
             if (lastThing == importDecl && thing != importDecl)
+            {
                 lineGap(1);
+                return;
+            }
 
             if (lastThing == loop)
+            {
                 lineGap(1);
+                return;
+            }
 
             switch(thing)
             {
                 case other:
-                    onNewline();
+                    newline();
                     break;
-                case aggregateDecl: goto case;
-                case attributeDecl: goto case;
+                case aggregateDecl:
+                case attributeDecl:
                 case functionDecl:
                     lineGap(1);
                     break;
@@ -3670,30 +3682,36 @@ private:
                     break;
                 case variableDecl:
                     lineGap(1);
-                    onNewline();
                     break;
                 case importDecl:
-                    onNewline();
+                    newlineIndent();
                     break;
                 case expr: break;
                 case catch_: goto case;
                 case else_:
                     final switch(style) with(IndentStyle)
                     {
-                        case allman: onNewline(); break;
+                        case allman: newline(); break;
                         case otbs: space(); break;
                     }
                     break;
-                default: break;
+                default: newlineIndent(); break;
             }
         }
     }
 
     void lineGap(int gap)
     {
+        foreach (i; 0 .. gap + 1)
+        {
+            if (i == gap)
+                newlineIndent();
+            else
+                newline();
+        }
     }
 
-    void newline()
+    void newlineIndent()
     {
         if (ignoreNewlines)
         {
@@ -3707,13 +3725,15 @@ private:
         }
     }
 
-    void onNewline()
+    void newline()
     {
+        sink.put("\n");
+        lineLength = 0;
     }
 
     void space()
     {
-		put(" ");
+        put(" ");
     }
 
     static string binary(string symbol, string operator = null, bool nospace = false)
@@ -3730,7 +3750,7 @@ private:
     {
         final switch(style) with(IndentStyle)
         {
-            case allman: onNewline(); break;
+            case allman: newline(); break;
             case otbs: space(); break;
         }
         put("{");
@@ -3740,7 +3760,7 @@ private:
     void endBlock()
     {
         outdent();
-        onNewline();
+        newline();
         put("}");
     }
 
@@ -3760,7 +3780,7 @@ private:
         if (!c.length) return;
         lineGap(1);
         put(c.splitLines().map!(l => getIndent() ~ l).join("\n"));
-        newline();
+        newlineIndent();
     }
 
     void putAttrs(const Attribute[] attrs)
