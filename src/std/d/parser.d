@@ -1827,8 +1827,21 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
             }
             break;
         case tok!"debug":
-            node.conditionalDeclaration = parseConditionalDeclaration();
-            if (node.conditionalDeclaration is null) return null;
+            if (peekIs(tok!"("))
+            {
+                node.conditionalDeclaration = parseConditionalDeclaration();
+                if (node.conditionalDeclaration is null) return null;
+            }
+            else if (peekIs(tok!"="))
+            {
+                node.debugSpecification = parseDebugSpecification();
+                if (node.debugSpecification is null) return null;
+            }
+            else
+            {
+                error(`"=" or "(" expected following "debug"`);
+                return null;
+            }
             break;
         default:
             error("Declaration expected");

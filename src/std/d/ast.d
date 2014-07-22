@@ -1111,7 +1111,7 @@ public:
             destructor, staticConstructor, staticDestructor,
             sharedStaticDestructor, sharedStaticConstructor,
             conditionalDeclaration, pragmaDeclaration, versionSpecification,
-            invariant_, postblit, declarations));
+            invariant_, postblit, declarations, debugSpecification));
     }
 
     /** */ Attribute[] attributes;
@@ -1143,6 +1143,7 @@ public:
     /** */ Invariant invariant_;
     /** */ Postblit postblit;
     /** */ Declaration[] declarations;
+    /** */ DebugSpecification debugSpecification;
     mixin OpEquals;
 }
 
