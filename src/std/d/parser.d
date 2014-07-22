@@ -1627,6 +1627,8 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
      *     | $(RULE variableDeclaration)
      *     | $(RULE attributeDeclaration)
      *     | $(RULE invariant)
+     *     | $(RULE versionSpecification)
+     *     | $(RULE debugSpecification)
      *     | $(LITERAL '{') $(RULE declaration)+ $(LITERAL '}')
      *     ;)
      */
