@@ -422,7 +422,10 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
 				(cast() output.data[tokenCount - 1]).trailingComment = lexer.front.text;
 			}
 			else
-				blockComment = lexer.front.text;
+			{
+				blockComment = blockComment.length == 0 ? lexer.front.text
+					: blockComment ~ "\n" ~ lexer.front.text;
+			}
 			lexer.popFront();
 			break;
 		case CommentType.notDoc:
