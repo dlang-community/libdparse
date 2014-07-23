@@ -3063,13 +3063,14 @@ final class VariableDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(storageClass, type, declarators, autoDeclaration));
+        mixin (visitIfNotNull!(attributes, storageClass, type, declarators, autoDeclaration));
     }
     /** */ Type type;
     /** */ Declarator[] declarators;
     /** */ StorageClass storageClass;
     /** */ AutoDeclaration autoDeclaration;
     /** */ string comment;
+    /** */ Attribute[] attributes;
     mixin OpEquals;
 }
 

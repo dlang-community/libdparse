@@ -423,8 +423,8 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
 			}
 			else
 			{
-				blockComment = blockComment.length == 0 ? lexer.front.text
-					: blockComment ~ "\n" ~ lexer.front.text;
+				blockComment = cache.intern(blockComment.length == 0 ? lexer.front.text
+					: blockComment ~ "\n" ~ lexer.front.text);
 			}
 			lexer.popFront();
 			break;

@@ -1790,7 +1790,7 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
                 && node.attributes[$ - 1].storageClass !is null)
             {
                 if (peekIs(tok!"="))
-                    node.variableDeclaration = parseVariableDeclaration(null, true);
+                    node.variableDeclaration = parseVariableDeclaration(null, true, node.attributes);
                 else if (peekIs(tok!"("))
                     node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);
                 else
@@ -2566,7 +2566,8 @@ body {} // six
      *       ($(RULE storageClass) | $(RULE _type)) $(LITERAL Identifier) $(RULE templateParameters) $(RULE parameters) $(RULE memberFunctionAttribute)* $(RULE constraint)? ($(RULE functionBody) | $(LITERAL ';'))
      *     ;)
      */
-    FunctionDeclaration parseFunctionDeclaration(Type type = null, bool isAuto = false, Attribute[] attributes = null)
+    FunctionDeclaration parseFunctionDeclaration(Type type = null, bool isAuto = false,
+        Attribute[] attributes = null)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!FunctionDeclaration;
@@ -6151,10 +6152,12 @@ q{doStuff(5)}c;
      *     | $(RULE autoDeclaration)
      *     ;)
      */
-    VariableDeclaration parseVariableDeclaration(Type type = null, bool isAuto = false)
+    VariableDeclaration parseVariableDeclaration(Type type = null, bool isAuto = false,
+        Attribute[] attributes = null)
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!VariableDeclaration;
+        node.attributes = attributes;
         if (isAuto)
         {
             node.autoDeclaration = parseAutoDeclaration();
@@ -6171,10 +6174,10 @@ q{doStuff(5)}c;
             if (declarator is null) return null;
             declarators ~= declarator;
             if (moreTokens() && currentIs(tok!","))
-			{
-				declarator.comment = current.trailingComment;
+            {
+                declarator.comment = current.trailingComment;
                 advance();
-			}
+            }
             else
                 break;
         }
@@ -6188,9 +6191,9 @@ q{doStuff(5)}c;
 //        }
 //        else
         {
-			auto semicolon = expect(tok!";");
+            auto semicolon = expect(tok!";");
             if (semicolon is null) return null;
-			declarators[$ - 1].comment = semicolon.trailingComment;
+            declarators[$ - 1].comment = semicolon.trailingComment;
             return node;
         }
     }
