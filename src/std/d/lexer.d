@@ -1790,7 +1790,7 @@ body
 					j++;
 					while (j < comment.length && comment[j] == '/')
 						j++;
-					outputRange.put(' ');
+					outputRange.put('\n');
 					i = j;
 					goto again;
 				}
