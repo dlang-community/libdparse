@@ -3375,7 +3375,7 @@ class Formatter(Sink)
         Token return_;
         **/
 
-        put("typeof (");
+        put("typeof(");
         typeofExpr.expression ? format(typeofExpr.expression) : format(typeofExpr.return_);
         put(")");
     }
