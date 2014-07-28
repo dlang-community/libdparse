@@ -2090,13 +2090,17 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
                     enumMembers ~= parseEnumMember();
                 else if (currentIs(tok!","))
                 {
-					if (enumMembers[$ - 1].comment is null)
-						enumMembers[$ - 1].comment = current.trailingComment;
+                    if (enumMembers[$ - 1].comment is null)
+                        enumMembers[$ - 1].comment = current.trailingComment;
                     advance();
                     continue;
                 }
                 else if (currentIs(tok!"}"))
+                {
+                    if (enumMembers.length > 0 && enumMembers[$ - 1].comment is null)
+                        enumMembers[$ - 1].comment = tokens[index - 1].trailingComment;
                     break;
+                }
                 else
                 {
                     error(`",", "}", or enum member expected`);
@@ -3651,8 +3655,8 @@ invariant() foo();
         auto start = expect(tok!"module");
         node.moduleName = parseIdentifierChain();
         node.comment = start.comment;
-		if (node.comment is null)
-			node.comment = start.trailingComment;
+        if (node.comment is null)
+            node.comment = start.trailingComment;
         comment = null;
         auto end = expect(tok!";");
         node.startLocation = start.index;
