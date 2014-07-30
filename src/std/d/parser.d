@@ -807,6 +807,8 @@ alias core.sys.posix.stdio.fileno fileno;
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AutoDeclaration;
+        node.comment = comment;
+        comment = null;
         Token[] identifiers;
         Initializer[] initializers;
         do
@@ -6165,6 +6167,8 @@ q{doStuff(5)}c;
         if (isAuto)
         {
             node.autoDeclaration = parseAutoDeclaration();
+            if (node.autoDeclaration !is null)
+                node.comment = node.autoDeclaration.comment;
             return node;
         }
 
