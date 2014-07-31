@@ -807,6 +807,8 @@ alias core.sys.posix.stdio.fileno fileno;
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AutoDeclaration;
+        node.comment = comment;
+        comment = null;
         Token[] identifiers;
         Initializer[] initializers;
         do
@@ -1807,6 +1809,8 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
         mixin (BASIC_TYPE_CASES);
         type:
             Type type = parseType();
+            if (type is null)
+                return null;
             if (!currentIs(tok!"identifier"))
             {
                 error("Identifier expected");
@@ -2364,7 +2368,7 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ForeachType;
         if (currentIsOneOf(tok!"ref", tok!"const", tok!"immutable",
-            tok!"shared", tok!"inout"))
+            tok!"shared", tok!"inout") && !peekIs(tok!"("))
         {
             trace("\033[01;36mType constructor");
             if ((node.typeConstructors = parseTypeConstructors()) is null)
@@ -6165,6 +6169,7 @@ q{doStuff(5)}c;
         if (isAuto)
         {
             node.autoDeclaration = parseAutoDeclaration();
+            node.comment = node.autoDeclaration.comment;
             return node;
         }
 
@@ -6186,20 +6191,10 @@ q{doStuff(5)}c;
                 break;
         }
         node.declarators = ownArray(declarators);
-//        if (node.declarators.length == 1
-//            && node.declarators[0].initializer !is null
-//            && node.declarators[0].initializer.nonVoidInitializer !is null
-//            && node.declarators[0].initializer.nonVoidInitializer.functionBody !is null)
-//        {
-//            return node;
-//        }
-//        else
-        {
-            auto semicolon = expect(tok!";");
-            if (semicolon is null) return null;
-            declarators[$ - 1].comment = semicolon.trailingComment;
-            return node;
-        }
+        auto semicolon = expect(tok!";");
+        if (semicolon is null) return null;
+        declarators[$ - 1].comment = semicolon.trailingComment;
+        return node;
     }
 
     /**
