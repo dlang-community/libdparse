@@ -6169,7 +6169,8 @@ q{doStuff(5)}c;
         if (isAuto)
         {
             node.autoDeclaration = parseAutoDeclaration();
-            node.comment = node.autoDeclaration.comment;
+            if (node.autoDeclaration !is null)
+                node.comment = node.autoDeclaration.comment;
             return node;
         }
 
