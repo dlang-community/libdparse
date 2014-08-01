@@ -5463,7 +5463,7 @@ q{(int a, ...)
      * Parses a TemplateValueParameter
      *
      * $(GRAMMAR $(RULEDEF templateValueParameter):
-     *     $(RULE type) $(LITERAL Identifier) ($(LITERAL ':') $(RULE expression))? $(RULE templateValueParameterDefault)?
+     *     $(RULE type) $(LITERAL Identifier) ($(LITERAL ':') $(RULE assignExpression))? $(RULE templateValueParameterDefault)?
      *     ;)
      */
     TemplateValueParameter parseTemplateValueParameter()
@@ -5477,7 +5477,7 @@ q{(int a, ...)
         if (currentIs(tok!":"))
         {
             advance();
-            if ((node.expression = parseExpression()) is null) return null;
+            if ((node.assignExpression = parseAssignExpression()) is null) return null;
         }
         if (currentIs(tok!"="))
         {

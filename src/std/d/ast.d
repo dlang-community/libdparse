@@ -2827,12 +2827,12 @@ final class TemplateValueParameter : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(type, identifier, expression,
+        mixin (visitIfNotNull!(type, identifier, assignExpression,
             templateValueParameterDefault));
     }
     /** */ Type type;
     /** */ Token identifier;
-    /** */ Expression expression;
+    /** */ AssignExpression assignExpression;
     /** */ TemplateValueParameterDefault templateValueParameterDefault;
     mixin OpEquals;
 }

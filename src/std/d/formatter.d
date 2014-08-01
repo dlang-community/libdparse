@@ -3104,10 +3104,10 @@ class Formatter(Sink)
             space();
             format(identifier);
 
-            if (expression)
+            if (assignExpression)
             {
                 put(" : ");
-                format(expression);
+                format(assignExpression);
             }
 
             if (templateValueParameterDefault)
