@@ -1801,6 +1801,7 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
             else
                 goto type;
             break;
+        case tok!".":
         case tok!"const":
         case tok!"immutable":
         case tok!"inout":
