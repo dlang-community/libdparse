@@ -998,6 +998,9 @@ class Formatter(Sink)
         foreach(suffix; declarator.cstyle)
             format(suffix);
 
+        if (declarator.templateParameters)
+            format(declarator.templateParameters);
+
         if (declarator.initializer)
         {
             put(" = ");

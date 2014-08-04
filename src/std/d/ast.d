@@ -1179,12 +1179,13 @@ final class Declarator : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(initializer));
+        mixin (visitIfNotNull!(templateParameters, initializer));
     }
     /** */ Token name;
+    /** */ TemplateParameters templateParameters;
     /** */ Initializer initializer;
     /** */ TypeSuffix[] cstyle;
-	/** */ string comment;
+    /** */ string comment;
     mixin OpEquals;
 }
 

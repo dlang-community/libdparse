@@ -1794,7 +1794,16 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
                 if (peekIs(tok!"="))
                     node.variableDeclaration = parseVariableDeclaration(null, true, node.attributes);
                 else if (peekIs(tok!"("))
-                    node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);
+                {
+                    auto b = setBookmark();
+                    advance();
+                    auto t = peekPastParens();
+                    goToBookmark(b);
+                    if (t !is null && *t == tok!"=")
+                        node.variableDeclaration = parseVariableDeclaration(null, true, node.attributes);
+                    else
+                        node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);
+                }
                 else
                     goto type;
             }
@@ -1813,12 +1822,20 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
             if (type is null)
                 return null;
             if (!currentIs(tok!"identifier"))
-            {
-                error("Identifier expected");
                 return null;
-            }
             if (peekIs(tok!"("))
-                node.functionDeclaration = parseFunctionDeclaration(type, false, node.attributes);
+            {
+                auto b = setBookmark();
+                advance();
+                auto t = peekPastParens();
+                goToBookmark(b);
+                if (t is null)
+                    return null;
+                if (*t != tok!"=")
+                    node.functionDeclaration = parseFunctionDeclaration(type, false, node.attributes);
+                else
+                    node.variableDeclaration = parseVariableDeclaration(type, false, node.attributes);
+            }
             else
                 node.variableDeclaration = parseVariableDeclaration(type);
             break;
@@ -1913,7 +1930,9 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
      * Parses a Declarator
      *
      * $(GRAMMAR $(RULEDEF declarator):
-     *     $(LITERAL Identifier) ($(LITERAL '=') $(RULE initializer))?
+     *       $(LITERAL Identifier)
+     *     | $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer)
+     *     | $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE initializer)
      *     ;)
      */
     Declarator parseDeclarator()
@@ -1937,7 +1956,13 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
             }
             node.cstyle = ownArray(typeSuffixes);
         }
-        if (currentIs(tok!"="))
+        if (currentIs(tok!"("))
+        {
+            if ((node.templateParameters = parseTemplateParameters()) is null) return null;
+            if (expect(tok!"=") is null) return null;
+            if ((node.initializer = parseInitializer()) is null) return null;
+        }
+        else if (currentIs(tok!"="))
         {
             advance();
             node.initializer = parseInitializer();
@@ -5212,8 +5237,8 @@ q{(int a, ...)
      * Parses an EponymousTemplateDeclaration
      *
      * $(GRAMMAR $(RULEDEF eponymousTemplateDeclaration):
-     *     $(LITERAL 'enum') $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE assignExpression) $(LITERAL ';')
-     *     $(LITERAL 'enum') $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE type) $(LITERAL ';')
+     *     ($(LITERAL 'enum') | ($LITERAL 'alias')) $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE assignExpression) $(LITERAL ';')
+     *     ($(LITERAL 'enum') | ($LITERAL 'alias')) $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE type) $(LITERAL ';')
      *     ;)
      */
     EponymousTemplateDeclaration parseEponymousTemplateDeclaration()
