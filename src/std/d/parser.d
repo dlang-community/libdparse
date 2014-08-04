@@ -1806,6 +1806,7 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
         case tok!"inout":
         case tok!"scope":
         case tok!"typeof":
+        case tok!".":
         mixin (BASIC_TYPE_CASES);
         type:
             Type type = parseType();
