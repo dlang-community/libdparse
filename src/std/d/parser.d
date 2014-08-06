@@ -2964,11 +2964,17 @@ body {} // six
         ImportBind[] importBinds;
         while (moreTokens())
         {
-            importBinds ~= parseImportBind();
-            if (currentIs(tok!","))
-                advance();
-            else
-                break;
+			auto b = parseImportBind();
+			if (b !is null)
+			{
+				importBinds ~= b;
+				if (currentIs(tok!","))
+					advance();
+				else
+					break;
+			}
+			else
+				break;
         }
         node.importBinds = ownArray(importBinds);
         return node;
