@@ -90,6 +90,10 @@ private enum extraFields = q{
 		if (index > i) return 1;
 		return 0;
 	}
+
+	int opCmp(ref const typeof(this) other) const pure nothrow @safe {
+		return opCmp(other.index);
+	}
 };
 public alias Token = std.lexer.TokenStructure!(IdType, extraFields);
 
