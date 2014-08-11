@@ -3149,6 +3149,8 @@ import core.stdc.stdio, std.string : KeepTerminator;
         auto node = allocate!InStatement;
         if (expect(tok!"in") is null) return null;
         node.blockStatement = parseBlockStatement();
+		if (node.blockStatement is null)
+			return null;
         return node;
     }
 
@@ -4007,6 +4009,8 @@ invariant() foo();
             expect(tok!")");
         }
         node.blockStatement = parseBlockStatement();
+		if (node.blockStatement is null)
+			return null;
         return node;
     }
 
