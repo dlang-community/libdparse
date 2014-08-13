@@ -6696,12 +6696,10 @@ protected:
         while (currentIsOneOf(Operators))
         {
             auto n = allocate!ExpressionType;
+            n.line = current.line;
+            n.column = current.column;
             static if (__traits(hasMember, ExpressionType, "operator"))
-            {
-                n.line = current.line;
-                n.column = current.column;
                 n.operator = advance().type;
-            }
             else
                 advance();
             n.left = node;
