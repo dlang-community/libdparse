@@ -1,3 +1,4 @@
+module a;
 int a;
 int[] a;
 int[string] a;
@@ -14,3 +15,7 @@ else
 debug void foo();
 version(AArch64) enum x = 100;
 version = coverage;
+mixin something;
+mixin something!A;
+mixin typeof(something!A).x;
+

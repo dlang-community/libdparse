@@ -1,8 +1,8 @@
-void foo() {}
-void foo() in {} body {}
-void foo() in {} out {} body {}
-void foo() in {} out(a) {} body {}
-void foo() out(a) {} in {} body {}
+void foo(int a ...) {}
+void foo(...) in {} body {}
+void foo(double) in {} out {} body {}
+void foo(const int) in {} out(a) {} body {}
+void foo(lazy real) out(a) {} in {} body {}
 
 void foo(T)();
 void foo(T)() in {} body {}
@@ -10,9 +10,30 @@ void foo(T)() in {} out {} body {}
 void foo(T)() in {} out(a) {} body {}
 void foo(T)() out(a) {} in {} body {}
 
-void foo(T)() if (something) {}
-void foo(T)() if (something) in {} body {}
-void foo(T)() if (something) in {} out {} body {}
-void foo(T)() if (something) in {} out(a) {} body {}
-void foo(T)() if (something) out(a) {} in {} body {}
+void foo(T)(immutable(T) t) if (something) {}
+void foo(T)(in int great) if (something) in {} body {}
+void foo(T)(final void* param) if (something) in {} out {} body {}
+void foo(T)(char c = 'a') if (something) in {} out(a) {} body {}
+void foo(T)(char s[]) if (something) out(a) {} in {} body {}
+
+auto foo(int ...) { return 1; }
+auto ref foo() { return 1; }
+ref auto foo() { return 1; }
+const foo() { return 1; }
+auto inout foo() { return 1; }
+inout auto foo() { return 1; }
+
+int foo() pure { return 1; }
+int foo() const { return 1; }
+int foo() const @safe { return 1; }
+int foo() const @safe nothrow { return 1; }
+
+auto a = function int (int a) { return a * 2; };
+auto a = function (int a) => a * 2;
+void bar()
+{
+	doStuff(function int(int a) { return a / 2; });
+	doStuff(function int(int a) body { return a / 2; });
+	doStuff(function int(int a) in { assert (a > 10); } body { return a / 2; });
+}
 

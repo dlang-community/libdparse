@@ -2688,34 +2688,6 @@ class Parser
     }
 
     /**
-     * Parses an IdentifierList
-     *
-     * $(GRAMMAR $(RULEDEF identifierList):
-     *     $(LITERAL Identifier) ($(LITERAL ',') $(LITERAL Identifier))*
-     *     ;)
-     */
-    IdentifierList parseIdentifierList()
-    {
-        auto node = allocate!IdentifierList;
-        Token[] identifiers;
-        do
-        {
-            auto ident = expect(tok!"identifier");
-            if (ident is null) return null;
-            identifiers ~= *ident;
-            if (currentIs(tok!","))
-            {
-                advance();
-                continue;
-            }
-            else
-                break;
-        } while (moreTokens());
-        node.identifiers = ownArray(identifiers);
-        return node;
-    }
-
-    /**
      * Parses an IdentifierOrTemplateChain
      *
      * $(GRAMMAR $(RULEDEF identifierOrTemplateChain):
@@ -3025,27 +2997,6 @@ class Parser
         if (expect(tok!"in") is null) return null;
         node.blockStatement = parseBlockStatement();
         if (node.blockStatement is null)
-            return null;
-        return node;
-    }
-
-    /**
-     * Parses an Initialize
-     *
-     * $(GRAMMAR $(RULEDEF initialize):
-     *       $(LITERAL ';')
-     *     | $(RULE statementNoCaseNoDefault)
-     *     ;)
-     */
-    Initialize parseInitialize()
-    {
-        auto node = allocate!Initialize;
-        if (!currentIs(tok!";"))
-        {
-            node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault();
-            if (node.statementNoCaseNoDefault is null) return null;
-        }
-        else if (expect(tok!";") is null)
             return null;
         return node;
     }
@@ -3858,11 +3809,6 @@ class Parser
             node.vararg = true;
             advance();
         }
-        else if (currentIs(tok!"="))
-        {
-            advance();
-            node.default_ = parseAssignExpression();
-        }
         return node;
     }
 
@@ -3934,12 +3880,6 @@ class Parser
         }
         while (moreTokens())
         {
-            if (currentIs(tok!"..."))
-            {
-                advance();
-                node.hasVarargs = true;
-                break;
-            }
             if (currentIs(tok!")"))
                 break;
             auto param = parseParameter();
