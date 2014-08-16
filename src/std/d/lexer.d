@@ -7,6 +7,7 @@ import std.algorithm;
 import std.range;
 import std.lexer;
 
+/// Operators
 private enum operators = [
 	",", ".", "..", "...", "/", "/=", "!", "!<", "!<=", "!<>", "!<>=", "!=",
 	"!>", "!>=", "$", "%", "%=", "&", "&&", "&=", "(", ")", "*", "*=", "+", "++",
@@ -15,6 +16,7 @@ private enum operators = [
 	"^=", "^^", "^^=", "{", "|", "|=", "||", "}", "~", "~="
 ];
 
+/// Kewords
 private enum keywords = [
 	"abstract", "alias", "align", "asm", "assert", "auto", "body", "bool",
 	"break", "byte", "case", "cast", "catch", "cdouble", "cent", "cfloat",
@@ -35,6 +37,7 @@ private enum keywords = [
 	"__VENDOR__", "__VERSION__"
 ];
 
+/// Other tokens
 private enum dynamicTokens = [
 	"specialTokenSequence", "comment", "identifier", "scriptLine",
 	"whitespace", "doubleLiteral", "floatLiteral", "idoubleLiteral",
@@ -75,12 +78,36 @@ private enum pseudoTokenHandlers = [
 	"#line", "lexSpecialTokenSequence"
 ];
 
+/// Token ID type for the D lexer.
 public alias IdType = TokenIdType!(operators, dynamicTokens, keywords);
+
+/**
+ * Function used for converting an IdType to a string.
+ *
+ * Examples:
+ * ---
+ * IdType c = tok!"case";
+ * assert (str(c) == "case");
+ * ---
+ */
 public alias str = tokenStringRepresentation!(IdType, operators, dynamicTokens, keywords);
+
+/**
+ * Template used to refer to D token types.
+ *
+ * See the $(B operators), $(B keywords), and $(B dynamicTokens) enums for
+ * values that can be passed to this template.
+ * Example:
+ * ---
+ * import std.d.lexer;
+ * IdType t = tok!"floatLiteral";
+ * ---
+ */
 public template tok(string token)
 {
     alias tok = TokenId!(IdType, operators, dynamicTokens, keywords, token);
 }
+
 private enum extraFields = q{
 	string comment;
 	string trailingComment;
@@ -95,6 +122,8 @@ private enum extraFields = q{
 		return opCmp(other.index);
 	}
 };
+
+/// The token type in the D lexer
 public alias Token = std.lexer.TokenStructure!(IdType, extraFields);
 
 /**
@@ -113,12 +142,18 @@ public enum StringBehavior : ubyte
 	source = includeQuoteChars | notEscaped
 }
 
+/**
+ * Lexer configuration struct
+ */
 public struct LexerConfig
 {
 	string fileName;
 	StringBehavior stringBehavior;
 }
 
+/**
+ * Returns: true if the given ID is for a basic type.
+ */
 public bool isBasicType(IdType type) nothrow pure @safe
 {
 	switch (type)
@@ -153,6 +188,9 @@ public bool isBasicType(IdType type) nothrow pure @safe
 	}
 }
 
+/**
+ * Returns: true if the given ID type is for a number literal.
+ */
 public bool isNumberLiteral(IdType type) nothrow pure @safe
 {
 	switch (type)
@@ -173,6 +211,9 @@ public bool isNumberLiteral(IdType type) nothrow pure @safe
 	}
 }
 
+/**
+ * Returns: true if the given ID type is for an operator.
+ */
 public bool isOperator(IdType type) nothrow pure @safe
 {
 	switch (type)
@@ -245,6 +286,9 @@ public bool isOperator(IdType type) nothrow pure @safe
 	}
 }
 
+/**
+ * Returns: true if the given ID type is for a keyword.
+ */
 public bool isKeyword(IdType type) pure nothrow @safe
 {
 	switch (type)
@@ -348,6 +392,9 @@ public bool isKeyword(IdType type) pure nothrow @safe
 	}
 }
 
+/**
+ * Returns: true if the given ID type is for a string literal.
+ */
 public bool isStringLiteral(IdType type) pure nothrow @safe
 {
 	switch (type)
@@ -361,6 +408,9 @@ public bool isStringLiteral(IdType type) pure nothrow @safe
 	}
 }
 
+/**
+ * Returns: true if the given ID type is for a protection attribute.
+ */
 public bool isProtection(IdType type) pure nothrow @safe
 {
 	switch (type)
@@ -449,6 +499,9 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
 	return output.data;
 }
 
+/**
+ * The D lexer struct.
+ */
 public struct DLexer
 {
 	import core.vararg;
@@ -458,6 +511,13 @@ public struct DLexer
 
 	@disable this();
 
+	/**
+	 * Params:
+	 *     range = the bytes that compose the source code that will be lexed.
+	 *     config = the lexer configuration to use.
+	 *     cache = the string interning cache for de-duplicating identifiers and
+	 *         other token text.
+	 */
 	this(ubyte[] range, const LexerConfig config, StringCache* cache)
 	{
 		auto r = (range.length >= 3 && range[0] == 0xef && range[1] == 0xbb && range[2] == 0xbf)
@@ -468,11 +528,11 @@ public struct DLexer
 		popFront();
 	}
 
+	///
 	public void popFront() pure
 	{
 		_popFront();
 	}
-
 
 	bool isWhitespace() pure /*const*/ nothrow
 	{
@@ -1884,11 +1944,24 @@ body
 }
 
 
+/**
+ * The string cache is used for string interning.
+ *
+ * It will only story a single copy of any string that it is asked to hold.
+ * Interned strings can be compared for equality by comparing their $(B .ptr)
+ * field.
+ *
+ * Default and postbilt constructors are disabled. When a StringCache goes out
+ * of scope, the memory held by it is freed.
+ *
+ * See_also: $(LINK http://en.wikipedia.org/wiki/String_interning)
+ */
 struct StringCache
 {
 public:
 
     @disable this();
+	@disable this(this);
 
     /**
      * Params: bucketCount = the initial number of buckets. Must be a

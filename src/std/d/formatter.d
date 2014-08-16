@@ -58,7 +58,7 @@ void format(Sink, T)(Sink sink, T node, bool useTabs = false,
 class Formatter(Sink)
 {
     /**
-     * Parameters:
+     * Params:
      *     sink = the output range that the formatted source code is placed in
      *     useTabs = if true, tabs are used for indent levels instead of spaces
      *     style = the brace style

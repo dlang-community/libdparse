@@ -1,13 +1,5 @@
 // Written in the D programming language
 
-/**
- * MACROS:
- * GRAMMAR = <pre class="grammar">$0</pre>
- * RULEDEF = $(B $(DDOC_ANCHOR $0) $0)
- * RULE = $(LINK2 #$0, $0)
- * LITERAL = $(D_STRING $(I $0))
- */
-
 module std.d.parser;
 
 import std.d.lexer;
@@ -50,7 +42,11 @@ Module parseModule(const(Token)[] tokens, string fileName, CAllocator allocator 
 }
 
 /**
- * Parser structure
+ * D Parser.
+ *
+ * It is sometimes useful to sub-class Parser to skip over things that are not
+ * interesting. For example, DCD skips over function bodies when caching symbols
+ * from imported files.
  */
 class Parser
 {
@@ -120,24 +116,9 @@ class Parser
         return node;
     }
 
-    unittest
-    {
-        auto sourceCode =
-q{
-alias core.sys.posix.stdio.fileno fileno;
-}c;
-
-        Parser p = getParserForUnittest(sourceCode, "parseAliasDeclaration");
-
-        AliasDeclaration d = p.parseAliasDeclaration();
-        assert (d !is null);
-        assert (p.errorCount == 0);
-
-        stderr.writeln("Unittest for parseAliasDeclaration() passed.");
-    }
-
     /**
-     * Parses an AliasInitializer
+     * Parses an AliasInitializer.
+	 *
      * $(GRAMMAR $(RULEDEF aliasInitializer):
      *     $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE storageClass)* $(RULE type)
      *     ;)
@@ -161,18 +142,9 @@ alias core.sys.posix.stdio.fileno fileno;
         return node;
     }
 
-    unittest
-    {
-        auto sourceCode = q{a = abcde!def};
-        Parser p = getParserForUnittest(sourceCode, "parseAliasInitializer");
-        auto initializer = p.parseAliasInitializer();
-        assert (initializer !is null);
-        assert (p.errorCount == 0);
-        stderr.writeln("Unittest for parseAliasInitializer() passed.");
-    }
-
     /**
-     * Parses an AliasThisDeclaration
+     * Parses an AliasThisDeclaration.
+	 *
      * $(GRAMMAR $(RULEDEF aliasThisDeclaration):
      *     $(LITERAL 'alias') $(LITERAL Identifier) $(LITERAL 'this') $(LITERAL ';')
      *     ;)
@@ -190,18 +162,9 @@ alias core.sys.posix.stdio.fileno fileno;
         return node;
     }
 
-    unittest
-    {
-        auto sourceCode = q{alias oneTwoThree this;};
-        Parser p = getParserForUnittest(sourceCode, "parseAliasThisDeclaration");
-        auto aliasThis = p.parseAliasThisDeclaration();
-        assert (aliasThis !is null);
-        assert (p.errorCount == 0);
-        stderr.writeln("Unittest for parseAliasThisDeclaration() passed.");
-    }
-
     /**
      * Parses an AlignAttribute.
+	 *
      * $(GRAMMAR $(RULEDEF alignAttribute):
      *     $(LITERAL 'align') ($(LITERAL '$(LPAREN)') $(LITERAL IntegerLiteral) $(LITERAL '$(RPAREN)'))?
      *     ;)
@@ -222,20 +185,9 @@ alias core.sys.posix.stdio.fileno fileno;
         return node;
     }
 
-    unittest
-    {
-        auto sourceCode = q{align(42) align};
-        Parser p = getParserForUnittest(sourceCode, "parseAlignAttribute");
-        auto attribute = p.parseAlignAttribute();
-        assert (attribute !is null);
-        attribute = p.parseAlignAttribute();
-        assert (attribute !is null);
-        assert (p.errorCount == 0);
-        stderr.writeln("Unittest for parseAlignAttribute() passed.");
-    }
-
     /**
-     * Parses an AndAndExpression
+     * Parses an AndAndExpression.
+	 *
      * $(GRAMMAR $(RULEDEF andAndExpression):
      *       $(RULE orExpression)
      *     | $(RULE andAndExpression) $(LITERAL '&&') $(RULE orExpression)
@@ -249,7 +201,7 @@ alias core.sys.posix.stdio.fileno fileno;
     }
 
     /**
-     * Parses an AndExpression
+     * Parses an AndExpression.
      *
      * $(GRAMMAR $(RULEDEF andExpression):
      *       $(RULE cmpExpression)
@@ -264,7 +216,7 @@ alias core.sys.posix.stdio.fileno fileno;
     }
 
     /**
-     * Parses an ArgumentList
+     * Parses an ArgumentList.
      *
      * $(GRAMMAR $(RULEDEF argumentList):
      *     $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression)?)*
@@ -281,7 +233,7 @@ alias core.sys.posix.stdio.fileno fileno;
     }
 
     /**
-     * Parses Arguments
+     * Parses Arguments.
      *
      * $(GRAMMAR $(RULEDEF arguments):
      *     $(LITERAL '$(LPAREN)') $(RULE argumentList)? $(LITERAL '$(RPAREN)')
@@ -299,7 +251,7 @@ alias core.sys.posix.stdio.fileno fileno;
     }
 
     /**
-     * Parses an ArrayInitializer
+     * Parses an ArrayInitializer.
      *
      * $(GRAMMAR $(RULEDEF arrayInitializer):
      *       $(LITERAL '[') $(LITERAL ']')
@@ -328,7 +280,7 @@ alias core.sys.posix.stdio.fileno fileno;
     }
 
     /**
-     * Parses an ArrayLiteral
+     * Parses an ArrayLiteral.
      *
      * $(GRAMMAR $(RULEDEF arrayLiteral):
      *     $(LITERAL '[') $(RULE argumentList)? $(LITERAL ']')
@@ -346,7 +298,7 @@ alias core.sys.posix.stdio.fileno fileno;
     }
 
     /**
-     * Parses an ArrayMemberInitialization
+     * Parses an ArrayMemberInitialization.
      *
      * $(GRAMMAR $(RULEDEF arrayMemberInitialization):
      *     ($(RULE assignExpression) $(LITERAL ':'))? $(RULE nonVoidInitializer)
@@ -416,7 +368,7 @@ alias core.sys.posix.stdio.fileno fileno;
      *
      * $(GRAMMAR $(RULEDEF asmBrExp):
      *       $(RULE asmUnaExp)
-     *     | $(RULE asmBrExp) $(LITERAL '[') $(RULE asmExp) $(LITERAL ']')
+     *     | $(RULE asmBrExp)? $(LITERAL '[') $(RULE asmExp) $(LITERAL ']')
      *     ;)
      */
     AsmBrExp parseAsmBrExp()
@@ -498,7 +450,7 @@ alias core.sys.posix.stdio.fileno fileno;
      * Parses an AsmInstruction
      *
      * $(GRAMMAR $(RULEDEF asmInstruction):
-     *     $(LITERAL Identifier)
+     *       $(LITERAL Identifier)
      *     | $(LITERAL 'align') $(LITERAL IntegerLiteral)
      *     | $(LITERAL 'align') $(LITERAL Identifier)
      *     | $(LITERAL Identifier) $(LITERAL ':') $(RULE asmInstruction)
@@ -715,18 +667,30 @@ alias core.sys.posix.stdio.fileno fileno;
         case tok!"real":
             AsmTypePrefix prefix = allocate!AsmTypePrefix();
             prefix.left = advance();
-            if (!currentIs(tok!"identifier"))
+            if (prefix.left.type == tok!"identifier") switch (prefix.left.text)
             {
-                error("Identifier expected");
+            case "near":
+            case "far":
+            case "word":
+            case "dword":
+            case "qword":
+                break;
+            default:
+                error("ASM type prefix expected");
                 return null;
             }
-            prefix.right = advance();
+            auto ident = expect(tok!"identifier");
+            if (ident is null || ident.text != "ptr")
+            {
+                error("'ptr' expected");
+                return null;
+            }
+            prefix.right = *ident;
             return prefix;
         default:
             error("Expected an identifier, 'byte', 'short', 'int', 'float', 'double', or 'real'");
             return null;
         }
-        assert (false);
     }
 
     /**
@@ -756,6 +720,16 @@ alias core.sys.posix.stdio.fileno fileno;
             if ((unary.asmUnaExp = parseAsmUnaExp()) is null)
                 return null;
             break;
+        case tok!"byte":
+        case tok!"short":
+        case tok!"int":
+        case tok!"float":
+        case tok!"double":
+        case tok!"real":
+        typePrefix:
+            if ((unary.asmTypePrefix = parseAsmTypePrefix()) is null)
+                return null;
+            break;
         case tok!"identifier":
             if (current().text == "offsetof" || current().text == "seg")
             {
@@ -765,11 +739,7 @@ alias core.sys.posix.stdio.fileno fileno;
                 break;
             }
             else if (peekIs(tok!"identifier"))
-            {
-                if ((unary.asmTypePrefix = parseAsmTypePrefix()) is null)
-                    return null;
-                break;
-            }
+                goto typePrefix;
             else
                 goto default;
         default:
@@ -1252,69 +1222,6 @@ alias core.sys.posix.stdio.fileno fileno;
         return node;
     }
 
-    unittest
-    {
-        auto sourceCode = q{
-const;
-const shared;
-immutable;
-inout;
-inout shared;
-shared;
-shared const;
-shared inout;
-incorrect;
-        };
-
-        Parser p = getParserForUnittest(sourceCode, "parseCastQualifier");
-
-        CastQualifier one = p.parseCastQualifier();
-        assert (one.first == tok!"const");
-        assert (one.second == tok!"");
-        p.expect(tok!";");
-
-        CastQualifier two = p.parseCastQualifier();
-        assert (two.first == tok!"const");
-        assert (two.second == tok!"shared");
-        p.expect(tok!";");
-
-        CastQualifier three = p.parseCastQualifier();
-        assert (three.first == tok!"immutable");
-        assert (three.second == tok!"");
-        p.expect(tok!";");
-
-        CastQualifier four = p.parseCastQualifier();
-        assert (four.first == tok!"inout");
-        assert (four.second == tok!"");
-        p.expect(tok!";");
-
-        CastQualifier five = p.parseCastQualifier();
-        assert (five.first == tok!"inout");
-        assert (five.second == tok!"shared");
-        p.expect(tok!";");
-
-        CastQualifier six = p.parseCastQualifier();
-        assert (six.first == tok!"shared");
-        assert (six.second == tok!"");
-        p.expect(tok!";");
-
-        CastQualifier seven = p.parseCastQualifier();
-        assert (seven.first == tok!"shared");
-        assert (seven.second == tok!"const");
-        p.expect(tok!";");
-
-        CastQualifier eight = p.parseCastQualifier();
-        assert (eight.first == tok!"shared");
-        assert (eight.second == tok!"inout");
-        p.expect(tok!";");
-
-        CastQualifier nine = p.parseCastQualifier();
-        assert (nine is null);
-        assert (p.errorCount > 0);
-
-        stderr.writeln("Unittest for parseCastQualifier() passed.");
-    }
-
     /**
      * Parses a Catch
      *
@@ -1369,8 +1276,9 @@ incorrect;
      * Parses a ClassDeclaration
      *
      * $(GRAMMAR $(RULEDEF classDeclaration):
-     *       $(LITERAL 'class') $(LITERAL Identifier) ($(LITERAL ':') $(RULE baseClassList))? $(LITERAL ';')
+     *       $(LITERAL 'class') $(LITERAL Identifier) $(LITERAL ';')
      *     | $(LITERAL 'class') $(LITERAL Identifier) ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody)
+     *     | $(LITERAL 'class') $(LITERAL Identifier) $(RULE templateParameters) $(RULE constraint)? ($(RULE structBody) | $(LITERAL ';'))
      *     | $(LITERAL 'class') $(LITERAL Identifier) $(RULE templateParameters) $(RULE constraint)? ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody)
      *     | $(LITERAL 'class') $(LITERAL Identifier) $(RULE templateParameters) ($(LITERAL ':') $(RULE baseClassList))? $(RULE constraint)? $(RULE structBody)
      *     ;)
@@ -1380,91 +1288,7 @@ incorrect;
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ClassDeclaration;
         expect(tok!"class");
-        auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
-        node.name = *ident;
-        node.comment = comment;
-        comment = null;
-        if (currentIs(tok!";"))
-        {
-            advance();
-            return node;
-        }
-        templateStuff: if (currentIs(tok!"("))
-        {
-            node.templateParameters = parseTemplateParameters();
-            constraint: if (currentIs(tok!"if"))
-                node.constraint = parseConstraint();
-            if (node.baseClassList !is null)
-                goto structBody;
-            if (currentIs(tok!":"))
-            {
-                advance();
-                node.baseClassList = parseBaseClassList();
-            }
-            if (currentIs(tok!"if"))
-                goto constraint;
-        }
-        if (currentIs(tok!":"))
-        {
-            advance();
-            node.baseClassList = parseBaseClassList();
-        }
-    structBody:
-        node.structBody = parseStructBody();
-        return node;
-    }
-
-    unittest
-    {
-        string sourceCode =
-q{class ClassZero;
-class ClassOne {}
-class ClassTwo : Super {}
-class ClassThree(A, B) : Super {}
-class ClassFour(A, B) if (someTest()) : Super {}
-class ClassFive(A, B) : Super if (someTest()) {}}c;
-
-        Parser p = getParserForUnittest(sourceCode, "parseClassDeclaration");
-
-        auto classZero = p.parseClassDeclaration();
-        assert (classZero.name.text == "ClassZero");
-        assert (classZero.structBody is null);
-
-        auto classOne = p.parseClassDeclaration();
-        assert (classOne.name.text == "ClassOne");
-        assert (classOne.structBody.declarations.length == 0);
-        assert (classOne.baseClassList is null);
-        assert (classOne.constraint is null);
-        assert (classOne.templateParameters is null);
-
-        auto classTwo = p.parseClassDeclaration();
-        assert (classTwo.name.text == "ClassTwo", classTwo.name.text);
-        assert (classTwo.baseClassList !is null);
-        assert (classTwo.baseClassList.items.length == 1,
-            to!string(classTwo.baseClassList.items.length));
-        assert (classTwo.structBody.declarations.length == 0,
-            to!string(classTwo.structBody.declarations.length));
-
-        auto classThree = p.parseClassDeclaration();
-        assert (classThree.name.text == "ClassThree", classThree.name.text);
-        assert (classThree.templateParameters !is null);
-        assert (classThree.templateParameters.templateParameterList.items.length == 2);
-        assert (classThree.baseClassList !is null);
-        assert (classThree.baseClassList.items.length == 1);
-        assert (classThree.structBody.declarations.length == 0,
-            to!string(classThree.structBody.declarations.length));
-
-        auto classFour = p.parseClassDeclaration();
-        assert (classFour.name.text == "ClassFour", classFour.name.text);
-        assert (classFour.templateParameters !is null);
-        assert (classFour.baseClassList !is null);
-        assert (classFour.constraint !is null);
-        assert (classFour.baseClassList.items.length == 1);
-        assert (classFour.structBody.declarations.length == 0,
-            to!string(classFour.structBody.declarations.length));
-
-        stderr.writeln("Unittest for parseClassDeclaration() passed.");
+        mixin (PARSE_INTERFACE_OR_CLASS);
     }
 
     /**
@@ -2223,17 +2047,6 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
         return node;
     }
 
-    unittest
-    {
-        auto sourceCode = q{~this(){}}c;
-        Parser p = getParserForUnittest(sourceCode, "parseDestructor");
-        Destructor d = p.parseDestructor();
-        assert (d !is null);
-        assert (d.functionBody !is null);
-        assert (p.errorCount == 0);
-        stderr.writeln("Unittest for parseDestructor() passed.");
-    }
-
     /**
      * Parses a DoStatement
      *
@@ -2648,55 +2461,6 @@ class ClassFive(A, B) : Super if (someTest()) {}}c;
             node.bodyStatement = parseBodyStatement();
         }
         return node;
-    }
-
-    unittest
-    {
-        auto sourceCode = q{
-{} // one
-in {} body{} // two
-out {} body{} // three
-in {} out {} body {} // four
-out {} in {} body {} // five
-body {} // six
-        };
-
-        Parser p = getParserForUnittest(sourceCode, "parseFunctionBody");
-
-        FunctionBody functionBodyOne = p.parseFunctionBody();
-        assert (functionBodyOne.blockStatement !is null);
-
-        FunctionBody functionBodyTwo = p.parseFunctionBody();
-        assert (functionBodyTwo.blockStatement is null);
-        assert (functionBodyTwo.inStatement !is null);
-        assert (functionBodyTwo.outStatement is null);
-        assert (functionBodyTwo.bodyStatement !is null);
-
-        FunctionBody functionBodyThree = p.parseFunctionBody();
-        assert (functionBodyThree.blockStatement is null);
-        assert (functionBodyThree.inStatement is null);
-        assert (functionBodyThree.outStatement !is null);
-        assert (functionBodyThree.bodyStatement !is null);
-
-        FunctionBody functionBodyFour = p.parseFunctionBody();
-        assert (functionBodyFour.blockStatement is null);
-        assert (functionBodyFour.inStatement !is null);
-        assert (functionBodyFour.outStatement !is null);
-        assert (functionBodyFour.bodyStatement !is null);
-
-        FunctionBody functionBodyFive = p.parseFunctionBody();
-        assert (functionBodyFive.blockStatement is null);
-        assert (functionBodyFive.inStatement !is null);
-        assert (functionBodyFive.outStatement !is null);
-        assert (functionBodyFive.bodyStatement !is null);
-
-        FunctionBody functionBodySix = p.parseFunctionBody();
-        assert (functionBodySix.blockStatement is null);
-        assert (functionBodySix.inStatement is null);
-        assert (functionBodySix.outStatement is null);
-        assert (functionBodySix.bodyStatement !is null);
-
-        stderr.writeln("Unittest for parseFunctionBody() passed.");
     }
 
     /**
@@ -3192,59 +2956,6 @@ body {} // six
         return node;
     }
 
-    unittest
-    {
-        auto sourceCode =
-q{import std.stdio;
-import foo, bar;
-import io = std.stdio;
-import std.stdio: writefln, foo = writef;
-import io = std.stdio : foo = writefln;
-import foo, bar, baz;
-import core.stdc.stdio, std.string : KeepTerminator;
-}c;
-
-        Parser p = getParserForUnittest(sourceCode, "parseImportDeclaration");
-
-        ImportDeclaration one = p.parseImportDeclaration();
-        assert (one !is null);
-        assert (one.singleImports.length == 1);
-        assert (p.errorCount == 0);
-
-        ImportDeclaration two = p.parseImportDeclaration();
-        assert (two !is null);
-        assert (two.singleImports.length == 2);
-        assert (p.errorCount == 0);
-
-        ImportDeclaration three = p.parseImportDeclaration();
-        assert (three !is null);
-        assert (three.singleImports.length == 1);
-        assert (p.errorCount == 0);
-
-        ImportDeclaration four = p.parseImportDeclaration();
-        assert (four !is null);
-        assert (four.importBindings !is null);
-        assert (four.importBindings.importBinds.length == 2);
-        assert (p.errorCount == 0);
-
-        ImportDeclaration five = p.parseImportDeclaration();
-        assert (five !is null);
-        assert (p.errorCount == 0);
-
-        ImportDeclaration six = p.parseImportDeclaration();
-        assert (six !is null);
-        assert (six.singleImports.length == 3);
-        assert (p.errorCount == 0);
-
-        ImportDeclaration seven = p.parseImportDeclaration();
-        assert (seven !is null);
-        assert (seven.singleImports.length == 1);
-        assert (seven.importBindings !is null);
-        assert (p.errorCount == 0);
-
-        stderr.writeln("Unittest for parseImportDeclaration() passed.");
-    }
-
     /**
      * Parses an ImportExpression
      *
@@ -3361,81 +3072,18 @@ import core.stdc.stdio, std.string : KeepTerminator;
      * Parses an InterfaceDeclaration
      *
      * $(GRAMMAR $(RULEDEF interfaceDeclaration):
-     *     $(LITERAL 'interface') $(LITERAL Identifier) ($(LITERAL ';') | ($(RULE templateParameters) $(RULE constraint)?)? ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody))
+     *       $(LITERAL 'interface') $(LITERAL Identifier) $(LITERAL ';')
+     *     | $(LITERAL 'interface') $(LITERAL Identifier) ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody)
+     *     | $(LITERAL 'interface') $(LITERAL Identifier) $(RULE templateParameters) $(RULE constraint)? ($(RULE structBody) | $(LITERAL ';'))
+     *     | $(LITERAL 'interface') $(LITERAL Identifier) $(RULE templateParameters) $(RULE constraint)? ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody)
+     *     | $(LITERAL 'interface') $(LITERAL Identifier) $(RULE templateParameters) ($(LITERAL ':') $(RULE baseClassList))? $(RULE constraint)? $(RULE structBody)
      *     ;)
      */
     InterfaceDeclaration parseInterfaceDeclaration()
     {
         auto node = allocate!InterfaceDeclaration;
-        if (expect(tok!"interface") is null) return null;
-        auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
-        node.name = *ident;
-        node.comment = comment;
-        comment = null;
-        if (currentIs(tok!";"))
-        {
-            advance();
-            return node;
-        }
-        if (currentIs(tok!"("))
-        {
-            node.templateParameters = parseTemplateParameters();
-            if (currentIs(tok!"if"))
-                node.constraint = parseConstraint();
-        }
-        if (currentIs(tok!":"))
-        {
-            advance();
-            node.baseClassList = parseBaseClassList();
-        }
-        node.structBody = parseStructBody();
-        return node;
-    }
-
-    unittest
-    {
-        auto sourceCode =
-q{interface One {}
-interface Two : Number {}
-interface Three(T) if (someTest(T)) {}
-interface "Four"
-}c;
-
-        Parser p = getParserForUnittest(sourceCode, "parseInterfaceDeclaration");
-
-        InterfaceDeclaration one = p.parseInterfaceDeclaration();
-        assert (one !is null);
-        assert (one.name.text == "One");
-        assert (one.constraint is null);
-        assert (one.templateParameters is null);
-        assert (one.structBody !is null);
-        assert (one.baseClassList is null);
-        assert (p.errorCount == 0);
-
-        InterfaceDeclaration two = p.parseInterfaceDeclaration();
-        assert (two !is null);
-        assert (two.name.text == "Two");
-        assert (two.constraint is null);
-        assert (two.templateParameters is null);
-        assert (two.structBody !is null);
-        assert (two.baseClassList !is null);
-        assert (p.errorCount == 0);
-
-        InterfaceDeclaration three = p.parseInterfaceDeclaration();
-        assert (three !is null);
-        assert (three.name.text == "Three");
-        assert (three.constraint !is null);
-        assert (three.templateParameters !is null);
-        assert (three.structBody !is null);
-        assert (three.baseClassList is null);
-        assert (p.errorCount == 0);
-
-        InterfaceDeclaration four = p.parseInterfaceDeclaration();
-        assert (four is null);
-        assert (p.errorCount > 0);
-
-        stderr.writeln("Unittest for parseInterfaceDeclaration() passed.");
+        expect(tok!"interface");
+        mixin (PARSE_INTERFACE_OR_CLASS);
     }
 
     /**
@@ -3458,31 +3106,6 @@ interface "Four"
         }
         if ((node.blockStatement = parseBlockStatement()) is null) return null;
         return node;
-    }
-
-    unittest
-    {
-        auto sourceCode =
-q{invariant() {}
-invariant{}
-invariant() foo();
-}c;
-
-        Parser p = getParserForUnittest(sourceCode, "parseInvariant");
-
-        auto inv1 = p.parseInvariant();
-        assert (inv1 !is null);
-        assert (inv1.blockStatement !is null);
-        assert (p.errorCount == 0);
-
-        auto inv2 = p.parseInvariant();
-        assert (inv2 !is null);
-        assert (inv2.blockStatement !is null);
-        assert (p.errorCount == 0);
-
-        auto inv3 = p.parseInvariant();
-        assert (inv3 is null);
-        assert (p.errorCount > 0);
     }
 
     /**
@@ -3514,16 +3137,6 @@ invariant() foo();
         }
         if (expect(tok!")") is null) return null;
         return node;
-    }
-
-    unittest
-    {
-        auto sourceCode = q{is ( x : uybte)}c;
-        Parser p = getParserForUnittest(sourceCode, "parseIsExpression");
-        auto isExp1 = p.parseIsExpression();
-        assert (isExp1 !is null);
-        assert (p.errorCount == 0);
-        stderr.writeln("Unittest for parseIsExpression passed.");
     }
 
     /**
@@ -3809,10 +3422,6 @@ invariant() foo();
         return node;
     }
 
-    unittest
-    {
-    }
-
     /**
      * Parses a Module
      *
@@ -3862,7 +3471,8 @@ invariant() foo();
     }
 
     /**
-     * Parses a MulExpression
+     * Parses a MulExpression.
+	 *
      * $(GRAMMAR $(RULEDEF mulExpression):
      *       $(RULE powExpression)
      *     | $(RULE mulExpression) ($(LITERAL '*') | $(LITERAL '/') | $(LITERAL '%')) $(RULE powExpression)
@@ -4346,33 +3956,6 @@ invariant() foo();
         if (expect(tok!")") is null)
             return null;
         return node;
-    }
-
-    unittest
-    {
-        string sourceCode =
-q{(int a, ...)
-(double ...)
-(Range r)}c;
-
-        Parser p = getParserForUnittest(sourceCode, "parseParameters");
-
-        Parameters params1 = p.parseParameters();
-        assert (params1.hasVarargs);
-        assert (params1.parameters.length == 1);
-        assert (params1.parameters[0].name.text == "a");
-
-        Parameters params2 = p.parseParameters();
-        assert (params2.parameters.length == 1);
-        assert (params2.parameters[0].vararg);
-        assert (params2.parameters[0].type !is null);
-
-        Parameters params3 = p.parseParameters();
-        assert (params3.parameters.length == 1);
-        assert (!params3.parameters[0].vararg);
-        assert (params3.parameters[0].type !is null);
-
-        stderr.writeln("Unittest for parseParameters() passed.");
     }
 
     /**
@@ -6297,17 +5880,6 @@ q{(int a, ...)
         return node;
     }
 
-    unittest
-    {
-        auto sourceCode =
-q{doStuff(5)}c;
-        Parser p = getParserForUnittest(sourceCode, "parseUnaryExpression");
-        auto unary = p.parseUnaryExpression();
-        assert (unary !is null);
-        assert (unary.functionCallExpression !is null);
-        stderr.writeln("Unittest for parseUnaryExpression() passed.");
-    }
-
     /**
      * Parses an UnionDeclaration
      *
@@ -7148,28 +6720,6 @@ protected:
         index = i;
     }
 
-    version (unittest) static void doNothingErrorFunction(string,
-        size_t, size_t, string, bool) {}
-
-    version (unittest) static Parser getParserForUnittest(string sourceCode,
-        string testName)
-    {
-        auto r = getTokensForParser(cast(ubyte[]) sourceCode, LexerConfig(),
-            new StringCache(StringCache.defaultBucketCount));
-
-        CAllocator allocator = new ParseAllocator();
-        enum numBytes = __traits(classInstanceSize, Parser);
-        void[] mem = allocator.allocate(numBytes);
-        assert (mem.length == numBytes, format("%d", mem.length));
-        Parser p = emplace!Parser(mem);
-        assert (cast(void*) p == mem.ptr, "%x, %x".format(cast(void*) p, mem.ptr));
-
-        p.messageFunction = &doNothingErrorFunction;
-        p.fileName = testName ~ ".d";
-        p.tokens = r.array();
-        return p;
-    }
-
     template simpleParse(NodeType, parts ...)
     {
         static if (__traits(hasMember, NodeType, "comment"))
@@ -7293,6 +6843,58 @@ protected:
         case tok!"__TIMESTAMP__":
         case tok!"__VENDOR__":
         case tok!"__VERSION__":
+    };
+    enum string PARSE_INTERFACE_OR_CLASS = q{
+        auto ident = expect(tok!"identifier");
+        if (ident is null) return null;
+        node.name = *ident;
+        node.comment = comment;
+        comment = null;
+        if (currentIs(tok!";"))
+            goto emptyBody;
+        if (currentIs(tok!"{"))
+            goto structBody;
+        templateStuff: if (currentIs(tok!"("))
+        {
+            node.templateParameters = parseTemplateParameters();
+            if (currentIs(tok!";"))
+                goto emptyBody;
+            constraint: if (currentIs(tok!"if"))
+                node.constraint = parseConstraint();
+            if (node.baseClassList !is null)
+            {
+                if (currentIs(tok!"{"))
+                    goto structBody;
+                else if (currentIs(tok!";"))
+                    goto emptyBody;
+                else
+                {
+                    error("Struct body or ';' expected");
+                    return null;
+                }
+            }
+            if (currentIs(tok!":"))
+                goto baseClassList;
+            if (currentIs(tok!"if"))
+                goto constraint;
+            if (currentIs(tok!";"))
+                goto emptyBody;
+        }
+        if (currentIs(tok!":"))
+        {
+    baseClassList:
+            advance(); // :
+            if ((node.baseClassList = parseBaseClassList()) is null)
+                return null;
+            if (currentIs(tok!"if"))
+                goto constraint;
+        }
+    structBody:
+        node.structBody = parseStructBody();
+        return node;
+    emptyBody:
+        advance();
+        return node;
     };
     const(Token)[] tokens;
     int suppressMessages;

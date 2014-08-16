@@ -1,0 +1,4 @@
+GRAMMAR = <pre class="grammar">$0</pre>
+RULEDEF = $(B $0)
+RULE = $(B $0)
+LITERAL = $(D_STRING $(I $0))

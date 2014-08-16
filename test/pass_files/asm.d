@@ -1,0 +1,22 @@
+void doStuff()
+{
+    asm
+    {
+        mov RAX, a;
+        ret;
+        mov RAX, a[100];
+        mov RAX, [a + 100];
+        mov RAX, a ? b : c;
+        align 100;
+        align whatever;
+    label:
+        mov RAX, RCX;
+        db "test";
+        mov RAX, 100;
+        mov RAX, 10.0f;
+        mov RAX, 10.0;
+        mov ST(0), 1;
+        add near ptr [EAX], 3;
+        add byte ptr [EAX], 3;
+    }
+}

@@ -1,0 +1,9 @@
+auto a = cast() b;
+auto a = cast(const) b;
+auto a = cast(const shared) b;
+auto a = cast(immutable) b;
+auto a = cast(inout) b;
+auto a = cast(inout shared) b;
+auto a = cast(shared) b;
+auto a = cast(shared const) b;
+auto a = cast(shared inout) b;
