@@ -18,5 +18,13 @@ void doStuff()
         mov ST(0), 1;
         add near ptr [EAX], 3;
         add byte ptr [EAX], 3;
+		mov RAX, a.b.c;
+		mov RAX, ~a;
+		mov RAX, !a;
+		mov RAX, -a;
+		mov RAX, +a;
+		mov RAX, offsetof a;
+		jge short L_largepositive;
+		lea     EDX,[ECX][ECX*8]        ;
     }
 }

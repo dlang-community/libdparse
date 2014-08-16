@@ -8,6 +8,8 @@ auto a = 1 >> 2;
 auto a = 1 < 2;
 auto a = 1 > 2;
 auto a = 1 >>> 2;
+auto a = cast() a;
+auto a = cast(int) a;
 auto a = a || b || c && d;
 auto a = b++;
 auto a = ++b;
@@ -15,6 +17,9 @@ auto a = b[10];
 auto a = b[10 .. $];
 auto a = b[$];
 auto a = b[1 .. 2];
+auto a = [10] ~ [20];
+auto a = [[10], [20]];
+auto a = [{1}];
 auto a = "string";
 auto a = "string" "concatenated";
 auto a = int.mangleof;
@@ -22,6 +27,20 @@ auto a = .x;
 auto a = const(int).mangleof;
 void foo()
 {
+	a = b;
+	a >>>= b;
+	a >>= b;
+	a <<= b;
+	a += b;
+	a -= b;
+	a *= b;
+	a %= b;
+	a &= b;
+	a /= b;
+	a |= b;
+	a ^^= b;
+	a ^= b;
+	a ~= b;
 	auto a = b <= c;
 	auto a = b == c;
 	auto a = b is c;
@@ -50,4 +69,6 @@ void foo()
 	auto a = new (x, y, z) class {};
 	auto a = new (x, y, z) class (c, d) {};
 	auto a = new (x, y, z) class A, B {};
+	assert (a);
+	assert (a, "b");
 }

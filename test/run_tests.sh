@@ -60,4 +60,4 @@ for i in coverage/*.lst; do
 	echo $(tail $i -n1)
 done
 
-rm -f tester tester.o
+#rm -f tester tester.o

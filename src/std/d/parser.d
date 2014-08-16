@@ -384,12 +384,14 @@ class Parser
                 return null;
             if (expect(tok!"]") is null)
                 return null;
+            if (currentIs(tok!"["))
+                goto brLoop;
         }
         else
         {
             if ((brExp.asmUnaExp = parseAsmUnaExp()) is null)
                 return null;
-            while (currentIs(tok!"["))
+            brLoop: while (currentIs(tok!"["))
             {
                 AsmBrExp br = allocate!AsmBrExp(); // huehuehuehue
                 br.asmBrExp = brExp;
@@ -643,14 +645,18 @@ class Parser
     /**
      * Parses an AsmTypePrefix
      *
+     * Note that in the following grammar definition the first identifier must
+     * be "near", "far", "word", "dword", or "qword". The second identifier must
+     * be "ptr".
+     *
      * $(GRAMMAR $(RULEDEF asmTypePrefix):
-     *       $(LITERAL Identifier) $(LITERAL Identifier)
-     *     | $(LITERAL 'byte') $(LITERAL Identifier)
-     *     | $(LITERAL 'short') $(LITERAL Identifier)
-     *     | $(LITERAL 'int') $(LITERAL Identifier)
-     *     | $(LITERAL 'float') $(LITERAL Identifier)
-     *     | $(LITERAL 'double') $(LITERAL Identifier)
-     *     | $(LITERAL 'real') $(LITERAL Identifier)
+     *       $(LITERAL Identifier) $(LITERAL Identifier)?
+     *     | $(LITERAL 'byte') $(LITERAL Identifier)?
+     *     | $(LITERAL 'short') $(LITERAL Identifier)?
+     *     | $(LITERAL 'int') $(LITERAL Identifier)?
+     *     | $(LITERAL 'float') $(LITERAL Identifier)?
+     *     | $(LITERAL 'double') $(LITERAL Identifier)?
+     *     | $(LITERAL 'real') $(LITERAL Identifier)?
      *     ;)
      */
     AsmTypePrefix parseAsmTypePrefix()
@@ -679,13 +685,8 @@ class Parser
                 error("ASM type prefix expected");
                 return null;
             }
-            auto ident = expect(tok!"identifier");
-            if (ident is null || ident.text != "ptr")
-            {
-                error("'ptr' expected");
-                return null;
-            }
-            prefix.right = *ident;
+            if (currentIs(tok!"identifier") && current().text == "ptr")
+                prefix.right = advance();
             return prefix;
         default:
             error("Expected an identifier, 'byte', 'short', 'int', 'float', 'double', or 'real'");
@@ -729,19 +730,29 @@ class Parser
         typePrefix:
             if ((unary.asmTypePrefix = parseAsmTypePrefix()) is null)
                 return null;
+            if ((unary.asmExp = parseAsmExp()) is null)
+                return null;
             break;
         case tok!"identifier":
-            if (current().text == "offsetof" || current().text == "seg")
+            switch (current().text)
             {
+            case "offsetof":
+            case "seg":
                 unary.prefix = advance();
                 if ((unary.asmExp = parseAsmExp()) is null)
                     return null;
                 break;
-            }
-            else if (peekIs(tok!"identifier"))
+            case "near":
+            case "far":
+            case "word":
+            case "dword":
+            case "qword":
                 goto typePrefix;
-            else
-                goto default;
+            default:
+                goto outerDefault;
+            }
+            break;
+        outerDefault:
         default:
             if ((unary.asmPrimaryExp = parseAsmPrimaryExp()) is null)
                 return null;
@@ -1100,10 +1111,7 @@ class Parser
     IdType parseBasicType()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        if (isBasicType(current.type))
-            return advance().type;
-        error("Basic type expected");
-        return tok!"";
+		return advance().type;
     }
 
     /**
@@ -1144,13 +1152,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CaseStatement;
-        if (argumentList is null)
-        {
-            expect(tok!"case");
-            node.argumentList = parseArgumentList();
-        }
-        else
-            node.argumentList = argumentList;
+        node.argumentList = argumentList;
         if (expect(tok!":") is null) return null;
         node.declarationsAndStatements = parseDeclarationsAndStatements();
         return node;
@@ -3809,6 +3811,11 @@ class Parser
             node.vararg = true;
             advance();
         }
+        else if (currentIs(tok!"="))
+        {
+            advance();
+            node.default_ = parseAssignExpression();
+        }
         return node;
     }
 
@@ -3880,6 +3887,12 @@ class Parser
         }
         while (moreTokens())
         {
+			if (currentIs(tok!"..."))
+			{
+				advance();
+				node.hasVarargs = true;
+				break;
+			}
             if (currentIs(tok!")"))
                 break;
             auto param = parseParameter();
@@ -3920,21 +3933,6 @@ class Parser
             advance();
         else
             node.functionBody = parseFunctionBody();
-        return node;
-    }
-
-    /**
-     * Parses a PostIncDecExpression
-     *
-     * $(GRAMMAR $(RULEDEF postIncDecExpression):
-     *     $(RULE unaryExpression) ($(LITERAL '++') | $(LITERAL '--'))
-     *     ;)
-     */
-    PostIncDecExpression parsePostIncDecExpression(UnaryExpression unary = null)
-    {
-        auto node = allocate!PostIncDecExpression;
-        node.unaryExpression = unary is null ? parseUnaryExpression() : unary;
-        node.operator = advance().type;
         return node;
     }
 
@@ -3990,28 +3988,6 @@ class Parser
             node.argumentList = parseArgumentList();
         }
         expect(tok!")");
-        return node;
-    }
-
-    /**
-     * Parses a PreIncDecExpression
-     *
-     * $(GRAMMAR $(RULEDEF preIncDecExpression):
-     *     ($(LITERAL '++') | $(LITERAL '--')) $(RULE unaryExpression)
-     *     ;)
-     */
-    PreIncDecExpression parsePreIncDecExpression()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!PreIncDecExpression;
-        if (currentIsOneOf(tok!"++", tok!"--"))
-            advance();
-        else
-        {
-            error(`"++" or "--" expected`);
-            return null;
-        }
-        node.unaryExpression = parseUnaryExpression();
         return node;
     }
 

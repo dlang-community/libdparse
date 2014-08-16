@@ -12,6 +12,7 @@ void foo()
 	case 2: goto default;
 	case 3: goto label2;
 	case 4: goto case 3;
+	case 5: .. case 100: break;
 	}
 	while (true) { continue; }
 	while (true) { continue onAndOn; }
@@ -35,4 +36,12 @@ void foo()
 	throw aParty!tonight;
 	with (great.power) comes(great.responsibility);
 	final switch (x) {}
+	version(ARM_HardFloat)
+		a = b.c;
+	else
+		a = c.d;
+	debug
+		a = 100;
+	static if (someCondition)
+		a = 9;
 }
