@@ -755,9 +755,15 @@ alias core.sys.posix.stdio.fileno fileno;
             unary.prefix = advance();
             if ((unary.asmUnaExp = parseAsmUnaExp()) is null)
                 return null;
+            break;
         case tok!"identifier":
             if (current().text == "offsetof" || current().text == "seg")
+            {
                 unary.prefix = advance();
+                if ((unary.asmExp = parseAsmExp()) is null)
+                    return null;
+                break;
+            }
             else if (peekIs(tok!"identifier"))
             {
                 if ((unary.asmTypePrefix = parseAsmTypePrefix()) is null)

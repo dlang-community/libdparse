@@ -730,7 +730,7 @@ public:
         mixin (visitIfNotNull!(prefix, asmTypePrefix, asmExp, asmPrimaryExp, asmUnaExp));
     }
     /** */ AsmTypePrefix asmTypePrefix;
-    /** */ AsmExp asmExp;
+    /** */ ExpressionNode asmExp;
     /** */ Token prefix;
     /** */ AsmPrimaryExp asmPrimaryExp;
     /** */ AsmUnaExp asmUnaExp;
