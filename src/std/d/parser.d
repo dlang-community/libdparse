@@ -118,7 +118,7 @@ class Parser
 
     /**
      * Parses an AliasInitializer.
-	 *
+     *
      * $(GRAMMAR $(RULEDEF aliasInitializer):
      *     $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE storageClass)* $(RULE type)
      *     ;)
@@ -144,7 +144,7 @@ class Parser
 
     /**
      * Parses an AliasThisDeclaration.
-	 *
+     *
      * $(GRAMMAR $(RULEDEF aliasThisDeclaration):
      *     $(LITERAL 'alias') $(LITERAL Identifier) $(LITERAL 'this') $(LITERAL ';')
      *     ;)
@@ -164,7 +164,7 @@ class Parser
 
     /**
      * Parses an AlignAttribute.
-	 *
+     *
      * $(GRAMMAR $(RULEDEF alignAttribute):
      *     $(LITERAL 'align') ($(LITERAL '$(LPAREN)') $(LITERAL IntegerLiteral) $(LITERAL '$(RPAREN)'))?
      *     ;)
@@ -187,7 +187,7 @@ class Parser
 
     /**
      * Parses an AndAndExpression.
-	 *
+     *
      * $(GRAMMAR $(RULEDEF andAndExpression):
      *       $(RULE orExpression)
      *     | $(RULE andAndExpression) $(LITERAL '&&') $(RULE orExpression)
@@ -1111,7 +1111,7 @@ class Parser
     IdType parseBasicType()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-		return advance().type;
+        return advance().type;
     }
 
     /**
@@ -3425,7 +3425,7 @@ class Parser
 
     /**
      * Parses a MulExpression.
-	 *
+     *
      * $(GRAMMAR $(RULEDEF mulExpression):
      *       $(RULE powExpression)
      *     | $(RULE mulExpression) ($(LITERAL '*') | $(LITERAL '/') | $(LITERAL '%')) $(RULE powExpression)
@@ -3887,12 +3887,12 @@ class Parser
         }
         while (moreTokens())
         {
-			if (currentIs(tok!"..."))
-			{
-				advance();
-				node.hasVarargs = true;
-				break;
-			}
+            if (currentIs(tok!"..."))
+            {
+                advance();
+                node.hasVarargs = true;
+                break;
+            }
             if (currentIs(tok!")"))
                 break;
             auto param = parseParameter();
