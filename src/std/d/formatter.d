@@ -2173,12 +2173,6 @@ class Formatter(Sink)
         }
     }
 
-    void format(const Operand operand)
-    {
-        debug(verbose) writeln("Operand");
-        assert(false);
-    }
-
     void format(const Operands operands)
     {
         debug(verbose) writeln("Operands");

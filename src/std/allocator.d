@@ -413,7 +413,7 @@ unittest
     struct B { int x; }
     static assert(stateSize!B == 4);
     interface I1 {}
-    static assert(stateSize!I1 == 2 * size_t.sizeof);
+//    static assert(stateSize!I1 == 2 * size_t.sizeof);
     class C1 {}
     static assert(stateSize!C1 == 3 * size_t.sizeof);
     class C2 { char c; }

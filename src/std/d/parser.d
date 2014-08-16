@@ -392,6 +392,7 @@ alias core.sys.posix.stdio.fileno fileno;
      */
     ExpressionNode parseAsmAddExp()
     {
+        mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmAddExp, AsmMulExp,
             tok!"+", tok!"-")();
     }
@@ -400,13 +401,14 @@ alias core.sys.posix.stdio.fileno fileno;
      * Parses an AsmAndExp
      *
      * $(GRAMMAR $(RULEDEF asmAndExp):
-     *     $(RULE asmEqualExp) ($(LITERAL '&') $(RULE asmEqualExp))?
+     *       $(RULE asmEqualExp)
+     *     | $(RULE asmAndExp) $(LITERAL '&') $(RULE asmEqualExp)
      *     ;)
      */
-    AsmAndExp parseAsmAndExp()
+    ExpressionNode parseAsmAndExp()
     {
-//        auto node = allocate!AsmAndExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmAndExp, AsmEqualExp, tok!"&");
     }
 
     /**
@@ -419,21 +421,53 @@ alias core.sys.posix.stdio.fileno fileno;
      */
     AsmBrExp parseAsmBrExp()
     {
-//        auto node = allocate!AsmBrExp;
-        assert (false, "asm"); // TODO asm
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        AsmBrExp brExp = allocate!AsmBrExp();
+        size_t line = current.line;
+        size_t column = current.column;
+        if (currentIs(tok!"["))
+        {
+            advance(); // [
+            if ((brExp.asmExp = parseAsmExp()) is null)
+                return null;
+            if (expect(tok!"]") is null)
+                return null;
+        }
+        else
+        {
+            if ((brExp.asmUnaExp = parseAsmUnaExp()) is null)
+                return null;
+            while (currentIs(tok!"["))
+            {
+                AsmBrExp br = allocate!AsmBrExp(); // huehuehuehue
+                br.asmBrExp = brExp;
+                br.line = current().line;
+                br.column = current().column;
+                brExp = br;
+                brExp.line = line;
+                brExp.column = column;
+                advance(); // [
+                if ((brExp.asmExp = parseAsmExp()) is null)
+                    return null;
+                if (expect(tok!"]") is null)
+                    return null;
+            }
+        }
+        return brExp;
     }
 
     /**
      * Parses an AsmEqualExp
      *
      * $(GRAMMAR $(RULEDEF asmEqualExp):
-     *     $(RULE asmRelExp) (('==' | '!=') $(RULE asmRelExp))?
+     *       $(RULE asmRelExp)
+     *     | $(RULE asmEqualExp) ('==' | '!=') $(RULE asmRelExp)
      *     ;)
      */
-    AsmEqualExp parseAsmEqualExp()
+    ExpressionNode parseAsmEqualExp()
     {
-//        auto node = allocate!AsmEqualExp;
-        assert (false, "asm"); // TODO asm
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmEqualExp, AsmRelExp, tok!"==", tok!"!=")();
     }
 
     /**
@@ -443,10 +477,21 @@ alias core.sys.posix.stdio.fileno fileno;
      *     $(RULE asmLogOrExp) ($(LITERAL '?') $(RULE asmExp) $(LITERAL ':') $(RULE asmExp))?
      *     ;)
      */
-    AsmExp parseAsmExp()
+    ExpressionNode parseAsmExp()
     {
-//        auto node = allocate!AsmExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        AsmExp asmExp = allocate!AsmExp;
+        asmExp.left = parseAsmLogOrExp();
+        if (asmExp.left is null)
+            return null;
+        if (currentIs(tok!"?"))
+        {
+            advance();
+            if ((asmExp.middle = parseAsmExp()) is null) return null;
+            if (expect(tok!":") is null) return null;
+            if ((asmExp.right = parseAsmExp()) is null) return null;
+        }
+        return asmExp;
     }
 
     /**
@@ -457,66 +502,92 @@ alias core.sys.posix.stdio.fileno fileno;
      *     | $(LITERAL 'align') $(LITERAL IntegerLiteral)
      *     | $(LITERAL 'align') $(LITERAL Identifier)
      *     | $(LITERAL Identifier) $(LITERAL ':') $(RULE asmInstruction)
-     *     | $(LITERAL Identifier) $(RULE asmExp)
      *     | $(LITERAL Identifier) $(RULE operands)
      *     ;)
      */
     AsmInstruction parseAsmInstruction()
     {
-//        auto node = allocate!AsmInstruction;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        AsmInstruction node = allocate!AsmInstruction;
+        if (currentIs(tok!"align"))
+        {
+            advance(); // align
+            node.hasAlign = true;
+            if (currentIsOneOf(tok!"intLiteral", tok!"identifier"))
+                node.identifierOrIntegerOrOpcode = advance();
+            else
+                error("Identifier or integer literal expected.");
+        }
+        else if (currentIs(tok!"identifier"))
+        {
+            node.identifierOrIntegerOrOpcode = advance();
+            if (currentIs(tok!":"))
+            {
+                advance(); // :
+                if ((node.asmInstruction = parseAsmInstruction()) is null)
+                    return null;
+            }
+            else if (!currentIs(tok!";"))
+                if ((node.operands = parseOperands()) is null)
+                    return null;
+        }
+        return node;
     }
 
     /**
      * Parses an AsmLogAndExp
      *
      * $(GRAMMAR $(RULEDEF asmLogAndExp):
-     *     $(RULE asmOrExp) ('&&' $(RULE asmOrExp))?
+     *     $(RULE asmOrExp)
+     *     $(RULE asmLogAndExp) $(LITERAL '&&') $(RULE asmOrExp)
      *     ;)
      */
-    AsmLogAndExp parseAsmLogAndExp()
+    ExpressionNode parseAsmLogAndExp()
     {
-//        auto node = allocate!AsmLogAndExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmLogAndExp, AsmOrExp, tok!"&&");
     }
 
     /**
      * Parses an AsmLogOrExp
      *
      * $(GRAMMAR $(RULEDEF asmLogOrExp):
-     *     $(RULE asmLogAndExp) ('||' $(RULE asmLogAndExp))?
+     *       $(RULE asmLogAndExp)
+     *     | $(RULE asmLogOrExp) ('||' $(RULE asmLogAndExp))?
      *     ;)
      */
-    AsmLogOrExp parseAsmLogOrExp()
+    ExpressionNode parseAsmLogOrExp()
     {
-//        auto node = allocate!AsmLogOrExp;
-        assert (false, "asm"); // TODO asm
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmLogOrExp, AsmLogAndExp, tok!"||")();
     }
 
     /**
      * Parses an AsmMulExp
      *
      * $(GRAMMAR $(RULEDEF asmMulExp):
-     *     $(RULE asmBrExp) (($(LITERAL '*') | $(LITERAL '/') | $(LITERAL '%')) $(RULE asmBrExp))?
+     *       $(RULE asmBrExp)
+     *     | $(RULE asmMulExp) ($(LITERAL '*') | $(LITERAL '/') | $(LITERAL '%')) $(RULE asmBrExp)
      *     ;)
      */
-    AsmMulExp parseAsmMulExp()
+    ExpressionNode parseAsmMulExp()
     {
-//        auto node = allocate!AsmMulExp;
-        assert (false, "asm"); // TODO asm
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmMulExp, AsmBrExp, tok!"*", tok!"/", tok!"%")();
     }
 
     /**
      * Parses an AsmOrExp
      *
      * $(GRAMMAR $(RULEDEF asmOrExp):
-     *     $(RULE asmXorExp) ($(LITERAL '|') $(RULE asmXorExp))?
+     *       $(RULE asmXorExp)
+     *     | $(RULE asmOrExp) $(LITERAL '|') $(RULE asmXorExp)
      *     ;)
      */
-    AsmOrExp parseAsmOrExp()
+    ExpressionNode parseAsmOrExp()
     {
-//        auto node = allocate!AsmOrExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmOrExp, AsmXorExp, tok!"|")();
     }
 
     /**
@@ -532,34 +603,61 @@ alias core.sys.posix.stdio.fileno fileno;
      */
     AsmPrimaryExp parseAsmPrimaryExp()
     {
-//        auto node = allocate!AsmPrimaryExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        AsmPrimaryExp primary = allocate!AsmPrimaryExp();
+        switch (current().type)
+        {
+        case tok!"doubleLiteral":
+        case tok!"floatLiteral":
+        case tok!"intLiteral":
+        case tok!"longLiteral":
+        case tok!"stringLiteral":
+        case tok!"$":
+            primary.token = advance();
+            break;
+        case tok!"identifier":
+            if (peekIs(tok!"("))
+                primary.register = parseRegister();
+            else if (peekIs(tok!"."))
+                primary.identifierChain = parseIdentifierChain();
+            else
+                primary.token = advance();
+            break;
+        default:
+            error("Float literal, integer literal, $, or identifier expected.");
+            return null;
+        }
+        return primary;
     }
 
     /**
      * Parses an AsmRelExp
      *
      * $(GRAMMAR $(RULEDEF asmRelExp):
-     *     $(RULE asmShiftExp) (($(LITERAL '<') | $(LITERAL '<=') | $(LITERAL '>') | $(LITERAL '>=')) $(RULE asmShiftExp))?
+     *       $(RULE asmShiftExp)
+     *     | $(RULE asmRelExp) (($(LITERAL '<') | $(LITERAL '<=') | $(LITERAL '>') | $(LITERAL '>=')) $(RULE asmShiftExp))?
      *     ;)
      */
-    AsmRelExp parseAsmRelExp()
+    ExpressionNode parseAsmRelExp()
     {
-//        auto node = allocate!AsmRelExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmRelExp, AsmShiftExp, tok!"<",
+            tok!"<=", tok!">", tok!">=")();
     }
 
     /**
      * Parses an AsmShiftExp
      *
      * $(GRAMMAR $(RULEDEF asmShiftExp):
-     *     $(RULE asmAddExp) (($(LITERAL '<<') | $(LITERAL '>>') | $(LITERAL '>>>')) $(RULE asmAddExp))?
+     *     $(RULE asmAddExp)
+     *     $(RULE asmShiftExp) ($(LITERAL '<<') | $(LITERAL '>>') | $(LITERAL '>>>')) $(RULE asmAddExp)
      *     ;)
      */
-    AsmShiftExp parseAsmShiftExp()
+    ExpressionNode parseAsmShiftExp()
     {
-//        auto node = allocate!AsmShiftExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmShiftExp, AsmAddExp, tok!"<<",
+            tok!">>", tok!">>>");
     }
 
     /**
@@ -571,11 +669,22 @@ alias core.sys.posix.stdio.fileno fileno;
      */
     AsmStatement parseAsmStatement()
     {
-        // TODO asm
-        auto node = allocate!AsmStatement;
-        warn("Skipping assembly statement. Not supported.");
-        advance();
-        skipBraces();
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        AsmStatement node = allocate!AsmStatement;
+        AsmInstruction[] instructions;
+        advance(); // asm
+        advance(); // {
+        while (moreTokens() && !currentIs(tok!"}"))
+        {
+            AsmInstruction instruction = parseAsmInstruction();
+            if (instruction is null)
+                return null;
+            if (!expect(tok!";"))
+                return null;
+            instructions ~= instruction;
+        }
+        node.asmInstructions = ownArray(instructions);
+        expect(tok!"}");
         return node;
     }
 
@@ -594,8 +703,30 @@ alias core.sys.posix.stdio.fileno fileno;
      */
     AsmTypePrefix parseAsmTypePrefix()
     {
-//        auto node = allocate!AsmTypePrefix;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        switch (current().type)
+        {
+        case tok!"identifier":
+        case tok!"byte":
+        case tok!"short":
+        case tok!"int":
+        case tok!"float":
+        case tok!"double":
+        case tok!"real":
+            AsmTypePrefix prefix = allocate!AsmTypePrefix();
+            prefix.left = advance();
+            if (!currentIs(tok!"identifier"))
+            {
+                error("Identifier expected");
+                return null;
+            }
+            prefix.right = advance();
+            return prefix;
+        default:
+            error("Expected an identifier, 'byte', 'short', 'int', 'float', 'double', or 'real'");
+            return null;
+        }
+        assert (false);
     }
 
     /**
@@ -613,21 +744,48 @@ alias core.sys.posix.stdio.fileno fileno;
      */
     AsmUnaExp parseAsmUnaExp()
     {
-//        auto node = allocate!AsmUnaExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        AsmUnaExp unary = allocate!AsmUnaExp();
+        switch (current().type)
+        {
+        case tok!"+":
+        case tok!"-":
+        case tok!"!":
+        case tok!"~":
+            unary.prefix = advance();
+            if ((unary.asmUnaExp = parseAsmUnaExp()) is null)
+                return null;
+        case tok!"identifier":
+            if (current().text == "offsetof" || current().text == "seg")
+                unary.prefix = advance();
+            else if (peekIs(tok!"identifier"))
+            {
+                if ((unary.asmTypePrefix = parseAsmTypePrefix()) is null)
+                    return null;
+                break;
+            }
+            else
+                goto default;
+        default:
+            if ((unary.asmPrimaryExp = parseAsmPrimaryExp()) is null)
+                return null;
+            break;
+        }
+        return unary;
     }
 
     /**
      * Parses an AsmXorExp
      *
      * $(GRAMMAR $(RULEDEF asmXorExp):
-     *     $(RULE asmAndExp) ($(LITERAL '^') $(RULE asmAndExp))?
+     *       $(RULE asmAndExp)
+     *     | $(RULE asmXorExp) $(LITERAL '^') $(RULE asmAndExp)
      *     ;)
      */
-    AsmXorExp parseAsmXorExp()
+    ExpressionNode parseAsmXorExp()
     {
-//        auto node = allocate!AsmXorExp;
-        assert (false, "asm"); // TODO asm
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        return parseLeftAssocBinaryExpression!(AsmXorExp, AsmAndExp, tok!"^")();
     }
 
     /**
@@ -2964,17 +3122,17 @@ body {} // six
         ImportBind[] importBinds;
         while (moreTokens())
         {
-			auto b = parseImportBind();
-			if (b !is null)
-			{
-				importBinds ~= b;
-				if (currentIs(tok!","))
-					advance();
-				else
-					break;
-			}
-			else
-				break;
+            auto b = parseImportBind();
+            if (b !is null)
+            {
+                importBinds ~= b;
+                if (currentIs(tok!","))
+                    advance();
+                else
+                    break;
+            }
+            else
+                break;
         }
         node.importBinds = ownArray(importBinds);
         return node;
@@ -3149,8 +3307,8 @@ import core.stdc.stdio, std.string : KeepTerminator;
         auto node = allocate!InStatement;
         if (expect(tok!"in") is null) return null;
         node.blockStatement = parseBlockStatement();
-		if (node.blockStatement is null)
-			return null;
+        if (node.blockStatement is null)
+            return null;
         return node;
     }
 
@@ -3950,13 +4108,28 @@ invariant() foo();
      * Parses Operands
      *
      * $(GRAMMAR $(RULEDEF operands):
-     *     $(RULE asmExp)+
+     *       $(RULE asmExp)
+     *     | $(RULE asmExp), $(RULE operands)
      *     ;)
      */
     Operands parseOperands()
     {
-//        auto node = allocate!Operands;
-        assert (false, "asm"); // TODO asm
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        Operands node = allocate!Operands;
+        ExpressionNode[] expressions;
+        while (true)
+        {
+            ExpressionNode exp = parseAsmExp();
+            if (exp is null)
+                return null;
+            expressions ~= exp;
+            if (currentIs(tok!","))
+                advance();
+            else
+                break;
+        }
+        node.operands = ownArray(expressions);
+        return node;
     }
 
     /**
@@ -4009,8 +4182,8 @@ invariant() foo();
             expect(tok!")");
         }
         node.blockStatement = parseBlockStatement();
-		if (node.blockStatement is null)
-			return null;
+        if (node.blockStatement is null)
+            return null;
         return node;
     }
 
@@ -5556,7 +5729,7 @@ q{(int a, ...)
     ExpressionNode parseTernaryExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!TernaryExpression;
+        TernaryExpression node = allocate!TernaryExpression;
         node.orOrExpression = parseOrOrExpression();
         if (currentIs(tok!"?"))
         {

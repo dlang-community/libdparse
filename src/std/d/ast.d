@@ -39,13 +39,17 @@ public:
         else if (cast(AndExpression) n) visit(cast(AndExpression) n);
         else if (cast(AsmAddExp) n) visit(cast(AsmAddExp) n);
         else if (cast(AsmAndExp) n) visit(cast(AsmAndExp) n);
+        else if (cast(AsmBrExp) n) visit(cast(AsmBrExp) n);
+        else if (cast(AsmExp) n) visit(cast(AsmExp) n);
         else if (cast(AsmEqualExp) n) visit(cast(AsmEqualExp) n);
         else if (cast(AsmLogAndExp) n) visit(cast(AsmLogAndExp) n);
         else if (cast(AsmLogOrExp) n) visit(cast(AsmLogOrExp) n);
         else if (cast(AsmMulExp) n) visit(cast(AsmMulExp) n);
         else if (cast(AsmOrExp) n) visit(cast(AsmOrExp) n);
         else if (cast(AsmRelExp) n) visit(cast(AsmRelExp) n);
+        else if (cast(AsmUnaExp) n) visit(cast(AsmUnaExp) n);
         else if (cast(AsmShiftExp) n) visit(cast(AsmShiftExp) n);
+        else if (cast(AsmXorExp) n) visit(cast(AsmXorExp) n);
         else if (cast(AssertExpression) n) visit(cast(AssertExpression) n);
         else if (cast(AssignExpression) n) visit(cast(AssignExpression) n);
         else if (cast(CmpExpression) n) visit(cast(CmpExpression) n);
@@ -205,7 +209,6 @@ public:
     /** */ void visit(const NewAnonClassExpression newAnonClassExpression) { newAnonClassExpression.accept(this); }
     /** */ void visit(const NewExpression newExpression) { newExpression.accept(this); }
     /** */ void visit(const NonVoidInitializer nonVoidInitializer) { nonVoidInitializer.accept(this); }
-    /** */ void visit(const Operand operand) { operand.accept(this); }
     /** */ void visit(const Operands operands) { operands.accept(this); }
     /** */ void visit(const OrExpression orExpression) { orExpression.accept(this); }
     /** */ void visit(const OrOrExpression orOrExpression) { orOrExpression.accept(this); }
@@ -262,7 +265,7 @@ public:
     /** */ void visit(const TemplateValueParameterDefault templateValueParameterDefault) { templateValueParameterDefault.accept(this); }
     /** */ void visit(const TernaryExpression ternaryExpression) { ternaryExpression.accept(this); }
     /** */ void visit(const ThrowStatement throwStatement) { throwStatement.accept(this); }
-    /** */ void visit(const Token token) { }
+    /** */ void visit(const Token) { }
     /** */ void visit(const TraitsExpression traitsExpression) { traitsExpression.accept(this); }
     /** */ void visit(const TryStatement tryStatement) { tryStatement.accept(this); }
     /** */ void visit(const Type type) { type.accept(this); }
@@ -288,8 +291,6 @@ interface ASTNode
 public:
     /** */ void accept(ASTVisitor visitor) const;
 }
-
-immutable string DEFAULT_ACCEPT = q{override void accept(ASTVisitor visitor) const {}};
 
 template visitIfNotNull(fields ...)
 {
@@ -526,7 +527,10 @@ public:
 final class AsmAddExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin OpEquals;
     /** */ IdType operator;
     mixin BinaryExpressionBody;
@@ -536,19 +540,27 @@ public:
 final class AsmAndExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin OpEquals;
     mixin BinaryExpressionBody;
 }
 
 ///
-final class AsmBrExp : ASTNode
+final class AsmBrExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(asmBrExp, asmExp, asmUnaExp));
+    }
     mixin OpEquals;
+    size_t line;
+    size_t column;
     /** */ AsmBrExp asmBrExp;
-    /** */ AsmEqualExp asmEqualExp;
+    /** */ ExpressionNode asmExp;
     /** */ AsmUnaExp asmUnaExp;
 }
 
@@ -556,32 +568,41 @@ public:
 final class AsmEqualExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin BinaryExpressionBody;
     mixin OpEquals;
-    /** */ Token operator;
+    /** */ IdType operator;
 }
 
 ///
-final class AsmExp : ASTNode
+final class AsmExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, middle, right));
+    }
     mixin OpEquals;
-    /** */ AsmLogOrExp left;
-    /** */ AsmExp middle;
-    /** */ AsmExp right;
+    /** */ ExpressionNode left;
+    /** */ ExpressionNode middle;
+    /** */ ExpressionNode right;
 }
 
 ///
 final class AsmInstruction : ASTNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(identifierOrIntegerOrOpcode, asmInstruction, operands));
+    }
     mixin OpEquals;
     /** */ Token identifierOrIntegerOrOpcode;
     /** */ bool hasAlign;
-    /** */ AsmExp asmExp;
+    /** */ AsmInstruction asmInstruction;
     /** */ Operands operands;
 }
 
@@ -589,7 +610,10 @@ public:
 final class AsmLogAndExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin BinaryExpressionBody;
     mixin OpEquals;
 }
@@ -598,7 +622,10 @@ public:
 final class AsmLogOrExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin BinaryExpressionBody;
     mixin OpEquals;
 }
@@ -607,7 +634,10 @@ public:
 final class AsmMulExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     /** */ IdType operator;
     mixin BinaryExpressionBody;
     mixin OpEquals;
@@ -618,7 +648,10 @@ public:
 final class AsmOrExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin BinaryExpressionBody;
     mixin OpEquals;
 }
@@ -627,7 +660,10 @@ public:
 final class AsmPrimaryExp : ASTNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(token, register, identifierChain));
+    }
     /** */ IdentifierChain identifierChain;
     /** */ Register register;
     /** */ Token token;
@@ -638,9 +674,12 @@ public:
 final class AsmRelExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin BinaryExpressionBody;
-    /** */ Token operator;
+    /** */ IdType operator;
     mixin OpEquals;
 }
 
@@ -648,9 +687,12 @@ public:
 final class AsmShiftExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin BinaryExpressionBody;
-    /** */ Token operator;
+    /** */ IdType operator;
     mixin OpEquals;
 }
 
@@ -658,7 +700,10 @@ public:
 final class AsmStatement : ASTNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!asmInstructions);
+    }
     /** */ AsmInstruction[] asmInstructions;
     mixin OpEquals;
 }
@@ -667,7 +712,10 @@ public:
 final class AsmTypePrefix : ASTNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     /** */ Token left;
     /** */ Token right;
     mixin OpEquals;
@@ -677,7 +725,10 @@ public:
 final class AsmUnaExp : ASTNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(prefix, asmTypePrefix, asmExp, asmPrimaryExp, asmUnaExp));
+    }
     /** */ AsmTypePrefix asmTypePrefix;
     /** */ AsmExp asmExp;
     /** */ Token prefix;
@@ -687,10 +738,13 @@ public:
 }
 
 ///
-final class AsmXorExp : ASTNode
+final class AsmXorExp : ExpressionNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(left, right));
+    }
     mixin BinaryExpressionBody;
     mixin OpEquals;
 }
@@ -1971,7 +2025,7 @@ public:
     {
         mixin (visitIfNotNull!(scriptLine, moduleDeclaration, declarations));
     }
-	/** */ Token scriptLine;
+    /** */ Token scriptLine;
     /** */ ModuleDeclaration moduleDeclaration;
     /** */ Declaration[] declarations;
     mixin OpEquals;
@@ -1988,7 +2042,7 @@ public:
     /** */ IdentifierChain moduleName;
     /** */ size_t startLocation;
     /** */ size_t endLocation;
-	/** */ string comment;
+    /** */ string comment;
     mixin OpEquals;
 }
 
@@ -2100,20 +2154,14 @@ public:
 }
 
 ///
-final class Operand : ASTNode
-{
-public:
-    mixin (DEFAULT_ACCEPT);
-    /** */ AsmExp asmExp;
-    mixin OpEquals;
-}
-
-///
 final class Operands : ASTNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
-    /** */ Operand[] operands;
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(operands));
+    }
+    /** */ ExpressionNode[] operands;
     mixin OpEquals;
 }
 
@@ -2301,7 +2349,10 @@ public:
 final class Register : ASTNode
 {
 public:
-    mixin (DEFAULT_ACCEPT);
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(identifier, intLiteral));
+    }
     /** */ Token identifier;
     /** */ Token intLiteral;
     /** */ bool hasIntegerLiteral;
