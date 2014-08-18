@@ -1806,6 +1806,7 @@ class Parser
         case tok!"inout":
         case tok!"scope":
         case tok!"typeof":
+        case tok!"__vector":
         mixin (BASIC_TYPE_CASES);
         type:
             Type type = parseType();
@@ -5365,6 +5366,7 @@ class Parser
      *     | $(RULE symbol)
      *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE identifierOrTemplateChain))?
      *     | $(RULE typeConstructor) $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)')
+	 *     | $(RULE vector)
      *     ;)
      */
     Type2 parseType2()
@@ -5402,6 +5404,10 @@ class Parser
             if ((node.type = parseType()) is null) return null;
             if (expect(tok!")") is null) return null;
             break;
+		case tok!"__vector":
+			if ((node.vector = parseVector()) is null)
+				return null;
+			break;
         default:
             error("Basic type, type constructor, symbol, or typeof expected");
             return null;

@@ -2977,7 +2977,7 @@ public:
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(symbol, typeofExpression,
-            identifierOrTemplateChain, type));
+            identifierOrTemplateChain, type, vector));
     }
 
     /** */ IdType builtinType;
@@ -2986,6 +2986,7 @@ public:
     /** */ IdentifierOrTemplateChain identifierOrTemplateChain;
     /** */ IdType typeConstructor;
     /** */ Type type;
+    /** */ Vector vector;
     mixin OpEquals;
 }
 
