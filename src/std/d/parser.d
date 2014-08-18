@@ -550,13 +550,14 @@ class Parser
      * $(GRAMMAR $(RULEDEF asmPrimaryExp):
      *       $(LITERAL IntegerLiteral)
      *     | $(LITERAL FloatLiteral)
-     *     | $(RULE register)
+     *     | $(RULE register) ($(LITERAL ':') $(RULE asmExp))?
      *     | $(RULE identifierChain)
      *     | $(LITERAL '$')
      *     ;)
      */
     AsmPrimaryExp parseAsmPrimaryExp()
     {
+        import std.range : assumeSorted;
         mixin (traceEnterAndExit!(__FUNCTION__));
         AsmPrimaryExp primary = allocate!AsmPrimaryExp();
         switch (current().type)
@@ -570,8 +571,15 @@ class Parser
             primary.token = advance();
             break;
         case tok!"identifier":
-            if (peekIs(tok!"("))
-                primary.register = parseRegister();
+            if (assumeSorted(REGISTER_NAMES).equalRange(current().text).length > 0)
+            {
+                if ((primary.register = parseRegister()) is null) return null;
+                if (currentIs(tok!":"))
+                {
+                    advance();
+                    if ((primary.asmExp = parseAsmExp()) is null) return null;
+                }
+            }
             else if (peekIs(tok!"."))
                 primary.identifierChain = parseIdentifierChain();
             else
@@ -6096,13 +6104,17 @@ protected:
         switch (current.type)
         {
         case tok!"const":
-            return peekIsOneOf(tok!"shared", tok!")");
+            if (peekIs(tok!")")) return true;
+            return startsWith(tok!"const", tok!"shared", tok!")");
         case tok!"immutable":
             return peekIs(tok!")");
         case tok!"inout":
-            return peekIsOneOf(tok!"shared", tok!")");
+            if (peekIs(tok!")")) return true;
+            return startsWith(tok!"inout", tok!"shared", tok!")");
         case tok!"shared":
-            return peekIsOneOf(tok!"const", tok!"inout", tok!")");
+            if (peekIs(tok!")")) return true;
+            if (startsWith(tok!"shared", tok!"const", tok!")")) return true;
+            return startsWith(tok!"shared", tok!"inout", tok!")");
         default:
             return false;
         }
@@ -6710,6 +6722,24 @@ protected:
     {
         void trace(lazy string) {}
     }
+
+    // This list MUST BE MAINTAINED IN SORTED ORDER.
+    static immutable string[] REGISTER_NAMES = [
+        "AH", "AL", "AX", "BH", "BL", "BP", "BPL", "BX", "CH", "CL", "CR0", "CR2",
+        "CR3", "CR4", "CS", "CX", "DH", "DI", "DIL", "DL", "DR0", "DR1", "DR2",
+        "DR3", "DR6", "DR7", "DS", "DX", "EAX", "EBP", "EBX", "ECX", "EDI", "EDX",
+        "ES", "ESI", "ESP", "FS", "GS", "MM0", "MM1", "MM2", "MM3", "MM4", "MM5",
+        "MM6", "MM7", "R10", "R10B", "R10D", "R10W", "R11", "R11B", "R11D", "R11W",
+        "R12", "R12B", "R12D", "R12W", "R13", "R13B", "R13D", "R13W", "R14", "R14B",
+        "R14D", "R14W", "R15", "R15B", "R15D", "R15W", "R8", "R8B", "R8D", "R8W",
+        "R9", "R9B", "R9D", "R9W", "RAX", "RBP", "RBX", "RCX", "RDI", "RDX", "RSI",
+        "RSP", "SI", "SIL", "SP", "SPL", "SS", "ST", "TR3", "TR4", "TR5", "TR6",
+        "TR7", "XMM0", "XMM1", "XMM10", "XMM11", "XMM12", "XMM13", "XMM14", "XMM15",
+        "XMM2", "XMM3", "XMM4", "XMM5", "XMM6", "XMM7", "XMM8", "XMM9", "YMM0",
+        "YMM1", "YMM10", "YMM11", "YMM12", "YMM13", "YMM14", "YMM15", "YMM2",
+        "YMM3", "YMM4", "YMM5", "YMM6", "YMM7", "YMM8", "YMM9"
+    ];
+
 
     enum string BASIC_TYPE_CASES = q{
         case tok!"int":
