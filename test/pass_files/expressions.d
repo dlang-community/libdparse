@@ -71,4 +71,5 @@ void foo()
 	auto a = new (x, y, z) class A, B {};
 	assert (a);
 	assert (a, "b");
+	auto ptr = cast(const shared int*) &val;
 }
