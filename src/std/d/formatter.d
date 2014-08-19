@@ -1452,14 +1452,6 @@ class Formatter(Sink)
         }
     }
 
-    void format(const FunctionCallStatement functionCallStatement)
-    {
-        debug(verbose) writeln("FunctionCallStatement");
-
-        format(functionCallStatement.functionCallExpression);
-        put(";");
-    }
-
     void format(const FunctionDeclaration decl, const Attribute[] attrs = null)
     {
         debug(verbose) writeln("FunctionDeclaration");
@@ -2593,7 +2585,6 @@ class Formatter(Sink)
                 "staticAssertStatement",
                 "versionSpecification",
                 "debugSpecification",
-                "functionCallStatement",
                 "expressionStatement"
             );
 
