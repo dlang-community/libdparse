@@ -497,11 +497,6 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
 		output.put(t);
 		break;
 	}
-	foreach (message; lexer.messages)
-	{
-		import std.stdio;
-		writeln(message);
-	}
 	return output.data;
 }
 
