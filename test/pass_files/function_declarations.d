@@ -25,10 +25,15 @@ inout auto foo() { return 1; }
 
 int foo() pure { return 1; }
 int foo() const { return 1; }
+int foo() inout { return 1; }
+int foo() immutable { return 1; }
+int foo() shared { return 1; }
 int foo() const @safe { return 1; }
 int foo() const @safe nothrow { return 1; }
 
 auto a = function int (int a) { return a * 2; };
+auto a = function int (int a) pure { return a * 2; };
+auto a = function int (int a) @whatever { return a * 2; };
 auto a = function (int a) => a * 2;
 void bar()
 {
@@ -39,3 +44,4 @@ void bar()
 
 void cVarArg(int, ...);
 enum bool isInputRange = is(typeof((inout int = 0){}));
+auto a = b => b * 2;

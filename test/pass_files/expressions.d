@@ -65,6 +65,7 @@ void foo()
 	enum a = mixin("something");
 	enum a = mixin(nothing);
 	pragma(startaddress, b);
+	auto a = new int[100];
 	auto a = new class {};
 	auto a = new (x, y, z) class {};
 	auto a = new (x, y, z) class (c, d) {};

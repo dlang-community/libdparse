@@ -459,6 +459,7 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
 	size_t tokenCount;
 	while (!lexer.empty) switch (lexer.front.type)
 	{
+	case tok!"specialTokenSequence":
 	case tok!"whitespace":
 		lexer.popFront();
 		break;

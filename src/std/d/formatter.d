@@ -121,7 +121,7 @@ class Formatter(Sink)
                     format(type);
                     space();
                 }
-                format(name);
+                format(identifierList);
             }
             put(";");
         }
@@ -1557,7 +1557,11 @@ class Formatter(Sink)
     void format(const IdentifierList identifierList)
     {
         debug(verbose) writeln("IdentifierList");
-        assert(false);
+        foreach(count, ident; identifierList.identifiers)
+        {
+            if (count) put(", ");
+            put(ident.text);
+        }
     }
 
     void format(const IdentifierOrTemplateChain identifierOrTemplateChain)

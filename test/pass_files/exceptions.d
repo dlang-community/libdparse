@@ -17,4 +17,9 @@ void foo()
     } catch (Exception e) {
         doSomethingElse();
     }
+
+	try
+		doSomething();
+	finally
+		doSomethingElse();
 }

@@ -9,7 +9,7 @@ GREEN="\033[32m"
 RED="\033[31m"
 CYAN="\033[36m"
 
-echo -en "Compiling... "
+echo -en "Compiling tester... "
 dmd tester.d ../src/std/*.d ../src/std/d/*.d  -I../src/ || exit 1
 echo -e "${GREEN}DONE${NORMAL}"
 
@@ -61,3 +61,4 @@ for i in coverage/*.lst; do
 done
 
 rm -f tester tester.o
+rm -f lexer_sanity_check lexer_sanity_check.o

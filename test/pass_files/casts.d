@@ -7,3 +7,5 @@ auto a = cast(inout shared) b;
 auto a = cast(shared) b;
 auto a = cast(shared const) b;
 auto a = cast(shared inout) b;
+auto a = cast(shared inout int*) b;
+auto a = cast(int) b;

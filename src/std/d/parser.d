@@ -70,7 +70,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF aliasDeclaration):
      *       $(LITERAL 'alias') $(RULE aliasInitializer) $(LPAREN)$(LITERAL ',') $(RULE aliasInitializer)$(RPAREN)* $(LITERAL ';')
-     *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(LITERAL identifier) $(LITERAL ';')
+     *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(LITERAL identifierList) $(LITERAL ';')
      *     ;)
      */
     AliasDeclaration parseAliasDeclaration()
@@ -107,10 +107,7 @@ class Parser
             warn("Prefer the new \"'alias' identifier '=' type ';'\" syntax"
                 ~ " to the  old \"'alias' type identifier ';'\" syntax");
             if ((node.type = parseType()) is null) return null;
-            auto ident = expect(tok!"identifier");
-            if (ident is null)
-                return null;
-            node.name = *ident;
+            if ((node.identifierList = parseIdentifierList()) is null) return null;
         }
         if (expect(tok!";") is null) return null;
         return node;
@@ -1129,17 +1126,12 @@ class Parser
      *     $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(LITERAL '...') $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(RULE declarationsAndStatements)
      *     ;)
      */
-    CaseRangeStatement parseCaseRangeStatement(AssignExpression low = null)
+    CaseRangeStatement parseCaseRangeStatement(AssignExpression low)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CaseRangeStatement;
-        if (low is null)
-        {
-            expect(tok!"case");
-            node.low = parseAssignExpression();
-        }
-        else
-            node.low = low;
+        assert (low !is null);
+        node.low = low;
         if (expect(tok!":") is null) return null;
         if (expect(tok!"..") is null) return null;
         expect(tok!"case");
@@ -2169,6 +2161,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!EnumMember;
         node.comment = current.comment;
+        const(Token)* ident;
         if (currentIs(tok!"identifier"))
         {
             if (peekIsOneOf(tok!",", tok!"}"))
@@ -2185,6 +2178,9 @@ class Parser
         {
     type:
             node.type = parseType();
+            ident = expect(tok!"identifier");
+            if (ident is null) return null;
+            node.name = *ident;
     assign:
             expect(tok!"=");
             node.assignExpression = parseAssignExpression();
@@ -2512,22 +2508,6 @@ class Parser
     }
 
     /**
-     * Parses a FunctionCallStatement
-     *
-     * $(GRAMMAR $(RULEDEF functionCallStatement):
-     *     $(RULE functionCallExpression) $(LITERAL ';')
-     *     ;)
-     */
-    FunctionCallStatement parseFunctionCallStatement()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!FunctionCallStatement;
-        node.functionCallExpression = parseFunctionCallExpression();
-        if (expect(tok!";") is null) return null;
-        return node;
-    }
-
-    /**
      * Parses a FunctionDeclaration
      *
      * $(GRAMMAR $(RULEDEF functionDeclaration):
@@ -2687,6 +2667,34 @@ class Parser
             if (ident is null) return null;
             identifiers ~= *ident;
             if (currentIs(tok!"."))
+            {
+                advance();
+                continue;
+            }
+            else
+                break;
+        }
+        node.identifiers = ownArray(identifiers);
+        return node;
+    }
+
+    /**
+     * Parses an IdentifierList
+     *
+     * $(GRAMMAR $(RULEDEF identifierList):
+     *     $(LITERAL Identifier) ($(LITERAL ',') $(LITERAL Identifier))*
+     *     ;)
+     */
+    IdentifierList parseIdentifierList()
+    {
+        auto node = allocate!IdentifierList;
+        Token[] identifiers;
+        while (moreTokens())
+        {
+            auto ident = expect(tok!"identifier");
+            if (ident is null) return null;
+            identifiers ~= *ident;
+            if (currentIs(tok!","))
             {
                 advance();
                 continue;
@@ -3074,7 +3082,11 @@ class Parser
      * Parses an IsExpression
      *
      * $(GRAMMAR $(RULEDEF isExpression):
-     *     $(LITERAL'is') $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL Identifier)? (($(LITERAL ':') | $(LITERAL '==')) $(RULE typeSpecialization) ($(LITERAL ',') $(RULE templateParameterList))?)? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL'is') $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL identifier)? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL'is') $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL identifier)? $(LITERAL ':') $(RULE typeSpecialization) $(LITERAL '$(RPAREN)')
+     *     $(LITERAL'is') $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL identifier)? $(LITERAL '=') $(RULE typeSpecialization) $(LITERAL '$(RPAREN)')
+     *     $(LITERAL'is') $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL identifier)? $(LITERAL ':') $(RULE typeSpecialization) $(LITERAL ',') $(RULE templateParameterList) $(LITERAL '$(RPAREN)')
+     *     $(LITERAL'is') $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL identifier)? $(LITERAL '=') $(RULE typeSpecialization) $(LITERAL ',') $(RULE templateParameterList) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     IsExpression parseIsExpression()
@@ -3479,6 +3491,11 @@ class Parser
      */
     NewExpression parseNewExpression()
     {
+        // Parse ambiguity.
+        // auto a = new int[10];
+        //              ^^^^^^^
+        // auto a = new int[10];
+        //              ^^^****
         auto node = allocate!NewExpression;
         if (peekIsOneOf(tok!"class", tok!"("))
             node.newAnonClassExpression = parseNewAnonClassExpression();
@@ -5374,7 +5391,7 @@ class Parser
      *     | $(RULE symbol)
      *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE identifierOrTemplateChain))?
      *     | $(RULE typeConstructor) $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)')
-	 *     | $(RULE vector)
+     *     | $(RULE vector)
      *     ;)
      */
     Type2 parseType2()
@@ -5412,10 +5429,10 @@ class Parser
             if ((node.type = parseType()) is null) return null;
             if (expect(tok!")") is null) return null;
             break;
-		case tok!"__vector":
-			if ((node.vector = parseVector()) is null)
-				return null;
-			break;
+        case tok!"__vector":
+            if ((node.vector = parseVector()) is null)
+                return null;
+            break;
         default:
             error("Basic type, type constructor, symbol, or typeof expected");
             return null;
@@ -6241,14 +6258,6 @@ protected:
         scope(exit) goToBookmark(b);
 
         return parseDeclaration() !is null;
-    }
-
-    bool isStatement()
-    {
-        if (!moreTokens()) return false;
-        auto b = setBookmark();
-        scope (exit) goToBookmark(b);
-        return parseStatement() !is null;
     }
 
     bool isExpression()

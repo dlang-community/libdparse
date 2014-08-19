@@ -170,7 +170,6 @@ public:
     /** */ void visit(const FunctionAttribute functionAttribute) { functionAttribute.accept(this); }
     /** */ void visit(const FunctionBody functionBody) { functionBody.accept(this); }
     /** */ void visit(const FunctionCallExpression functionCallExpression) { functionCallExpression.accept(this); }
-    /** */ void visit(const FunctionCallStatement functionCallStatement) { functionCallStatement.accept(this); }
     /** */ void visit(const FunctionDeclaration functionDeclaration) { functionDeclaration.accept(this); }
     /** */ void visit(const FunctionLiteralExpression functionLiteralExpression) { functionLiteralExpression.accept(this); }
     /** */ void visit(const GotoStatement gotoStatement) { gotoStatement.accept(this); }
@@ -387,12 +386,12 @@ final class AliasDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(storageClasses, type, name, initializers));
+        mixin (visitIfNotNull!(storageClasses, type, identifierList, initializers));
     }
     mixin OpEquals;
     /** */ StorageClass[] storageClasses;
     /** */ Type type;
-    /** */ Token name;
+    /** */ IdentifierList identifierList;
     /** */ AliasInitializer[] initializers;
     /** */ string comment;
 }
@@ -1560,18 +1559,6 @@ public:
 }
 
 ///
-final class FunctionCallStatement : ASTNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(functionCallExpression));
-    }
-    /** */ FunctionCallExpression functionCallExpression;
-    mixin OpEquals;
-}
-
-///
 final class FunctionDeclaration : ASTNode
 {
 public:
@@ -2107,7 +2094,7 @@ public:
             synchronizedStatement, tryStatement, throwStatement,
             scopeGuardStatement, asmStatement, conditionalStatement,
             staticAssertStatement, versionSpecification, debugSpecification,
-            functionCallStatement, expressionStatement));
+            expressionStatement));
     }
     /** */ LabeledStatement labeledStatement;
     /** */ BlockStatement blockStatement;
@@ -2132,7 +2119,6 @@ public:
     /** */ StaticAssertStatement staticAssertStatement;
     /** */ VersionSpecification versionSpecification;
     /** */ DebugSpecification debugSpecification;
-    /** */ FunctionCallStatement functionCallStatement;
     /** */ ExpressionStatement expressionStatement;
     mixin OpEquals;
 }

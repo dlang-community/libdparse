@@ -1,6 +1,7 @@
 alias a = b;
 alias b a;
 alias int b;
+alias int b, c, d, e;
 alias c = int;
 alias x = y, w = z;
 alias const immutable int constInt;
