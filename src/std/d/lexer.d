@@ -497,6 +497,11 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
 		output.put(t);
 		break;
 	}
+	foreach (message; lexer.messages)
+	{
+		import std.stdio;
+		writeln(message);
+	}
 	return output.data;
 }
 
@@ -1545,7 +1550,6 @@ public struct DLexer
 		case '"':
 		case '?':
 		case '\\':
-		case '0':
 		case 'a':
 		case 'b':
 		case 'f':
@@ -1577,6 +1581,13 @@ public struct DLexer
 				}
 			}
 			break;
+		case '0':
+			if (!range.canPeek(1) || (range.canPeek(1) && range.peekAt(1) == '\''))
+			{
+				range.popFront();
+				break;
+			}
+			goto case;
 		case '1': .. case '7':
 			for (size_t i = 0; i < 3 && !range.empty && range.front >= '0' && range.front <= '7'; i++)
 				range.popFront();
