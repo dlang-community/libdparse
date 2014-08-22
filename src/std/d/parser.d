@@ -4633,11 +4633,14 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!StructDeclaration;
-        expect(tok!"struct");
+        auto t = expect(tok!"struct");
         if (currentIs(tok!"identifier"))
-        {
             node.name = advance();
-        }
+		else
+		{
+			node.name.line = t.line;
+			node.name.column = t.column;
+		}
         node.comment = comment;
         comment = null;
 
@@ -5841,7 +5844,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!UnionDeclaration;
         // grab line number even if it's anonymous
-        auto l = expect(tok!"union").line;
+        auto t = expect(tok!"union");
         if (currentIs(tok!"identifier"))
         {
             node.name = advance();
@@ -5857,7 +5860,8 @@ class Parser
         }
         else
         {
-            node.name.line = l;
+            node.name.line = t.line;
+            node.name.column = t.column;
     semiOrStructBody:
             if (currentIs(tok!";"))
                 advance();
