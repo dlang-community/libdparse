@@ -61,4 +61,3 @@ for i in coverage/*.lst; do
 done
 
 rm -f tester tester.o
-rm -f lexer_sanity_check lexer_sanity_check.o
