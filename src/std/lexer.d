@@ -10,7 +10,7 @@
  *
  * To write a _lexer using this API:
  * $(OL
- *     $(LI Create the string array costants for your language.
+ *     $(LI Create the string array constants for your language.
  *         $(UL
  *             $(LI $(LINK2 #.staticTokens, staticTokens))
  *             $(LI $(LINK2 #.dynamicTokens, dynamicTokens))
