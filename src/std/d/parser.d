@@ -222,10 +222,15 @@ class Parser
     ArgumentList parseArgumentList()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (!moreTokens)
+        {
+            error("argument list expected instead of EOF");
+            return null;
+        }
         size_t startLocation = current().index;
         auto ret= parseCommaSeparatedRule!(ArgumentList, AssignExpression)(true);
         ret.startLocation = startLocation;
-        ret.endLocation = current().index;
+        if (moreTokens) ret.endLocation = current().index;
         return ret;
     }
 
@@ -830,6 +835,11 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AssignExpression;
+        if (!moreTokens)
+        {
+            error("Assign expression expected instead of EOF");
+            return null;
+        }
         node.line = current().line;
         node.column = current().column;
         node.ternaryExpression = parseTernaryExpression();
@@ -873,6 +883,11 @@ class Parser
         auto node = allocate!AtAttribute;
         auto start = expect(tok!"@");
         if (start is null) return null;
+        if (!moreTokens)
+        {
+            error(`"(", or identifier expected`);
+            return null;
+        }
         node.startLocation = start.index;
         switch (current.type)
         {
@@ -891,7 +906,7 @@ class Parser
             error(`"(", or identifier expected`);
             return null;
         }
-        node.endLocation = current().index;
+        if (moreTokens) node.endLocation = current().index;
         return node;
     }
 
@@ -1628,6 +1643,11 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Declaration;
+        if (!moreTokens)
+        {
+            error("declaration expected instead of EOF");
+            return null;
+        }
         comment = current.comment;
         Attribute[] attributes;
         do
@@ -1650,6 +1670,12 @@ class Parser
                 attributes ~= attr;
         } while (moreTokens());
         node.attributes = ownArray(attributes);
+
+        if (!moreTokens)
+        {
+            error("declaration expected instead of EOF");
+            return null;
+        }
 
         switch (current.type)
         {
@@ -1728,7 +1754,7 @@ class Parser
                     {
                         goToBookmark(b);
                         error("Declaration expected");
-                        advance();
+                        if (moreTokens) advance();
                         return null;
                     }
                 }
@@ -2031,6 +2057,11 @@ class Parser
         node.comment = comment;
         comment = null;
         if (expect(tok!"~") is null) return null;
+        if (!moreTokens)
+        {
+            error("'this' expected");
+            return null;
+        }
         node.index = current.index;
         node.line = current.line;
         node.column = current.column;
@@ -2092,10 +2123,15 @@ class Parser
             while (moreTokens())
             {
                 if (!currentIsOneOf(tok!",", tok!"}"))
-                    enumMembers ~= parseEnumMember();
+                {
+                    auto member = parseEnumMember();
+                    if (member is null)
+                        return null;
+                    enumMembers ~= member;
+                }
                 else if (currentIs(tok!","))
                 {
-                    if (enumMembers[$ - 1].comment is null)
+                    if (enumMembers.length > 0 && enumMembers[$ - 1].comment is null)
                         enumMembers[$ - 1].comment = current.trailingComment;
                     advance();
                     continue;
@@ -2280,7 +2316,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ForStatement;
         if (expect(tok!"for") is null) return null;
-        node.startIndex = current().index;
+        if (!moreTokens) node.startIndex = current().index;
         if (expect(tok!"(") is null) return null;
 
         if (currentIs(tok!";"))
@@ -3440,7 +3476,8 @@ class Parser
         comment = null;
         auto end = expect(tok!";");
         node.startLocation = start.index;
-        node.endLocation = end.index;
+        if (end !is null)
+            node.endLocation = end.index;
         return node;
     }
 
@@ -3632,6 +3669,11 @@ class Parser
                 node.conditionalStatement = parseConditionalStatement();
             else if (peekIs(tok!"assert"))
                 node.staticAssertStatement = parseStaticAssertStatement();
+            else
+            {
+                error("'if' or 'assert' expected.");
+                return null;
+            }
             break;
         case tok!"identifier":
             if (peekIs(tok!":"))
@@ -4647,7 +4689,7 @@ class Parser
         if (currentIs(tok!"("))
         {
             node.templateParameters = parseTemplateParameters();
-            if (tokens[index] == tok!"if")
+            if (currentIs(tok!"if"))
                 node.constraint = parseConstraint();
             node.structBody = parseStructBody();
         }
@@ -5348,6 +5390,11 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Type;
+        if (!moreTokens)
+        {
+            error("type expected");
+            return null;
+        }
         switch (current.type)
         {
         case tok!"const":
@@ -5401,6 +5448,11 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Type2;
+        if (!moreTokens)
+        {
+            error("type2 expected instead of EOF");
+            return null;
+        }
         switch (current.type)
         {
         case tok!"identifier":
@@ -5790,7 +5842,8 @@ class Parser
             if (peekIs(tok!"is"))
                 break loop;
             index++;
-            bool jump =  (currentIs(tok!"(") && peekPastParens().type == tok!"(")
+            auto p = peekPastParens();
+            bool jump =  (currentIs(tok!"(") && p !is null && p.type == tok!"(")
                 || peekIs(tok!"(");
             index--;
             if (jump)
@@ -6381,6 +6434,7 @@ protected:
 
     bool currentIsMemberFunctionAttribute() const
     {
+        if (!moreTokens) return false;
         switch (current.type)
         {
         case tok!"const":
