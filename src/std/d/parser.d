@@ -5158,6 +5158,11 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TemplateSingleArgument;
+        if (!moreTokens)
+        {
+            error("template argument expected instead of EOF");
+            return null;
+        }
         switch (current.type)
         {
         case tok!"true":

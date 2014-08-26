@@ -4,7 +4,7 @@ import std.stdio;
 
 void main()
 {
-	foreach (i; 0 .. 500)
+	foreach (i; 0 .. 100)
 		writeRandomToken();
 }
 

@@ -1,7 +1,11 @@
 #!/bin/bash
 
+echo "Compiling fuzzer"
 dmd fuzzer.d -I../src/ ../src/std/d/*.d ../src/std/*.d || exit 1
+echo "Done"
+echo "Compiling parser"
 dmd -O -inline -g tester.d ../src/std/*.d ../src/std/d/*.d  -I../src/ || exit 1
+echo "Done"
 for i in $(seq 0 100000); do
 	./fuzzer > tokens.txt
 	./tester tokens.txt > output.txt 2>&1
