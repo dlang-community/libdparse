@@ -4014,6 +4014,7 @@ class Parser
      */
     ExpressionNode parsePowExpression()
     {
+        mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(PowExpression, UnaryExpression,
             tok!"^^")();
     }
