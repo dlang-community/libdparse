@@ -2474,7 +2474,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF functionBody):
      *       $(RULE blockStatement)
-     *     | ($(RULE inStatement) | $(RULE outStatement) | $(RULE outStatement) $(RULE inStatement) | $(RULE inStatement) $(RULE outStatement))? $(RULE bodyStatement)
+     *     | ($(RULE inStatement) | $(RULE outStatement) | $(RULE outStatement) $(RULE inStatement) | $(RULE inStatement) $(RULE outStatement))? $(RULE bodyStatement)?
      *     ;)
      */
     FunctionBody parseFunctionBody()
@@ -2501,7 +2501,10 @@ class Parser
                 if (currentIs(tok!"in"))
                     node.inStatement = parseInStatement();
             }
-            node.bodyStatement = parseBodyStatement();
+            // Allow function bodies without body statements because this is
+            // valid inside of interfaces.
+            if (currentIs(tok!"body"))
+                node.bodyStatement = parseBodyStatement();
         }
         return node;
     }
