@@ -1,0 +1,6 @@
+GRAMMAR = <pre class="grammar">$0</pre>
+RULEDEF = <span style="font-weight: bold">$0</span>
+RULE = <span>$0</span>
+LITERAL = <span style="font-weight: italic; color: blue;">$0</span>
+LREF = $0
+D_KEYWORD = $(B $0)

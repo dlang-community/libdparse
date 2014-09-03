@@ -115,8 +115,9 @@
 module std.lexer;
 
 /**
- * Template for determining the type used for a token type. Selects the smallest
- * unsigned integral type that is able to hold the value
+ * Template for determining the type used for a token type.
+ *
+ * Selects the smallest unsigned integral type that is able to hold the value
  * staticTokens.length + dynamicTokens.length + possibleDefaultTokens.length.
  * For example if there are 20 static tokens, 30 dynamic tokens,
  * and 10 possible default tokens, this template will alias itself to ubyte,
@@ -143,8 +144,9 @@ template TokenIdType(alias staticTokens, alias dynamicTokens,
 }
 
 /**
- * Looks up the string representation of the given token type. This is the
- * opposite of the function of the TokenId template.
+ * Looks up the string representation of the given token type.
+ *
+ * This is the opposite of the function of the TokenId template.
  * Params: type = the token type identifier
  * Examples:
  * ---
@@ -168,7 +170,6 @@ string tokenStringRepresentation(IdType, alias staticTokens, alias dynamicTokens
 
 unittest
 {
-    /// Fix https://github.com/Hackerpilot/Dscanner/issues/96
     alias IdType = TokenIdType!(["foo"], ["bar"], ["doo"]);
     enum tok(string token) = TokenId!(IdType, ["foo"], ["bar"], ["doo"], token);
     alias str = tokenStringRepresentation!(IdType, ["foo"], ["bar"], ["doo"]);
@@ -179,8 +180,9 @@ unittest
 }
 
 /**
- * Generates the token type identifier for the given symbol. There are two
- * special cases:
+ * Generates the token type identifier for the given symbol.
+ *
+ * There are two special cases:
  * $(UL
  *     $(LI If symbol is $(D_STRING ""), then the token identifier will be 0)
  *     $(LI If symbol is $(D_STRING "\0"), then the token identifier will be the maximum
@@ -322,6 +324,7 @@ public:
 
 /**
  * The implementation of the _lexer is contained within this mixin template.
+ *
  * To use it, this template should be mixed in to a struct that represents the
  * _lexer for your language. This struct should implement the following methods:
  * $(UL
@@ -333,7 +336,7 @@ public:
  *         most languages this will be the identifier lexing function. This
  *         should then be passed to the $(LREF Lexer) template mixin as the
  *         $(LINK2 #.defaultTokenFunction defaultTokenFunction) template
- *         parameter).
+ *         parameter.)
  *     $(LI A function that is able to determine if an identifier/keyword has
  *         come to an end. This function must return $(D_KEYWORD bool) and take
  *         a single $(D_KEYWORD size_t) argument representing the number of
