@@ -459,6 +459,9 @@ class Parser
      *     | $(LITERAL 'align') $(LITERAL Identifier)
      *     | $(LITERAL Identifier) $(LITERAL ':') $(RULE asmInstruction)
      *     | $(LITERAL Identifier) $(RULE operands)
+     *     | $(LITERAL 'in') $(RULE operands)
+     *     | $(LITERAL 'out') $(RULE operands)
+     *     | $(LITERAL 'int') $(RULE operands)
      *     ;)
      */
     AsmInstruction parseAsmInstruction()
@@ -474,10 +477,10 @@ class Parser
             else
                 error("Identifier or integer literal expected.");
         }
-        else if (currentIs(tok!"identifier"))
+        else if (currentIsOneOf(tok!"identifier", tok!"in", tok!"out", tok!"int"))
         {
             node.identifierOrIntegerOrOpcode = advance();
-            if (currentIs(tok!":"))
+            if (node.identifierOrIntegerOrOpcode == tok!"identifier" && currentIs(tok!":"))
             {
                 advance(); // :
                 if ((node.asmInstruction = parseAsmInstruction()) is null)
