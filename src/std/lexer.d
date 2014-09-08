@@ -322,6 +322,7 @@ public:
 
 /**
  * The implementation of the _lexer is contained within this mixin template.
+ *
  * To use it, this template should be mixed in to a struct that represents the
  * _lexer for your language. This struct should implement the following methods:
  * $(UL
@@ -333,7 +334,7 @@ public:
  *         most languages this will be the identifier lexing function. This
  *         should then be passed to the $(LREF Lexer) template mixin as the
  *         $(LINK2 #.defaultTokenFunction defaultTokenFunction) template
- *         parameter).
+ *         parameter.)
  *     $(LI A function that is able to determine if an identifier/keyword has
  *         come to an end. This function must return $(D_KEYWORD bool) and take
  *         a single $(D_KEYWORD size_t) argument representing the number of
