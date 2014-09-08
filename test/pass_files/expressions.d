@@ -22,9 +22,16 @@ auto a = [[10], [20]];
 auto a = [{1}];
 auto a = "string";
 auto a = "string" "concatenated";
+auto a = void.sizeof;
 auto a = int.mangleof;
 auto a = .x;
 auto a = const(int).mangleof;
+auto a = function(int a) { return a; };
+auto a = delegate(int a) { return a; };
+auto a = function() { return 100; };
+auto a = delegate() { return 100; };
+auto a = function { return 100; };
+auto a = delegate { return 100; };
 void foo()
 {
 	a = b;

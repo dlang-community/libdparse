@@ -2628,12 +2628,13 @@ class Parser
      */
     FunctionLiteralExpression parseFunctionLiteralExpression()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!FunctionLiteralExpression;
         if (currentIsOneOf(tok!"function", tok!"delegate"))
         {
             node.functionOrDelegate = advance().type;
             if (!currentIsOneOf(tok!"(", tok!"in", tok!"body",
-                tok!"out", tok!"}"))
+                tok!"out", tok!"{"))
             {
                 node.type = parseType();
                 if (node.type is null) return null;
@@ -3070,7 +3071,7 @@ class Parser
     Initializer parseInitializer()
     {
         auto node = allocate!Initializer;
-        if (currentIs(tok!"void"))
+        if (currentIs(tok!"void") && peekIsOneOf(tok!",", tok!";"))
             advance();
         else
             node.nonVoidInitializer = parseNonVoidInitializer();
@@ -4167,9 +4168,21 @@ class Parser
                     break;
                 }
                 else
+                {
+
                     goToBookmark(b);
+                    node.functionLiteralExpression = parseFunctionLiteralExpression();
+                    break;
+                }
             }
-            goto case;
+            else if (peekIs(tok!"{"))
+            {
+                trace("Funtion literal expression");
+                node.functionLiteralExpression = parseFunctionLiteralExpression();
+                break;
+            }
+            else
+                goto case;
         case tok!"{":
         case tok!"in":
         case tok!"out":

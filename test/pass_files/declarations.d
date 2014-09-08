@@ -33,6 +33,7 @@ static if (true):
 mixin ("int a;");
 mixin something;
 mixin something!A;
+mixin duff!(i, j, delegate { foo13(i); });
 mixin typeof(something!A).x;
 __vector(int[4]) intVector;
 ;
