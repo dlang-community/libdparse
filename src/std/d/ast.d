@@ -2738,6 +2738,15 @@ public:
     /** */ Declaration[] declarations;
     /** */ EponymousTemplateDeclaration eponymousTemplateDeclaration;
     /** */ string comment;
+	/**
+     * Byte position of the opening brace
+     */
+    size_t startLocation;
+
+    /**
+     * Byte position of the closing brace
+     */
+    size_t endLocation;
     mixin OpEquals;
 }
 

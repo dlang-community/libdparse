@@ -4999,7 +4999,8 @@ class Parser
         node.templateParameters = parseTemplateParameters();
         if (currentIs(tok!"if"))
             node.constraint = parseConstraint();
-        if (expect(tok!"{") is null) return null;
+        auto start = expect(tok!"{");
+        if (start is null) return null; else node.startLocation = start.index;
         Declaration[] declarations;
         while (moreTokens() && !currentIs(tok!"}"))
         {
@@ -5008,7 +5009,8 @@ class Parser
                 declarations ~= decl;
         }
         node.declarations = ownArray(declarations);
-        expect(tok!"}");
+        auto end = expect(tok!"}");
+        if (end !is null) node.endLocation = end.index;
         return node;
     }
 
@@ -5143,7 +5145,7 @@ class Parser
         auto node = allocate!TemplateParameters;
         if (expect(tok!"(") is null) return null;
         if (!currentIs(tok!")"))
-            node.templateParameterList = parseTemplateParameterList();
+            if ((node.templateParameterList = parseTemplateParameterList()) is null) return null;
         if (expect(tok!")") is null) return null;
         return node;
     }
