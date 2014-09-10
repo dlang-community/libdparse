@@ -3270,7 +3270,6 @@ class Parser
             return null;
         }
 
-            return null;
     lambda:
         if (expect(tok!"=>") is null) return null;
         if ((node.assignExpression = parseAssignExpression()) is null) return null;
