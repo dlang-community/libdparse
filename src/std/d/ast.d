@@ -1902,7 +1902,7 @@ final class LambdaExpression : ExpressionNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, parameters, functionAttributes,
+        mixin (visitIfNotNull!(identifier, returnType, parameters, functionAttributes,
             assignExpression));
     }
     /** */ IdType functionType;
@@ -1910,6 +1910,7 @@ public:
     /** */ Parameters parameters;
     /** */ FunctionAttribute[] functionAttributes;
     /** */ AssignExpression assignExpression;
+    /** */ Type returnType;
     mixin OpEquals;
 }
 

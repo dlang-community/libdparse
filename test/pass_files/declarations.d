@@ -35,6 +35,10 @@ mixin something;
 mixin something!A;
 mixin duff!(i, j, delegate { foo13(i); });
 mixin typeof(something!A).x;
+template mix(){
+	int x;
+}
+mixin .mix;
 __vector(int[4]) intVector;
 ;
 {

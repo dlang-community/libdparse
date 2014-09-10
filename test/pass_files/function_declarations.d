@@ -35,6 +35,8 @@ auto a = function int (int a) { return a * 2; };
 auto a = function int (int a) pure { return a * 2; };
 auto a = function int (int a) @whatever { return a * 2; };
 auto a = function (int a) => a * 2;
+auto a = (int a) => a * 2;
+auto a = function int (int a) => a * 2;
 void bar()
 {
 	doStuff(function int(int a) { return a / 2; });
