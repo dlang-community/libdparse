@@ -1757,7 +1757,6 @@ class Parser
                     {
                         goToBookmark(b);
                         error("Declaration expected");
-                        if (moreTokens) advance();
                         return null;
                     }
                 }
@@ -1884,8 +1883,6 @@ class Parser
             break;
         default:
             error("Declaration expected");
-            if (moreTokens())
-                advance();
             return null;
         }
         return node;
