@@ -1678,7 +1678,7 @@ class Parser
         {
             error("declaration expected instead of EOF");
             deallocate(node);
-            return null; }
+            return null;
         }
 
         switch (current.type)
