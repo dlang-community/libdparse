@@ -253,35 +253,6 @@ class Parser
     }
 
     /**
-     * Parses an ArrayInitializer.
-     *
-     * $(GRAMMAR $(RULEDEF arrayInitializer):
-     *       $(LITERAL '[') $(LITERAL ']')
-     *     | $(LITERAL '[') $(RULE arrayMemberInitialization) ($(LITERAL ',') $(RULE arrayMemberInitialization)?)* $(LITERAL ']')
-     *     ;)
-     */
-    ArrayInitializer parseArrayInitializer()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!ArrayInitializer;
-        if (expect(tok!"[") is null) { deallocate(node); return null; }
-        ArrayMemberInitialization[] arrayMemberInitializations;
-        while (moreTokens())
-        {
-            if (currentIs(tok!"]"))
-                break;
-            arrayMemberInitializations ~= parseArrayMemberInitialization();
-            if (currentIs(tok!","))
-                advance();
-            else
-                break;
-        }
-        node.arrayMemberInitializations = ownArray(arrayMemberInitializations);
-        if (expect(tok!"]") is null) { deallocate(node); return null; }
-        return node;
-    }
-
-    /**
      * Parses an ArrayLiteral.
      *
      * $(GRAMMAR $(RULEDEF arrayLiteral):
@@ -296,43 +267,6 @@ class Parser
         if (!currentIs(tok!"]"))
             node.argumentList = parseArgumentList();
         if (expect(tok!"]") is null) { deallocate(node); return null; }
-        return node;
-    }
-
-    /**
-     * Parses an ArrayMemberInitialization.
-     *
-     * $(GRAMMAR $(RULEDEF arrayMemberInitialization):
-     *     ($(RULE assignExpression) $(LITERAL ':'))? $(RULE nonVoidInitializer)
-     *     ;)
-     */
-    ArrayMemberInitialization parseArrayMemberInitialization()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!ArrayMemberInitialization;
-        switch (current.type)
-        {
-        case tok!"{":
-        case tok!"[":
-            node.nonVoidInitializer = parseNonVoidInitializer();
-            if (node.nonVoidInitializer is null) { deallocate(node); return null; }
-            break;
-        default:
-            auto assignExpression = parseAssignExpression();
-            if (assignExpression is null) { deallocate(node); return null; }
-            if (currentIs(tok!":"))
-            {
-                node.assignExpression = assignExpression;
-                advance();
-                node.nonVoidInitializer = parseNonVoidInitializer();
-                if (node.nonVoidInitializer is null) { deallocate(node); return null; }
-            }
-            else
-            {
-                node.nonVoidInitializer = allocate!NonVoidInitializer;
-                node.nonVoidInitializer.assignExpression = assignExpression;
-            }
-        }
         return node;
     }
 
@@ -3721,7 +3655,6 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF nonVoidInitializer):
      *       $(RULE assignExpression)
-     *     | $(RULE arrayInitializer)
      *     | $(RULE structInitializer)
      *     | $(RULE functionBody)
      *     ;)
@@ -3740,27 +3673,14 @@ class Parser
             else
                 node.structInitializer = parseStructInitializer();
         }
-        else if (currentIs(tok!"["))
-        {
-            auto b = peekPastBrackets();
-            if (b !is null && (b.type == tok!","
-                || b.type == tok!")"
-                || b.type == tok!"]"
-                || b.type == tok!"}"
-                || b.type == tok!";"))
-            {
-                node.arrayInitializer = parseArrayInitializer();
-            }
-            else
-                node.assignExpression = parseAssignExpression();
-        }
         else if (currentIsOneOf(tok!"in", tok!"out", tok!"body"))
             node.functionBody = parseFunctionBody();
         else
             node.assignExpression = parseAssignExpression();
-        if (node.assignExpression is null && node.arrayInitializer is null
-        && node.structInitializer is null && node.functionBody is null)
+        if (node.assignExpression is null && node.structInitializer is null
+            && node.functionBody is null)
         {
+            deallocate(node);
             return null;
         }
         return node;
@@ -3783,7 +3703,10 @@ class Parser
         {
             ExpressionNode exp = parseAsmExp();
             if (exp is null)
+            {
+                deallocate(node);
                 return null;
+            }
             expressions ~= exp;
             if (currentIs(tok!","))
                 advance();

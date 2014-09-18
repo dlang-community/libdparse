@@ -96,9 +96,7 @@ public:
     /** */ void visit(const AndExpression andExpression) { andExpression.accept(this); }
     /** */ void visit(const ArgumentList argumentList) { argumentList.accept(this); }
     /** */ void visit(const Arguments arguments) { arguments.accept(this); }
-    /** */ void visit(const ArrayInitializer arrayInitializer) { arrayInitializer.accept(this); }
     /** */ void visit(const ArrayLiteral arrayLiteral) { arrayLiteral.accept(this); }
-    /** */ void visit(const ArrayMemberInitialization arrayMemberInitialization) { arrayMemberInitialization.accept(this); }
     /** */ void visit(const AsmAddExp asmAddExp) { asmAddExp.accept(this); }
     /** */ void visit(const AsmAndExp asmAndExp) { asmAndExp.accept(this); }
     /** */ void visit(const AsmBrExp asmBrExp) { asmBrExp.accept(this); }
@@ -486,18 +484,6 @@ public:
 }
 
 ///
-final class ArrayInitializer : ASTNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(arrayMemberInitializations));
-    }
-    mixin OpEquals;
-    /** */ ArrayMemberInitialization[] arrayMemberInitializations;
-}
-
-///
 final class ArrayLiteral : ASTNode
 {
 public:
@@ -507,19 +493,6 @@ public:
     }
     mixin OpEquals;
     /** */ ArgumentList argumentList;
-}
-
-///
-final class ArrayMemberInitialization : ASTNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(assignExpression, nonVoidInitializer));
-    }
-    mixin OpEquals;
-    /** */ AssignExpression assignExpression;
-    /** */ NonVoidInitializer nonVoidInitializer;
 }
 
 ///
@@ -2130,11 +2103,9 @@ final class NonVoidInitializer : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(assignExpression, arrayInitializer,
-            structInitializer, functionBody));
+        mixin (visitIfNotNull!(assignExpression, structInitializer, functionBody));
     }
     /** */ AssignExpression assignExpression;
-    /** */ ArrayInitializer arrayInitializer;
     /** */ StructInitializer structInitializer;
     /** */ FunctionBody functionBody;
 
