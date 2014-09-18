@@ -312,8 +312,21 @@ class Parser
         auto node = allocate!ArrayMemberInitialization;
         switch (current.type)
         {
-        case tok!"{":
         case tok!"[":
+            auto b = setBookmark();
+            skipBrackets();
+            if (currentIs(tok!":"))
+            {
+                node.assignExpression = parseAssignExpression();
+                advance(); // :
+                if (node.nonVoidInitializer is null) { deallocate(node); return null; }
+            }
+            else
+            {
+                goToBookmark(b);
+                goto case;
+            }
+        case tok!"{":
             node.nonVoidInitializer = parseNonVoidInitializer();
             if (node.nonVoidInitializer is null) { deallocate(node); return null; }
             break;

@@ -79,7 +79,8 @@ void foo()
 	auto a = new (x, y, z) class A, B {};
 	assert (a);
 	assert (a, "b");
+	assert((lower & upper).empty);
 	auto ptr = cast(const shared int*) &val;
 	(cast(Node*) data.ptr).next = null;
-//	int[int[string]] aa5 = [["a":1]:2, ["b":3]:4];
+	int[int[string]] aa5 = [["a":1]:2, ["b":3]:4];
 }
