@@ -1905,7 +1905,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DeclarationsAndStatements;
         DeclarationOrStatement[] declarationsAndStatements;
-        while (!currentIsOneOf(tok!"}") && moreTokens() && errorCount < MAX_ERRORS)
+        while (!currentIsOneOf(tok!"}") && moreTokens() && suppressedErrorCount <= MAX_ERRORS)
         {
             auto dos = parseDeclarationOrStatement();
             if (dos !is null)
@@ -4967,7 +4967,7 @@ class Parser
         auto t = parseType();
         if (t !is null && currentIsOneOf(tok!",", tok!")"))
         {
-            abandonBookmark();
+            abandonBookmark(b);
             node.type = t;
         }
         else
@@ -5711,8 +5711,7 @@ class Parser
             auto type = parseType();
             if (type !is null && currentIs(tok!"]"))
             {
-                goToBookmark(bookmark);
-                type = parseType();
+                abandonBookmark(bookmark);
                 node.type = type;
             }
             else
@@ -5767,9 +5766,8 @@ class Parser
         }
         else
         {
-            goToBookmark(b);
-            node.type = parseType();
-            if (node.type is null) { deallocate(node); return null; }
+            abandonBookmark(b);
+            node.type = t;
         }
         expect(tok!")");
         return node;
@@ -5882,7 +5880,6 @@ class Parser
             if (startsWith(tok!".", tok!"identifier"))
             {
                 // go back to the (
-                index = b;
                 advance();
                 auto t = parseType();
                 if (t is null || !currentIs(tok!")"))
@@ -5890,6 +5887,7 @@ class Parser
                     goToBookmark(b);
                     goto default;
                 }
+                abandonBookmark(b);
                 node.type = t;
                 advance(); // )
                 advance(); // .
@@ -6594,7 +6592,7 @@ protected:
     void error(string message, bool shouldAdvance = true)
     {
         import std.stdio;
-        if (suppressMessages <= 0)
+        if (suppressMessages == 0)
         {
             ++errorCount;
             auto column = index < tokens.length ? tokens[index].column : tokens[$ - 1].column;
@@ -6654,6 +6652,7 @@ protected:
 
     void skipParens()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         skip!(tok!"(", tok!")")();
     }
 
@@ -6791,24 +6790,28 @@ protected:
         return true;
     }
 
-    size_t setBookmark()
+    alias Bookmark = size_t;
+
+    Bookmark setBookmark()
     {
 //        mixin(traceEnterAndExit!(__FUNCTION__));
-        suppressMessages++;
+        ++suppressMessages;
         return index;
     }
 
-    void abandonBookmark() nothrow
-    {
-        --suppressMessages;
-    }
-
-    void goToBookmark(size_t i) nothrow
+    void abandonBookmark(Bookmark bookmark) nothrow
     {
         --suppressMessages;
         if (suppressMessages == 0)
             suppressedErrorCount = 0;
-        index = i;
+    }
+
+    void goToBookmark(Bookmark bookmark) nothrow
+    {
+        --suppressMessages;
+        if (suppressMessages == 0)
+            suppressedErrorCount = 0;
+        index = bookmark;
     }
 
     template simpleParse(NodeType, parts ...)
