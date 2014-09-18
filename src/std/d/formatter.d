@@ -225,6 +225,24 @@ class Formatter(Sink)
         put(")");
     }
 
+    void format(const ArrayInitializer arrayInitializer)
+    {
+        debug(verbose) writeln("ArrayInitializer");
+
+        /**
+        ArrayMemberInitialization[] arrayMemberInitializations;
+        **/
+
+        put("[");
+        foreach(count, init; arrayInitializer.arrayMemberInitializations)
+        {
+            format(init);
+            if (count < arrayInitializer.arrayMemberInitializations.length - 1)
+                put(", ");
+        }
+        put("]");
+    }
+
     void format(const ArrayLiteral arrayLiteral)
     {
         debug(verbose) writeln("ArrayLiteral");
@@ -236,6 +254,28 @@ class Formatter(Sink)
         if (arrayLiteral.argumentList)
             format(arrayLiteral.argumentList);
         put("]");
+    }
+
+    void format(const ArrayMemberInitialization arrayMemberInitialization)
+    {
+        debug(verbose) writeln("ArrayMemberInitialization");
+
+        /**
+        AssignExpression assignExpression;
+        NonVoidInitializer nonVoidInitializer;
+        **/
+
+        with(arrayMemberInitialization)
+        {
+            if (assignExpression)
+            {
+                format(assignExpression);
+                put(":");
+            }
+            if (nonVoidInitializer)
+                format(nonVoidInitializer);
+
+        }
     }
 
     void format(const AsmAddExp asmAddExp)
@@ -2124,6 +2164,7 @@ class Formatter(Sink)
         with(nonVoidInitializer)
         {
             if (assignExpression) format(assignExpression);
+            else if (arrayInitializer) format(arrayInitializer);
             else if (structInitializer) format(structInitializer);
         }
     }
