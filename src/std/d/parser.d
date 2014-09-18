@@ -4113,7 +4113,6 @@ class Parser
                 }
                 else
                 {
-
                     goToBookmark(b);
                     node.functionLiteralExpression = parseFunctionLiteralExpression();
                     break;
@@ -5803,6 +5802,8 @@ class Parser
             if (startsWith(tok!".", tok!"identifier"))
             {
                 // go back to the (
+                goToBookmark(b);
+                b = setBookmark();
                 advance();
                 auto t = parseType();
                 if (t is null || !currentIs(tok!")"))
