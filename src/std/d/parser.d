@@ -77,7 +77,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AliasDeclaration;
-        if (expect(tok!"alias") is null) return null;
+        if (expect(tok!"alias") is null) { deallocate(node); return null; }
         node.comment = comment;
         comment = null;
 
@@ -87,7 +87,7 @@ class Parser
             do
             {
                 auto initializer = parseAliasInitializer();
-                if (initializer is null) return null;
+                if (initializer is null) { deallocate(node); return null; }
                 initializers ~= initializer;
                 if (currentIs(tok!","))
                     advance();
@@ -106,10 +106,10 @@ class Parser
                 node.storageClasses = ownArray(storageClasses);
             warn("Prefer the new \"'alias' identifier '=' type ';'\" syntax"
                 ~ " to the  old \"'alias' type identifier ';'\" syntax");
-            if ((node.type = parseType()) is null) return null;
-            if ((node.identifierList = parseIdentifierList()) is null) return null;
+            if ((node.type = parseType()) is null) { deallocate(node); return null; }
+            if ((node.identifierList = parseIdentifierList()) is null) { deallocate(node); return null; }
         }
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -125,11 +125,11 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AliasInitializer;
         auto i = expect(tok!"identifier");
-        if (i is null) return null;
+        if (i is null) { deallocate(node); return null; }
         node.name = *i;
         if (currentIs(tok!"("))
             node.templateParameters = parseTemplateParameters();
-        if (expect(tok!"=") is null) return null;
+        if (expect(tok!"=") is null) { deallocate(node); return null; }
         StorageClass[] storageClasses;
         while (moreTokens() && isStorageClass())
             storageClasses ~= parseStorageClass();
@@ -150,12 +150,12 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AliasThisDeclaration;
-        if (expect(tok!"alias") is null) return null;
+        if (expect(tok!"alias") is null) { deallocate(node); return null; }
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
-        if (expect(tok!"this") is null) return null;
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!"this") is null) { deallocate(node); return null; }
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -173,11 +173,11 @@ class Parser
         expect(tok!"align");
         if (currentIs(tok!"("))
         {
-            if (expect(tok!"(") is null) return null;
+            if (expect(tok!"(") is null) { deallocate(node); return null; }
             auto intLit = expect(tok!"intLiteral");
-            if (intLit is null) return null;
+            if (intLit is null) { deallocate(node); return null; }
             node.intLiteral = *intLit;
-            if (expect(tok!")") is null) return null;
+            if (expect(tok!")") is null) { deallocate(node); return null; }
         }
         return node;
     }
@@ -245,10 +245,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Arguments;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         if (!currentIs(tok!")"))
             node.argumentList = parseArgumentList();
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -264,7 +264,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ArrayInitializer;
-        if (expect(tok!"[") is null) return null;
+        if (expect(tok!"[") is null) { deallocate(node); return null; }
         ArrayMemberInitialization[] arrayMemberInitializations;
         while (moreTokens())
         {
@@ -277,7 +277,7 @@ class Parser
                 break;
         }
         node.arrayMemberInitializations = ownArray(arrayMemberInitializations);
-        if (expect(tok!"]") is null) return null;
+        if (expect(tok!"]") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -292,10 +292,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ArrayLiteral;
-        if (expect(tok!"[") is null) return null;
+        if (expect(tok!"[") is null) { deallocate(node); return null; }
         if (!currentIs(tok!"]"))
             node.argumentList = parseArgumentList();
-        if (expect(tok!"]") is null) return null;
+        if (expect(tok!"]") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -315,17 +315,17 @@ class Parser
         case tok!"{":
         case tok!"[":
             node.nonVoidInitializer = parseNonVoidInitializer();
-            if (node.nonVoidInitializer is null) return null;
+            if (node.nonVoidInitializer is null) { deallocate(node); return null; }
             break;
         default:
             auto assignExpression = parseAssignExpression();
-            if (assignExpression is null) return null;
+            if (assignExpression is null) { deallocate(node); return null; }
             if (currentIs(tok!":"))
             {
                 node.assignExpression = assignExpression;
                 advance();
                 node.nonVoidInitializer = parseNonVoidInitializer();
-                if (node.nonVoidInitializer is null) return null;
+                if (node.nonVoidInitializer is null) { deallocate(node); return null; }
             }
             else
             {
@@ -436,18 +436,18 @@ class Parser
     ExpressionNode parseAsmExp()
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
-        AsmExp asmExp = allocate!AsmExp;
-        asmExp.left = parseAsmLogOrExp();
-        if (asmExp.left is null)
+        AsmExp node = allocate!AsmExp;
+        node.left = parseAsmLogOrExp();
+        if (node.left is null)
             return null;
         if (currentIs(tok!"?"))
         {
             advance();
-            if ((asmExp.middle = parseAsmExp()) is null) return null;
-            if (expect(tok!":") is null) return null;
-            if ((asmExp.right = parseAsmExp()) is null) return null;
+            if ((node.middle = parseAsmExp()) is null) { deallocate(node); return null; }
+            if (expect(tok!":") is null) { deallocate(node); return null; }
+            if ((node.right = parseAsmExp()) is null) { deallocate(node); return null; }
         }
-        return asmExp;
+        return node;
     }
 
     /**
@@ -564,7 +564,7 @@ class Parser
     {
         import std.range : assumeSorted;
         mixin (traceEnterAndExit!(__FUNCTION__));
-        AsmPrimaryExp primary = allocate!AsmPrimaryExp();
+        AsmPrimaryExp node = allocate!AsmPrimaryExp();
         switch (current().type)
         {
         case tok!"doubleLiteral":
@@ -573,28 +573,28 @@ class Parser
         case tok!"longLiteral":
         case tok!"stringLiteral":
         case tok!"$":
-            primary.token = advance();
+            node.token = advance();
             break;
         case tok!"identifier":
             if (assumeSorted(REGISTER_NAMES).equalRange(current().text).length > 0)
             {
-                if ((primary.register = parseRegister()) is null) return null;
+                if ((node.register = parseRegister()) is null) { deallocate(node); return null; }
                 if (currentIs(tok!":"))
                 {
                     advance();
-                    if ((primary.asmExp = parseAsmExp()) is null) return null;
+                    if ((node.asmExp = parseAsmExp()) is null) { deallocate(node); return null; }
                 }
             }
             else if (peekIs(tok!"."))
-                primary.identifierChain = parseIdentifierChain();
+                node.identifierChain = parseIdentifierChain();
             else
-                primary.token = advance();
+                node.token = advance();
             break;
         default:
             error("Float literal, integer literal, $, or identifier expected.");
             return null;
         }
-        return primary;
+        return node;
     }
 
     /**
@@ -800,14 +800,14 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AssertExpression;
         expect(tok!"assert");
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         node.assertion = parseAssignExpression();
         if (currentIs(tok!","))
         {
             advance();
             node.message = parseAssignExpression();
         }
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -885,7 +885,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AtAttribute;
         auto start = expect(tok!"@");
-        if (start is null) return null;
+        if (start is null) { deallocate(node); return null; }
         if (!moreTokens)
         {
             error(`"(", or identifier expected`);
@@ -982,11 +982,11 @@ class Parser
         do
         {
             auto ident = expect(tok!"identifier");
-            if (ident is null) return null;
+            if (ident is null) { deallocate(node); return null; }
             identifiers ~= *ident;
-            if (expect(tok!"=") is null) return null;
+            if (expect(tok!"=") is null) { deallocate(node); return null; }
             auto init = parseInitializer();
-            if (init is null) return null;
+            if (init is null) { deallocate(node); return null; }
             initializers ~= init;
             if (currentIs(tok!","))
                 advance();
@@ -995,7 +995,7 @@ class Parser
         } while (moreTokens());
         node.identifiers = ownArray(identifiers);
         node.initializers = ownArray(initializers);
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -1011,7 +1011,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!BlockStatement;
         auto openBrace = expect(tok!"{");
-        if (openBrace is null) return null;
+        if (openBrace is null) { deallocate(node); return null; }
         node.startLocation = openBrace.index;
         if (!currentIs(tok!"}"))
             node.declarationsAndStatements = parseDeclarationsAndStatements();
@@ -1053,7 +1053,7 @@ class Parser
         {
         case tok!"identifier":
             node.label = advance();
-            if (expect(tok!";") is null) return null;
+            if (expect(tok!";") is null) { deallocate(node); return null; }
             break;
         case tok!";":
             advance();
@@ -1084,7 +1084,7 @@ class Parser
         if (currentIs(tok!"typeof"))
         {
             node.typeofExpression = parseTypeofExpression();
-            if (expect(tok!".") is null) return null;
+            if (expect(tok!".") is null) { deallocate(node); return null; }
         }
         node.identifierOrTemplateChain = parseIdentifierOrTemplateChain();
         return node;
@@ -1150,11 +1150,11 @@ class Parser
         auto node = allocate!CaseRangeStatement;
         assert (low !is null);
         node.low = low;
-        if (expect(tok!":") is null) return null;
-        if (expect(tok!"..") is null) return null;
+        if (expect(tok!":") is null) { deallocate(node); return null; }
+        if (expect(tok!"..") is null) { deallocate(node); return null; }
         expect(tok!"case");
         node.high = parseAssignExpression();
-        if (expect(tok!":") is null) return null;
+        if (expect(tok!":") is null) { deallocate(node); return null; }
         node.declarationsAndStatements = parseDeclarationsAndStatements();
         return node;
     }
@@ -1171,7 +1171,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CaseStatement;
         node.argumentList = argumentList;
-        if (expect(tok!":") is null) return null;
+        if (expect(tok!":") is null) { deallocate(node); return null; }
         node.declarationsAndStatements = parseDeclarationsAndStatements();
         return node;
     }
@@ -1188,7 +1188,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CastExpression;
         expect(tok!"cast");
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         if (!currentIs(tok!")"))
         {
             if (isCastQualifier())
@@ -1196,7 +1196,7 @@ class Parser
             else
                 node.type = parseType();
         }
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         node.unaryExpression = parseUnaryExpression();
         return node;
     }
@@ -1254,11 +1254,11 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Catch;
         expect(tok!"catch");
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         node.type = parseType();
         if (currentIs(tok!"identifier"))
             node.identifier = advance();
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         node.declarationOrStatement = parseDeclarationOrStatement();
         return node;
     }
@@ -1425,7 +1425,7 @@ class Parser
         }
 
         auto dec = parseDeclaration();
-        if (dec is null) return null;
+        if (dec is null) { deallocate(node); return null; }
         trueDeclarations ~= dec;
         node.trueDeclarations = ownArray(trueDeclarations);
 
@@ -1435,7 +1435,7 @@ class Parser
             return node;
 
         auto elseDec = parseDeclaration();
-        if (elseDec is null) return null;
+        if (elseDec is null) { deallocate(node); return null; }
         node.falseDeclaration = elseDec;
         return node;
     }
@@ -1472,10 +1472,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Constraint;
-        if (expect(tok!"if") is null) return null;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"if") is null) { deallocate(node); return null; }
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         node.expression = parseExpression();
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -1493,7 +1493,7 @@ class Parser
         node.comment = comment;
         comment = null;
         auto t = expect(tok!"this");
-        if (t is null) return null;
+        if (t is null) { deallocate(node); return null; }
         node.location = t.index;
         node.line = t.line;
         node.column = t.column;
@@ -1505,7 +1505,7 @@ class Parser
             node.templateParameters = parseTemplateParameters();
         }
         node.parameters = parseParameters();
-        if (node.parameters is null) return null;
+        if (node.parameters is null) { deallocate(node); return null; }
 
         MemberFunctionAttribute[] memberFunctionAttributes;
         while (moreTokens() && currentIsMemberFunctionAttribute())
@@ -1520,7 +1520,7 @@ class Parser
         else
         {
             node.functionBody = parseFunctionBody();
-            if (node.functionBody is null) return null;
+            if (node.functionBody is null) { deallocate(node); return null; }
         }
 
         return node;
@@ -1542,7 +1542,7 @@ class Parser
         {
         case tok!"identifier":
             node.label = advance();
-            if (expect(tok!";") is null) return null;
+            if (expect(tok!";") is null) { deallocate(node); return null; }
             break;
         case tok!";":
             advance();
@@ -1565,7 +1565,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DebugCondition;
-        if (expect(tok!"debug") is null) return null;
+        if (expect(tok!"debug") is null) { deallocate(node); return null; }
         if (currentIs(tok!"("))
         {
             advance();
@@ -1576,7 +1576,7 @@ class Parser
                 error(`Integer literal or identifier expected`);
                 return null;
             }
-            if (expect(tok!")") is null) return null;
+            if (expect(tok!")") is null) { deallocate(node); return null; }
         }
         return node;
     }
@@ -1592,8 +1592,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DebugSpecification;
-        if (expect(tok!"debug") is null) return null;
-        if (expect(tok!"=") is null) return null;
+        if (expect(tok!"debug") is null) { deallocate(node); return null; }
+        if (expect(tok!"=") is null) { deallocate(node); return null; }
         if (currentIsOneOf(tok!"identifier", tok!"intLiteral"))
             node.identifierOrInteger = advance();
         else
@@ -1601,7 +1601,7 @@ class Parser
             error("Integer literal or identifier expected");
             return null;
         }
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -1677,7 +1677,8 @@ class Parser
         if (!moreTokens)
         {
             error("declaration expected instead of EOF");
-            return null;
+            deallocate(node);
+            return null; }
         }
 
         switch (current.type)
@@ -1697,7 +1698,7 @@ class Parser
                     declarations ~= declaration;
             }
             node.declarations = ownArray(declarations);
-            if (expect(tok!"}") is null) return null;
+            if (expect(tok!"}") is null) { deallocate(node); return null; }
             break;
         case tok!"alias":
             if (startsWith(tok!"alias", tok!"identifier", tok!"this"))
@@ -1712,31 +1713,31 @@ class Parser
             if (startsWith(tok!"this", tok!"(", tok!"this"))
             {
                 node.postblit = parsePostblit();
-                if (node.postblit is null) return null;
+                if (node.postblit is null) { deallocate(node); return null; }
             }
             else
             {
                 node.constructor = parseConstructor();
-                if (node.constructor is null) return null;
+                if (node.constructor is null) { deallocate(node); return null; }
             }
             break;
         case tok!"~":
             node.destructor = parseDestructor();
-            if (node.destructor is null) return null;
+            if (node.destructor is null) { deallocate(node); return null; }
             break;
         case tok!"enum":
             if (startsWith(tok!"enum", tok!"identifier", tok!"("))
                 goto case tok!"template";
             node.enumDeclaration = parseEnumDeclaration();
-            if (node.enumDeclaration is null) return null;
+            if (node.enumDeclaration is null) { deallocate(node); return null; }
             break;
         case tok!"import":
             node.importDeclaration = parseImportDeclaration();
-            if (node.importDeclaration is null) return null;
+            if (node.importDeclaration is null) { deallocate(node); return null; }
             break;
         case tok!"interface":
             node.interfaceDeclaration = parseInterfaceDeclaration();
-            if (node.interfaceDeclaration is null) return null;
+            if (node.interfaceDeclaration is null) { deallocate(node); return null; }
             break;
         case tok!"mixin":
             if (peekIs(tok!"template"))
@@ -1757,6 +1758,7 @@ class Parser
                     {
                         goToBookmark(b);
                         error("Declaration expected");
+                        deallocate(node);
                         return null;
                     }
                 }
@@ -1838,10 +1840,11 @@ class Parser
         mixin (BASIC_TYPE_CASES);
         type:
             Type type = parseType();
-            if (type is null)
+            if (type is null || !currentIs(tok!"identifier"))
+            {
+                deallocate(node);
                 return null;
-            if (!currentIs(tok!"identifier"))
-                return null;
+            }
             if (peekIs(tok!"("))
             {
                 auto b = setBookmark();
@@ -1866,6 +1869,7 @@ class Parser
             else
             {
                 error(`"=" or "(" expected following "version"`);
+                deallocate(node);
                 return null;
             }
             break;
@@ -1873,16 +1877,17 @@ class Parser
             if (peekIs(tok!"="))
             {
                 node.debugSpecification = parseDebugSpecification();
-                if (node.debugSpecification is null) return null;
+                if (node.debugSpecification is null) { deallocate(node); return null; }
             }
             else
             {
                 node.conditionalDeclaration = parseConditionalDeclaration();
-                if (node.conditionalDeclaration is null) return null;
+                if (node.conditionalDeclaration is null) { deallocate(node); return null; }
             }
             break;
         default:
             error("Declaration expected");
+            deallocate(node);
             return null;
         }
         return node;
@@ -1900,7 +1905,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DeclarationsAndStatements;
         DeclarationOrStatement[] declarationsAndStatements;
-        while (!currentIsOneOf(tok!"}") && moreTokens())
+        while (!currentIsOneOf(tok!"}") && moreTokens() && errorCount < MAX_ERRORS)
         {
             auto dos = parseDeclarationOrStatement();
             if (dos !is null)
@@ -1938,6 +1943,7 @@ class Parser
         if (node.statement is null && node.declaration is null)
         {
             error("Could not parse declaration or statement");
+            deallocate(node);
             return null;
         }
         return node;
@@ -1957,7 +1963,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Declarator;
         auto id = expect(tok!"identifier");
-        if (id is null) return null;
+        if (id is null) { deallocate(node); return null; }
         node.name = *id;
         if (currentIs(tok!"[")) // dmd doesn't accept pointer after identifier
         {
@@ -1969,15 +1975,18 @@ class Parser
                 if (suffix !is null)
                     typeSuffixes ~= suffix;
                 else
+                {
+                    deallocate(node);
                     return null;
+                }
             }
             node.cstyle = ownArray(typeSuffixes);
         }
         if (currentIs(tok!"("))
         {
-            if ((node.templateParameters = parseTemplateParameters()) is null) return null;
-            if (expect(tok!"=") is null) return null;
-            if ((node.initializer = parseInitializer()) is null) return null;
+            if ((node.templateParameters = parseTemplateParameters()) is null) { deallocate(node); return null; }
+            if (expect(tok!"=") is null) { deallocate(node); return null; }
+            if ((node.initializer = parseInitializer()) is null) { deallocate(node); return null; }
         }
         else if (currentIs(tok!"="))
         {
@@ -1998,8 +2007,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DefaultStatement;
-        if (expect(tok!"default") is null) return null;
-        if (expect(tok!":") is null) return null;
+        if (expect(tok!"default") is null) { deallocate(node); return null; }
+        if (expect(tok!":") is null) { deallocate(node); return null; }
         node.declarationsAndStatements = parseDeclarationsAndStatements();
         return node;
     }
@@ -2017,7 +2026,7 @@ class Parser
         auto node = allocate!DeleteExpression;
         node.line = current.line;
         node.column = current.column;
-        if (expect(tok!"delete") is null) return null;
+        if (expect(tok!"delete") is null) { deallocate(node); return null; }
         node.unaryExpression = parseUnaryExpression();
         return node;
     }
@@ -2033,12 +2042,12 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Deprecated;
-        if (expect(tok!"deprecated") is null) return null;
+        if (expect(tok!"deprecated") is null) { deallocate(node); return null; }
         if (currentIs(tok!"("))
         {
             advance();
             node.assignExpression = parseAssignExpression();
-            if (expect(tok!")") is null) return null;
+            if (expect(tok!")") is null) { deallocate(node); return null; }
         }
         return node;
     }
@@ -2056,18 +2065,19 @@ class Parser
         auto node = allocate!Destructor;
         node.comment = comment;
         comment = null;
-        if (expect(tok!"~") is null) return null;
+        if (expect(tok!"~") is null) { deallocate(node); return null; }
         if (!moreTokens)
         {
             error("'this' expected");
+            deallocate(node);
             return null;
         }
         node.index = current.index;
         node.line = current.line;
         node.column = current.column;
-        if (expect(tok!"this") is null) return null;
-        if (expect(tok!"(") is null) return null;
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!"this") is null) { deallocate(node); return null; }
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         if (currentIs(tok!";"))
             advance();
         else
@@ -2092,13 +2102,13 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DoStatement;
-        if (expect(tok!"do") is null) return null;
+        if (expect(tok!"do") is null) { deallocate(node); return null; }
         node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault();
-        if (expect(tok!"while") is null) return null;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"while") is null) { deallocate(node); return null; }
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         node.expression = parseExpression();
-        if (expect(tok!")") is null) return null;
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2168,7 +2178,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!EnumDeclaration;
-        if (expect(tok!"enum") is null) return null;
+        if (expect(tok!"enum") is null) { deallocate(node); return null; }
         if (currentIs(tok!"identifier"))
             node.name = advance();
         else
@@ -2215,7 +2225,7 @@ class Parser
     type:
             node.type = parseType();
             ident = expect(tok!"identifier");
-            if (ident is null) return null;
+            if (ident is null) { deallocate(node); return null; }
             node.name = *ident;
     assign:
             expect(tok!"=");
@@ -2252,6 +2262,7 @@ class Parser
     Expression parseExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (suppressedErrorCount > MAX_ERRORS) return null;
         return parseCommaSeparatedRule!(Expression, AssignExpression)();
     }
 
@@ -2267,7 +2278,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ExpressionStatement;
         node.expression = expression is null ? parseExpression() : expression;
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2282,9 +2293,9 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!FinalSwitchStatement;
-        if (expect(tok!"final") is null) return null;
+        if (expect(tok!"final") is null) { deallocate(node); return null; }
         node.switchStatement = parseSwitchStatement();
-        if (node.switchStatement is null) return null;
+        if (node.switchStatement is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2299,7 +2310,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Finally;
-        if (expect(tok!"finally") is null) return null;
+        if (expect(tok!"finally") is null) { deallocate(node); return null; }
         node.declarationOrStatement = parseDeclarationOrStatement();
         return node;
     }
@@ -2315,9 +2326,9 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ForStatement;
-        if (expect(tok!"for") is null) return null;
+        if (expect(tok!"for") is null) { deallocate(node); return null; }
         if (!moreTokens) node.startIndex = current().index;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
 
         if (currentIs(tok!";"))
             advance();
@@ -2332,14 +2343,14 @@ class Parser
         if (!currentIs(tok!")"))
             node.increment = parseExpression();
 
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         if (currentIs(tok!"}"))
         {
             error("Statement expected", false);
             return node; // this line makes DCD better
         }
         node.declarationOrStatement = parseDeclarationOrStatement();
-        if (node.declarationOrStatement is null) return null;
+        if (node.declarationOrStatement is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2363,13 +2374,13 @@ class Parser
             return null;
         }
         node.startIndex = current().index;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         ForeachTypeList feType = parseForeachTypeList();
         bool canBeRange = feType.items.length == 1;
 
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         node.low = parseExpression();
-        if (node.low is null) return null;
+        if (node.low is null) { deallocate(node); return null; }
         if (currentIs(tok!".."))
         {
             if (!canBeRange)
@@ -2380,20 +2391,20 @@ class Parser
             advance();
             node.high = parseExpression();
             node.foreachType = feType.items[0];
-            if (node.high is null) return null;
+            if (node.high is null) { deallocate(node); return null; }
         }
         else
         {
             node.foreachTypeList = feType;
         }
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         if (currentIs(tok!"}"))
         {
             error("Statement expected", false);
             return node; // this line makes DCD better
         }
         node.declarationOrStatement = parseDeclarationOrStatement();
-        if (node.declarationOrStatement is null) return null;
+        if (node.declarationOrStatement is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2420,9 +2431,9 @@ class Parser
             node.identifier = advance();
             return node;
         }
-        if ((node.type = parseType()) is null) return null;
+        if ((node.type = parseType()) is null) { deallocate(node); return null; }
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         return node;
     }
@@ -2464,6 +2475,7 @@ class Parser
         default:
             if (validate)
                 error(`@attribute, "pure", or "nothrow" expected`);
+            deallocate(node);
             return null;
         }
         return node;
@@ -2543,7 +2555,12 @@ class Parser
             if (unary !is null)
                 node.arguments = parseArguments();
         }
-        return node.arguments is null ? null : node;
+        if (node.arguments is null)
+        {
+            deallocate(node);
+            return null;
+        }
+        return node;
     }
 
     /**
@@ -2585,7 +2602,7 @@ class Parser
 
     functionName:
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
 
         node.name = *ident;
 
@@ -2603,7 +2620,7 @@ class Parser
             node.templateParameters = parseTemplateParameters();
 
         node.parameters = parseParameters();
-        if (node.parameters is null) return null;
+        if (node.parameters is null) { deallocate(node); return null; }
 
         while (moreTokens() && currentIsMemberFunctionAttribute())
             memberFunctionAttributes ~= parseMemberFunctionAttribute();
@@ -2637,13 +2654,13 @@ class Parser
                 tok!"out", tok!"{"))
             {
                 node.type = parseType();
-                if (node.type is null) return null;
+                if (node.type is null) { deallocate(node); return null; }
             }
         }
         if (currentIs(tok!"("))
         {
             node.parameters = parseParameters();
-            if (node.parameters is null) return null;
+            if (node.parameters is null) { deallocate(node); return null; }
             FunctionAttribute[] functionAttributes;
             do
             {
@@ -2656,7 +2673,7 @@ class Parser
             node.functionAttributes = ownArray(functionAttributes);
         }
         node.functionBody = parseFunctionBody();
-        if (node.functionBody is null) return null;
+        if (node.functionBody is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2670,7 +2687,7 @@ class Parser
     GotoStatement parseGotoStatement()
     {
         auto node = allocate!GotoStatement;
-        if (expect(tok!"goto") is null) return null;
+        if (expect(tok!"goto") is null) { deallocate(node); return null; }
         switch (current.type)
         {
         case tok!"identifier":
@@ -2686,7 +2703,7 @@ class Parser
             error(`Identifier, "default", or "case" expected`);
             return null;
         }
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2704,7 +2721,7 @@ class Parser
         while (moreTokens())
         {
             auto ident = expect(tok!"identifier");
-            if (ident is null) return null;
+            if (ident is null) { deallocate(node); return null; }
             identifiers ~= *ident;
             if (currentIs(tok!"."))
             {
@@ -2732,7 +2749,7 @@ class Parser
         while (moreTokens())
         {
             auto ident = expect(tok!"identifier");
-            if (ident is null) return null;
+            if (ident is null) { deallocate(node); return null; }
             identifiers ~= *ident;
             if (currentIs(tok!","))
             {
@@ -2790,7 +2807,7 @@ class Parser
         else
         {
             auto ident = expect(tok!"identifier");
-            if (ident is null) return null;
+            if (ident is null) { deallocate(node); return null; }
             node.identifier = *ident;
         }
         return node;
@@ -2813,7 +2830,7 @@ class Parser
             advance();
             node.negated = true;
         }
-        if (expect(tok!"is") is null) return null;
+        if (expect(tok!"is") is null) { deallocate(node); return null; }
         node.right = parseShiftExpression();
         return node;
     }
@@ -2835,9 +2852,9 @@ class Parser
         auto node = allocate!IfStatement;
         node.line = current().line;
         node.column = current().column;
-        if (expect(tok!"if") is null) return null;
+        if (expect(tok!"if") is null) { deallocate(node); return null; }
         node.startIndex = current().index;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
 
         if (currentIs(tok!"auto"))
         {
@@ -2870,7 +2887,7 @@ class Parser
             }
         }
 
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         if (currentIs(tok!"}"))
         {
             error("Statement expected", false);
@@ -2896,13 +2913,13 @@ class Parser
     {
         auto node = allocate!ImportBind;
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.left = *ident;
         if (currentIs(tok!"="))
         {
             advance();
             auto id = expect(tok!"identifier");
-            if (id is null) return null;
+            if (id is null) { deallocate(node); return null; }
             node.right = *id;
         }
         return node;
@@ -2919,7 +2936,7 @@ class Parser
     {
         auto node = allocate!ImportBindings;
         node.singleImport = singleImport is null ? parseSingleImport() : singleImport;
-        if (expect(tok!":") is null) return null;
+        if (expect(tok!":") is null) { deallocate(node); return null; }
         ImportBind[] importBinds;
         while (moreTokens())
         {
@@ -2950,7 +2967,7 @@ class Parser
     ImportDeclaration parseImportDeclaration()
     {
         auto node = allocate!ImportDeclaration;
-        if (expect(tok!"import") is null) return null;
+        if (expect(tok!"import") is null) { deallocate(node); return null; }
         SingleImport si = parseSingleImport();
         if (currentIs(tok!":"))
             node.importBindings = parseImportBindings(si);
@@ -2983,7 +3000,7 @@ class Parser
             }
             node.singleImports = ownArray(singleImports);
         }
-        if (expect(tok!";") is null) return null;
+        if (expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2997,10 +3014,10 @@ class Parser
     ImportExpression parseImportExpression()
     {
         auto node = allocate!ImportExpression;
-        if (expect(tok!"import") is null) return null;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"import") is null) { deallocate(node); return null; }
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         node.assignExpression = parseAssignExpression();
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -3016,9 +3033,9 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!IndexExpression;
         node.unaryExpression = unaryExpression is null ? parseUnaryExpression() : unaryExpression;
-        if (expect(tok!"[") is null) return null;
+        if (expect(tok!"[") is null) { deallocate(node); return null; }
         node.argumentList = parseArgumentList();
-        if (expect(tok!"]") is null) return null;
+        if (expect(tok!"]") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -3038,7 +3055,7 @@ class Parser
             node.negated = true;
             advance();
         }
-        if (expect(tok!"in") is null) return null;
+        if (expect(tok!"in") is null) { deallocate(node); return null; }
         node.right = parseShiftExpression();
         return node;
     }
@@ -3053,7 +3070,7 @@ class Parser
     InStatement parseInStatement()
     {
         auto node = allocate!InStatement;
-        if (expect(tok!"in") is null) return null;
+        if (expect(tok!"in") is null) { deallocate(node); return null; }
         node.blockStatement = parseBlockStatement();
         if (node.blockStatement is null)
             return null;
@@ -3108,13 +3125,13 @@ class Parser
         auto node = allocate!Invariant;
         node.index = current.index;
         node.line = current.line;
-        if (expect(tok!"invariant") is null) return null;
+        if (expect(tok!"invariant") is null) { deallocate(node); return null; }
         if (currentIs(tok!"("))
         {
             advance();
-            if (expect(tok!")") is null) return null;
+            if (expect(tok!")") is null) { deallocate(node); return null; }
         }
-        if ((node.blockStatement = parseBlockStatement()) is null) return null;
+        if ((node.blockStatement = parseBlockStatement()) is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -3133,10 +3150,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!IsExpression;
-        if (expect(tok!"is") is null) return null;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"is") is null) { deallocate(node); return null; }
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         node.type = parseType();
-        if (node.type is null) return null;
+        if (node.type is null) { deallocate(node); return null; }
         if (currentIs(tok!"identifier"))
             node.identifier = advance();
         if (currentIsOneOf(tok!"==", tok!":"))
@@ -3149,7 +3166,7 @@ class Parser
                 node.templateParameterList = parseTemplateParameterList();
             }
         }
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -3165,7 +3182,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!KeyValuePair;
         node.key = parseAssignExpression();
-        if (expect(tok!":") is null) return null;
+        if (expect(tok!":") is null) { deallocate(node); return null; }
         node.value = parseAssignExpression();
         return node;
     }
@@ -3212,7 +3229,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!LabeledStatement;
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         expect(tok!":");
         node.declarationOrStatement = parseDeclarationOrStatement();
@@ -3237,7 +3254,7 @@ class Parser
         {
             node.functionType = advance().type;
             if (!currentIs(tok!"("))
-                if ((node.returnType = parseType()) is null) return null;
+                if ((node.returnType = parseType()) is null) { deallocate(node); return null; }
             goto lParen;
         }
         else if (startsWith(tok!"identifier", tok!"=>"))
@@ -3268,8 +3285,8 @@ class Parser
         }
 
     lambda:
-        if (expect(tok!"=>") is null) return null;
-        if ((node.assignExpression = parseAssignExpression()) is null) return null;
+        if (expect(tok!"=>") is null) { deallocate(node); return null; }
+        if ((node.assignExpression = parseAssignExpression()) is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -3285,7 +3302,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!LastCatch;
         auto t = expect(tok!"catch");
-        if (t is null) return null;
+        if (t is null) { deallocate(node); return null; }
         node.line = t.line;
         node.column = t.column;
         if ((node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault()) is null)
@@ -3307,7 +3324,7 @@ class Parser
         expect(tok!"extern");
         expect(tok!"(");
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         if (currentIs(tok!"++"))
         {
@@ -3411,9 +3428,9 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!MixinTemplateDeclaration;
-        if (expect(tok!"mixin") is null) return null;
+        if (expect(tok!"mixin") is null) { deallocate(node); return null; }
         node.templateDeclaration = parseTemplateDeclaration();
-        if (node.templateDeclaration is null) return null;
+        if (node.templateDeclaration is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -3822,7 +3839,7 @@ class Parser
         {
             advance();
             auto ident = expect(tok!"identifier");
-            if (ident is null) return null;
+            if (ident is null) { deallocate(node); return null; }
             node.parameter = *ident;
             expect(tok!")");
         }
@@ -3854,7 +3871,7 @@ class Parser
         }
         node.parameterAttributes = ownArray(parameterAttributes);
         node.type = parseType();
-        if (node.type is null) return null;
+        if (node.type is null) { deallocate(node); return null; }
         if (currentIs(tok!"identifier"))
         {
             node.name = advance();
@@ -3951,7 +3968,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Parameters;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         Parameter[] parameters;
         if (currentIs(tok!")"))
             goto end;
@@ -4057,7 +4074,7 @@ class Parser
         expect(tok!"pragma");
         expect(tok!"(");
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         if (currentIs(tok!","))
         {
@@ -4207,7 +4224,7 @@ class Parser
                     goto case;
                 }
                 goToBookmark(b);
-                if ((node.lambdaExpression = parseLambdaExpression()) is null) return null;
+                if ((node.lambdaExpression = parseLambdaExpression()) is null) { deallocate(node); return null; }
                 return node;
             }
         case tok!"{":
@@ -4312,13 +4329,13 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Register;
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         if (currentIs(tok!"("))
         {
             advance();
             auto intLit = expect(tok!"intLiteral");
-            if (intLit is null) return null;
+            if (intLit is null) { deallocate(node); return null; }
             node.intLiteral = *intLit;
             expect(tok!")");
         }
@@ -4368,12 +4385,12 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ReturnStatement;
         auto start = expect(tok!"return");
-        if (start is null) return null;
+        if (start is null) { deallocate(node); return null; }
         node.startLocation = start.index;
         if (!currentIs(tok!";"))
             node.expression = parseExpression();
         auto semicolon = expect(tok!";");
-        if (semicolon is null) return null;
+        if (semicolon is null) { deallocate(node); return null; }
         node.endLocation = semicolon.index;
         return node;
     }
@@ -4392,7 +4409,7 @@ class Parser
         expect(tok!"scope");
         expect(tok!"(");
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         expect(tok!")");
         node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault();
@@ -4478,7 +4495,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!SliceExpression;
         node.unaryExpression = unary is null ? parseUnaryExpression() : unary;
-        if (expect(tok!"[") is null) return null;
+        if (expect(tok!"[") is null) { deallocate(node); return null; }
         if (!currentIs(tok!"]"))
         {
             node.lower = parseAssignExpression();
@@ -4495,7 +4512,7 @@ class Parser
                 return null;
             }
         }
-        if (expect(tok!"]") is null) return null;
+        if (expect(tok!"]") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -4641,7 +4658,7 @@ class Parser
         {
         case tok!"@":
             node.atAttribute = parseAtAttribute();
-            if (node.atAttribute is null) return null;
+            if (node.atAttribute is null) { deallocate(node); return null; }
             break;
         case tok!"deprecated":
             node.deprecated_ = parseDeprecated();
@@ -4722,11 +4739,11 @@ class Parser
         auto t = expect(tok!"struct");
         if (currentIs(tok!"identifier"))
             node.name = advance();
-		else
-		{
-			node.name.line = t.line;
-			node.name.column = t.column;
-		}
+        else
+        {
+            node.name.line = t.line;
+            node.name.column = t.column;
+        }
         node.comment = comment;
         comment = null;
 
@@ -4908,9 +4925,9 @@ class Parser
         }
         else
         {
-            if ((node.type = parseType()) is null) return null;
+            if ((node.type = parseType()) is null) { deallocate(node); return null; }
             auto ident = expect(tok!"identifier");
-            if (ident is null) return null;
+            if (ident is null) { deallocate(node); return null; }
             node.identifier = *ident;
         }
 
@@ -4944,18 +4961,19 @@ class Parser
     TemplateArgument parseTemplateArgument()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (suppressedErrorCount > MAX_ERRORS) return null;
         auto node = allocate!TemplateArgument;
         auto b = setBookmark();
         auto t = parseType();
         if (t !is null && currentIsOneOf(tok!",", tok!")"))
         {
-            goToBookmark(b);
-            node.type = parseType();
+            abandonBookmark();
+            node.type = t;
         }
         else
         {
             goToBookmark(b);
-            if ((node.assignExpression = parseAssignExpression()) is null) return null;
+            if ((node.assignExpression = parseAssignExpression()) is null) { deallocate(node); return null; }
         }
         return node;
     }
@@ -4983,6 +5001,7 @@ class Parser
     TemplateArguments parseTemplateArguments()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (suppressedErrorCount > MAX_ERRORS) return null;
         auto node = allocate!TemplateArguments;
         expect(tok!"!");
         if (currentIs(tok!"("))
@@ -4990,7 +5009,7 @@ class Parser
             advance();
             if (!currentIs(tok!")"))
                 node.templateArgumentList = parseTemplateArgumentList();
-            expect(tok!")");
+            if (expect(tok!")") is null) { deallocate(node); return null; }
         }
         else
             node.templateSingleArgument = parseTemplateSingleArgument();
@@ -5018,13 +5037,13 @@ class Parser
         }
         expect(tok!"template");
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.name = *ident;
         node.templateParameters = parseTemplateParameters();
         if (currentIs(tok!"if"))
             node.constraint = parseConstraint();
         auto start = expect(tok!"{");
-        if (start is null) return null; else node.startLocation = start.index;
+        if (start is null) { deallocate(node); return null; } else node.startLocation = start.index;
         Declaration[] declarations;
         while (moreTokens() && !currentIs(tok!"}"))
         {
@@ -5053,7 +5072,7 @@ class Parser
         if (currentIsOneOf(tok!"enum", tok!"alias"))
             advance();
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.name = *ident;
         node.templateParameters = parseTemplateParameters();
         expect(tok!"=");
@@ -5075,9 +5094,10 @@ class Parser
     TemplateInstance parseTemplateInstance()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (suppressedErrorCount > MAX_ERRORS) return null;
         auto node = allocate!TemplateInstance;
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         node.templateArguments = parseTemplateArguments();
         if (node.templateArguments is null)
@@ -5096,7 +5116,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TemplateMixinExpression;
-        if (expect(tok!"mixin") is null) return null;
+        if (expect(tok!"mixin") is null) { deallocate(node); return null; }
         node.mixinTemplateName = parseMixinTemplateName();
         if (currentIs(tok!"!"))
             node.templateArguments = parseTemplateArguments();
@@ -5167,10 +5187,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TemplateParameters;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         if (!currentIs(tok!")"))
-            if ((node.templateParameterList = parseTemplateParameterList()) is null) return null;
-        if (expect(tok!")") is null) return null;
+            if ((node.templateParameterList = parseTemplateParameterList()) is null) { deallocate(node); return null; }
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -5259,7 +5279,7 @@ class Parser
         if (i is null)
             return null;
         node.identifier = *i;
-        if (expect(tok!"...") is null) return null;
+        if (expect(tok!"...") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -5275,7 +5295,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TemplateTypeParameter;
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         if (currentIs(tok!":"))
         {
@@ -5301,14 +5321,14 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TemplateValueParameter;
-        if ((node.type = parseType()) is null) return null;
+        if ((node.type = parseType()) is null) { deallocate(node); return null; }
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         if (currentIs(tok!":"))
         {
             advance();
-            if ((node.assignExpression = parseAssignExpression()) is null) return null;
+            if ((node.assignExpression = parseAssignExpression()) is null) { deallocate(node); return null; }
         }
         if (currentIs(tok!"="))
         {
@@ -5362,7 +5382,7 @@ class Parser
         {
             advance();
             node.expression = parseExpression();
-            if (expect(tok!":") is null) return null;
+            if (expect(tok!":") is null) { deallocate(node); return null; }
             node.ternaryExpression = parseTernaryExpression();
         }
         return node;
@@ -5396,17 +5416,17 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TraitsExpression;
-        if (expect(tok!"__traits") is null) return null;
-        if (expect(tok!"(") is null) return null;
+        if (expect(tok!"__traits") is null) { deallocate(node); return null; }
+        if (expect(tok!"(") is null) { deallocate(node); return null; }
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         if (currentIs(tok!","))
         {
             advance();
-            if ((node.templateArgumentList = parseTemplateArgumentList()) is null) return null;
+            if ((node.templateArgumentList = parseTemplateArgumentList()) is null) { deallocate(node); return null; }
         }
-        if (expect(tok!")") is null) return null;
+        if (expect(tok!")") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -5531,9 +5551,9 @@ class Parser
         case tok!"inout":
         case tok!"shared":
             node.typeConstructor = advance().type;
-            if (expect(tok!"(") is null) return null;
-            if ((node.type = parseType()) is null) return null;
-            if (expect(tok!")") is null) return null;
+            if (expect(tok!"(") is null) { deallocate(node); return null; }
+            if ((node.type = parseType()) is null) { deallocate(node); return null; }
+            if (expect(tok!")") is null) { deallocate(node); return null; }
             break;
         case tok!"__vector":
             if ((node.vector = parseVector()) is null)
@@ -5699,15 +5719,15 @@ class Parser
             {
                 goToBookmark(bookmark);
                 node.low = parseAssignExpression();
-                if (node.low is null) return null;
+                if (node.low is null) { deallocate(node); return null; }
                 if (currentIs(tok!".."))
                 {
                     advance();
                     node.high = parseAssignExpression();
-                    if (node.high is null) return null;
+                    if (node.high is null) { deallocate(node); return null; }
                 }
             }
-            if (expect(tok!"]") is null) return null;
+            if (expect(tok!"]") is null) { deallocate(node); return null; }
             return node;
         case tok!"delegate":
         case tok!"function":
@@ -5743,13 +5763,13 @@ class Parser
         {
             goToBookmark(b);
             node.expression = parseExpression();
-            if (node.expression is null) return null;
+            if (node.expression is null) { deallocate(node); return null; }
         }
         else
         {
             goToBookmark(b);
             node.type = parseType();
-            if (node.type is null) return null;
+            if (node.type is null) { deallocate(node); return null; }
         }
         expect(tok!")");
         return node;
@@ -6018,7 +6038,7 @@ class Parser
         while (true)
         {
             auto declarator = parseDeclarator();
-            if (declarator is null) return null;
+            if (declarator is null) { deallocate(node); return null; }
             declarators ~= declarator;
             if (moreTokens() && currentIs(tok!","))
             {
@@ -6030,7 +6050,7 @@ class Parser
         }
         node.declarators = ownArray(declarators);
         auto semicolon = expect(tok!";");
-        if (semicolon is null) return null;
+        if (semicolon is null) { deallocate(node); return null; }
         declarators[$ - 1].comment = semicolon.trailingComment;
         return node;
     }
@@ -6201,6 +6221,10 @@ class Parser
 
 protected:
 
+    uint suppressedErrorCount;
+
+    enum MAX_ERRORS = 10;
+
     T[] ownArray(T)(T[] from)
     {
         if (allocator is null)
@@ -6222,6 +6246,12 @@ protected:
         T t = emplace!T(mem, args);
         assert (cast(void*) t == mem.ptr, "%x, %x".format(cast(void*) t, mem.ptr));
         return t;
+    }
+
+    void deallocate(T)(T t)
+    {
+        if (allocator !is null)
+            allocator.deallocate((cast (void*) t)[0 .. __traits(classInstanceSize, T)]);
     }
 
     bool isCastQualifier() const
@@ -6247,6 +6277,7 @@ protected:
 
     bool isAssociativeArrayLiteral()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto b = setBookmark();
         scope(exit) goToBookmark(b);
         advance();
@@ -6560,7 +6591,7 @@ protected:
             messageFunction(fileName, line, column, message, false);
     }
 
-    void error(lazy string message, bool shouldAdvance = true)
+    void error(string message, bool shouldAdvance = true)
     {
         import std.stdio;
         if (suppressMessages <= 0)
@@ -6575,6 +6606,8 @@ protected:
             else
                 messageFunction(fileName, line, column, message, true);
         }
+        else
+            ++suppressedErrorCount;
         while (shouldAdvance && moreTokens())
         {
             if (currentIsOneOf(tok!";", tok!"}",
@@ -6762,13 +6795,19 @@ protected:
     {
 //        mixin(traceEnterAndExit!(__FUNCTION__));
         suppressMessages++;
-        auto i = index;
-        return i;
+        return index;
+    }
+
+    void abandonBookmark() nothrow
+    {
+        --suppressMessages;
     }
 
     void goToBookmark(size_t i) nothrow
     {
         --suppressMessages;
+        if (suppressMessages == 0)
+            suppressedErrorCount = 0;
         index = i;
     }
 
@@ -6801,17 +6840,17 @@ protected:
     {
         static if (is (typeof(item) == string))
             enum simpleParseItem = "if ((node." ~ item[0 .. item.countUntil("|")]
-                ~ " = " ~ item[item.countUntil("|") + 1 .. $] ~ "()) is null) return null;";
+                ~ " = " ~ item[item.countUntil("|") + 1 .. $] ~ "()) is null) { deallocate(node); return null; }";
         else
-            enum simpleParseItem = "if (expect(" ~ item.stringof ~ ") is null) return null;";
+            enum simpleParseItem = "if (expect(" ~ item.stringof ~ ") is null) { deallocate(node); return null; }";
     }
 
     template expectSequence(sequence ...)
     {
         static if (sequence.length == 1)
-            enum expectSequence = "if (expect(" ~ sequence[0].stringof ~ ") is null) return null;";
+            enum expectSequence = "if (expect(" ~ sequence[0].stringof ~ ") is null) { deallocate(node); return null; }";
         else
-            enum expectSequence = "if (expect(" ~ sequence[0].stringof ~ ") is null) return null;\n"
+            enum expectSequence = "if (expect(" ~ sequence[0].stringof ~ ") is null) { deallocate(node); return null; }\n"
                 ~ expectSequence!(sequence[1..$]);
     }
 
@@ -6916,7 +6955,7 @@ protected:
     };
     enum string PARSE_INTERFACE_OR_CLASS = q{
         auto ident = expect(tok!"identifier");
-        if (ident is null) return null;
+        if (ident is null) { deallocate(node); return null; }
         node.name = *ident;
         node.comment = comment;
         comment = null;
