@@ -320,6 +320,7 @@ class Parser
                 node.assignExpression = parseAssignExpression();
                 advance(); // :
                 if (node.nonVoidInitializer is null) { deallocate(node); return null; }
+                break;
             }
             else
             {
