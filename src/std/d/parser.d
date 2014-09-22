@@ -3626,6 +3626,7 @@ class Parser
     StatementNoCaseNoDefault parseStatementNoCaseNoDefault()
     {
         auto node = allocate!StatementNoCaseNoDefault;
+        node.startLocation = current().index;
         switch (current.type)
         {
         case tok!"{":
@@ -3727,6 +3728,7 @@ class Parser
             node.expressionStatement = parseExpressionStatement();
             break;
         }
+        node.endLocation = tokens[index - 1].index;
         return node;
     }
 

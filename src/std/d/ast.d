@@ -2121,6 +2121,8 @@ public:
     /** */ VersionSpecification versionSpecification;
     /** */ DebugSpecification debugSpecification;
     /** */ ExpressionStatement expressionStatement;
+	/** */ size_t startLocation;
+	/** */ size_t endLocation;
     mixin OpEquals;
 }
 
