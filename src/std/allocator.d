@@ -4226,7 +4226,7 @@ struct Bucketizer(Allocator, size_t min, size_t max, size_t step)
 
     /// The array of allocators is publicly available for e.g. initialization
     /// and inspection.
-    Allocator buckets[(max - (min - 1)) / step];
+    Allocator[(max - (min - 1)) / step] buckets;
 
     /**
     The alignment offered is the same as $(D Allocator.alignment).
