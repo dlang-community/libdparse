@@ -6334,8 +6334,9 @@ protected:
 
             auto b = setBookmark();
             scope (exit) goToBookmark(b);
-            advance();
-            return isDeclaration();
+            advance(); // version
+            skipParens();
+            return currentIsOneOf(tok!"{", tok!":") || isDeclaration();
         }
         case tok!"synchronized":
             if (peekIs(tok!"("))
@@ -6344,7 +6345,7 @@ protected:
             {
                 auto b = setBookmark();
                 scope (exit) goToBookmark(b);
-                advance();
+                advance(); // synchronized
                 return isDeclaration();
             }
         case tok!"static":
