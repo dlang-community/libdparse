@@ -705,6 +705,7 @@ public:
         mixin (visitIfNotNull!asmInstructions);
     }
     /** */ AsmInstruction[] asmInstructions;
+    /** */ FunctionAttribute[] functionAttributes;
     mixin OpEquals;
 }
 

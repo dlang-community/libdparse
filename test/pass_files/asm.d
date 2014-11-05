@@ -1,5 +1,9 @@
 void doStuff()
 {
+	asm nothrow @safe @nogc
+	{
+		xor RAX, RAX;
+	}
 	asm
 	{
 		mov RAX, a;

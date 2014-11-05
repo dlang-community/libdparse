@@ -645,7 +645,7 @@ class Parser
      * Parses an AsmStatement
      *
      * $(GRAMMAR $(RULEDEF asmStatement):
-     *     $(LITERAL 'asm') $(LITERAL '{') $(RULE asmInstruction)+ $(LITERAL '}')
+     *     $(LITERAL 'asm') $(RULE functionAttributes)? $(LITERAL '{') $(RULE asmInstruction)+ $(LITERAL '}')
      *     ;)
      */
     AsmStatement parseAsmStatement()
@@ -654,6 +654,18 @@ class Parser
         AsmStatement node = allocate!AsmStatement;
         AsmInstruction[] instructions;
         advance(); // asm
+        FunctionAttribute[] functionAttributes;
+        while (isAttribute())
+        {
+            auto attr = parseFunctionAttribute();
+            if (attr is null)
+            {
+                error("Function attribute or '{' expected");
+                return null;
+            }
+            functionAttributes ~= attr;
+        }
+        node.functionAttributes = ownArray(functionAttributes);
         advance(); // {
         while (moreTokens() && !currentIs(tok!"}"))
         {
@@ -6331,12 +6343,15 @@ protected:
         {
             if (peekIs(tok!"="))
                 return false;
-
-            auto b = setBookmark();
-            scope (exit) goToBookmark(b);
-            advance(); // version
-            skipParens();
-            return currentIsOneOf(tok!"{", tok!":") || isDeclaration();
+            if (peekIs(tok!"("))
+            {
+                auto b = setBookmark();
+                scope (exit) goToBookmark(b);
+                advance(); // version
+                skipParens();
+                return currentIsOneOf(tok!"{", tok!":") || isDeclaration();
+            }
+            return false;
         }
         case tok!"synchronized":
             if (peekIs(tok!"("))
