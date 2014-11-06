@@ -2027,8 +2027,9 @@ final class ModuleDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(moduleName));
+        mixin (visitIfNotNull!(moduleName, deprecated_));
     }
+    /** */ Deprecated deprecated_;
     /** */ IdentifierChain moduleName;
     /** */ size_t startLocation;
     /** */ size_t endLocation;

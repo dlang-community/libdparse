@@ -3496,7 +3496,7 @@ class Parser
         Module m = allocate!Module;
         if (currentIs(tok!"scriptLine"))
             m.scriptLine = advance();
-        if (currentIs(tok!"module"))
+        if (currentIs(tok!"module") || currentIs(tok!"deprecated"))
             m.moduleDeclaration = parseModuleDeclaration();
         Declaration[] declarations;
         while (moreTokens())
@@ -3513,12 +3513,14 @@ class Parser
      * Parses a ModuleDeclaration
      *
      * $(GRAMMAR $(RULEDEF moduleDeclaration):
-     *     $(LITERAL 'module') $(RULE identifierChain) $(LITERAL ';')
+     *     $(RULE deprecated)? $(LITERAL 'module') $(RULE identifierChain) $(LITERAL ';')
      *     ;)
      */
     ModuleDeclaration parseModuleDeclaration()
     {
         auto node = allocate!ModuleDeclaration;
+        if (currentIs(tok!"deprecated"))
+            node.deprecated_ = parseDeprecated();
         auto start = expect(tok!"module");
         node.moduleName = parseIdentifierChain();
         node.comment = start.comment;

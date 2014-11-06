@@ -1,4 +1,4 @@
-module a;
+deprecated("this code is older than the dinosaurs") module declarations;
 int a;
 int[] a;
 int[string] a;

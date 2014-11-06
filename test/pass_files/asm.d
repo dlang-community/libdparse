@@ -1,3 +1,5 @@
+module hasasm;
+
 void doStuff()
 {
 	asm nothrow @safe @nogc
