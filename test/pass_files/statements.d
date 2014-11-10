@@ -44,4 +44,9 @@ void foo()
 		a = 100;
 	static if (someCondition)
 		a = 9;
+	version(graphviz_debugging)
+	{
+		File f = File("graph%04d.dot".format(i), "w");
+		tsTree.print(f);
+	}
 }

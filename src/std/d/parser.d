@@ -1446,6 +1446,11 @@ class Parser
             advance();
             while (isDeclaration())
                 trueDeclarations ~= parseDeclaration();
+            if (trueDeclarations.length == 0)
+            {
+                error("Declaration expected");
+                return null;
+            }
             node.trueDeclarations = ownArray(trueDeclarations);
             return node;
         }
@@ -1634,6 +1639,8 @@ class Parser
     /**
      * Parses a Declaration
      *
+     * Params: strict = if true, do not return partial AST nodes on errors.
+     *
      * $(GRAMMAR $(RULEDEF declaration):
      *     $(RULE attribute)* $(declaration2)
      *     ;
@@ -1668,7 +1675,7 @@ class Parser
      *     | $(LITERAL '{') $(RULE declaration)+ $(LITERAL '}')
      *     ;)
      */
-    Declaration parseDeclaration()
+    Declaration parseDeclaration(bool strict = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Declaration;
@@ -1722,6 +1729,8 @@ class Parser
                 auto declaration = parseDeclaration();
                 if (declaration !is null)
                     declarations ~= declaration;
+                else if (strict)
+                    return null;
             }
             node.declarations = ownArray(declarations);
             if (expect(tok!"}") is null) { deallocate(node); return null; }
@@ -6351,7 +6360,10 @@ protected:
                 scope (exit) goToBookmark(b);
                 advance(); // version
                 skipParens();
-                return currentIsOneOf(tok!"{", tok!":") || isDeclaration();
+                if (currentIs(tok!":") || isDeclaration())
+                    return true;
+                if (currentIs(tok!"{"))
+                    return parseDeclaration(true) !is null;
             }
             return false;
         }
@@ -6429,7 +6441,7 @@ protected:
         auto b = setBookmark();
         scope(exit) goToBookmark(b);
 
-        return parseDeclaration() !is null;
+        return parseDeclaration(true) !is null;
     }
 
     bool isExpression()
