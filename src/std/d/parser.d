@@ -2811,7 +2811,11 @@ class Parser
         IdentifierOrTemplateInstance[] identifiersOrTemplateInstances;
         while (moreTokens())
         {
-            identifiersOrTemplateInstances ~= parseIdentifierOrTemplateInstance();
+            auto t = parseIdentifierOrTemplateInstance();
+            if (t !is null)
+                identifiersOrTemplateInstances ~= t;
+            else
+                break;
             if (!currentIs(tok!"."))
                 break;
             else
