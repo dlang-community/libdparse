@@ -6367,7 +6367,17 @@ protected:
                 if (currentIs(tok!":") || isDeclaration())
                     return true;
                 if (currentIs(tok!"{"))
-                    return parseDeclaration(true) !is null;
+                {
+                    while (!currentIs(tok!"}"))
+                    {
+                        auto dec = parseDeclaration(true);
+                        if (dec is null)
+                            return false;
+                        else
+                            deallocate(dec);
+                    }
+                    return true;
+                }
             }
             return false;
         }
