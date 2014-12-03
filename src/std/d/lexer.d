@@ -456,7 +456,7 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
     auto lexer = DLexer(sourceCode, config, cache);
     string blockComment;
     size_t tokenCount;
-    while (!lexer.empty) switch (lexer.front.type)
+    loop: while (!lexer.empty) switch (lexer.front.type)
     {
     case tok!"specialTokenSequence":
     case tok!"whitespace":
@@ -486,6 +486,8 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
             break;
         }
         break;
+    case tok!"__EOF__":
+        break loop;
     default:
         Token t = lexer.front;
         lexer.popFront();
@@ -503,8 +505,6 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
  */
 public struct DLexer
 {
-    import core.vararg;
-
     mixin Lexer!(Token, lexIdentifier, isSeparating, operators, dynamicTokens,
         keywords, pseudoTokenHandlers);
 
