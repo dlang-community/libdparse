@@ -3260,9 +3260,9 @@ private:
         string result;
         foreach (v; names)
             result ~= "static if (flags & Options."~v~") {"
-                "private "~type~" _"~v~";"
-                "public const("~type~") "~v~"() const { return _"~v~"; }"
-                "}";
+                ~ "private "~type~" _"~v~";"
+                ~ "public const("~type~") "~v~"() const { return _"~v~"; }"
+                ~ "}";
         return result;
     }
 
@@ -3702,7 +3702,7 @@ allocators themselves, in a private linked list.
 struct CascadingAllocator(alias make)
 {
     /// Alias for $(D typeof(make)).
-    alias typeof(make()) Allocator;
+    alias Allocator = typeof(make()) ;
     private struct Node
     {
         Allocator a;
@@ -3914,9 +3914,9 @@ shared) methods.
 struct Segregator(size_t threshold, SmallAllocator, LargeAllocator)
 {
     static if (stateSize!SmallAllocator) SmallAllocator _small;
-    else static alias SmallAllocator.it _small;
+    else static alias _small = SmallAllocator.it;
     static if (stateSize!LargeAllocator) LargeAllocator _large;
-    else alias LargeAllocator.it _large;
+    else alias _large = LargeAllocator.it;
 
     version (StdDdoc)
     {
