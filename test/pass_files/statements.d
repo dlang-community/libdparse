@@ -49,4 +49,12 @@ void foo()
 		File f = File("graph%04d.dot".format(i), "w");
 		tsTree.print(f);
 	}
+
+	version(Alpha)
+	{
+	}
+	else
+	{
+		i++;
+	}
 }

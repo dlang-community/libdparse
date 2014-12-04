@@ -6376,6 +6376,27 @@ protected:
                         else
                             deallocate(dec);
                     }
+                    if (currentIs(tok!"}"))
+                    {
+                        advance();
+                        if (currentIs(tok!"else"))
+                        {
+                            advance();
+                            if (currentIs(tok!"{"))
+                            {
+                                advance();
+                                while (!currentIs(tok!"}"))
+                                {
+                                    auto dec = parseDeclaration(true);
+                                    if (dec is null)
+                                        return false;
+                                    else
+                                        deallocate(dec);
+                                }
+                                return true;
+                            }
+                        }
+                    }
                     return true;
                 }
             }
