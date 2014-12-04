@@ -534,16 +534,9 @@ class Formatter(Sink)
     void format(const BaseClass baseClass)
     {
         debug(verbose) writeln("BaseClass");
-
-        /**
-        IdentifierOrTemplateChain identifierOrTemplateChain;
-        TypeofExpression typeofExpression;
-        **/
-
         with(baseClass)
         {
-            if (identifierOrTemplateChain) format(identifierOrTemplateChain);
-            else if (typeofExpression) format(typeofExpression);
+            if (type2) format(type2);
         }
     }
 

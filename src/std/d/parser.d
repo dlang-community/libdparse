@@ -1095,7 +1095,7 @@ class Parser
      * Parses a BaseClass
      *
      * $(GRAMMAR $(RULEDEF baseClass):
-     *     ($(RULE typeofExpression) $(LITERAL '.'))? $(RULE identifierOrTemplateChain)
+     *     $(RULE type2)
      *     ;)
      */
     BaseClass parseBaseClass()
@@ -1107,12 +1107,11 @@ class Parser
             warn("Use of base class protection is deprecated.");
             advance();
         }
-        if (currentIs(tok!"typeof"))
+        if ((node.type2 = parseType2()) is null)
         {
-            node.typeofExpression = parseTypeofExpression();
-            if (expect(tok!".") is null) { deallocate(node); return null; }
+            deallocate(node);
+            return null;
         }
-        node.identifierOrTemplateChain = parseIdentifierOrTemplateChain();
         return node;
     }
 
@@ -6368,6 +6367,7 @@ protected:
                     return true;
                 if (currentIs(tok!"{"))
                 {
+                    advance(); // "{"
                     while (!currentIs(tok!"}"))
                     {
                         auto dec = parseDeclaration(true);

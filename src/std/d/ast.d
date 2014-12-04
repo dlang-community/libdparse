@@ -902,10 +902,9 @@ final class BaseClass : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifierOrTemplateChain, typeofExpression));
+        mixin (visitIfNotNull!(type2));
     }
-    /** */ IdentifierOrTemplateChain identifierOrTemplateChain;
-    /** */ TypeofExpression typeofExpression;
+    /** */ Type2 type2;
     mixin OpEquals;
 }
 
