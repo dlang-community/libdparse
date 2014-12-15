@@ -454,6 +454,12 @@ class Formatter(Sink)
         {
             if (pragmaExpression) format(pragmaExpression);
             if (attribute.type != tok!"") put(tokenRep(attribute.type));
+            if (identifierChain)
+            {
+                put("(");
+                format(identifierChain);
+                put(")");
+            }
             if (deprecated_) format(deprecated_);
             if (atAttribute) format(atAttribute);
         }

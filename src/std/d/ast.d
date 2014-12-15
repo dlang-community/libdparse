@@ -809,14 +809,15 @@ public:
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(pragmaExpression, deprecated_, atAttribute,
-			alignAttribute));
+            alignAttribute, identifierChain));
     }
     /** */ PragmaExpression pragmaExpression;
     /** */ Deprecated deprecated_;
     /** */ AtAttribute atAttribute;
-	/** */ AlignAttribute alignAttribute;
-	/** */ LinkageAttribute linkageAttribute;
+    /** */ AlignAttribute alignAttribute;
+    /** */ LinkageAttribute linkageAttribute;
     /** */ Token attribute;
+    /** */ IdentifierChain identifierChain;
     mixin OpEquals;
 }
 
@@ -837,8 +838,8 @@ final class AutoDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-		if (storageClass !is null)
-			visitor.visit(storageClass);
+        if (storageClass !is null)
+            visitor.visit(storageClass);
         foreach (i; 0 .. initializers.length)
         {
             visitor.visit(initializers[i]);
@@ -846,7 +847,7 @@ public:
     }
     /** */ Token[] identifiers;
     /** */ Initializer[] initializers;
-	/** */ StorageClass storageClass;
+    /** */ StorageClass storageClass;
     /** */ string comment;
     mixin OpEquals;
 }
@@ -1168,7 +1169,7 @@ public:
             sharedStaticDestructor, sharedStaticConstructor,
             conditionalDeclaration, pragmaDeclaration, versionSpecification,
             invariant_, postblit, declarations, debugSpecification,
-			eponymousTemplateDeclaration));
+            eponymousTemplateDeclaration));
     }
 
     /** */ AliasDeclaration aliasDeclaration;
@@ -1182,7 +1183,7 @@ public:
     /** */ Declaration[] declarations;
     /** */ Destructor destructor;
     /** */ EnumDeclaration enumDeclaration;
-	/** */ EponymousTemplateDeclaration eponymousTemplateDeclaration;
+    /** */ EponymousTemplateDeclaration eponymousTemplateDeclaration;
     /** */ FunctionDeclaration functionDeclaration;
     /** */ ImportDeclaration importDeclaration;
     /** */ InterfaceDeclaration interfaceDeclaration;
@@ -1570,8 +1571,8 @@ public:
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(storageClasses, returnType, parameters,
-			templateParameters, constraint, memberFunctionAttributes,
-			functionBody));
+            templateParameters, constraint, memberFunctionAttributes,
+            functionBody));
     }
     /** */ bool hasAuto;
     /** */ bool hasRef;
@@ -2129,8 +2130,8 @@ public:
     /** */ VersionSpecification versionSpecification;
     /** */ DebugSpecification debugSpecification;
     /** */ ExpressionStatement expressionStatement;
-	/** */ size_t startLocation;
-	/** */ size_t endLocation;
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     mixin OpEquals;
 }
 

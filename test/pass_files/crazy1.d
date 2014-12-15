@@ -1,4 +1,4 @@
-package mixin template phone() if (new class : ulong {
+package mixin template phone() if (new class ulong {
 import omg = ouchMyFinger.pineapple;
 }
  & knife!__DATE__(phone is +33890, 'G', raspberry !is ~76988.5, cast (shared const) -import (assert ('q'))) &= 's' || raspberry)

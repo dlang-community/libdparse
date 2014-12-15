@@ -232,11 +232,11 @@ class Parser
         }
         size_t startLocation = current().index;
         auto node = parseCommaSeparatedRule!(ArgumentList, AssignExpression)(true);
-		if (node is null)
-		{
-			deallocate(node);
-			return null;
-		}
+        if (node is null)
+        {
+            deallocate(node);
+            return null;
+        }
         node.startLocation = startLocation;
         if (moreTokens) node.endLocation = current().index;
         return node;
@@ -1016,8 +1016,16 @@ class Parser
             }
             else
                 goto case;
-        case tok!"private":
         case tok!"package":
+            node.attribute = advance();
+            if (currentIs(tok!"("))
+            {
+                expect(tok!"(");
+                node.identifierChain = parseIdentifierChain();
+                expect(tok!")");;
+            }
+            break;
+        case tok!"private":
         case tok!"protected":
         case tok!"public":
         case tok!"export":
@@ -1122,11 +1130,11 @@ class Parser
         auto closeBrace = expect(tok!"}");
         if (closeBrace !is null)
             node.endLocation = closeBrace.index;
-		else
-		{
-			trace("blargh?");
-			node.endLocation = size_t.max;
-		}
+        else
+        {
+            trace("blargh?");
+            node.endLocation = size_t.max;
+        }
 
         return node;
     }
@@ -1434,11 +1442,11 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CmpExpression;
         auto shift = parseShiftExpression();
-		if (shift is null)
-		{
-			deallocate(node);
-			return null;
-		}
+        if (shift is null)
+        {
+            deallocate(node);
+            return null;
+        }
         if (!moreTokens())
             return shift;
         switch (current.type)
@@ -1863,11 +1871,13 @@ class Parser
                     {
                         goToBookmark(b);
                         node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);
+                        if (node.functionDeclaration is null) { deallocate(node); return null; }
                     }
                     else
                     {
                         goToBookmark(b);
                         node.eponymousTemplateDeclaration = parseEponymousTemplateDeclaration();
+                        if (node.eponymousTemplateDeclaration is null) { deallocate(node); return null; }
                     }
                 }
                 else if (currentIsOneOf(tok!":", tok!"{", tok!";"))
@@ -1876,6 +1886,12 @@ class Parser
                     goToBookmark(b);
                     node.enumDeclaration = parseEnumDeclaration();
                     if (node.enumDeclaration is null) { deallocate(node); return null; }
+                }
+                else
+                {
+                    goToBookmark(b);
+                    node.variableDeclaration = parseVariableDeclaration(null, true);
+                    if (node.variableDeclaration is null) { deallocate(node); return null; }
                 }
             }
             else
@@ -2558,17 +2574,17 @@ class Parser
         else
         {
             error(`"foreach" or "foreach_reverse" expected`);
-			deallocate(node);
+            deallocate(node);
             return null;
         }
         node.startIndex = current().index;
         if (expect(tok!"(") is null) { deallocate(node); return null; }
         ForeachTypeList feType = parseForeachTypeList();
-		if (feType is null)
-		{
-			deallocate(node);
-			return null;
-		}
+        if (feType is null)
+        {
+            deallocate(node);
+            return null;
+        }
         bool canBeRange = feType.items.length == 1;
 
         if (expect(tok!";") is null) { deallocate(node); return null; }
@@ -3761,11 +3777,12 @@ class Parser
      * Parses a NewAnonClassExpression
      *
      * $(GRAMMAR $(RULEDEF newAnonClassExpression):
-     *     $(LITERAL 'new') $(RULE arguments)? $(LITERAL 'class') $(RULE arguments)? ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody)
+     *     $(LITERAL 'new') $(RULE arguments)? $(LITERAL 'class') $(RULE arguments)? $(RULE baseClassList)? $(RULE structBody)
      *     ;)
      */
     NewAnonClassExpression parseNewAnonClassExpression()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!NewAnonClassExpression;
         expect(tok!"new");
         if (currentIs(tok!"("))
@@ -3773,11 +3790,8 @@ class Parser
         expect(tok!"class");
         if (currentIs(tok!"("))
             node.constructorArguments = parseArguments();
-        if (currentIs(tok!":"))
-        {
-            advance(); // :
+        if (!currentIs(tok!"{"))
             node.baseClassList = parseBaseClassList();
-        }
         node.structBody = parseStructBody();
         return node;
     }
@@ -3847,7 +3861,7 @@ class Parser
             {
                 assert (currentIs(tok!"{"));
                 auto m = setBookmark();
-                if (parseAssignExpression() is null)
+                if (parseStructInitializer() !is null)
                 {
                     goToBookmark(m);
                     if ((node.structInitializer = parseStructInitializer()) is null)
@@ -4680,10 +4694,10 @@ class Parser
             break;
         default:
             if ((node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault()) is null)
-			{
-				deallocate(node);
-				return null;
-			}
+            {
+                deallocate(node);
+                return null;
+            }
             break;
         }
         return node;
@@ -4822,10 +4836,10 @@ class Parser
         case tok!"assert":
         default:
             if ((node.expressionStatement = parseExpressionStatement()) is null)
-			{
-				deallocate(node);
-				return null;
-			}
+            {
+                deallocate(node);
+                return null;
+            }
             break;
         }
         node.endLocation = tokens[index - 1].index;
