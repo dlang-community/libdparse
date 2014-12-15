@@ -28,7 +28,8 @@ alias ParseAllocator = CAllocatorImpl!(Mallocator);
  * Returns: the parsed module
  */
 Module parseModule(const(Token)[] tokens, string fileName, CAllocator allocator = null,
-    void function(string, size_t, size_t, string, bool) messageFunction = null)
+    void function(string, size_t, size_t, string, bool) messageFunction = null,
+    uint* errorCount = null, uint* warningCount = null)
 {
     auto parser = new Parser();
     parser.fileName = fileName;
@@ -36,8 +37,10 @@ Module parseModule(const(Token)[] tokens, string fileName, CAllocator allocator 
     parser.messageFunction = messageFunction;
     parser.allocator = allocator;
     auto mod = parser.parseModule();
-    // writefln("Parsing finished with %d errors and %d warnings.",
-    //     parser.errorCount, parser.warningCount);
+    if (warningCount !is null)
+        *warningCount = parser.warningCount;
+    if (errorCount !is null)
+        *errorCount = parser.errorCount;
     return mod;
 }
 
@@ -228,10 +231,15 @@ class Parser
             return null;
         }
         size_t startLocation = current().index;
-        auto ret= parseCommaSeparatedRule!(ArgumentList, AssignExpression)(true);
-        ret.startLocation = startLocation;
-        if (moreTokens) ret.endLocation = current().index;
-        return ret;
+        auto node = parseCommaSeparatedRule!(ArgumentList, AssignExpression)(true);
+		if (node is null)
+		{
+			deallocate(node);
+			return null;
+		}
+        node.startLocation = startLocation;
+        if (moreTokens) node.endLocation = current().index;
+        return node;
     }
 
     /**
@@ -526,7 +534,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF asmLogOrExp):
      *       $(RULE asmLogAndExp)
-     *     | $(RULE asmLogOrExp) ('||' $(RULE asmLogAndExp))?
+     *     | $(RULE asmLogOrExp) '||' $(RULE asmLogAndExp)
      *     ;)
      */
     ExpressionNode parseAsmLogOrExp()
@@ -569,6 +577,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF asmPrimaryExp):
      *       $(LITERAL IntegerLiteral)
      *     | $(LITERAL FloatLiteral)
+     *     | $(LITERAL StringLiteral)
      *     | $(RULE register) ($(LITERAL ':') $(RULE asmExp))?
      *     | $(RULE identifierChain)
      *     | $(LITERAL '$')
@@ -872,6 +881,11 @@ class Parser
         node.line = current().line;
         node.column = current().column;
         node.ternaryExpression = parseTernaryExpression();
+        if (node.ternaryExpression is null)
+        {
+            deallocate(node);
+            return null;
+        }
         if (currentIsOneOf(tok!"=", tok!">>>=",
             tok!">>=", tok!"<<=",
             tok!"+=", tok!"-=", tok!"*=",
@@ -903,7 +917,9 @@ class Parser
      * Parses an AtAttribute
      *
      * $(GRAMMAR $(RULEDEF atAttribute):
-     *     $(LITERAL '@') ($(LITERAL Identifier) | $(LITERAL '$(LPAREN)') $(RULE argumentList) $(LITERAL '$(RPAREN)') | $(RULE functionCallExpression))
+     *       $(LITERAL '@') $(LITERAL Identifier)
+     *     | $(LITERAL '@') $(LITERAL Identifier) $(LITERAL '$(LPAREN)') $(RULE argumentList)? $(LITERAL '$(RPAREN)')
+     *     | $(LITERAL '@') $(LITERAL '$(LPAREN)') $(RULE argumentList) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     AtAttribute parseAtAttribute()
@@ -921,10 +937,13 @@ class Parser
         switch (current.type)
         {
         case tok!"identifier":
-            if (peekIsOneOf(tok!"(", tok!".", tok!"!"))
-                node.functionCallExpression = parseFunctionCallExpression();
-            else
-                node.identifier = advance();
+            node.identifier = advance();
+            if (currentIs(tok!"("))
+            {
+                advance(); // (
+                node.argumentList = parseArgumentList();
+                expect(tok!")");
+            }
             break;
         case tok!"(":
             advance();
@@ -944,12 +963,31 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF attribute):
      *     | $(RULE pragmaExpression)
-     *     | $(RULE storageClass)
+     *     | $(RULE alignAttribute)
+     *     | $(RULE deprecated)
+     *     | $(RULE atAttribute)
+     *     | $(RULE linkageAttribute)
      *     | $(LITERAL 'export')
      *     | $(LITERAL 'package')
      *     | $(LITERAL 'private')
      *     | $(LITERAL 'protected')
      *     | $(LITERAL 'public')
+     *     | $(LITERAL 'static')
+     *     | $(LITERAL 'extern')
+     *     | $(LITERAL 'abstract')
+     *     | $(LITERAL 'final')
+     *     | $(LITERAL 'override')
+     *     | $(LITERAL 'synchronized')
+     *     | $(LITERAL 'auto')
+     *     | $(LITERAL 'scope')
+     *     | $(LITERAL 'const')
+     *     | $(LITERAL 'immutable')
+     *     | $(LITERAL 'inout')
+     *     | $(LITERAL 'shared')
+     *     | $(LITERAL '__gshared')
+     *     | $(LITERAL 'nothrow')
+     *     | $(LITERAL 'pure')
+     *     | $(LITERAL 'ref')
      *     ;)
      */
     Attribute parseAttribute()
@@ -961,16 +999,48 @@ class Parser
         case tok!"pragma":
             node.pragmaExpression = parsePragmaExpression();
             break;
+        case tok!"deprecated":
+            node.deprecated_ = parseDeprecated();
+            break;
+        case tok!"align":
+            node.alignAttribute = parseAlignAttribute();
+            break;
+        case tok!"@":
+            node.atAttribute = parseAtAttribute();
+            break;
+        case tok!"extern":
+            if (peekIs(tok!"("))
+            {
+                node.linkageAttribute = parseLinkageAttribute();
+                break;
+            }
+            else
+                goto case;
         case tok!"private":
         case tok!"package":
         case tok!"protected":
         case tok!"public":
         case tok!"export":
-            node.attribute = advance().type;
+        case tok!"static":
+        case tok!"abstract":
+        case tok!"final":
+        case tok!"override":
+        case tok!"synchronized":
+        case tok!"auto":
+        case tok!"scope":
+        case tok!"const":
+        case tok!"immutable":
+        case tok!"inout":
+        case tok!"shared":
+        case tok!"__gshared":
+        case tok!"nothrow":
+        case tok!"pure":
+        case tok!"ref":
+            node.attribute = advance();
             break;
         default:
-            node.storageClass = parseStorageClass();
-            break;
+            deallocate(node);
+            return null;
         }
         return node;
     }
@@ -1003,6 +1073,8 @@ class Parser
         auto node = allocate!AutoDeclaration;
         node.comment = comment;
         comment = null;
+        if (isStorageClass())
+            node.storageClass = parseStorageClass();
         Token[] identifiers;
         Initializer[] initializers;
         do
@@ -1032,7 +1104,7 @@ class Parser
      *     $(LITERAL '{') $(RULE declarationsAndStatements)? $(LITERAL '}')
      *     ;)
      */
-    BlockStatement parseBlockStatement()
+    BlockStatement parseBlockStatement(bool strict = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!BlockStatement;
@@ -1040,12 +1112,22 @@ class Parser
         if (openBrace is null) { deallocate(node); return null; }
         node.startLocation = openBrace.index;
         if (!currentIs(tok!"}"))
-            node.declarationsAndStatements = parseDeclarationsAndStatements();
+        {
+            if ((node.declarationsAndStatements = parseDeclarationsAndStatements()) is null)
+            {
+                deallocate(node);
+                return null;
+            }
+        }
         auto closeBrace = expect(tok!"}");
         if (closeBrace !is null)
             node.endLocation = closeBrace.index;
-        else
-            node.endLocation = size_t.max;
+		else
+		{
+			trace("blargh?");
+			node.endLocation = size_t.max;
+		}
+
         return node;
     }
 
@@ -1156,7 +1238,7 @@ class Parser
      *    | $(LITERAL 'void')
      *    ;)
      */
-    IdType parseBasicType()
+    IdType parseBuiltinType()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         return advance().type;
@@ -1352,6 +1434,11 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CmpExpression;
         auto shift = parseShiftExpression();
+		if (shift is null)
+		{
+			deallocate(node);
+			return null;
+		}
         if (!moreTokens())
             return shift;
         switch (current.type)
@@ -1430,7 +1517,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF conditionalDeclaration):
      *       $(RULE compileCondition) $(RULE declaration)
      *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+
-     *     | $(RULE compileCondition) $(RULE declaration) ($(LITERAL 'else') $(RULE declaration))?
+     *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') $(RULE declaration)
      *     ;)
      */
     ConditionalDeclaration parseConditionalDeclaration()
@@ -1444,11 +1531,10 @@ class Parser
         {
             advance();
             while (isDeclaration())
-                trueDeclarations ~= parseDeclaration();
-            if (trueDeclarations.length == 0)
             {
-                error("Declaration expected");
-                return null;
+                auto d = parseDeclaration();
+                if (d !is null)
+                    trueDeclarations ~= d;
             }
             node.trueDeclarations = ownArray(trueDeclarations);
             return node;
@@ -1513,7 +1599,7 @@ class Parser
      * Parses a Constructor
      *
      * $(GRAMMAR $(RULEDEF constructor):
-     *       $(LITERAL 'this') $(RULE templateParameters) $(RULE parameters) $(RULE memberFunctionAttribute)* $(RULE constraint)? ($(RULE functionBody) | $(LITERAL ';'))
+     *       $(LITERAL 'this') $(RULE templateParameters)? $(RULE parameters) $(RULE memberFunctionAttribute)* $(RULE constraint)? ($(RULE functionBody) | $(LITERAL ';'))
      *     ;)
      */
     Constructor parseConstructor()
@@ -1646,14 +1732,18 @@ class Parser
      * $(RULEDEF declaration2):
      *       $(RULE aliasDeclaration)
      *     | $(RULE aliasThisDeclaration)
+     *     | $(RULE attributeDeclaration)
      *     | $(RULE classDeclaration)
      *     | $(RULE conditionalDeclaration)
      *     | $(RULE constructor)
+     *     | $(RULE debugSpecification)
      *     | $(RULE destructor)
      *     | $(RULE enumDeclaration)
+     *     | $(RULE eponymousTemplateDeclaration)
      *     | $(RULE functionDeclaration)
      *     | $(RULE importDeclaration)
      *     | $(RULE interfaceDeclaration)
+     *     | $(RULE invariant)
      *     | $(RULE mixinDeclaration)
      *     | $(RULE mixinTemplateDeclaration)
      *     | $(RULE pragmaDeclaration)
@@ -1667,10 +1757,7 @@ class Parser
      *     | $(RULE unionDeclaration)
      *     | $(RULE unittest)
      *     | $(RULE variableDeclaration)
-     *     | $(RULE attributeDeclaration)
-     *     | $(RULE invariant)
      *     | $(RULE versionSpecification)
-     *     | $(RULE debugSpecification)
      *     | $(LITERAL '{') $(RULE declaration)+ $(LITERAL '}')
      *     ;)
      */
@@ -1760,10 +1847,43 @@ class Parser
             if (node.destructor is null) { deallocate(node); return null; }
             break;
         case tok!"enum":
-            if (startsWith(tok!"enum", tok!"identifier", tok!"("))
-                goto case tok!"template";
-            node.enumDeclaration = parseEnumDeclaration();
-            if (node.enumDeclaration is null) { deallocate(node); return null; }
+            auto b = setBookmark();
+            advance(); // enum
+            if (currentIsOneOf(tok!";", tok!":", tok!"{"))
+                goto enumDeclaration;
+            else if (currentIs(tok!"identifier"))
+            {
+                advance();
+                if (currentIs(tok!"("))
+                {
+                    skipParens(); // ()
+                    if (currentIs(tok!"("))
+                        skipParens();
+                    if (currentIs(tok!"{"))
+                    {
+                        goToBookmark(b);
+                        node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);
+                    }
+                    else
+                    {
+                        goToBookmark(b);
+                        node.eponymousTemplateDeclaration = parseEponymousTemplateDeclaration();
+                    }
+                }
+                else if (currentIsOneOf(tok!":", tok!"{", tok!";"))
+                {
+            enumDeclaration:
+                    goToBookmark(b);
+                    node.enumDeclaration = parseEnumDeclaration();
+                    if (node.enumDeclaration is null) { deallocate(node); return null; }
+                }
+            }
+            else
+            {
+                goToBookmark(b);
+                node.variableDeclaration = parseVariableDeclaration();
+                if (node.variableDeclaration is null) { deallocate(node); return null; }
+            }
             break;
         case tok!"import":
             node.importDeclaration = parseImportDeclaration();
@@ -1842,8 +1962,7 @@ class Parser
             node.unittest_ = parseUnittest();
             break;
         case tok!"identifier":
-            if (node.attributes.length > 0
-                && node.attributes[$ - 1].storageClass !is null)
+            if (node.attributes.length > 0)
             {
                 if (peekIs(tok!"="))
                     node.variableDeclaration = parseVariableDeclaration(null, true, node.attributes);
@@ -1871,7 +1990,7 @@ class Parser
         case tok!"scope":
         case tok!"typeof":
         case tok!"__vector":
-        mixin (BASIC_TYPE_CASES);
+        mixin (BUILTIN_TYPE_CASES);
         type:
             Type type = parseType();
             if (type is null || !currentIs(tok!"identifier"))
@@ -1944,6 +2063,11 @@ class Parser
             auto dos = parseDeclarationOrStatement();
             if (dos !is null)
                 declarationsAndStatements ~= dos;
+            else if (suppressMessages > 0)
+            {
+                deallocate(node);
+                return null;
+            }
         }
         node.declarationsAndStatements = ownArray(declarationsAndStatements);
         return node;
@@ -2069,7 +2193,7 @@ class Parser
      * Parses a Deprecated attribute
      *
      * $(GRAMMAR $(RULEDEF deprecated):
-     *     $(LITERAL 'deprecated') ($(LITERAL '$(LPAREN)') $(RULE assignExpression) $(LITERAL '$(RPAREN)'))?
+     *     $(LITERAL 'deprecated') ($(LITERAL '$(LPAREN)') $(LITERAL StringLiteral) $(LITERAL '$(RPAREN)'))?
      *     ;)
      */
     Deprecated parseDeprecated()
@@ -2080,7 +2204,9 @@ class Parser
         if (currentIs(tok!"("))
         {
             advance();
-            node.assignExpression = parseAssignExpression();
+            auto s = expect(tok!"stringLiteral");
+            if (s is null) { deallocate(node); return null; }
+            node.stringLiteral = *s;
             if (expect(tok!")") is null) { deallocate(node); return null; }
         }
         return node;
@@ -2197,6 +2323,8 @@ class Parser
             if (close !is null)
                 node.endLocation = close.index;
         }
+        else
+            advance();
     ret:
         return node;
     }
@@ -2233,7 +2361,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF enumMember):
      *       $(LITERAL Identifier)
-     *     | ($(LITERAL Identifier) | $(RULE type)) $(LITERAL '=') $(RULE assignExpression)
+     *     | $(RULE type)? $(LITERAL Identifier) $(LITERAL '=') $(RULE assignExpression)
      *     ;)
      */
     EnumMember parseEnumMember()
@@ -2265,6 +2393,31 @@ class Parser
             expect(tok!"=");
             node.assignExpression = parseAssignExpression();
         }
+        return node;
+    }
+
+    /**
+     * Parses an EponymousTemplateDeclaration
+     *
+     * $(GRAMMAR $(RULEDEF eponymousTemplateDeclaration):
+     *     $(LITERAL 'enum') $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE assignExpression) $(LITERAL ';')
+     *     ;)
+     */
+    EponymousTemplateDeclaration parseEponymousTemplateDeclaration()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocate!EponymousTemplateDeclaration;
+        advance(); // enum
+        auto ident = expect(tok!"identifier");
+        if (ident is null) { deallocate(node); return null; }
+        node.name = *ident;
+        node.templateParameters = parseTemplateParameters();
+        expect(tok!"=");
+        if (isExpression())
+            node.assignExpression = parseAssignExpression();
+        else
+            node.type = parseType();
+        expect(tok!";");
         return node;
     }
 
@@ -2312,7 +2465,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ExpressionStatement;
         node.expression = expression is null ? parseExpression() : expression;
-        if (expect(tok!";") is null) { deallocate(node); return null; }
+        if (node.expression is null || expect(tok!";") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2405,11 +2558,17 @@ class Parser
         else
         {
             error(`"foreach" or "foreach_reverse" expected`);
+			deallocate(node);
             return null;
         }
         node.startIndex = current().index;
         if (expect(tok!"(") is null) { deallocate(node); return null; }
         ForeachTypeList feType = parseForeachTypeList();
+		if (feType is null)
+		{
+			deallocate(node);
+			return null;
+		}
         bool canBeRange = feType.items.length == 1;
 
         if (expect(tok!";") is null) { deallocate(node); return null; }
@@ -2453,8 +2612,13 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ForeachType;
-        if (currentIsOneOf(tok!"ref", tok!"const", tok!"immutable",
-            tok!"shared", tok!"inout") && !peekIs(tok!"("))
+        if (currentIs(tok!"ref"))
+        {
+            node.isRef = true;
+            advance();
+        }
+        if (currentIsOneOf(tok!"const", tok!"immutable",
+            tok!"inout") && !peekIs(tok!"("))
         {
             trace("\033[01;36mType constructor");
             if ((node.typeConstructors = parseTypeConstructors()) is null)
@@ -2525,6 +2689,7 @@ class Parser
      */
     FunctionBody parseFunctionBody()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!FunctionBody;
         if (currentIs(tok!";"))
         {
@@ -2532,7 +2697,13 @@ class Parser
             return node;
         }
         else if (currentIs(tok!"{"))
-            node.blockStatement = parseBlockStatement();
+        {
+            if ((node.blockStatement = parseBlockStatement()) is null)
+            {
+                deallocate(node);
+                return null;
+            }
+        }
         else
         {
             if (currentIs(tok!"in"))
@@ -2601,7 +2772,8 @@ class Parser
      * Parses a FunctionDeclaration
      *
      * $(GRAMMAR $(RULEDEF functionDeclaration):
-     *       ($(RULE storageClass) | $(RULE _type)) $(LITERAL Identifier) $(RULE templateParameters) $(RULE parameters) $(RULE memberFunctionAttribute)* $(RULE constraint)? ($(RULE functionBody) | $(LITERAL ';'))
+     *       ($(RULE storageClass)+ | $(RULE _type)) $(LITERAL Identifier) $(RULE parameters) $(RULE memberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ';'))
+     *     | ($(RULE storageClass)+ | $(RULE _type)) $(LITERAL Identifier) $(RULE templateParameters) $(RULE parameters) $(RULE memberFunctionAttribute)* $(RULE constraint)? ($(RULE functionBody) | $(LITERAL ';'))
      *     ;)
      */
     FunctionDeclaration parseFunctionDeclaration(Type type = null, bool isAuto = false,
@@ -2617,24 +2789,39 @@ class Parser
 
         if (isAuto)
         {
+            StorageClass[] storageClasses;
+            while (isStorageClass())
+            {
+                auto s = parseStorageClass();
+                if (s is null)
+                {
+                    deallocate(node);
+                    return null;
+                }
+                else
+                    storageClasses ~= s;
+            }
+            node.storageClasses = storageClasses;
+
+
             foreach (a; node.attributes)
             {
-                if (a.storageClass is null)
-                    continue;
-                if (a.storageClass.token == tok!"auto")
+                if (a.attribute == tok!"auto")
                     node.hasAuto = true;
-                if (a.storageClass.token == tok!"ref")
+                else if (a.attribute == tok!"ref")
                     node.hasRef = true;
+                else
+                    continue;
             }
-            goto functionName;
+        }
+        else
+        {
+            while (moreTokens() && currentIsMemberFunctionAttribute())
+                memberFunctionAttributes ~= parseMemberFunctionAttribute();
+
+            node.returnType = type is null ? parseType() : type;
         }
 
-        while (moreTokens() && currentIsMemberFunctionAttribute())
-            memberFunctionAttributes ~= parseMemberFunctionAttribute();
-
-        node.returnType = type is null ? parseType() : type;
-
-    functionName:
         auto ident = expect(tok!"identifier");
         if (ident is null) { deallocate(node); return null; }
 
@@ -2706,8 +2893,7 @@ class Parser
             } while (moreTokens());
             node.functionAttributes = ownArray(functionAttributes);
         }
-        node.functionBody = parseFunctionBody();
-        if (node.functionBody is null) { deallocate(node); return null; }
+        if ((node.functionBody = parseFunctionBody()) is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -2720,6 +2906,7 @@ class Parser
      */
     GotoStatement parseGotoStatement()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!GotoStatement;
         if (expect(tok!"goto") is null) { deallocate(node); return null; }
         switch (current.type)
@@ -2855,7 +3042,7 @@ class Parser
      * Parses an IdentityExpression
      *
      * $(GRAMMAR $(RULEDEF identityExpression):
-     *     $(RULE shiftExpression) ($(LITERAL 'is') | $(LITERAL '!') $(LITERAL 'is')) $(RULE shiftExpression)
+     *     $(RULE shiftExpression) ($(LITERAL 'is') | ($(LITERAL '!') $(LITERAL 'is'))) $(RULE shiftExpression)
      *     ;)
      */
     ExpressionNode parseIdentityExpression(ExpressionNode shift = null)
@@ -3081,7 +3268,7 @@ class Parser
      * Parses an InExpression
      *
      * $(GRAMMAR $(RULEDEF inExpression):
-     *     $(RULE shiftExpression) ($(LITERAL 'in') | $(LITERAL '!') $(LITERAL 'in')) $(RULE shiftExpression)
+     *     $(RULE shiftExpression) ($(LITERAL 'in') | ($(LITERAL '!') $(LITERAL 'in'))) $(RULE shiftExpression)
      *     ;)
      */
     ExpressionNode parseInExpression(ExpressionNode shift = null)
@@ -3139,7 +3326,6 @@ class Parser
      * $(GRAMMAR $(RULEDEF interfaceDeclaration):
      *       $(LITERAL 'interface') $(LITERAL Identifier) $(LITERAL ';')
      *     | $(LITERAL 'interface') $(LITERAL Identifier) ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody)
-     *     | $(LITERAL 'interface') $(LITERAL Identifier) $(RULE templateParameters) $(RULE constraint)? ($(RULE structBody) | $(LITERAL ';'))
      *     | $(LITERAL 'interface') $(LITERAL Identifier) $(RULE templateParameters) $(RULE constraint)? ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody)
      *     | $(LITERAL 'interface') $(LITERAL Identifier) $(RULE templateParameters) ($(LITERAL ':') $(RULE baseClassList))? $(RULE constraint)? $(RULE structBody)
      *     ;)
@@ -3508,7 +3694,17 @@ class Parser
         Module m = allocate!Module;
         if (currentIs(tok!"scriptLine"))
             m.scriptLine = advance();
-        if (currentIs(tok!"module") || currentIs(tok!"deprecated"))
+        bool isDeprecatedModule;
+        if (currentIs(tok!"deprecated"))
+        {
+            auto b = setBookmark();
+            advance();
+            if (currentIs(tok!"("))
+                skipParens();
+            isDeprecatedModule = currentIs(tok!"module");
+            goToBookmark(b);
+        }
+        if (currentIs(tok!"module") || isDeprecatedModule)
             m.moduleDeclaration = parseModuleDeclaration();
         Declaration[] declarations;
         while (moreTokens())
@@ -3565,7 +3761,7 @@ class Parser
      * Parses a NewAnonClassExpression
      *
      * $(GRAMMAR $(RULEDEF newAnonClassExpression):
-     *     $(LITERAL 'new') $(RULE arguments)? $(LITERAL 'class') $(RULE arguments)? $(RULE baseClassList)? $(RULE structBody)
+     *     $(LITERAL 'new') $(RULE arguments)? $(LITERAL 'class') $(RULE arguments)? ($(LITERAL ':') $(RULE baseClassList))? $(RULE structBody)
      *     ;)
      */
     NewAnonClassExpression parseNewAnonClassExpression()
@@ -3577,8 +3773,11 @@ class Parser
         expect(tok!"class");
         if (currentIs(tok!"("))
             node.constructorArguments = parseArguments();
-        if (!currentIs(tok!"{"))
+        if (currentIs(tok!":"))
+        {
+            advance(); // :
             node.baseClassList = parseBaseClassList();
+        }
         node.structBody = parseStructBody();
         return node;
     }
@@ -3587,7 +3786,7 @@ class Parser
      * Parses a NewExpression
      *
      * $(GRAMMAR $(RULEDEF newExpression):
-     *       $(LITERAL 'new') $(RULE type) ($(LITERAL '[') $(RULE assignExpression) $(LITERAL ']') | $(RULE arguments))?
+     *       $(LITERAL 'new') $(RULE type) (($(LITERAL '[') $(RULE assignExpression) $(LITERAL ']')) | $(RULE arguments))?
      *     | $(RULE newAnonClassExpression)
      *     ;)
      */
@@ -3600,7 +3799,14 @@ class Parser
         //              ^^^****
         auto node = allocate!NewExpression;
         if (peekIsOneOf(tok!"class", tok!"("))
+        {
             node.newAnonClassExpression = parseNewAnonClassExpression();
+            if (node.newAnonClassExpression is null)
+            {
+                deallocate(node);
+                return null;
+            }
+        }
         else
         {
             expect(tok!"new");
@@ -3620,152 +3826,12 @@ class Parser
     }
 
     /**
-     * Parses a StatementNoCaseNoDefault
-     *
-     * $(GRAMMAR $(RULEDEF statementNoCaseNoDefault):
-     *       $(RULE labeledStatement)
-     *     | $(RULE blockStatement)
-     *     | $(RULE ifStatement)
-     *     | $(RULE whileStatement)
-     *     | $(RULE doStatement)
-     *     | $(RULE forStatement)
-     *     | $(RULE foreachStatement)
-     *     | $(RULE switchStatement)
-     *     | $(RULE finalSwitchStatement)
-     *     | $(RULE continueStatement)
-     *     | $(RULE breakStatement)
-     *     | $(RULE returnStatement)
-     *     | $(RULE gotoStatement)
-     *     | $(RULE withStatement)
-     *     | $(RULE synchronizedStatement)
-     *     | $(RULE tryStatement)
-     *     | $(RULE throwStatement)
-     *     | $(RULE scopeGuardStatement)
-     *     | $(RULE asmStatement)
-     *     | $(RULE conditionalStatement)
-     *     | $(RULE staticAssertStatement)
-     *     | $(RULE versionSpecification)
-     *     | $(RULE debugSpecification)
-     *     | $(RULE expressionStatement)
-     *     ;)
-     */
-    StatementNoCaseNoDefault parseStatementNoCaseNoDefault()
-    {
-        auto node = allocate!StatementNoCaseNoDefault;
-        node.startLocation = current().index;
-        switch (current.type)
-        {
-        case tok!"{":
-            node.blockStatement = parseBlockStatement();
-            break;
-        case tok!"if":
-            node.ifStatement = parseIfStatement();
-            break;
-        case tok!"while":
-            node.whileStatement = parseWhileStatement();
-            break;
-        case tok!"do":
-            node.doStatement = parseDoStatement();
-            break;
-        case tok!"for":
-            node.forStatement = parseForStatement();
-            break;
-        case tok!"foreach":
-        case tok!"foreach_reverse":
-            node.foreachStatement = parseForeachStatement();
-            break;
-        case tok!"switch":
-            node.switchStatement = parseSwitchStatement();
-            break;
-        case tok!"continue":
-            node.continueStatement = parseContinueStatement();
-            break;
-        case tok!"break":
-            node.breakStatement = parseBreakStatement();
-            break;
-        case tok!"return":
-            node.returnStatement = parseReturnStatement();
-            break;
-        case tok!"goto":
-            node.gotoStatement = parseGotoStatement();
-            break;
-        case tok!"with":
-            node.withStatement = parseWithStatement();
-            break;
-        case tok!"synchronized":
-            node.synchronizedStatement = parseSynchronizedStatement();
-            break;
-        case tok!"try":
-            node.tryStatement = parseTryStatement();
-            break;
-        case tok!"throw":
-            node.throwStatement = parseThrowStatement();
-            break;
-        case tok!"scope":
-            node.scopeGuardStatement = parseScopeGuardStatement();
-            break;
-        case tok!"asm":
-            node.asmStatement = parseAsmStatement();
-            break;
-        case tok!"final":
-            if (peekIs(tok!"switch"))
-            {
-                node.finalSwitchStatement = parseFinalSwitchStatement();
-                break;
-            }
-            else
-            {
-                error(`"switch" expected`);
-                return null;
-            }
-        case tok!"debug":
-            if (peekIs(tok!"="))
-                node.debugSpecification = parseDebugSpecification();
-            else
-                node.conditionalStatement = parseConditionalStatement();
-            break;
-        case tok!"version":
-            if (peekIs(tok!"="))
-                node.versionSpecification = parseVersionSpecification();
-            else
-                node.conditionalStatement = parseConditionalStatement();
-            break;
-        case tok!"static":
-            if (peekIs(tok!"if"))
-                node.conditionalStatement = parseConditionalStatement();
-            else if (peekIs(tok!"assert"))
-                node.staticAssertStatement = parseStaticAssertStatement();
-            else
-            {
-                error("'if' or 'assert' expected.");
-                return null;
-            }
-            break;
-        case tok!"identifier":
-            if (peekIs(tok!":"))
-            {
-                node.labeledStatement = parseLabeledStatement();
-                break;
-            }
-            goto default;
-        case tok!"delete":
-        case tok!"assert":
-        default:
-            node.expressionStatement = parseExpressionStatement();
-            break;
-        }
-        node.endLocation = tokens[index - 1].index;
-        return node;
-    }
-
-    /**
      * Parses a NonVoidInitializer
      *
      * $(GRAMMAR $(RULEDEF nonVoidInitializer):
      *       $(RULE assignExpression)
      *     | $(RULE arrayInitializer)
      *     | $(RULE structInitializer)
-     *     | $(RULE functionBody)
      *     ;)
      */
     NonVoidInitializer parseNonVoidInitializer()
@@ -3777,10 +3843,29 @@ class Parser
             auto b = peekPastBraces();
             if (b !is null && (b.type == tok!"("))
                 node.assignExpression = parseAssignExpression();
-            else if (hasMagicDelimiter!(tok!"{", tok!";")())
-                node.functionBody = parseFunctionBody();
             else
-                node.structInitializer = parseStructInitializer();
+            {
+                assert (currentIs(tok!"{"));
+                auto m = setBookmark();
+                if (parseAssignExpression() is null)
+                {
+                    goToBookmark(m);
+                    if ((node.structInitializer = parseStructInitializer()) is null)
+                    {
+                        deallocate(node);
+                        return null;
+                    }
+                }
+                else
+                {
+                    goToBookmark(m);
+                    if ((node.assignExpression = parseAssignExpression()) is null)
+                    {
+                        deallocate(node);
+                        return null;
+                    }
+                }
+            }
         }
         else if (currentIs(tok!"["))
         {
@@ -3796,13 +3881,12 @@ class Parser
             else
                 node.assignExpression = parseAssignExpression();
         }
-        else if (currentIsOneOf(tok!"in", tok!"out", tok!"body"))
-            node.functionBody = parseFunctionBody();
         else
             node.assignExpression = parseAssignExpression();
         if (node.assignExpression is null && node.arrayInitializer is null
-        && node.structInitializer is null && node.functionBody is null)
+        && node.structInitializer is null)
         {
+            deallocate(node);
             return null;
         }
         return node;
@@ -3813,7 +3897,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF operands):
      *       $(RULE asmExp)
-     *     | $(RULE asmExp), $(RULE operands)
+     *     | $(RULE asmExp) $(LITERAL ',') $(RULE operands)
      *     ;)
      */
     Operands parseOperands()
@@ -3895,7 +3979,9 @@ class Parser
      * Parses a Parameter
      *
      * $(GRAMMAR $(RULEDEF parameter):
-     *     $(RULE parameterAttribute)* $(RULE type) (($(LITERAL Identifier) $(RULE typeSuffix)*)? $(LITERAL '...') | ($(LITERAL Identifier)? ($(LITERAL '=') $(RULE assignExpression))?))?
+     *     $(RULE parameterAttribute)* $(RULE type)
+     *     $(RULE parameterAttribute)* $(RULE type) $(LITERAL Identifier)? $(LITERAL '...')
+     *     $(RULE parameterAttribute)* $(RULE type) $(LITERAL Identifier)? ($(LITERAL '=') $(RULE assignExpression))?
      *     ;)
      */
     Parameter parseParameter()
@@ -3980,14 +4066,13 @@ class Parser
             if (peekIs(tok!"("))
                 return tok!"";
             else
-                goto _auto;
+                goto case;
         case tok!"final":
         case tok!"in":
         case tok!"lazy":
         case tok!"out":
         case tok!"ref":
         case tok!"scope":
-        _auto:
         case tok!"auto":
             return advance().type;
         default:
@@ -4133,7 +4218,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF primaryExpression):
      *       $(RULE identifierOrTemplateInstance)
      *     | $(LITERAL '.') $(RULE identifierOrTemplateInstance)
-     *     | $(RULE typeConstructor) $(LITERAL '(') $(RULE basicType) $(LITERAL ')') $(LITERAL '.') $(LITERAL Identifier)
+     *     | $(RULE typeConstructor) $(LITERAL '$(LPAREN)') $(RULE basicType) $(LITERAL '$(RPAREN)') $(LITERAL '.') $(LITERAL Identifier)
      *     | $(RULE basicType) $(LITERAL '.') $(LITERAL Identifier)
      *     | $(RULE basicType) $(RULE arguments)
      *     | $(RULE typeofExpression)
@@ -4203,7 +4288,7 @@ class Parser
             if (ident !is null)
                 node.primary = *ident;
             break;
-        mixin (BASIC_TYPE_CASES);
+        mixin (BUILTIN_TYPE_CASES);
             node.basicType = advance();
             if (currentIs(tok!"."))
             {
@@ -4272,7 +4357,11 @@ class Parser
         case tok!"in":
         case tok!"out":
         case tok!"body":
-            node.functionLiteralExpression = parseFunctionLiteralExpression();
+            if ((node.functionLiteralExpression = parseFunctionLiteralExpression()) is null)
+            {
+                deallocate(node);
+                return null;
+            }
             break;
         case tok!"typeof":
             node.typeofExpression = parseTypeofExpression();
@@ -4361,7 +4450,7 @@ class Parser
      * Parses a Register
      *
      * $(GRAMMAR $(RULEDEF register):
-     *     $(LITERAL Identifier)
+     *       $(LITERAL Identifier)
      *     | $(LITERAL Identifier) $(LITERAL '$(LPAREN)') $(LITERAL IntegerLiteral) $(LITERAL '$(RPAREN)')
      *     ;)
      */
@@ -4590,9 +4679,156 @@ class Parser
             node.defaultStatement = parseDefaultStatement();
             break;
         default:
-            node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault();
+            if ((node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault()) is null)
+			{
+				deallocate(node);
+				return null;
+			}
             break;
         }
+        return node;
+    }
+
+        /**
+     * Parses a StatementNoCaseNoDefault
+     *
+     * $(GRAMMAR $(RULEDEF statementNoCaseNoDefault):
+     *       $(RULE labeledStatement)
+     *     | $(RULE blockStatement)
+     *     | $(RULE ifStatement)
+     *     | $(RULE whileStatement)
+     *     | $(RULE doStatement)
+     *     | $(RULE forStatement)
+     *     | $(RULE foreachStatement)
+     *     | $(RULE switchStatement)
+     *     | $(RULE finalSwitchStatement)
+     *     | $(RULE continueStatement)
+     *     | $(RULE breakStatement)
+     *     | $(RULE returnStatement)
+     *     | $(RULE gotoStatement)
+     *     | $(RULE withStatement)
+     *     | $(RULE synchronizedStatement)
+     *     | $(RULE tryStatement)
+     *     | $(RULE throwStatement)
+     *     | $(RULE scopeGuardStatement)
+     *     | $(RULE asmStatement)
+     *     | $(RULE conditionalStatement)
+     *     | $(RULE staticAssertStatement)
+     *     | $(RULE versionSpecification)
+     *     | $(RULE debugSpecification)
+     *     | $(RULE expressionStatement)
+     *     ;)
+     */
+    StatementNoCaseNoDefault parseStatementNoCaseNoDefault()
+    {
+        auto node = allocate!StatementNoCaseNoDefault;
+        node.startLocation = current().index;
+        switch (current.type)
+        {
+        case tok!"{":
+            node.blockStatement = parseBlockStatement();
+            break;
+        case tok!"if":
+            node.ifStatement = parseIfStatement();
+            break;
+        case tok!"while":
+            node.whileStatement = parseWhileStatement();
+            break;
+        case tok!"do":
+            node.doStatement = parseDoStatement();
+            break;
+        case tok!"for":
+            node.forStatement = parseForStatement();
+            break;
+        case tok!"foreach":
+        case tok!"foreach_reverse":
+            node.foreachStatement = parseForeachStatement();
+            break;
+        case tok!"switch":
+            node.switchStatement = parseSwitchStatement();
+            break;
+        case tok!"continue":
+            node.continueStatement = parseContinueStatement();
+            break;
+        case tok!"break":
+            node.breakStatement = parseBreakStatement();
+            break;
+        case tok!"return":
+            node.returnStatement = parseReturnStatement();
+            break;
+        case tok!"goto":
+            node.gotoStatement = parseGotoStatement();
+            break;
+        case tok!"with":
+            node.withStatement = parseWithStatement();
+            break;
+        case tok!"synchronized":
+            node.synchronizedStatement = parseSynchronizedStatement();
+            break;
+        case tok!"try":
+            node.tryStatement = parseTryStatement();
+            break;
+        case tok!"throw":
+            node.throwStatement = parseThrowStatement();
+            break;
+        case tok!"scope":
+            node.scopeGuardStatement = parseScopeGuardStatement();
+            break;
+        case tok!"asm":
+            node.asmStatement = parseAsmStatement();
+            break;
+        case tok!"final":
+            if (peekIs(tok!"switch"))
+            {
+                node.finalSwitchStatement = parseFinalSwitchStatement();
+                break;
+            }
+            else
+            {
+                error(`"switch" expected`);
+                return null;
+            }
+        case tok!"debug":
+            if (peekIs(tok!"="))
+                node.debugSpecification = parseDebugSpecification();
+            else
+                node.conditionalStatement = parseConditionalStatement();
+            break;
+        case tok!"version":
+            if (peekIs(tok!"="))
+                node.versionSpecification = parseVersionSpecification();
+            else
+                node.conditionalStatement = parseConditionalStatement();
+            break;
+        case tok!"static":
+            if (peekIs(tok!"if"))
+                node.conditionalStatement = parseConditionalStatement();
+            else if (peekIs(tok!"assert"))
+                node.staticAssertStatement = parseStaticAssertStatement();
+            else
+            {
+                error("'if' or 'assert' expected.");
+                return null;
+            }
+            break;
+        case tok!"identifier":
+            if (peekIs(tok!":"))
+            {
+                node.labeledStatement = parseLabeledStatement();
+                break;
+            }
+            goto default;
+        case tok!"delete":
+        case tok!"assert":
+        default:
+            if ((node.expressionStatement = parseExpressionStatement()) is null)
+			{
+				deallocate(node);
+				return null;
+			}
+            break;
+        }
+        node.endLocation = tokens[index - 1].index;
         return node;
     }
 
@@ -4681,7 +4917,6 @@ class Parser
      *     | $(LITERAL 'enum')
      *     | $(LITERAL 'extern')
      *     | $(LITERAL 'final')
-     *     | $(LITERAL 'virtual')
      *     | $(LITERAL 'nothrow')
      *     | $(LITERAL 'override')
      *     | $(LITERAL 'pure')
@@ -4722,7 +4957,6 @@ class Parser
         case tok!"auto":
         case tok!"enum":
         case tok!"final":
-        case tok!"virtual":
         case tok!"nothrow":
         case tok!"override":
         case tok!"pure":
@@ -5036,7 +5270,7 @@ class Parser
      * Parses TemplateArguments
      *
      * $(GRAMMAR $(RULEDEF templateArguments):
-     *     $(LITERAL '!') ($(LITERAL '$(LPAREN)') $(RULE templateArgumentList)? $(LITERAL '$(RPAREN)') | $(RULE templateSingleArgument))
+     *     $(LITERAL '!') ($(LITERAL '$(LPAREN)') $(RULE templateArgumentList)? $(LITERAL '$(RPAREN)')) | $(RULE templateSingleArgument)
      *     ;)
      */
     TemplateArguments parseTemplateArguments()
@@ -5062,7 +5296,6 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF templateDeclaration):
      *       $(LITERAL 'template') $(LITERAL Identifier) $(RULE templateParameters) $(RULE constraint)? $(LITERAL '{') $(RULE declaration)* $(LITERAL '}')
-     *     | $(RULE eponymousTemplateDeclaration)
      *     ;)
      */
     TemplateDeclaration parseTemplateDeclaration()
@@ -5071,11 +5304,6 @@ class Parser
         auto node = allocate!TemplateDeclaration;
         node.comment = comment;
         comment = null;
-        if (currentIs(tok!"enum"))
-        {
-            node.eponymousTemplateDeclaration = parseEponymousTemplateDeclaration();
-            return node;
-        }
         expect(tok!"template");
         auto ident = expect(tok!"identifier");
         if (ident is null) { deallocate(node); return null; }
@@ -5095,33 +5323,6 @@ class Parser
         node.declarations = ownArray(declarations);
         auto end = expect(tok!"}");
         if (end !is null) node.endLocation = end.index;
-        return node;
-    }
-
-    /**
-     * Parses an EponymousTemplateDeclaration
-     *
-     * $(GRAMMAR $(RULEDEF eponymousTemplateDeclaration):
-     *     ($(LITERAL 'enum') | ($LITERAL 'alias')) $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE assignExpression) $(LITERAL ';')
-     *     ($(LITERAL 'enum') | ($LITERAL 'alias')) $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE type) $(LITERAL ';')
-     *     ;)
-     */
-    EponymousTemplateDeclaration parseEponymousTemplateDeclaration()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!EponymousTemplateDeclaration;
-        if (currentIsOneOf(tok!"enum", tok!"alias"))
-            advance();
-        auto ident = expect(tok!"identifier");
-        if (ident is null) { deallocate(node); return null; }
-        node.name = *ident;
-        node.templateParameters = parseTemplateParameters();
-        expect(tok!"=");
-        if (isExpression())
-            node.assignExpression = parseAssignExpression();
-        else
-            node.type = parseType();
-        expect(tok!";");
         return node;
     }
 
@@ -5279,7 +5480,7 @@ class Parser
         case tok!"identifier":
         mixin (SPECIAL_CASES);
         mixin (LITERAL_CASES);
-        mixin (BASIC_TYPE_CASES);
+        mixin (BUILTIN_TYPE_CASES);
             node.token = advance();
             break;
         default:
@@ -5419,6 +5620,11 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         TernaryExpression node = allocate!TernaryExpression;
         node.orOrExpression = parseOrOrExpression();
+        if (node.orOrExpression is null)
+        {
+            deallocate(node);
+            return null;
+        }
         if (currentIs(tok!"?"))
         {
             advance();
@@ -5495,7 +5701,7 @@ class Parser
      * Parses a Type
      *
      * $(GRAMMAR $(RULEDEF type):
-     *     $(RULE attribute)? $(RULE type2) $(RULE typeSuffix)*
+     *     $(RULE typeConstructors)? $(RULE type2) $(RULE typeSuffix)*
      *     ;)
      */
     Type parseType()
@@ -5572,8 +5778,8 @@ class Parser
             if ((node.symbol = parseSymbol()) is null)
                 return null;
             break;
-        mixin (BASIC_TYPE_CASES);
-            if ((node.builtinType = parseBasicType()) == tok!"")
+        mixin (BUILTIN_TYPE_CASES);
+            if ((node.builtinType = parseBuiltinType()) == tok!"")
                 return null;
             break;
         case tok!"typeof":
@@ -5615,7 +5821,6 @@ class Parser
      *     | $(LITERAL 'immutable')
      *     | $(LITERAL 'inout')
      *     | $(LITERAL 'shared')
-     *     | $(LITERAL 'scope')
      *     ;)
      */
     IdType parseTypeConstructor(bool validate = true)
@@ -5627,16 +5832,12 @@ class Parser
         case tok!"immutable":
         case tok!"inout":
         case tok!"shared":
-        case tok!"scope":
-        case tok!"ref":
-        case tok!"pure":
-        case tok!"nothrow":
             if (!peekIs(tok!"("))
                 return advance().type;
             goto default;
         default:
             if (validate)
-                error(`"const", "immutable", "inout", "shared", or "scope" expected`);
+                error(`"const", "immutable", "inout", or "shared" expected`);
             return tok!"";
         }
     }
@@ -5944,7 +6145,11 @@ class Parser
                 goto default;
             }
         default:
-            node.primaryExpression = parsePrimaryExpression();
+            if ((node.primaryExpression = parsePrimaryExpression()) is null)
+            {
+                deallocate(node);
+                return null;
+            }
             break;
         }
 
@@ -6053,8 +6258,8 @@ class Parser
      * Parses a VariableDeclaration
      *
      * $(GRAMMAR $(RULEDEF variableDeclaration):
-     *       $(RULE _type) $(RULE declarator) ($(LITERAL ',') $(RULE declarator))* $(LITERAL ';')
-     *     | $(RULE _type) $(RULE declarator) $(LITERAL '=') $(RULE functionBody)
+     *       $(RULE storageClass)* $(RULE type) $(RULE declarator) ($(LITERAL ',') $(RULE declarator))* $(LITERAL ';')
+     *     | $(RULE storageClass)* $(RULE type) $(RULE declarator) $(LITERAL '=') $(RULE functionBody) $(LITERAL ';')
      *     | $(RULE autoDeclaration)
      *     ;)
      */
@@ -6068,9 +6273,30 @@ class Parser
         {
             node.autoDeclaration = parseAutoDeclaration();
             if (node.autoDeclaration !is null)
+            {
                 node.comment = node.autoDeclaration.comment;
-            return node;
+                return node;
+            }
+            else
+            {
+                deallocate(node);
+                return null;
+            }
         }
+
+        StorageClass[] storageClasses;
+        while (isStorageClass())
+        {
+            auto s = parseStorageClass();
+            if (s !is null)
+                storageClasses ~= s;
+            else
+            {
+                deallocate(node);
+                return null;
+            }
+        }
+        node.storageClasses = ownArray(storageClasses);
 
         node.type = type is null ? parseType() : type;
         node.comment = comment;
@@ -6356,7 +6582,7 @@ protected:
         case tok!"version":
         {
             if (peekIs(tok!"="))
-                return false;
+                return true;
             if (peekIs(tok!"("))
             {
                 auto b = setBookmark();
@@ -6447,9 +6673,8 @@ protected:
         case tok!"abstract":
         case tok!"pure":
         case tok!"nothrow":
-        case tok!"virtual":
             return true;
-        mixin(BASIC_TYPE_CASES);
+        mixin(BUILTIN_TYPE_CASES);
             return !peekIs(tok!".");
         case tok!"case":
         case tok!"default":
@@ -6515,7 +6740,6 @@ protected:
         case tok!"enum":
         case tok!"extern":
         case tok!"final":
-        case tok!"virtual":
         case tok!"nothrow":
         case tok!"override":
         case tok!"pure":
@@ -6546,21 +6770,6 @@ protected:
             return !(startsWith(tok!"shared", tok!"static", tok!"this")
                 || startsWith(tok!"shared", tok!"static", tok!"~")
                 || peekIs(tok!"("));
-        case tok!"enum":
-            if (peekIsOneOf(tok!"{", tok!":", tok!";"))
-                return false;
-            else if (peekIs(tok!"identifier"))
-            {
-                if (startsWith(tok!"enum", tok!"identifier", tok!"("))
-                    return false;
-                auto b = setBookmark();
-                scope(exit) goToBookmark(b);
-                advance();
-                if (peekIsOneOf(tok!"{", tok!":", tok!";"))
-                    return false;
-                return true;
-            }
-            return true;
         case tok!"pragma":
             auto b = setBookmark();
             scope(exit) goToBookmark(b);
@@ -6576,7 +6785,6 @@ protected:
         case tok!"public":
         case tok!"export":
         case tok!"final":
-        case tok!"virtual":
         case tok!"synchronized":
         case tok!"override":
         case tok!"abstract":
@@ -6617,6 +6825,11 @@ protected:
     {
         ExpressionNode node;
         mixin ("node = part is null ? parse" ~ ExpressionPartType.stringof ~ "() : part;");
+        if (node is null)
+        {
+            deallocate(node);
+            return null;
+        }
         while (currentIsOneOf(Operators))
         {
             auto n = allocate!ExpressionType;
@@ -6639,7 +6852,14 @@ protected:
         ItemType[] items;
         while (moreTokens())
         {
-            mixin ("items ~= parse" ~ ItemType.stringof ~ "();");
+            mixin ("auto i = parse" ~ ItemType.stringof ~ "();");
+            if (i !is null)
+                items ~= i;
+            else
+            {
+                deallocate(node);
+                return null;
+            }
             if (currentIs(tok!","))
             {
                 advance();
@@ -6983,7 +7203,7 @@ protected:
     ];
 
 
-    enum string BASIC_TYPE_CASES = q{
+    enum string BUILTIN_TYPE_CASES = q{
         case tok!"int":
         case tok!"uint":
         case tok!"double":

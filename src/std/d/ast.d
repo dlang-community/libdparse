@@ -70,10 +70,8 @@ public:
         else if (cast(NewExpression) n) visit(cast(NewExpression) n);
         else if (cast(OrExpression) n) visit(cast(OrExpression) n);
         else if (cast(OrOrExpression) n) visit(cast(OrOrExpression) n);
-        else if (cast(PostIncDecExpression) n) visit(cast(PostIncDecExpression) n);
         else if (cast(PowExpression) n) visit(cast(PowExpression) n);
         else if (cast(PragmaExpression) n) visit(cast(PragmaExpression) n);
-        else if (cast(PreIncDecExpression) n) visit(cast(PreIncDecExpression) n);
         else if (cast(PrimaryExpression) n) visit(cast(PrimaryExpression) n);
         else if (cast(RelExpression) n) visit(cast(RelExpression) n);
         else if (cast(ShiftExpression) n) visit(cast(ShiftExpression) n);
@@ -215,11 +213,9 @@ public:
     /** */ void visit(const Parameter parameter) { parameter.accept(this); }
     /** */ void visit(const Parameters parameters) { parameters.accept(this); }
     /** */ void visit(const Postblit postblit) { postblit.accept(this); }
-    /** */ void visit(const PostIncDecExpression postIncDecExpression) { postIncDecExpression.accept(this); }
     /** */ void visit(const PowExpression powExpression) { powExpression.accept(this); }
     /** */ void visit(const PragmaDeclaration pragmaDeclaration) { pragmaDeclaration.accept(this); }
     /** */ void visit(const PragmaExpression pragmaExpression) { pragmaExpression.accept(this); }
-    /** */ void visit(const PreIncDecExpression preIncDecExpression) { preIncDecExpression.accept(this); }
     /** */ void visit(const PrimaryExpression primaryExpression) { primaryExpression.accept(this); }
     /** */ void visit(const Register register) { register.accept(this); }
     /** */ void visit(const RelExpression relExpression) { relExpression.accept(this); }
@@ -797,9 +793,8 @@ final class AtAttribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(functionCallExpression, argumentList));
+        mixin (visitIfNotNull!(argumentList));
     }
-    /** */ FunctionCallExpression functionCallExpression;
     /** */ ArgumentList argumentList;
     /** */ Token identifier;
     /** */ size_t startLocation;
@@ -813,11 +808,15 @@ final class Attribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(pragmaExpression, storageClass));
+        mixin (visitIfNotNull!(pragmaExpression, deprecated_, atAttribute,
+			alignAttribute));
     }
     /** */ PragmaExpression pragmaExpression;
-    /** */ StorageClass storageClass;
-    /** */ IdType attribute;
+    /** */ Deprecated deprecated_;
+    /** */ AtAttribute atAttribute;
+	/** */ AlignAttribute alignAttribute;
+	/** */ LinkageAttribute linkageAttribute;
+    /** */ Token attribute;
     mixin OpEquals;
 }
 
@@ -838,6 +837,8 @@ final class AutoDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
+		if (storageClass !is null)
+			visitor.visit(storageClass);
         foreach (i; 0 .. initializers.length)
         {
             visitor.visit(initializers[i]);
@@ -845,6 +846,7 @@ public:
     }
     /** */ Token[] identifiers;
     /** */ Initializer[] initializers;
+	/** */ StorageClass storageClass;
     /** */ string comment;
     mixin OpEquals;
 }
@@ -1165,39 +1167,41 @@ public:
             destructor, staticConstructor, staticDestructor,
             sharedStaticDestructor, sharedStaticConstructor,
             conditionalDeclaration, pragmaDeclaration, versionSpecification,
-            invariant_, postblit, declarations, debugSpecification));
+            invariant_, postblit, declarations, debugSpecification,
+			eponymousTemplateDeclaration));
     }
 
+    /** */ AliasDeclaration aliasDeclaration;
+    /** */ AliasThisDeclaration aliasThisDeclaration;
     /** */ Attribute[] attributes;
     /** */ AttributeDeclaration attributeDeclaration;
-    /** */ ImportDeclaration importDeclaration;
-    /** */ FunctionDeclaration functionDeclaration;
-    /** */ VariableDeclaration variableDeclaration;
-    /** */ AliasThisDeclaration aliasThisDeclaration;
-    /** */ StructDeclaration structDeclaration;
     /** */ ClassDeclaration classDeclaration;
-    /** */ InterfaceDeclaration interfaceDeclaration;
-    /** */ UnionDeclaration unionDeclaration;
+    /** */ ConditionalDeclaration conditionalDeclaration;
+    /** */ Constructor constructor;
+    /** */ DebugSpecification debugSpecification;
+    /** */ Declaration[] declarations;
+    /** */ Destructor destructor;
     /** */ EnumDeclaration enumDeclaration;
-    /** */ AliasDeclaration aliasDeclaration;
+	/** */ EponymousTemplateDeclaration eponymousTemplateDeclaration;
+    /** */ FunctionDeclaration functionDeclaration;
+    /** */ ImportDeclaration importDeclaration;
+    /** */ InterfaceDeclaration interfaceDeclaration;
+    /** */ Invariant invariant_;
     /** */ MixinDeclaration mixinDeclaration;
     /** */ MixinTemplateDeclaration mixinTemplateDeclaration;
-    /** */ Unittest unittest_;
+    /** */ Postblit postblit;
+    /** */ PragmaDeclaration pragmaDeclaration;
+    /** */ SharedStaticConstructor sharedStaticConstructor;
+    /** */ SharedStaticDestructor sharedStaticDestructor;
     /** */ StaticAssertDeclaration staticAssertDeclaration;
-    /** */ TemplateDeclaration templateDeclaration;
-    /** */ Constructor constructor;
-    /** */ Destructor destructor;
     /** */ StaticConstructor staticConstructor;
     /** */ StaticDestructor staticDestructor;
-    /** */ SharedStaticDestructor sharedStaticDestructor;
-    /** */ SharedStaticConstructor sharedStaticConstructor;
-    /** */ ConditionalDeclaration conditionalDeclaration;
-    /** */ PragmaDeclaration pragmaDeclaration;
+    /** */ StructDeclaration structDeclaration;
+    /** */ TemplateDeclaration templateDeclaration;
+    /** */ UnionDeclaration unionDeclaration;
+    /** */ Unittest unittest_;
+    /** */ VariableDeclaration variableDeclaration;
     /** */ VersionSpecification versionSpecification;
-    /** */ Invariant invariant_;
-    /** */ Postblit postblit;
-    /** */ Declaration[] declarations;
-    /** */ DebugSpecification debugSpecification;
     mixin OpEquals;
 }
 
@@ -1287,9 +1291,9 @@ final class Deprecated : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(assignExpression));
+        mixin (visitIfNotNull!(stringLiteral));
     }
-    /** */ AssignExpression assignExpression;
+    /** */ Token stringLiteral;
     mixin OpEquals;
 }
 
@@ -1495,6 +1499,7 @@ public:
     {
         mixin (visitIfNotNull!(type, identifier));
     }
+    /** */ bool isRef;
     /** */ IdType[] typeConstructors;
     /** */ Type type;
     /** */ Token identifier;
@@ -1564,8 +1569,9 @@ final class FunctionDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(returnType, parameters, templateParameters,
-            constraint, memberFunctionAttributes, functionBody));
+        mixin (visitIfNotNull!(storageClasses, returnType, parameters,
+			templateParameters, constraint, memberFunctionAttributes,
+			functionBody));
     }
     /** */ bool hasAuto;
     /** */ bool hasRef;
@@ -1578,6 +1584,7 @@ public:
     /** */ MemberFunctionAttribute[] memberFunctionAttributes;
     /** */ string comment;
     /** */ Attribute[] attributes;
+    /** */ StorageClass[] storageClasses;
     mixin OpEquals;
 }
 
@@ -2134,12 +2141,11 @@ public:
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(assignExpression, arrayInitializer,
-            structInitializer, functionBody));
+            structInitializer));
     }
     /** */ AssignExpression assignExpression;
     /** */ ArrayInitializer arrayInitializer;
     /** */ StructInitializer structInitializer;
-    /** */ FunctionBody functionBody;
 
     mixin OpEquals;
 }
@@ -2240,19 +2246,6 @@ public:
 }
 
 ///
-final class PostIncDecExpression : ExpressionNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(unaryExpression));
-    }
-    /** */ IdType operator;
-    /** */ UnaryExpression unaryExpression;
-    mixin OpEquals;
-}
-
-///
 final class PowExpression : ExpressionNode
 {
 public:
@@ -2286,19 +2279,6 @@ public:
     }
     /** */ Token identifier;
     /** */ ArgumentList argumentList;
-    mixin OpEquals;
-}
-
-///
-final class PreIncDecExpression : ExpressionNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(unaryExpression));
-    }
-    /** */ IdType operator;
-    /** */ UnaryExpression unaryExpression;
     mixin OpEquals;
 }
 
@@ -2734,15 +2714,14 @@ public:
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(name, templateParameters, constraint,
-            declarations, eponymousTemplateDeclaration));
+            declarations));
     }
     /** */ Token name;
     /** */ TemplateParameters templateParameters;
     /** */ Constraint constraint;
     /** */ Declaration[] declarations;
-    /** */ EponymousTemplateDeclaration eponymousTemplateDeclaration;
     /** */ string comment;
-	/**
+    /**
      * Byte position of the opening brace
      */
     size_t startLocation;
@@ -3116,14 +3095,14 @@ final class VariableDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(attributes, storageClass, type, declarators, autoDeclaration));
+        mixin (visitIfNotNull!(attributes, storageClasses, type, declarators, autoDeclaration));
     }
     /** */ Type type;
     /** */ Declarator[] declarators;
-    /** */ StorageClass storageClass;
+    /** */ StorageClass[] storageClasses;
+    /** */ Attribute[] attributes;
     /** */ AutoDeclaration autoDeclaration;
     /** */ string comment;
-    /** */ Attribute[] attributes;
     mixin OpEquals;
 }
 

@@ -1,4 +1,4 @@
-void foo()
+deprecated void foo()
 {
 	if (a) b();
 	if (a) b(); else c();

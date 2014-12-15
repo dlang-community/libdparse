@@ -434,8 +434,7 @@ class Formatter(Sink)
         {
             put("@");
             format(identifier);
-            if (functionCallExpression) format(functionCallExpression);
-            else if(argumentList) format(argumentList);
+            if(argumentList) format(argumentList);
         }
     }
 
@@ -453,9 +452,10 @@ class Formatter(Sink)
 
         with(att)
         {
-            if (storageClass) format(storageClass);
             if (pragmaExpression) format(pragmaExpression);
-            if (attribute) put(tokenRep(attribute));
+            if (attribute.type != tok!"") put(tokenRep(attribute.type));
+            if (deprecated_) format(deprecated_);
+            if (atAttribute) format(atAttribute);
         }
     }
 
@@ -1034,10 +1034,10 @@ class Formatter(Sink)
         debug(verbose) writeln("Deprecated");
 
         put("deprecated");
-        if (deprecated_.assignExpression)
+        if (deprecated_.stringLiteral.type != tok!"")
         {
             put("(");
-            format(deprecated_.assignExpression);
+            put(deprecated_.stringLiteral.text);
             put(")");
             newlineIndent();
         }
@@ -1237,10 +1237,8 @@ class Formatter(Sink)
         else if (cast(NewExpression) n) format(cast(NewExpression) n);
         else if (cast(OrExpression) n) format(cast(OrExpression) n);
         else if (cast(OrOrExpression) n) format(cast(OrOrExpression) n);
-        else if (cast(PostIncDecExpression) n) format(cast(PostIncDecExpression) n);
         else if (cast(PowExpression) n) format(cast(PowExpression) n);
         else if (cast(PragmaExpression) n) format(cast(PragmaExpression) n);
-        else if (cast(PreIncDecExpression) n) format(cast(PreIncDecExpression) n);
         else if (cast(PrimaryExpression) n) format(cast(PrimaryExpression) n);
         else if (cast(RelExpression) n) format(cast(RelExpression) n);
         else if (cast(ShiftExpression) n) format(cast(ShiftExpression) n);
@@ -2291,12 +2289,6 @@ class Formatter(Sink)
             put(";");
     }
 
-    void format(const PostIncDecExpression postIncDecExpression)
-    {
-        debug(verbose) writeln("PostIncDecExpression");
-        assert(false);  // parsePostIncDecExpression never gets called??
-    }
-
     void format(const PowExpression powExpression)
     {
         debug(verbose) writeln("PowExpression");
@@ -2333,12 +2325,6 @@ class Formatter(Sink)
             format(pragmaExpression.argumentList);
         }
         put(")");
-    }
-
-    void format(const PreIncDecExpression preIncDecExpression)
-    {
-        debug(verbose) writeln("PreIncDecExpression");
-        assert(false);  // parsePreIncDecExpression never called ??
     }
 
     void format(const PrimaryExpression primaryExpression)
@@ -2909,29 +2895,22 @@ class Formatter(Sink)
             putComment(comment);
             putAttrs(attrs);
 
-            if (eponymousTemplateDeclaration)
+            put("template ");
+            format(name);
+
+            if (templateParameters)
+                format(templateParameters);
+
+            if (constraint)
             {
-                format(eponymousTemplateDeclaration);
+                space();
+                format(constraint);
             }
-            else
-            {
-                put("template ");
-                format(name);
 
-                if (templateParameters)
-                    format(templateParameters);
-
-                if (constraint)
-                {
-                    space();
-                    format(constraint);
-                }
-
-                startBlock();
-                foreach(d; declarations)
-                    format(d);
-                endBlock();
-            }
+            startBlock();
+            foreach(d; declarations)
+                format(d);
+            endBlock();
         }
     }
 
@@ -3494,9 +3473,9 @@ class Formatter(Sink)
             format(decl.autoDeclaration);
         else
         {
-            if (decl.storageClass)
+            foreach (c; decl.storageClasses)
             {
-                format(decl.storageClass);
+                format(c);
                 space();
             }
             if (decl.type) format(decl.type);
