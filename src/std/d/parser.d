@@ -4690,6 +4690,11 @@ class Parser
         case tok!"case":
             advance();
             auto argumentList = parseArgumentList();
+            if (argumentList is null)
+            {
+                deallocate(node);
+                return null;
+            }
             if (argumentList.items.length == 1 && startsWith(tok!":", tok!".."))
                 node.caseRangeStatement = parseCaseRangeStatement(argumentList.items[0]);
             else
