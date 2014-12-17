@@ -2221,7 +2221,13 @@ class Parser
         {
             advance();
             auto s = expect(tok!"stringLiteral");
-            if (s is null) { deallocate(node); return null; }
+            if (s is null)
+            {
+                if (currentIs(tok!")"))
+                    advance();
+                deallocate(node);
+                return null;
+            }
             node.stringLiteral = *s;
             if (expect(tok!")") is null) { deallocate(node); return null; }
         }
@@ -3746,6 +3752,7 @@ class Parser
         if (currentIs(tok!"deprecated"))
             node.deprecated_ = parseDeprecated();
         auto start = expect(tok!"module");
+        if (start is null) { deallocate(node); return null; }
         node.moduleName = parseIdentifierChain();
         node.comment = start.comment;
         if (node.comment is null)
