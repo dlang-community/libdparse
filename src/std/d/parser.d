@@ -3514,14 +3514,13 @@ class Parser
         lParen:
             node.parameters = parseParameters();
             FunctionAttribute[] functionAttributes;
-            do
+            while (moreTokens())
             {
                 auto attribute = parseFunctionAttribute(false);
                 if (attribute is null)
                     break;
                 functionAttributes ~= attribute;
             }
-            while (moreTokens());
             node.functionAttributes = ownArray(functionAttributes);
         }
         else
