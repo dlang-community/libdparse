@@ -5096,7 +5096,11 @@ class Parser
                 deallocate(node);
                 return null;
             }
-            expect(tok!"}");
+            if (expect(tok!"}") is null)
+            {
+                deallocate(node);
+                return null;
+            }
         }
         return node;
     }

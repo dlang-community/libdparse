@@ -42,6 +42,10 @@ enum apple(...) @carton
 
 creal[] eggplant = {
 return;
+}
+;
 
+immutable drywall.orange plastic = {
+__VENDOR__;
 }
 ;
