@@ -1867,7 +1867,7 @@ class Parser
                     skipParens(); // ()
                     if (currentIs(tok!"("))
                         skipParens();
-                    if (currentIs(tok!"{"))
+                    if (!currentIs(tok!"="))
                     {
                         goToBookmark(b);
                         node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);

@@ -34,3 +34,7 @@ align tape()(bool* boom...)
 
 debug:
 version = 20571;
+
+enum apple(...) @carton
+{
+}
