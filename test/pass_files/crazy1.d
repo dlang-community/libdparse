@@ -20,6 +20,7 @@ out (aaargh)
 }
 body
 {
+	immutable uint(assert (--32106[shared(creal).apple], omg));
 }
 }
 
@@ -38,3 +39,9 @@ version = 20571;
 enum apple(...) @carton
 {
 }
+
+creal[] eggplant = {
+return;
+
+}
+;

@@ -4460,6 +4460,7 @@ class Parser
                 node.primary = advance();
             break;
         default:
+            deallocate(node);
             error(`Primary expression expected`);
             return null;
         }
@@ -4538,7 +4539,13 @@ class Parser
         if (start is null) { deallocate(node); return null; }
         node.startLocation = start.index;
         if (!currentIs(tok!";"))
-            node.expression = parseExpression();
+        {
+            if ((node.expression = parseExpression()) is null)
+            {
+                deallocate(node);
+                return null;
+            }
+        }
         auto semicolon = expect(tok!";");
         if (semicolon is null) { deallocate(node); return null; }
         node.endLocation = semicolon.index;
@@ -5084,7 +5091,11 @@ class Parser
             advance();
         else
         {
-            node.structMemberInitializers = parseStructMemberInitializers();
+            if ((node.structMemberInitializers = parseStructMemberInitializers()) is null)
+            {
+                deallocate(node);
+                return null;
+            }
             expect(tok!"}");
         }
         return node;
@@ -5106,7 +5117,11 @@ class Parser
             node.identifier = tokens[index++];
             index++;
         }
-        node.nonVoidInitializer = parseNonVoidInitializer();
+        if ((node.nonVoidInitializer = parseNonVoidInitializer()) is null)
+        {
+            deallocate(node);
+            return null;
+        }
         return node;
     }
 
@@ -5127,6 +5142,11 @@ class Parser
             auto structMemberInitializer = parseStructMemberInitializer();
             if (structMemberInitializer !is null)
                 structMemberInitializers ~= structMemberInitializer;
+            else
+            {
+                deallocate(node);
+                return null;
+            }
             if (currentIs(tok!","))
             {
                 advance();
@@ -5744,9 +5764,6 @@ class Parser
         case tok!"immutable":
         case tok!"inout":
         case tok!"shared":
-        case tok!"scope":
-        case tok!"pure":
-        case tok!"nothrow":
             if (!peekIs(tok!"("))
                 node.typeConstructors = parseTypeConstructors();
             break;
@@ -6675,6 +6692,20 @@ protected:
         case tok!"immutable":
         case tok!"inout":
         case tok!"shared":
+            auto b = setBookmark();
+            auto p = parseFunctionCallExpression();
+            if (p is null)
+            {
+                goToBookmark(b);
+                return true;
+            }
+            else
+            {
+                goToBookmark(b);
+                deallocate(p);
+                return false;
+            }
+            break;
         case tok!"__gshared":
         case tok!"alias":
         case tok!"class":
