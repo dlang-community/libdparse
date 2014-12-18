@@ -6682,7 +6682,7 @@ protected:
                 auto b = setBookmark();
                 scope (exit) goToBookmark(b);
                 advance(); // synchronized
-                return isDeclaration();
+                return peekIs(tok!"(") || isDeclaration();
             }
         case tok!"static":
             if (peekIs(tok!"if"))

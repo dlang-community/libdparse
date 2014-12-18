@@ -49,3 +49,7 @@ immutable drywall.orange plastic = {
 __VENDOR__;
 }
 ;
+
+synchronized gosh(omg..., boom)()
+{
+}
