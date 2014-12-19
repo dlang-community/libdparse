@@ -6772,13 +6772,14 @@ protected:
         return parseExpression() !is null;
     }
 
+    /// Only use this in template parameter parsing
     bool isType()
     {
         if (!moreTokens()) return false;
         auto b = setBookmark();
         scope (exit) goToBookmark(b);
         if (parseType() is null) return false;
-        if (currentIsOneOf(tok!",", tok!")")) return true;
+        if (currentIsOneOf(tok!",", tok!")", tok!"=")) return true;
         return false;
     }
 

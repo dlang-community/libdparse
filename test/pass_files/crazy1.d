@@ -53,3 +53,5 @@ __VENDOR__;
 synchronized gosh(omg..., boom)()
 {
 }
+
+enum phone(alias shared short acrylic : immutable ireal* = 78419) = 'P';
