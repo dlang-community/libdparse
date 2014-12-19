@@ -1553,7 +1553,7 @@ class Parser
             return node;
         }
 
-        auto dec = parseDeclaration();
+        auto dec = parseDeclaration(suppressMessages > 0);
         if (dec is null) { deallocate(node); return null; }
         trueDeclarations ~= dec;
         node.trueDeclarations = ownArray(trueDeclarations);
@@ -1563,7 +1563,7 @@ class Parser
         else
             return node;
 
-        if ((node.falseDeclaration = parseDeclaration()) is null)
+        if ((node.falseDeclaration = parseDeclaration(suppressMessages > 0)) is null)
         {
             deallocate(node);
             return null;
