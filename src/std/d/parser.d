@@ -6735,7 +6735,7 @@ protected:
         case tok!"nothrow":
             return true;
         mixin(BUILTIN_TYPE_CASES);
-            return !peekIs(tok!".");
+            return !peekIsOneOf(tok!".", tok!"(");
         case tok!"case":
         case tok!"default":
         case tok!"return":
