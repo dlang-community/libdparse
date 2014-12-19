@@ -5266,7 +5266,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TemplateAliasParameter;
         expect(tok!"alias");
-        if (currentIs(tok!"identifier"))
+        if (currentIs(tok!"identifier") && !peekIs(tok!"."))
         {
             if (peekIsOneOf(tok!",", tok!")", tok!"=",
                 tok!":"))

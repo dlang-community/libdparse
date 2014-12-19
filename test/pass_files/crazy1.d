@@ -67,3 +67,7 @@ gosh %= 'A';
 @carton template nanny_ogg(eggplant, orange) if (33586.8 !in (uint).knife)
 {
 }
+
+override scope class discworld(alias angelic.cocaine.items portal)
+{
+}
