@@ -55,3 +55,11 @@ synchronized gosh(omg..., boom)()
 }
 
 enum phone(alias shared short acrylic : immutable ireal* = 78419) = 'P';
+
+unittest
+{
+version (53056)
+union {}
+else
+gosh %= 'A';
+}

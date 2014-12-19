@@ -1112,7 +1112,7 @@ class Parser
      *     $(LITERAL '{') $(RULE declarationsAndStatements)? $(LITERAL '}')
      *     ;)
      */
-    BlockStatement parseBlockStatement(bool strict = false)
+    BlockStatement parseBlockStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!BlockStatement;
@@ -1132,7 +1132,7 @@ class Parser
             node.endLocation = closeBrace.index;
         else
         {
-            trace("blargh?");
+            trace("Could not find end of block statement.");
             node.endLocation = size_t.max;
         }
 
@@ -1543,6 +1543,11 @@ class Parser
                 auto d = parseDeclaration();
                 if (d !is null)
                     trueDeclarations ~= d;
+                else
+                {
+                    deallocate(node);
+                    return null;
+                }
             }
             node.trueDeclarations = ownArray(trueDeclarations);
             return node;
@@ -1558,9 +1563,11 @@ class Parser
         else
             return node;
 
-        auto elseDec = parseDeclaration();
-        if (elseDec is null) { deallocate(node); return null; }
-        node.falseDeclaration = elseDec;
+        if ((node.falseDeclaration = parseDeclaration()) is null)
+        {
+            deallocate(node);
+            return null;
+        }
         return node;
     }
 
@@ -2011,6 +2018,7 @@ class Parser
             Type type = parseType();
             if (type is null || !currentIs(tok!"identifier"))
             {
+                trace("Returning null on %d".format(__LINE__));
                 deallocate(node);
                 return null;
             }
@@ -2028,13 +2036,32 @@ class Parser
                     node.variableDeclaration = parseVariableDeclaration(type, false, node.attributes);
             }
             else
-                node.variableDeclaration = parseVariableDeclaration(type);
+            {
+                if ((node.variableDeclaration = parseVariableDeclaration(type)) is null)
+                {
+                    deallocate(node);
+                    return null;
+                }
+            }
+
             break;
         case tok!"version":
             if (peekIs(tok!"("))
-                node.conditionalDeclaration = parseConditionalDeclaration();
+            {
+                if ((node.conditionalDeclaration = parseConditionalDeclaration()) is null)
+                {
+                    deallocate(node);
+                    return null;
+                }
+            }
             else if (peekIs(tok!"="))
-                node.versionSpecification = parseVersionSpecification();
+            {
+                if ((node.versionSpecification = parseVersionSpecification()) is null)
+                {
+                    deallocate(node);
+                    return null;
+                }
+            }
             else
             {
                 error(`"=" or "(" expected following "version"`);
@@ -6633,42 +6660,12 @@ protected:
             {
                 auto b = setBookmark();
                 scope (exit) goToBookmark(b);
-                advance(); // version
-                skipParens();
-                if (currentIs(tok!":") || isDeclaration())
-                    return true;
-                if (currentIs(tok!"{"))
+                auto dec = parseDeclaration(true);
+                if (dec is null)
+                    return false;
+                else
                 {
-                    advance(); // "{"
-                    while (!currentIs(tok!"}"))
-                    {
-                        auto dec = parseDeclaration(true);
-                        if (dec is null)
-                            return false;
-                        else
-                            deallocate(dec);
-                    }
-                    if (currentIs(tok!"}"))
-                    {
-                        advance();
-                        if (currentIs(tok!"else"))
-                        {
-                            advance();
-                            if (currentIs(tok!"{"))
-                            {
-                                advance();
-                                while (!currentIs(tok!"}"))
-                                {
-                                    auto dec = parseDeclaration(true);
-                                    if (dec is null)
-                                        return false;
-                                    else
-                                        deallocate(dec);
-                                }
-                                return true;
-                            }
-                        }
-                    }
+                    deallocate(dec);
                     return true;
                 }
             }
