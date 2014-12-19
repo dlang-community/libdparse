@@ -2293,7 +2293,7 @@ public:
             typeofExpression, typeidExpression, arrayLiteral, assocArrayLiteral,
             expression, dot, identifierOrTemplateInstance, isExpression,
             lambdaExpression, functionLiteralExpression,
-            mixinExpression, importExpression, vector));
+            mixinExpression, importExpression, vector, arguments));
     }
     /** */ Token dot;
     /** */ Token primary;
