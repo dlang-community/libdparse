@@ -6229,15 +6229,18 @@ class Parser
         loop: while (moreTokens()) switch (current.type)
         {
         case tok!"!":
-            if (peekIs(tok!"is"))
-                break loop;
-            index++;
-            auto p = peekPastParens();
-            bool jump =  (currentIs(tok!"(") && p !is null && p.type == tok!"(")
-                || peekIs(tok!"(");
-            index--;
-            if (jump)
-                goto case tok!"(";
+            if (peekIs(tok!"("))
+            {
+                index++;
+                auto p = peekPastParens();
+                bool jump =  (currentIs(tok!"(") && p !is null && p.type == tok!"(")
+                    || peekIs(tok!"(");
+                index--;
+                if (jump)
+                    goto case tok!"(";
+                else
+                    break loop;
+            }
             else
                 break loop;
         case tok!"(":
