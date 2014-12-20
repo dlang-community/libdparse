@@ -6335,7 +6335,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF variableDeclaration):
      *       $(RULE storageClass)* $(RULE type) $(RULE declarator) ($(LITERAL ',') $(RULE declarator))* $(LITERAL ';')
-     *     | $(RULE storageClass)* $(RULE type) $(RULE declarator) $(LITERAL '=') $(RULE functionBody) $(LITERAL ';')
+     *     | $(RULE storageClass)* $(RULE type) $(LITERAL identifier) $(LITERAL '=') $(RULE functionBody) $(LITERAL ';')
      *     | $(RULE autoDeclaration)
      *     ;)
      */
@@ -6376,6 +6376,8 @@ class Parser
 
         node.type = type is null ? parseType() : type;
         node.comment = comment;
+
+        // TODO: handle function bodies correctly
 
         Declarator[] declarators;
         while (true)
