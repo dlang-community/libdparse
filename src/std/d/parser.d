@@ -80,7 +80,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AliasDeclaration;
-        if (expect(tok!"alias") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"alias")`);
         node.comment = comment;
         comment = null;
 
@@ -90,7 +90,7 @@ class Parser
             do
             {
                 auto initializer = parseAliasInitializer();
-                if (initializer is null) { deallocate(node); return null; }
+                mixin (nullCheck!`initializer`);
                 initializers ~= initializer;
                 if (currentIs(tok!","))
                     advance();
@@ -109,10 +109,10 @@ class Parser
                 node.storageClasses = ownArray(storageClasses);
             warn("Prefer the new \"'alias' identifier '=' type ';'\" syntax"
                 ~ " to the  old \"'alias' type identifier ';'\" syntax");
-            if ((node.type = parseType()) is null) { deallocate(node); return null; }
-            if ((node.identifierList = parseIdentifierList()) is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.type = parseType()`);
+            mixin (nullCheck!`node.identifierList = parseIdentifierList()`);
         }
-        if (expect(tok!";") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!";")`);
         return node;
     }
 
@@ -128,17 +128,17 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AliasInitializer;
         auto i = expect(tok!"identifier");
-        if (i is null) { deallocate(node); return null; }
+        mixin (nullCheck!`i`);
         node.name = *i;
         if (currentIs(tok!"("))
-            node.templateParameters = parseTemplateParameters();
-        if (expect(tok!"=") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
+        mixin (nullCheck!`expect(tok!"=")`);
         StorageClass[] storageClasses;
         while (moreTokens() && isStorageClass())
             storageClasses ~= parseStorageClass();
         if (storageClasses.length > 0)
             node.storageClasses = ownArray(storageClasses);
-        node.type = parseType();
+        mixin (nullCheck!`node.type = parseType()`);
         return node;
     }
 
@@ -153,12 +153,12 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AliasThisDeclaration;
-        if (expect(tok!"alias") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"alias")`);
         auto ident = expect(tok!"identifier");
-        if (ident is null) { deallocate(node); return null; }
+        mixin (nullCheck!`ident`);
         node.identifier = *ident;
-        if (expect(tok!"this") is null) { deallocate(node); return null; }
-        if (expect(tok!";") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"this")`);
+        mixin (nullCheck!`expect(tok!";")`);
         return node;
     }
 
@@ -176,11 +176,11 @@ class Parser
         expect(tok!"align");
         if (currentIs(tok!"("))
         {
-            if (expect(tok!"(") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!"(")`);
             auto intLit = expect(tok!"intLiteral");
-            if (intLit is null) { deallocate(node); return null; }
+            mixin (nullCheck!`intLit`);
             node.intLiteral = *intLit;
-            if (expect(tok!")") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!")")`);
         }
         return node;
     }
@@ -232,11 +232,7 @@ class Parser
         }
         size_t startLocation = current().index;
         auto node = parseCommaSeparatedRule!(ArgumentList, AssignExpression)(true);
-        if (node is null)
-        {
-            deallocate(node);
-            return null;
-        }
+        mixin (nullCheck!`node`);
         node.startLocation = startLocation;
         if (moreTokens) node.endLocation = current().index;
         return node;
@@ -253,10 +249,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Arguments;
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"(")`);
         if (!currentIs(tok!")"))
-            node.argumentList = parseArgumentList();
-        if (expect(tok!")") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.argumentList = parseArgumentList()`);
+        mixin (nullCheck!`expect(tok!")")`);
         return node;
     }
 
@@ -272,7 +268,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ArrayInitializer;
-        if (expect(tok!"[") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"[")`);
         ArrayMemberInitialization[] arrayMemberInitializations;
         while (moreTokens())
         {
@@ -285,7 +281,7 @@ class Parser
                 break;
         }
         node.arrayMemberInitializations = ownArray(arrayMemberInitializations);
-        if (expect(tok!"]") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"]")`);
         return node;
     }
 
@@ -300,10 +296,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ArrayLiteral;
-        if (expect(tok!"[") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"[")`);
         if (!currentIs(tok!"]"))
-            node.argumentList = parseArgumentList();
-        if (expect(tok!"]") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.argumentList = parseArgumentList()`);
+        mixin (nullCheck!`expect(tok!"]")`);
         return node;
     }
 
@@ -325,9 +321,9 @@ class Parser
             skipBrackets();
             if (currentIs(tok!":"))
             {
-                node.assignExpression = parseAssignExpression();
+                mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
                 advance(); // :
-                if (node.nonVoidInitializer is null) { deallocate(node); return null; }
+                mixin (nullCheck!`node.nonVoidInitializer`);
                 break;
             }
             else
@@ -336,18 +332,16 @@ class Parser
                 goto case;
             }
         case tok!"{":
-            node.nonVoidInitializer = parseNonVoidInitializer();
-            if (node.nonVoidInitializer is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.nonVoidInitializer = parseNonVoidInitializer()`);
             break;
         default:
             auto assignExpression = parseAssignExpression();
-            if (assignExpression is null) { deallocate(node); return null; }
+            mixin (nullCheck!`assignExpression`);
             if (currentIs(tok!":"))
             {
                 node.assignExpression = assignExpression;
                 advance();
-                node.nonVoidInitializer = parseNonVoidInitializer();
-                if (node.nonVoidInitializer is null) { deallocate(node); return null; }
+                mixin (nullCheck!`node.nonVoidInitializer = parseNonVoidInitializer()`);
             }
             else
             {
@@ -398,40 +392,35 @@ class Parser
     AsmBrExp parseAsmBrExp()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        AsmBrExp brExp = allocate!AsmBrExp();
+        AsmBrExp node = allocate!AsmBrExp();
         size_t line = current.line;
         size_t column = current.column;
         if (currentIs(tok!"["))
         {
             advance(); // [
-            if ((brExp.asmExp = parseAsmExp()) is null)
-                return null;
-            if (expect(tok!"]") is null)
-                return null;
+            mixin (nullCheck!`node.asmExp = parseAsmExp()`);
+            mixin (nullCheck!`expect(tok!"]")`);
             if (currentIs(tok!"["))
                 goto brLoop;
         }
         else
         {
-            if ((brExp.asmUnaExp = parseAsmUnaExp()) is null)
-                return null;
+            mixin (nullCheck!`node.asmUnaExp = parseAsmUnaExp()`);
             brLoop: while (currentIs(tok!"["))
             {
                 AsmBrExp br = allocate!AsmBrExp(); // huehuehuehue
-                br.asmBrExp = brExp;
+                br.asmBrExp = node;
                 br.line = current().line;
                 br.column = current().column;
-                brExp = br;
-                brExp.line = line;
-                brExp.column = column;
+                node = br;
+                node.line = line;
+                node.column = column;
                 advance(); // [
-                if ((brExp.asmExp = parseAsmExp()) is null)
-                    return null;
-                if (expect(tok!"]") is null)
-                    return null;
+                mixin (nullCheck!`node.asmExp = parseAsmExp()`);
+                mixin (nullCheck!`expect(tok!"]")`);
             }
         }
-        return brExp;
+        return node;
     }
 
     /**
@@ -459,15 +448,13 @@ class Parser
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
         AsmExp node = allocate!AsmExp;
-        node.left = parseAsmLogOrExp();
-        if (node.left is null)
-            return null;
+        mixin (nullCheck!`node.left = parseAsmLogOrExp()`);
         if (currentIs(tok!"?"))
         {
             advance();
-            if ((node.middle = parseAsmExp()) is null) { deallocate(node); return null; }
-            if (expect(tok!":") is null) { deallocate(node); return null; }
-            if ((node.right = parseAsmExp()) is null) { deallocate(node); return null; }
+            mixin (nullCheck!`(node.middle = parseAsmExp())`);
+            mixin (nullCheck!`expect(tok!":")`);
+            mixin (nullCheck!`(node.right = parseAsmExp())`);
         }
         return node;
     }
@@ -506,12 +493,10 @@ class Parser
             if (node.identifierOrIntegerOrOpcode == tok!"identifier" && currentIs(tok!":"))
             {
                 advance(); // :
-                if ((node.asmInstruction = parseAsmInstruction()) is null)
-                    return null;
+                mixin (nullCheck!`node.asmInstruction = parseAsmInstruction()`);
             }
             else if (!currentIs(tok!";"))
-                if ((node.operands = parseOperands()) is null)
-                    return null;
+                mixin (nullCheck!`node.operands = parseOperands()`);
         }
         return node;
     }
@@ -603,10 +588,10 @@ class Parser
             if (assumeSorted(REGISTER_NAMES).equalRange(current().text).length > 0)
             {
                 trace("Found register");
-                if ((node.register = parseRegister()) is null) { deallocate(node); return null; }
+                mixin (nullCheck!`(node.register = parseRegister())`);
             }
             else if (peekIs(tok!"."))
-                node.identifierChain = parseIdentifierChain();
+                mixin (nullCheck!`node.identifierChain = parseIdentifierChain()`);
             else
                 node.token = advance();
             break;
@@ -755,16 +740,15 @@ class Parser
     AsmUnaExp parseAsmUnaExp()
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
-        AsmUnaExp unary = allocate!AsmUnaExp();
+        AsmUnaExp node = allocate!AsmUnaExp();
         switch (current().type)
         {
         case tok!"+":
         case tok!"-":
         case tok!"!":
         case tok!"~":
-            unary.prefix = advance();
-            if ((unary.asmUnaExp = parseAsmUnaExp()) is null)
-                return null;
+            node.prefix = advance();
+            mixin (nullCheck!`node.asmUnaExp = parseAsmUnaExp()`);
             break;
         case tok!"byte":
         case tok!"short":
@@ -773,19 +757,16 @@ class Parser
         case tok!"double":
         case tok!"real":
         typePrefix:
-            if ((unary.asmTypePrefix = parseAsmTypePrefix()) is null)
-                return null;
-            if ((unary.asmExp = parseAsmExp()) is null)
-                return null;
+            mixin (nullCheck!`node.asmTypePrefix = parseAsmTypePrefix()`);
+            mixin (nullCheck!`node.asmExp = parseAsmExp()`);
             break;
         case tok!"identifier":
             switch (current().text)
             {
             case "offsetof":
             case "seg":
-                unary.prefix = advance();
-                if ((unary.asmExp = parseAsmExp()) is null)
-                    return null;
+                node.prefix = advance();
+                mixin (nullCheck!`node.asmExp = parseAsmExp()`);
                 break;
             case "near":
             case "far":
@@ -799,11 +780,10 @@ class Parser
             break;
         outerDefault:
         default:
-            if ((unary.asmPrimaryExp = parseAsmPrimaryExp()) is null)
-                return null;
+            mixin (nullCheck!`node.asmPrimaryExp = parseAsmPrimaryExp()`);
             break;
         }
-        return unary;
+        return node;
     }
 
     /**
@@ -832,14 +812,14 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AssertExpression;
         expect(tok!"assert");
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
-        node.assertion = parseAssignExpression();
+        mixin (nullCheck!`expect(tok!"(")`);
+        mixin (nullCheck!`node.assertion = parseAssignExpression()`);
         if (currentIs(tok!","))
         {
             advance();
-            node.message = parseAssignExpression();
+            mixin (nullCheck!`node.message = parseAssignExpression()`);
         }
-        if (expect(tok!")") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!")")`);
         return node;
     }
 
@@ -877,7 +857,7 @@ class Parser
         }
         node.line = current().line;
         node.column = current().column;
-        node.ternaryExpression = parseTernaryExpression();
+        mixin (nullCheck!`node.ternaryExpression = parseTernaryExpression()`);
         if (node.ternaryExpression is null)
         {
             deallocate(node);
@@ -891,7 +871,7 @@ class Parser
             tok!"~="))
         {
             node.operator = advance().type;
-            node.assignExpression = parseAssignExpression();
+            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         }
         return node;
     }
@@ -924,7 +904,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!AtAttribute;
         auto start = expect(tok!"@");
-        if (start is null) { deallocate(node); return null; }
+        mixin (nullCheck!`start`);
         if (!moreTokens)
         {
             error(`"(", or identifier expected`);
@@ -938,13 +918,13 @@ class Parser
             if (currentIs(tok!"("))
             {
                 advance(); // (
-                node.argumentList = parseArgumentList();
+                mixin (nullCheck!`node.argumentList = parseArgumentList()`);
                 expect(tok!")");
             }
             break;
         case tok!"(":
             advance();
-            node.argumentList = parseArgumentList();
+            mixin (nullCheck!`node.argumentList = parseArgumentList()`);
             expect(tok!")");
             break;
         default:
@@ -994,21 +974,21 @@ class Parser
         switch (current.type)
         {
         case tok!"pragma":
-            node.pragmaExpression = parsePragmaExpression();
+            mixin (nullCheck!`node.pragmaExpression = parsePragmaExpression()`);
             break;
         case tok!"deprecated":
-            node.deprecated_ = parseDeprecated();
+            mixin (nullCheck!`node.deprecated_ = parseDeprecated()`);
             break;
         case tok!"align":
-            node.alignAttribute = parseAlignAttribute();
+            mixin (nullCheck!`node.alignAttribute = parseAlignAttribute()`);
             break;
         case tok!"@":
-            node.atAttribute = parseAtAttribute();
+            mixin (nullCheck!`node.atAttribute = parseAtAttribute()`);
             break;
         case tok!"extern":
             if (peekIs(tok!"("))
             {
-                node.linkageAttribute = parseLinkageAttribute();
+                mixin (nullCheck!`node.linkageAttribute = parseLinkageAttribute()`);
                 break;
             }
             else
@@ -1018,7 +998,7 @@ class Parser
             if (currentIs(tok!"("))
             {
                 expect(tok!"(");
-                node.identifierChain = parseIdentifierChain();
+                mixin (nullCheck!`node.identifierChain = parseIdentifierChain()`);
                 expect(tok!")");;
             }
             break;
@@ -1079,17 +1059,17 @@ class Parser
         node.comment = comment;
         comment = null;
         if (isStorageClass())
-            node.storageClass = parseStorageClass();
+            mixin (nullCheck!`node.storageClass = parseStorageClass()`);
         Token[] identifiers;
         Initializer[] initializers;
         do
         {
             auto ident = expect(tok!"identifier");
-            if (ident is null) { deallocate(node); return null; }
+            mixin (nullCheck!`ident`);
             identifiers ~= *ident;
-            if (expect(tok!"=") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!"=")`);
             auto init = parseInitializer();
-            if (init is null) { deallocate(node); return null; }
+            mixin (nullCheck!`init`);
             initializers ~= init;
             if (currentIs(tok!","))
                 advance();
@@ -1098,7 +1078,7 @@ class Parser
         } while (moreTokens());
         node.identifiers = ownArray(identifiers);
         node.initializers = ownArray(initializers);
-        if (expect(tok!";") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!";")`);
         return node;
     }
 
@@ -1114,7 +1094,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!BlockStatement;
         auto openBrace = expect(tok!"{");
-        if (openBrace is null) { deallocate(node); return null; }
+        mixin (nullCheck!`openBrace`);
         node.startLocation = openBrace.index;
         if (!currentIs(tok!"}"))
         {
@@ -1166,7 +1146,7 @@ class Parser
         {
         case tok!"identifier":
             node.label = advance();
-            if (expect(tok!";") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!";")`);
             break;
         case tok!";":
             advance();
@@ -1262,12 +1242,12 @@ class Parser
         auto node = allocate!CaseRangeStatement;
         assert (low !is null);
         node.low = low;
-        if (expect(tok!":") is null) { deallocate(node); return null; }
-        if (expect(tok!"..") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!":")`);
+        mixin (nullCheck!`expect(tok!"..")`);
         expect(tok!"case");
-        node.high = parseAssignExpression();
-        if (expect(tok!":") is null) { deallocate(node); return null; }
-        node.declarationsAndStatements = parseDeclarationsAndStatements();
+        mixin (nullCheck!`node.high = parseAssignExpression()`);
+        mixin (nullCheck!`expect(tok!":")`);
+        mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements()`);
         return node;
     }
 
@@ -1283,8 +1263,8 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CaseStatement;
         node.argumentList = argumentList;
-        if (expect(tok!":") is null) { deallocate(node); return null; }
-        node.declarationsAndStatements = parseDeclarationsAndStatements();
+        mixin (nullCheck!`expect(tok!":")`);
+        mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements()`);
         return node;
     }
 
@@ -1300,16 +1280,16 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CastExpression;
         expect(tok!"cast");
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"(")`);
         if (!currentIs(tok!")"))
         {
             if (isCastQualifier())
-                node.castQualifier = parseCastQualifier();
+                mixin (nullCheck!`node.castQualifier = parseCastQualifier()`);
             else
-                node.type = parseType();
+                mixin (nullCheck!`node.type = parseType()`);
         }
-        if (expect(tok!")") is null) { deallocate(node); return null; }
-        node.unaryExpression = parseUnaryExpression();
+        mixin (nullCheck!`expect(tok!")")`);
+        mixin (nullCheck!`node.unaryExpression = parseUnaryExpression()`);
         return node;
     }
 
@@ -1366,12 +1346,12 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Catch;
         expect(tok!"catch");
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
-        node.type = parseType();
+        mixin (nullCheck!`expect(tok!"(")`);
+        mixin (nullCheck!`node.type = parseType()`);
         if (currentIs(tok!"identifier"))
             node.identifier = advance();
-        if (expect(tok!")") is null) { deallocate(node); return null; }
-        node.declarationOrStatement = parseDeclarationOrStatement();
+        mixin (nullCheck!`expect(tok!")")`);
+        mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
         return node;
     }
 
@@ -1501,13 +1481,13 @@ class Parser
         switch (current.type)
         {
         case tok!"version":
-            node.versionCondition = parseVersionCondition();
+            mixin (nullCheck!`node.versionCondition = parseVersionCondition()`);
             break;
         case tok!"debug":
-            node.debugCondition = parseDebugCondition();
+            mixin (nullCheck!`node.debugCondition = parseDebugCondition()`);
             break;
         case tok!"static":
-            node.staticIfCondition = parseStaticIfCondition();
+            mixin (nullCheck!`node.staticIfCondition = parseStaticIfCondition()`);
             break;
         default:
             error(`"version", "debug", or "static" expected`);
@@ -1529,7 +1509,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ConditionalDeclaration;
-        node.compileCondition = parseCompileCondition();
+        mixin (nullCheck!`node.compileCondition = parseCompileCondition()`);
 
         Declaration[] trueDeclarations;
         if (currentIs(tok!":"))
@@ -1551,7 +1531,7 @@ class Parser
         }
 
         auto dec = parseDeclaration(suppressMessages > 0);
-        if (dec is null) { deallocate(node); return null; }
+        mixin (nullCheck!`dec`);
         trueDeclarations ~= dec;
         node.trueDeclarations = ownArray(trueDeclarations);
 
@@ -1579,12 +1559,12 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ConditionalStatement;
-        node.compileCondition = parseCompileCondition();
-        node.trueStatement = parseDeclarationOrStatement();
+        mixin (nullCheck!`node.compileCondition = parseCompileCondition()`);
+        mixin (nullCheck!`node.trueStatement = parseDeclarationOrStatement()`);
         if (currentIs(tok!"else"))
         {
             advance();
-            node.falseStatement = parseDeclarationOrStatement();
+            mixin (nullCheck!`node.falseStatement = parseDeclarationOrStatement()`);
         }
         return node;
     }
@@ -1600,10 +1580,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Constraint;
-        if (expect(tok!"if") is null) { deallocate(node); return null; }
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
-        node.expression = parseExpression();
-        if (expect(tok!")") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"if")`);
+        mixin (nullCheck!`expect(tok!"(")`);
+        mixin (nullCheck!`node.expression = parseExpression()`);
+        mixin (nullCheck!`expect(tok!")")`);
         return node;
     }
 
@@ -1621,7 +1601,7 @@ class Parser
         node.comment = comment;
         comment = null;
         auto t = expect(tok!"this");
-        if (t is null) { deallocate(node); return null; }
+        mixin (nullCheck!`t`);
         node.location = t.index;
         node.line = t.line;
         node.column = t.column;
@@ -1630,10 +1610,10 @@ class Parser
         if (p !is null && p.type == tok!"(")
         {
             isTemplate = true;
-            node.templateParameters = parseTemplateParameters();
+            mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
         }
-        node.parameters = parseParameters();
-        if (node.parameters is null) { deallocate(node); return null; }
+        mixin (nullCheck!`node.parameters = parseParameters()`);
+        mixin (nullCheck!`node.parameters`);
 
         MemberFunctionAttribute[] memberFunctionAttributes;
         while (moreTokens() && currentIsMemberFunctionAttribute())
@@ -1641,14 +1621,14 @@ class Parser
         node.memberFunctionAttributes = ownArray(memberFunctionAttributes);
 
         if (isTemplate && currentIs(tok!"if"))
-            node.constraint = parseConstraint();
+            mixin (nullCheck!`node.constraint = parseConstraint()`);
 
         if (currentIs(tok!";"))
             advance();
         else
         {
-            node.functionBody = parseFunctionBody();
-            if (node.functionBody is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.functionBody = parseFunctionBody()`);
+            mixin (nullCheck!`node.functionBody`);
         }
 
         return node;
@@ -1670,7 +1650,7 @@ class Parser
         {
         case tok!"identifier":
             node.label = advance();
-            if (expect(tok!";") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!";")`);
             break;
         case tok!";":
             advance();
@@ -1693,7 +1673,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DebugCondition;
-        if (expect(tok!"debug") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"debug")`);
         if (currentIs(tok!"("))
         {
             advance();
@@ -1704,7 +1684,7 @@ class Parser
                 error(`Integer literal or identifier expected`);
                 return null;
             }
-            if (expect(tok!")") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!")")`);
         }
         return node;
     }
@@ -1720,8 +1700,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DebugSpecification;
-        if (expect(tok!"debug") is null) { deallocate(node); return null; }
-        if (expect(tok!"=") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"debug")`);
+        mixin (nullCheck!`expect(tok!"=")`);
         if (currentIsOneOf(tok!"identifier", tok!"intLiteral"))
             node.identifierOrInteger = advance();
         else
@@ -1729,7 +1709,7 @@ class Parser
             error("Integer literal or identifier expected");
             return null;
         }
-        if (expect(tok!";") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!";")`);
         return node;
     }
 
@@ -1831,32 +1811,32 @@ class Parser
                     return null;
             }
             node.declarations = ownArray(declarations);
-            if (expect(tok!"}") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!"}")`);
             break;
         case tok!"alias":
             if (startsWith(tok!"alias", tok!"identifier", tok!"this"))
-                node.aliasThisDeclaration = parseAliasThisDeclaration();
+                mixin (nullCheck!`node.aliasThisDeclaration = parseAliasThisDeclaration()`);
             else
-                node.aliasDeclaration = parseAliasDeclaration();
+                mixin (nullCheck!`node.aliasDeclaration = parseAliasDeclaration()`);
             break;
         case tok!"class":
-            node.classDeclaration = parseClassDeclaration();
+            mixin (nullCheck!`node.classDeclaration = parseClassDeclaration()`);
             break;
         case tok!"this":
             if (startsWith(tok!"this", tok!"(", tok!"this", tok!")"))
             {
-                node.postblit = parsePostblit();
-                if (node.postblit is null) { deallocate(node); return null; }
+                mixin (nullCheck!`node.postblit = parsePostblit()`);
+                mixin (nullCheck!`node.postblit`);
             }
             else
             {
-                node.constructor = parseConstructor();
-                if (node.constructor is null) { deallocate(node); return null; }
+                mixin (nullCheck!`node.constructor = parseConstructor()`);
+                mixin (nullCheck!`node.constructor`);
             }
             break;
         case tok!"~":
-            node.destructor = parseDestructor();
-            if (node.destructor is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.destructor = parseDestructor()`);
+            mixin (nullCheck!`node.destructor`);
             break;
         case tok!"enum":
             auto b = setBookmark();
@@ -1875,47 +1855,47 @@ class Parser
                     {
                         goToBookmark(b);
                         node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);
-                        if (node.functionDeclaration is null) { deallocate(node); return null; }
+                        mixin (nullCheck!`node.functionDeclaration`);
                     }
                     else
                     {
                         goToBookmark(b);
-                        node.eponymousTemplateDeclaration = parseEponymousTemplateDeclaration();
-                        if (node.eponymousTemplateDeclaration is null) { deallocate(node); return null; }
+                        mixin (nullCheck!`node.eponymousTemplateDeclaration = parseEponymousTemplateDeclaration()`);
+                        mixin (nullCheck!`node.eponymousTemplateDeclaration`);
                     }
                 }
                 else if (currentIsOneOf(tok!":", tok!"{", tok!";"))
                 {
             enumDeclaration:
                     goToBookmark(b);
-                    node.enumDeclaration = parseEnumDeclaration();
-                    if (node.enumDeclaration is null) { deallocate(node); return null; }
+                    mixin (nullCheck!`node.enumDeclaration = parseEnumDeclaration()`);
+                    mixin (nullCheck!`node.enumDeclaration`);
                 }
                 else
                 {
+                    auto eq = currentIs(tok!"=");
                     goToBookmark(b);
-                    node.variableDeclaration = parseVariableDeclaration(null, true);
-                    if (node.variableDeclaration is null) { deallocate(node); return null; }
+                    mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, eq)`);
                 }
             }
             else
             {
                 goToBookmark(b);
-                node.variableDeclaration = parseVariableDeclaration();
-                if (node.variableDeclaration is null) { deallocate(node); return null; }
+                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration()`);
+                mixin (nullCheck!`node.variableDeclaration`);
             }
             break;
         case tok!"import":
-            node.importDeclaration = parseImportDeclaration();
-            if (node.importDeclaration is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.importDeclaration = parseImportDeclaration()`);
+            mixin (nullCheck!`node.importDeclaration`);
             break;
         case tok!"interface":
-            node.interfaceDeclaration = parseInterfaceDeclaration();
-            if (node.interfaceDeclaration is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.interfaceDeclaration = parseInterfaceDeclaration()`);
+            mixin (nullCheck!`node.interfaceDeclaration`);
             break;
         case tok!"mixin":
             if (peekIs(tok!"template"))
-                node.mixinTemplateDeclaration = parseMixinTemplateDeclaration();
+                mixin (nullCheck!`node.mixinTemplateDeclaration = parseMixinTemplateDeclaration()`);
             else
             {
                 auto b = setBookmark();
@@ -1926,7 +1906,7 @@ class Parser
                     if (t !is null && t.type == tok!";")
                     {
                         goToBookmark(b);
-                        node.mixinDeclaration = parseMixinDeclaration();
+                        mixin (nullCheck!`node.mixinDeclaration = parseMixinDeclaration()`);
                     }
                     else
                     {
@@ -1939,47 +1919,47 @@ class Parser
                 else
                 {
                     goToBookmark(b);
-                    node.mixinDeclaration = parseMixinDeclaration();
+                    mixin (nullCheck!`node.mixinDeclaration = parseMixinDeclaration()`);
                 }
             }
             break;
         case tok!"pragma":
-            node.pragmaDeclaration = parsePragmaDeclaration();
+            mixin (nullCheck!`node.pragmaDeclaration = parsePragmaDeclaration()`);
             break;
         case tok!"shared":
             if (startsWith(tok!"shared", tok!"static", tok!"this"))
-                node.sharedStaticConstructor = parseSharedStaticConstructor();
+                mixin (nullCheck!`node.sharedStaticConstructor = parseSharedStaticConstructor()`);
             else if (startsWith(tok!"shared", tok!"static", tok!"~"))
-                node.sharedStaticDestructor = parseSharedStaticDestructor();
+                mixin (nullCheck!`node.sharedStaticDestructor = parseSharedStaticDestructor()`);
             else
                 goto type;
             break;
         case tok!"static":
             if (peekIs(tok!"this"))
-                node.staticConstructor = parseStaticConstructor();
+                mixin (nullCheck!`node.staticConstructor = parseStaticConstructor()`);
             else if (peekIs(tok!"~"))
-                node.staticDestructor = parseStaticDestructor();
+                mixin (nullCheck!`node.staticDestructor = parseStaticDestructor()`);
             else if (peekIs(tok!"if"))
-                node.conditionalDeclaration = parseConditionalDeclaration();
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration()`);
             else if (peekIs(tok!"assert"))
-                node.staticAssertDeclaration = parseStaticAssertDeclaration();
+                mixin (nullCheck!`node.staticAssertDeclaration = parseStaticAssertDeclaration()`);
             else
                 goto type;
             break;
         case tok!"struct":
-            node.structDeclaration = parseStructDeclaration();
+            mixin (nullCheck!`node.structDeclaration = parseStructDeclaration()`);
             break;
         case tok!"template":
-            node.templateDeclaration = parseTemplateDeclaration();
+            mixin (nullCheck!`node.templateDeclaration = parseTemplateDeclaration()`);
             break;
         case tok!"union":
-            node.unionDeclaration = parseUnionDeclaration();
+            mixin (nullCheck!`node.unionDeclaration = parseUnionDeclaration()`);
             break;
         case tok!"invariant":
-            node.invariant_ = parseInvariant();
+            mixin (nullCheck!`node.invariant_ = parseInvariant()`);
             break;
         case tok!"unittest":
-            node.unittest_ = parseUnittest();
+            mixin (nullCheck!`node.unittest_ = parseUnittest()`);
             break;
         case tok!"identifier":
             if (node.attributes.length > 0)
@@ -2069,13 +2049,13 @@ class Parser
         case tok!"debug":
             if (peekIs(tok!"="))
             {
-                node.debugSpecification = parseDebugSpecification();
-                if (node.debugSpecification is null) { deallocate(node); return null; }
+                mixin (nullCheck!`node.debugSpecification = parseDebugSpecification()`);
+                mixin (nullCheck!`node.debugSpecification`);
             }
             else
             {
-                node.conditionalDeclaration = parseConditionalDeclaration();
-                if (node.conditionalDeclaration is null) { deallocate(node); return null; }
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration()`);
+                mixin (nullCheck!`node.conditionalDeclaration`);
             }
             break;
         default:
@@ -2142,12 +2122,12 @@ class Parser
         if (isDeclaration())
         {
             trace("\033[01;36mparsing declaration\033[0m");
-            node.declaration = parseDeclaration();
+            mixin (nullCheck!`node.declaration = parseDeclaration()`);
         }
         else
         {
             trace("\033[01;36mparsing statement\033[0m");
-            node.statement = parseStatement();
+            mixin (nullCheck!`node.statement = parseStatement()`);
         }
 
         if (node.statement is null && node.declaration is null)
@@ -2173,7 +2153,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Declarator;
         auto id = expect(tok!"identifier");
-        if (id is null) { deallocate(node); return null; }
+        mixin (nullCheck!`id`);
         node.name = *id;
         if (currentIs(tok!"[")) // dmd doesn't accept pointer after identifier
         {
@@ -2194,14 +2174,14 @@ class Parser
         }
         if (currentIs(tok!"("))
         {
-            if ((node.templateParameters = parseTemplateParameters()) is null) { deallocate(node); return null; }
-            if (expect(tok!"=") is null) { deallocate(node); return null; }
-            if ((node.initializer = parseInitializer()) is null) { deallocate(node); return null; }
+            mixin (nullCheck!`(node.templateParameters = parseTemplateParameters())`);
+            mixin (nullCheck!`expect(tok!"=")`);
+            mixin (nullCheck!`(node.initializer = parseInitializer())`);
         }
         else if (currentIs(tok!"="))
         {
             advance();
-            node.initializer = parseInitializer();
+            mixin (nullCheck!`node.initializer = parseInitializer()`);
         }
         return node;
     }
@@ -2217,9 +2197,9 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DefaultStatement;
-        if (expect(tok!"default") is null) { deallocate(node); return null; }
-        if (expect(tok!":") is null) { deallocate(node); return null; }
-        node.declarationsAndStatements = parseDeclarationsAndStatements();
+        mixin (nullCheck!`expect(tok!"default")`);
+        mixin (nullCheck!`expect(tok!":")`);
+        mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements()`);
         return node;
     }
 
@@ -2236,8 +2216,8 @@ class Parser
         auto node = allocate!DeleteExpression;
         node.line = current.line;
         node.column = current.column;
-        if (expect(tok!"delete") is null) { deallocate(node); return null; }
-        node.unaryExpression = parseUnaryExpression();
+        mixin (nullCheck!`expect(tok!"delete")`);
+        mixin (nullCheck!`node.unaryExpression = parseUnaryExpression()`);
         return node;
     }
 
@@ -2252,7 +2232,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Deprecated;
-        if (expect(tok!"deprecated") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"deprecated")`);
         if (currentIs(tok!"("))
         {
             advance();
@@ -2265,7 +2245,7 @@ class Parser
                 return null;
             }
             node.stringLiteral = *s;
-            if (expect(tok!")") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!")")`);
         }
         return node;
     }
@@ -2283,7 +2263,7 @@ class Parser
         auto node = allocate!Destructor;
         node.comment = comment;
         comment = null;
-        if (expect(tok!"~") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"~")`);
         if (!moreTokens)
         {
             error("'this' expected");
@@ -2293,9 +2273,9 @@ class Parser
         node.index = current.index;
         node.line = current.line;
         node.column = current.column;
-        if (expect(tok!"this") is null) { deallocate(node); return null; }
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
-        if (expect(tok!")") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"this")`);
+        mixin (nullCheck!`expect(tok!"(")`);
+        mixin (nullCheck!`expect(tok!")")`);
         if (currentIs(tok!";"))
             advance();
         else
@@ -2304,7 +2284,7 @@ class Parser
             while (moreTokens() && currentIsMemberFunctionAttribute())
                 memberFunctionAttributes ~= parseMemberFunctionAttribute();
             node.memberFunctionAttributes = ownArray(memberFunctionAttributes);
-            node.functionBody = parseFunctionBody();
+            mixin (nullCheck!`node.functionBody = parseFunctionBody()`);
         }
         return node;
     }
@@ -2320,13 +2300,13 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DoStatement;
-        if (expect(tok!"do") is null) { deallocate(node); return null; }
-        node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault();
-        if (expect(tok!"while") is null) { deallocate(node); return null; }
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
-        node.expression = parseExpression();
-        if (expect(tok!")") is null) { deallocate(node); return null; }
-        if (expect(tok!";") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"do")`);
+        mixin (nullCheck!`node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault()`);
+        mixin (nullCheck!`expect(tok!"while")`);
+        mixin (nullCheck!`expect(tok!"(")`);
+        mixin (nullCheck!`node.expression = parseExpression()`);
+        mixin (nullCheck!`expect(tok!")")`);
+        mixin (nullCheck!`expect(tok!";")`);
         return node;
     }
 
@@ -2398,7 +2378,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!EnumDeclaration;
-        if (expect(tok!"enum") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"enum")`);
         if (currentIs(tok!"identifier"))
             node.name = advance();
         else
@@ -2408,9 +2388,9 @@ class Parser
         if (currentIs(tok!":"))
         {
             advance();
-            node.type = parseType();
+            mixin (nullCheck!`node.type = parseType()`);
         }
-        node.enumBody = parseEnumBody();
+        mixin (nullCheck!`node.enumBody = parseEnumBody()`);
         return node;
     }
 
@@ -2443,13 +2423,13 @@ class Parser
         else
         {
     type:
-            node.type = parseType();
+            mixin (nullCheck!`node.type = parseType()`);
             ident = expect(tok!"identifier");
-            if (ident is null) { deallocate(node); return null; }
+            mixin (nullCheck!`ident`);
             node.name = *ident;
     assign:
-            expect(tok!"=");
-            node.assignExpression = parseAssignExpression();
+            mixin (nullCheck!`expect(tok!"=")`);
+            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         }
         return node;
     }
@@ -2467,14 +2447,14 @@ class Parser
         auto node = allocate!EponymousTemplateDeclaration;
         advance(); // enum
         auto ident = expect(tok!"identifier");
-        if (ident is null) { deallocate(node); return null; }
+        mixin (nullCheck!`ident`);
         node.name = *ident;
-        node.templateParameters = parseTemplateParameters();
+        mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
         expect(tok!"=");
         if (isExpression())
-            node.assignExpression = parseAssignExpression();
+            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         else
-            node.type = parseType();
+            mixin (nullCheck!`node.type = parseType()`);
         expect(tok!";");
         return node;
     }
@@ -2490,10 +2470,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!EqualExpression;
-        node.left = shift is null ? parseShiftExpression() : shift;
+        mixin (nullCheck!`node.left = shift is null ? parseShiftExpression() : shift`);
         if (currentIsOneOf(tok!"==", tok!"!="))
             node.operator = advance().type;
-        node.right = parseShiftExpression();
+        mixin (nullCheck!`node.right = parseShiftExpression()`);
         return node;
     }
 
@@ -2537,11 +2517,7 @@ class Parser
     FinalSwitchStatement parseFinalSwitchStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!FinalSwitchStatement;
-        if (expect(tok!"final") is null) { deallocate(node); return null; }
-        node.switchStatement = parseSwitchStatement();
-        if (node.switchStatement is null) { deallocate(node); return null; }
-        return node;
+        mixin (simpleParse!(FinalSwitchStatement, tok!"final", "switchStatement|parseSwitchStatement"));
     }
 
     /**
@@ -2555,8 +2531,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Finally;
-        if (expect(tok!"finally") is null) { deallocate(node); return null; }
-        node.declarationOrStatement = parseDeclarationOrStatement();
+        mixin (nullCheck!`expect(tok!"finally")`);
+        mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
         return node;
     }
 
@@ -2571,34 +2547,33 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ForStatement;
-        if (expect(tok!"for") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"for")`);
         if (!moreTokens) node.startIndex = current().index;
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"(")`);
 
         if (currentIs(tok!";"))
             advance();
         else
-            node.initialization = parseDeclarationOrStatement();
+            mixin (nullCheck!`node.initialization = parseDeclarationOrStatement()`);
 
         if (currentIs(tok!";"))
             advance();
         else
         {
-            node.test = parseExpression();
+            mixin (nullCheck!`node.test = parseExpression()`);
             expect(tok!";");
         }
 
         if (!currentIs(tok!")"))
-            node.increment = parseExpression();
+             mixin (nullCheck!`node.increment = parseExpression()`);
 
-        if (expect(tok!")") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!")")`);
         if (currentIs(tok!"}"))
         {
             error("Statement expected", false);
             return node; // this line makes DCD better
         }
-        node.declarationOrStatement = parseDeclarationOrStatement();
-        if (node.declarationOrStatement is null) { deallocate(node); return null; }
+        mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
         return node;
     }
 
@@ -2623,18 +2598,14 @@ class Parser
             return null;
         }
         node.startIndex = current().index;
-        if (expect(tok!"(") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!"(")`);
         ForeachTypeList feType = parseForeachTypeList();
-        if (feType is null)
-        {
-            deallocate(node);
-            return null;
-        }
+        mixin (nullCheck!`feType`);
         bool canBeRange = feType.items.length == 1;
 
-        if (expect(tok!";") is null) { deallocate(node); return null; }
-        node.low = parseExpression();
-        if (node.low is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!";")`);
+        mixin (nullCheck!`node.low = parseExpression()`);
+        mixin (nullCheck!`node.low`);
         if (currentIs(tok!".."))
         {
             if (!canBeRange)
@@ -2643,22 +2614,21 @@ class Parser
                 return null;
             }
             advance();
-            node.high = parseExpression();
+            mixin (nullCheck!`node.high = parseExpression()`);
             node.foreachType = feType.items[0];
-            if (node.high is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.high`);
         }
         else
         {
             node.foreachTypeList = feType;
         }
-        if (expect(tok!")") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!")")`);
         if (currentIs(tok!"}"))
         {
             error("Statement expected", false);
             return node; // this line makes DCD better
         }
-        node.declarationOrStatement = parseDeclarationOrStatement();
-        if (node.declarationOrStatement is null) { deallocate(node); return null; }
+        mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
         return node;
     }
 
@@ -2725,7 +2695,7 @@ class Parser
         switch (current.type)
         {
         case tok!"@":
-            node.atAttribute = parseAtAttribute();
+            mixin (nullCheck!`node.atAttribute = parseAtAttribute()`);
             break;
         case tok!"pure":
         case tok!"nothrow":
@@ -2769,20 +2739,20 @@ class Parser
         {
             if (currentIs(tok!"in"))
             {
-                node.inStatement = parseInStatement();
+                mixin (nullCheck!`node.inStatement = parseInStatement()`);
                 if (currentIs(tok!"out"))
-                    node.outStatement = parseOutStatement();
+                    mixin (nullCheck!`node.outStatement = parseOutStatement()`);
             }
             else if (currentIs(tok!"out"))
             {
-                node.outStatement = parseOutStatement();
+                mixin (nullCheck!`node.outStatement = parseOutStatement()`);
                 if (currentIs(tok!"in"))
-                    node.inStatement = parseInStatement();
+                    mixin (nullCheck!`node.inStatement = parseInStatement()`);
             }
             // Allow function bodies without body statements because this is
             // valid inside of interfaces.
             if (currentIs(tok!"body"))
-                node.bodyStatement = parseBodyStatement();
+                mixin (nullCheck!`node.bodyStatement = parseBodyStatement()`);
         }
         return node;
     }
@@ -2809,16 +2779,16 @@ class Parser
         case tok!"scope":
         case tok!"pure":
         case tok!"nothrow":
-            node.type = parseType();
-            node.arguments = parseArguments();
+            mixin (nullCheck!`node.type = parseType()`);
+            mixin (nullCheck!`node.arguments = parseArguments()`);
             break;
         default:
             if (unary !is null)
                 node.unaryExpression = unary;
             else
-                node.unaryExpression = parseUnaryExpression();
+                mixin (nullCheck!`node.unaryExpression = parseUnaryExpression()`);
             if (currentIs(tok!"!"))
-                node.templateArguments = parseTemplateArguments();
+                mixin (nullCheck!`node.templateArguments = parseTemplateArguments()`);
             if (unary !is null)
                 if ((node.arguments = parseArguments()) is null)
                 {
@@ -2904,21 +2874,21 @@ class Parser
         bool isTemplate = p !is null && p.type == tok!"(";
 
         if (isTemplate)
-            node.templateParameters = parseTemplateParameters();
+            mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
 
-        node.parameters = parseParameters();
+        mixin (nullCheck!`node.parameters = parseParameters()`);
         if (node.parameters is null) { deallocate(node); return null; }
 
         while (moreTokens() && currentIsMemberFunctionAttribute())
             memberFunctionAttributes ~= parseMemberFunctionAttribute();
 
         if (isTemplate && currentIs(tok!"if"))
-            node.constraint = parseConstraint();
+            mixin (nullCheck!`node.constraint = parseConstraint()`);
 
         if (currentIs(tok!";"))
             advance();
         else
-            node.functionBody = parseFunctionBody();
+            mixin (nullCheck!`node.functionBody = parseFunctionBody()`);
         node.memberFunctionAttributes = ownArray(memberFunctionAttributes);
         return node;
     }
@@ -2940,13 +2910,13 @@ class Parser
             if (!currentIsOneOf(tok!"(", tok!"in", tok!"body",
                 tok!"out", tok!"{"))
             {
-                node.type = parseType();
+                mixin (nullCheck!`node.type = parseType()`);
                 if (node.type is null) { deallocate(node); return null; }
             }
         }
         if (currentIs(tok!"("))
         {
-            node.parameters = parseParameters();
+            mixin (nullCheck!`node.parameters = parseParameters()`);
             if (node.parameters is null) { deallocate(node); return null; }
             FunctionAttribute[] functionAttributes;
             do
@@ -2984,7 +2954,7 @@ class Parser
         case tok!"case":
             node.label = advance();
             if (!currentIs(tok!";"))
-                node.expression = parseExpression();
+                mixin (nullCheck!`node.expression = parseExpression()`);
             break;
         default:
             error(`Identifier, "default", or "case" expected`);
@@ -3093,7 +3063,7 @@ class Parser
             tok!"!", tok!"is")
             && !startsWith(tok!"identifier", tok!"!", tok!"in"))
         {
-            node.templateInstance = parseTemplateInstance();
+            mixin (nullCheck!`node.templateInstance = parseTemplateInstance()`);
         }
         else
         {
@@ -3122,7 +3092,7 @@ class Parser
             node.negated = true;
         }
         if (expect(tok!"is") is null) { deallocate(node); return null; }
-        node.right = parseShiftExpression();
+        mixin (nullCheck!`node.right = parseShiftExpression()`);
         return node;
     }
 
@@ -3154,7 +3124,7 @@ class Parser
             if (i !is null)
                 node.identifier = *i;
             expect(tok!"=");
-            node.expression = parseExpression();
+            mixin (nullCheck!`node.expression = parseExpression()`);
         }
         else
         {
@@ -3164,17 +3134,17 @@ class Parser
                 || !peekIs(tok!"="))
             {
                 goToBookmark(b);
-                node.expression = parseExpression();
+                mixin (nullCheck!`node.expression = parseExpression()`);
             }
             else
             {
                 goToBookmark(b);
-                node.type = parseType();
+                mixin (nullCheck!`node.type = parseType()`);
                 auto i = expect(tok!"identifier");
                 if (i !is null)
                     node.identifier = *i;
                 expect(tok!"=");
-                node.expression = parseExpression();
+                mixin (nullCheck!`node.expression = parseExpression()`);
             }
         }
 
@@ -3184,11 +3154,11 @@ class Parser
             error("Statement expected", false);
             return node; // this line makes DCD better
         }
-        node.thenStatement = parseDeclarationOrStatement();
+        mixin (nullCheck!`node.thenStatement = parseDeclarationOrStatement()`);
         if (currentIs(tok!"else"))
         {
             advance();
-            node.elseStatement = parseDeclarationOrStatement();
+            mixin (nullCheck!`node.elseStatement = parseDeclarationOrStatement()`);
         }
         return node;
     }
@@ -3307,7 +3277,7 @@ class Parser
         auto node = allocate!ImportExpression;
         if (expect(tok!"import") is null) { deallocate(node); return null; }
         if (expect(tok!"(") is null) { deallocate(node); return null; }
-        node.assignExpression = parseAssignExpression();
+        mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         if (expect(tok!")") is null) { deallocate(node); return null; }
         return node;
     }
@@ -3325,7 +3295,7 @@ class Parser
         auto node = allocate!IndexExpression;
         node.unaryExpression = unaryExpression is null ? parseUnaryExpression() : unaryExpression;
         if (expect(tok!"[") is null) { deallocate(node); return null; }
-        node.argumentList = parseArgumentList();
+        mixin (nullCheck!`node.argumentList = parseArgumentList()`);
         if (expect(tok!"]") is null) { deallocate(node); return null; }
         return node;
     }
@@ -3347,7 +3317,7 @@ class Parser
             advance();
         }
         if (expect(tok!"in") is null) { deallocate(node); return null; }
-        node.right = parseShiftExpression();
+        mixin (nullCheck!`node.right = parseShiftExpression()`);
         return node;
     }
 
@@ -3362,7 +3332,7 @@ class Parser
     {
         auto node = allocate!InStatement;
         if (expect(tok!"in") is null) { deallocate(node); return null; }
-        node.blockStatement = parseBlockStatement();
+        mixin (nullCheck!`node.blockStatement = parseBlockStatement()`);
         if (node.blockStatement is null)
             return null;
         return node;
@@ -3382,7 +3352,7 @@ class Parser
         if (currentIs(tok!"void") && peekIsOneOf(tok!",", tok!";"))
             advance();
         else
-            node.nonVoidInitializer = parseNonVoidInitializer();
+            mixin (nullCheck!`node.nonVoidInitializer = parseNonVoidInitializer()`);
         return node;
     }
 
@@ -3442,18 +3412,18 @@ class Parser
         auto node = allocate!IsExpression;
         if (expect(tok!"is") is null) { deallocate(node); return null; }
         if (expect(tok!"(") is null) { deallocate(node); return null; }
-        node.type = parseType();
+        mixin (nullCheck!`node.type = parseType()`);
         if (node.type is null) { deallocate(node); return null; }
         if (currentIs(tok!"identifier"))
             node.identifier = advance();
         if (currentIsOneOf(tok!"==", tok!":"))
         {
             node.equalsOrColon = advance().type;
-            node.typeSpecialization = parseTypeSpecialization();
+            mixin (nullCheck!`node.typeSpecialization = parseTypeSpecialization()`);
             if (currentIs(tok!","))
             {
                 advance();
-                node.templateParameterList = parseTemplateParameterList();
+                mixin (nullCheck!`node.templateParameterList = parseTemplateParameterList()`);
             }
         }
         if (expect(tok!")") is null) { deallocate(node); return null; }
@@ -3471,9 +3441,9 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!KeyValuePair;
-        node.key = parseAssignExpression();
+        mixin (nullCheck!`node.key = parseAssignExpression()`);
         if (expect(tok!":") is null) { deallocate(node); return null; }
-        node.value = parseAssignExpression();
+        mixin (nullCheck!`node.value = parseAssignExpression()`);
         return node;
     }
 
@@ -3522,7 +3492,7 @@ class Parser
         if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         expect(tok!":");
-        node.declarationOrStatement = parseDeclarationOrStatement();
+        mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
         return node;
     }
 
@@ -3556,7 +3526,7 @@ class Parser
         if (currentIs(tok!"("))
         {
         lParen:
-            node.parameters = parseParameters();
+            mixin (nullCheck!`node.parameters = parseParameters()`);
             FunctionAttribute[] functionAttributes;
             while (moreTokens())
             {
@@ -3622,7 +3592,7 @@ class Parser
             if (currentIs(tok!","))
             {
                 advance();
-                node.identifierChain = parseIdentifierChain();
+                mixin (nullCheck!`node.identifierChain = parseIdentifierChain()`);
             }
         }
         expect(tok!")");
@@ -3647,7 +3617,7 @@ class Parser
         switch (current.type)
         {
         case tok!"@":
-            node.atAttribute = parseAtAttribute();
+            mixin (nullCheck!`node.atAttribute = parseAtAttribute()`);
             break;
         case tok!"immutable":
         case tok!"inout":
@@ -3676,9 +3646,9 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!MixinDeclaration;
         if (peekIsOneOf(tok!"identifier", tok!"typeof", tok!"."))
-            node.templateMixinExpression = parseTemplateMixinExpression();
+            mixin (nullCheck!`node.templateMixinExpression = parseTemplateMixinExpression()`);
         else if (peekIs(tok!"("))
-            node.mixinExpression = parseMixinExpression();
+            mixin (nullCheck!`node.mixinExpression = parseMixinExpression()`);
         else
         {
             error(`"(" or identifier expected`);
@@ -3701,7 +3671,7 @@ class Parser
         auto node = allocate!MixinExpression;
         expect(tok!"mixin");
         expect(tok!"(");
-        node.assignExpression = parseAssignExpression();
+        mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         expect(tok!")");
         return node;
     }
@@ -3718,7 +3688,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!MixinTemplateDeclaration;
         if (expect(tok!"mixin") is null) { deallocate(node); return null; }
-        node.templateDeclaration = parseTemplateDeclaration();
+        mixin (nullCheck!`node.templateDeclaration = parseTemplateDeclaration()`);
         if (node.templateDeclaration is null) { deallocate(node); return null; }
         return node;
     }
@@ -3737,12 +3707,12 @@ class Parser
         auto node = allocate!MixinTemplateName;
         if (currentIs(tok!"typeof"))
         {
-            node.typeofExpression = parseTypeofExpression();
+            mixin (nullCheck!`node.typeofExpression = parseTypeofExpression()`);
             expect(tok!".");
-            node.identifierOrTemplateChain = parseIdentifierOrTemplateChain();
+            mixin (nullCheck!`node.identifierOrTemplateChain = parseIdentifierOrTemplateChain()`);
         }
         else
-            node.symbol = parseSymbol();
+            mixin (nullCheck!`node.symbol = parseSymbol()`);
         return node;
     }
 
@@ -3793,10 +3763,10 @@ class Parser
     {
         auto node = allocate!ModuleDeclaration;
         if (currentIs(tok!"deprecated"))
-            node.deprecated_ = parseDeprecated();
+            mixin (nullCheck!`node.deprecated_ = parseDeprecated()`);
         auto start = expect(tok!"module");
         if (start is null) { deallocate(node); return null; }
-        node.moduleName = parseIdentifierChain();
+        mixin (nullCheck!`node.moduleName = parseIdentifierChain()`);
         node.comment = start.comment;
         if (node.comment is null)
             node.comment = start.trailingComment;
@@ -3836,13 +3806,13 @@ class Parser
         auto node = allocate!NewAnonClassExpression;
         expect(tok!"new");
         if (currentIs(tok!"("))
-            node.allocatorArguments = parseArguments();
+            mixin (nullCheck!`node.allocatorArguments = parseArguments()`);
         expect(tok!"class");
         if (currentIs(tok!"("))
-            node.constructorArguments = parseArguments();
+            mixin (nullCheck!`node.constructorArguments = parseArguments()`);
         if (!currentIs(tok!"{"))
-            node.baseClassList = parseBaseClassList();
-        node.structBody = parseStructBody();
+            mixin (nullCheck!`node.baseClassList = parseBaseClassList()`);
+        mixin (nullCheck!`node.structBody = parseStructBody()`);
         return node;
     }
 
@@ -3864,7 +3834,7 @@ class Parser
         auto node = allocate!NewExpression;
         if (peekIsOneOf(tok!"class", tok!"("))
         {
-            node.newAnonClassExpression = parseNewAnonClassExpression();
+            mixin (nullCheck!`node.newAnonClassExpression = parseNewAnonClassExpression()`);
             if (node.newAnonClassExpression is null)
             {
                 deallocate(node);
@@ -3879,11 +3849,11 @@ class Parser
             if (currentIs(tok!"["))
             {
                 advance();
-                node.assignExpression = parseAssignExpression();
+                mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
                 expect(tok!"]");
             }
             else if (currentIs(tok!"("))
-                node.arguments = parseArguments();
+                mixin (nullCheck!`node.arguments = parseArguments()`);
         }
         return node;
     fail:
@@ -3908,7 +3878,7 @@ class Parser
         {
             auto b = peekPastBraces();
             if (b !is null && (b.type == tok!"("))
-                node.assignExpression = parseAssignExpression();
+                mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
             else
             {
                 assert (currentIs(tok!"{"));
@@ -3942,13 +3912,13 @@ class Parser
                 || b.type == tok!"}"
                 || b.type == tok!";"))
             {
-                node.arrayInitializer = parseArrayInitializer();
+                mixin (nullCheck!`node.arrayInitializer = parseArrayInitializer()`);
             }
             else
-                node.assignExpression = parseAssignExpression();
+                mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         }
         else
-            node.assignExpression = parseAssignExpression();
+            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         if (node.assignExpression is null && node.arrayInitializer is null
         && node.structInitializer is null)
         {
@@ -4035,7 +4005,7 @@ class Parser
             node.parameter = *ident;
             expect(tok!")");
         }
-        node.blockStatement = parseBlockStatement();
+        mixin (nullCheck!`node.blockStatement = parseBlockStatement()`);
         if (node.blockStatement is null)
             return null;
         return node;
@@ -4064,7 +4034,7 @@ class Parser
                 parameterAttributes ~= type;
         }
         node.parameterAttributes = ownArray(parameterAttributes);
-        node.type = parseType();
+        mixin (nullCheck!`node.type = parseType()`);
         if (node.type is null) { deallocate(node); return null; }
         if (currentIs(tok!"identifier"))
         {
@@ -4077,7 +4047,7 @@ class Parser
             else if (currentIs(tok!"="))
             {
                 advance();
-                node.default_ = parseAssignExpression();
+                mixin (nullCheck!`node.default_ = parseAssignExpression()`);
             }
             else if (currentIs(tok!"["))
             {
@@ -4101,7 +4071,7 @@ class Parser
         else if (currentIs(tok!"="))
         {
             advance();
-            node.default_ = parseAssignExpression();
+            mixin (nullCheck!`node.default_ = parseAssignExpression()`);
         }
         return node;
     }
@@ -4219,7 +4189,7 @@ class Parser
         if (currentIs(tok!";"))
             advance();
         else
-            node.functionBody = parseFunctionBody();
+            mixin (nullCheck!`node.functionBody = parseFunctionBody()`);
         return node;
     }
 
@@ -4249,7 +4219,7 @@ class Parser
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!PragmaDeclaration;
-        node.pragmaExpression = parsePragmaExpression();
+        mixin (nullCheck!`node.pragmaExpression = parsePragmaExpression()`);
         expect(tok!";");
         return node;
     }
@@ -4273,7 +4243,7 @@ class Parser
         if (currentIs(tok!","))
         {
             advance();
-            node.argumentList = parseArgumentList();
+            mixin (nullCheck!`node.argumentList = parseArgumentList()`);
         }
         expect(tok!")");
         return node;
@@ -4338,9 +4308,9 @@ class Parser
             goto case;
         case tok!"identifier":
             if (peekIs(tok!"=>"))
-                node.lambdaExpression = parseLambdaExpression();
+                mixin (nullCheck!`node.lambdaExpression = parseLambdaExpression()`);
             else
-                node.identifierOrTemplateInstance = parseIdentifierOrTemplateInstance();
+                mixin (nullCheck!`node.identifierOrTemplateInstance = parseIdentifierOrTemplateInstance()`);
             break;
         case tok!"immutable":
         case tok!"const":
@@ -4348,7 +4318,7 @@ class Parser
         case tok!"shared":
             advance();
             expect(tok!"(");
-            node.type = parseType();
+            mixin (nullCheck!`node.type = parseType()`);
             expect(tok!")");
             expect(tok!".");
             auto ident = expect(tok!"identifier");
@@ -4383,19 +4353,19 @@ class Parser
                 if (currentIs(tok!"=>"))
                 {
                     goToBookmark(b);
-                    node.lambdaExpression = parseLambdaExpression();
+                    mixin (nullCheck!`node.lambdaExpression = parseLambdaExpression()`);
                     break;
                 }
                 else
                 {
                     goToBookmark(b);
-                    node.functionLiteralExpression = parseFunctionLiteralExpression();
+                    mixin (nullCheck!`node.functionLiteralExpression = parseFunctionLiteralExpression()`);
                     break;
                 }
             }
             else if (peekIs(tok!"{"))
             {
-                node.functionLiteralExpression = parseFunctionLiteralExpression();
+                mixin (nullCheck!`node.functionLiteralExpression = parseFunctionLiteralExpression()`);
                 break;
             }
             else
@@ -4435,19 +4405,19 @@ class Parser
             }
             break;
         case tok!"typeof":
-            node.typeofExpression = parseTypeofExpression();
+            mixin (nullCheck!`node.typeofExpression = parseTypeofExpression()`);
             break;
         case tok!"typeid":
-            node.typeidExpression = parseTypeidExpression();
+            mixin (nullCheck!`node.typeidExpression = parseTypeidExpression()`);
             break;
         case tok!"__vector":
-            node.vector = parseVector();
+            mixin (nullCheck!`node.vector = parseVector()`);
             break;
         case tok!"[":
             if (isAssociativeArrayLiteral())
-                node.assocArrayLiteral = parseAssocArrayLiteral();
+                mixin (nullCheck!`node.assocArrayLiteral = parseAssocArrayLiteral()`);
             else
-                node.arrayLiteral = parseArrayLiteral();
+                mixin (nullCheck!`node.arrayLiteral = parseArrayLiteral()`);
             break;
         case tok!"(":
             auto b = setBookmark();
@@ -4457,32 +4427,32 @@ class Parser
             if (currentIs(tok!"=>"))
             {
                 goToBookmark(b);
-                node.lambdaExpression = parseLambdaExpression();
+                mixin (nullCheck!`node.lambdaExpression = parseLambdaExpression()`);
             }
             else if (currentIs(tok!"{"))
             {
                 goToBookmark(b);
-                node.functionLiteralExpression = parseFunctionLiteralExpression();
+                mixin (nullCheck!`node.functionLiteralExpression = parseFunctionLiteralExpression()`);
             }
             else
             {
                 goToBookmark(b);
                 advance();
-                node.expression = parseExpression();
+                mixin (nullCheck!`node.expression = parseExpression()`);
                 expect(tok!")");
             }
             break;
         case tok!"is":
-            node.isExpression = parseIsExpression();
+            mixin (nullCheck!`node.isExpression = parseIsExpression()`);
             break;
         case tok!"__traits":
-            node.traitsExpression = parseTraitsExpression();
+            mixin (nullCheck!`node.traitsExpression = parseTraitsExpression()`);
             break;
         case tok!"mixin":
-            node.mixinExpression = parseMixinExpression();
+            mixin (nullCheck!`node.mixinExpression = parseMixinExpression()`);
             break;
         case tok!"import":
-            node.importExpression = parseImportExpression();
+            mixin (nullCheck!`node.importExpression = parseImportExpression()`);
             break;
         case tok!"$":
         case tok!"this":
@@ -4620,7 +4590,7 @@ class Parser
         if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         expect(tok!")");
-        node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault();
+        mixin (nullCheck!`node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault()`);
         return node;
     }
 
@@ -4684,7 +4654,7 @@ class Parser
             node.rename = advance();
             advance(); // =
         }
-        node.identifierChain = parseIdentifierChain();
+        mixin (nullCheck!`node.identifierChain = parseIdentifierChain()`);
         if (node.identifierChain is null)
             return null;
         return node;
@@ -4706,14 +4676,14 @@ class Parser
         if (expect(tok!"[") is null) { deallocate(node); return null; }
         if (!currentIs(tok!"]"))
         {
-            node.lower = parseAssignExpression();
+            mixin (nullCheck!`node.lower = parseAssignExpression()`);
             if (node.lower is null)
             {
                 error("assignExpression expected");
                 return null;
             }
             expect(tok!"..");
-            node.upper = parseAssignExpression();
+            mixin (nullCheck!`node.upper = parseAssignExpression()`);
             if (node.upper is null)
             {
                 error("assignExpression expected");
@@ -4759,7 +4729,7 @@ class Parser
                 node.caseStatement = parseCaseStatement(argumentList);
             break;
         case tok!"default":
-            node.defaultStatement = parseDefaultStatement();
+            mixin (nullCheck!`node.defaultStatement = parseDefaultStatement()`);
             break;
         default:
             if ((node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault()) is null)
@@ -4810,61 +4780,61 @@ class Parser
         switch (current.type)
         {
         case tok!"{":
-            node.blockStatement = parseBlockStatement();
+            mixin (nullCheck!`node.blockStatement = parseBlockStatement()`);
             break;
         case tok!"if":
-            node.ifStatement = parseIfStatement();
+            mixin (nullCheck!`node.ifStatement = parseIfStatement()`);
             break;
         case tok!"while":
-            node.whileStatement = parseWhileStatement();
+            mixin (nullCheck!`node.whileStatement = parseWhileStatement()`);
             break;
         case tok!"do":
-            node.doStatement = parseDoStatement();
+            mixin (nullCheck!`node.doStatement = parseDoStatement()`);
             break;
         case tok!"for":
-            node.forStatement = parseForStatement();
+            mixin (nullCheck!`node.forStatement = parseForStatement()`);
             break;
         case tok!"foreach":
         case tok!"foreach_reverse":
-            node.foreachStatement = parseForeachStatement();
+            mixin (nullCheck!`node.foreachStatement = parseForeachStatement()`);
             break;
         case tok!"switch":
-            node.switchStatement = parseSwitchStatement();
+            mixin (nullCheck!`node.switchStatement = parseSwitchStatement()`);
             break;
         case tok!"continue":
-            node.continueStatement = parseContinueStatement();
+            mixin (nullCheck!`node.continueStatement = parseContinueStatement()`);
             break;
         case tok!"break":
-            node.breakStatement = parseBreakStatement();
+            mixin (nullCheck!`node.breakStatement = parseBreakStatement()`);
             break;
         case tok!"return":
-            node.returnStatement = parseReturnStatement();
+            mixin (nullCheck!`node.returnStatement = parseReturnStatement()`);
             break;
         case tok!"goto":
-            node.gotoStatement = parseGotoStatement();
+            mixin (nullCheck!`node.gotoStatement = parseGotoStatement()`);
             break;
         case tok!"with":
-            node.withStatement = parseWithStatement();
+            mixin (nullCheck!`node.withStatement = parseWithStatement()`);
             break;
         case tok!"synchronized":
-            node.synchronizedStatement = parseSynchronizedStatement();
+            mixin (nullCheck!`node.synchronizedStatement = parseSynchronizedStatement()`);
             break;
         case tok!"try":
-            node.tryStatement = parseTryStatement();
+            mixin (nullCheck!`node.tryStatement = parseTryStatement()`);
             break;
         case tok!"throw":
-            node.throwStatement = parseThrowStatement();
+            mixin (nullCheck!`node.throwStatement = parseThrowStatement()`);
             break;
         case tok!"scope":
-            node.scopeGuardStatement = parseScopeGuardStatement();
+            mixin (nullCheck!`node.scopeGuardStatement = parseScopeGuardStatement()`);
             break;
         case tok!"asm":
-            node.asmStatement = parseAsmStatement();
+            mixin (nullCheck!`node.asmStatement = parseAsmStatement()`);
             break;
         case tok!"final":
             if (peekIs(tok!"switch"))
             {
-                node.finalSwitchStatement = parseFinalSwitchStatement();
+                mixin (nullCheck!`node.finalSwitchStatement = parseFinalSwitchStatement()`);
                 break;
             }
             else
@@ -4874,21 +4844,21 @@ class Parser
             }
         case tok!"debug":
             if (peekIs(tok!"="))
-                node.debugSpecification = parseDebugSpecification();
+                mixin (nullCheck!`node.debugSpecification = parseDebugSpecification()`);
             else
-                node.conditionalStatement = parseConditionalStatement();
+                mixin (nullCheck!`node.conditionalStatement = parseConditionalStatement()`);
             break;
         case tok!"version":
             if (peekIs(tok!"="))
-                node.versionSpecification = parseVersionSpecification();
+                mixin (nullCheck!`node.versionSpecification = parseVersionSpecification()`);
             else
-                node.conditionalStatement = parseConditionalStatement();
+                mixin (nullCheck!`node.conditionalStatement = parseConditionalStatement()`);
             break;
         case tok!"static":
             if (peekIs(tok!"if"))
-                node.conditionalStatement = parseConditionalStatement();
+                mixin (nullCheck!`node.conditionalStatement = parseConditionalStatement()`);
             else if (peekIs(tok!"assert"))
-                node.staticAssertStatement = parseStaticAssertStatement();
+                mixin (nullCheck!`node.staticAssertStatement = parseStaticAssertStatement()`);
             else
             {
                 error("'if' or 'assert' expected.");
@@ -4898,7 +4868,7 @@ class Parser
         case tok!"identifier":
             if (peekIs(tok!":"))
             {
-                node.labeledStatement = parseLabeledStatement();
+                mixin (nullCheck!`node.labeledStatement = parseLabeledStatement()`);
                 break;
             }
             goto default;
@@ -5017,19 +4987,19 @@ class Parser
         switch (current.type)
         {
         case tok!"@":
-            node.atAttribute = parseAtAttribute();
+            mixin (nullCheck!`node.atAttribute = parseAtAttribute()`);
             if (node.atAttribute is null) { deallocate(node); return null; }
             break;
         case tok!"deprecated":
-            node.deprecated_ = parseDeprecated();
+            mixin (nullCheck!`node.deprecated_ = parseDeprecated()`);
             break;
         case tok!"align":
-            node.alignAttribute = parseAlignAttribute();
+            mixin (nullCheck!`node.alignAttribute = parseAlignAttribute()`);
             break;
         case tok!"extern":
             if (peekIs(tok!"("))
             {
-                node.linkageAttribute = parseLinkageAttribute();
+                mixin (nullCheck!`node.linkageAttribute = parseLinkageAttribute()`);
                 break;
             }
             else goto case;
@@ -5108,14 +5078,14 @@ class Parser
 
         if (currentIs(tok!"("))
         {
-            node.templateParameters = parseTemplateParameters();
+            mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
             if (currentIs(tok!"if"))
-                node.constraint = parseConstraint();
-            node.structBody = parseStructBody();
+                mixin (nullCheck!`node.constraint = parseConstraint()`);
+            mixin (nullCheck!`node.structBody = parseStructBody()`);
         }
         else if (currentIs(tok!"{"))
         {
-            node.structBody = parseStructBody();
+            mixin (nullCheck!`node.structBody = parseStructBody()`);
         }
         else if (currentIs(tok!";"))
             advance();
@@ -5231,9 +5201,9 @@ class Parser
         auto node = allocate!SwitchStatement;
         expect(tok!"switch");
         expect(tok!"(");
-        node.expression = parseExpression();
+        mixin (nullCheck!`node.expression = parseExpression()`);
         expect(tok!")");
-        node.statement = parseStatement();
+        mixin (nullCheck!`node.statement = parseStatement()`);
         return node;
     }
 
@@ -5253,7 +5223,7 @@ class Parser
             node.dot = true;
             advance();
         }
-        node.identifierOrTemplateChain = parseIdentifierOrTemplateChain();
+        mixin (nullCheck!`node.identifierOrTemplateChain = parseIdentifierOrTemplateChain()`);
         return node;
     }
 
@@ -5272,10 +5242,10 @@ class Parser
         if (currentIs(tok!"("))
         {
             expect(tok!"(");
-            node.expression = parseExpression();
+            mixin (nullCheck!`node.expression = parseExpression()`);
             expect(tok!")");
         }
-        node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault();
+        mixin (nullCheck!`node.statementNoCaseNoDefault = parseStatementNoCaseNoDefault()`);
         return node;
     }
 
@@ -5314,17 +5284,17 @@ class Parser
         {
             advance();
             if (isType())
-                node.colonType = parseType();
+                mixin (nullCheck!`node.colonType = parseType()`);
             else
-                node.colonExpression = parseAssignExpression();
+                mixin (nullCheck!`node.colonExpression = parseAssignExpression()`);
         }
         if (currentIs(tok!"="))
         {
             advance();
             if (isType())
-                node.assignType = parseType();
+                mixin (nullCheck!`node.assignType = parseType()`);
             else
-                node.assignExpression = parseAssignExpression();
+                mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         }
         return node;
     }
@@ -5387,11 +5357,11 @@ class Parser
         {
             advance();
             if (!currentIs(tok!")"))
-                node.templateArgumentList = parseTemplateArgumentList();
+                mixin (nullCheck!`node.templateArgumentList = parseTemplateArgumentList()`);
             if (expect(tok!")") is null) { deallocate(node); return null; }
         }
         else
-            node.templateSingleArgument = parseTemplateSingleArgument();
+            mixin (nullCheck!`node.templateSingleArgument = parseTemplateSingleArgument()`);
         return node;
     }
 
@@ -5412,9 +5382,9 @@ class Parser
         auto ident = expect(tok!"identifier");
         if (ident is null) { deallocate(node); return null; }
         node.name = *ident;
-        node.templateParameters = parseTemplateParameters();
+        mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
         if (currentIs(tok!"if"))
-            node.constraint = parseConstraint();
+            mixin (nullCheck!`node.constraint = parseConstraint()`);
         auto start = expect(tok!"{");
         if (start is null) { deallocate(node); return null; } else node.startLocation = start.index;
         Declaration[] declarations;
@@ -5445,7 +5415,7 @@ class Parser
         auto ident = expect(tok!"identifier");
         if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
-        node.templateArguments = parseTemplateArguments();
+        mixin (nullCheck!`node.templateArguments = parseTemplateArguments()`);
         if (node.templateArguments is null)
             return null;
         return node;
@@ -5463,9 +5433,9 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TemplateMixinExpression;
         if (expect(tok!"mixin") is null) { deallocate(node); return null; }
-        node.mixinTemplateName = parseMixinTemplateName();
+        mixin (nullCheck!`node.mixinTemplateName = parseMixinTemplateName()`);
         if (currentIs(tok!"!"))
-            node.templateArguments = parseTemplateArguments();
+            mixin (nullCheck!`node.templateArguments = parseTemplateArguments()`);
         if (currentIs(tok!"identifier"))
             node.identifier = advance();
         return node;
@@ -5489,21 +5459,21 @@ class Parser
         switch (current.type)
         {
         case tok!"alias":
-            node.templateAliasParameter = parseTemplateAliasParameter();
+            mixin (nullCheck!`node.templateAliasParameter = parseTemplateAliasParameter()`);
             break;
         case tok!"identifier":
             if (peekIs(tok!"..."))
-                node.templateTupleParameter = parseTemplateTupleParameter();
+                mixin (nullCheck!`node.templateTupleParameter = parseTemplateTupleParameter()`);
             else if (peekIsOneOf(tok!":", tok!"=", tok!",", tok!")"))
-                node.templateTypeParameter = parseTemplateTypeParameter();
+                mixin (nullCheck!`node.templateTypeParameter = parseTemplateTypeParameter()`);
             else
-                node.templateValueParameter = parseTemplateValueParameter();
+                mixin (nullCheck!`node.templateValueParameter = parseTemplateValueParameter()`);
             break;
         case tok!"this":
-            node.templateThisParameter = parseTemplateThisParameter();
+            mixin (nullCheck!`node.templateThisParameter = parseTemplateThisParameter()`);
             break;
         default:
-            node.templateValueParameter = parseTemplateValueParameter();
+            mixin (nullCheck!`node.templateValueParameter = parseTemplateValueParameter()`);
             break;
         }
         return node;
@@ -5606,7 +5576,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TemplateThisParameter;
         expect(tok!"this");
-        node.templateTypeParameter = parseTemplateTypeParameter();
+        mixin (nullCheck!`node.templateTypeParameter = parseTemplateTypeParameter()`);
         return node;
     }
 
@@ -5646,12 +5616,12 @@ class Parser
         if (currentIs(tok!":"))
         {
             advance();
-            node.colonType = parseType();
+            mixin (nullCheck!`node.colonType = parseType()`);
         }
         if (currentIs(tok!"="))
         {
             advance();
-            node.assignType = parseType();
+            mixin (nullCheck!`node.assignType = parseType()`);
         }
         return node;
     }
@@ -5706,7 +5676,7 @@ class Parser
             node.token = advance();
             break;
         default:
-            node.assignExpression = parseAssignExpression();
+            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
             break;
         }
         return node;
@@ -5723,7 +5693,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         TernaryExpression node = allocate!TernaryExpression;
-        node.orOrExpression = parseOrOrExpression();
+        mixin (nullCheck!`node.orOrExpression = parseOrOrExpression()`);
         if (node.orOrExpression is null)
         {
             deallocate(node);
@@ -5732,9 +5702,9 @@ class Parser
         if (currentIs(tok!"?"))
         {
             advance();
-            node.expression = parseExpression();
+            mixin (nullCheck!`node.expression = parseExpression()`);
             if (expect(tok!":") is null) { deallocate(node); return null; }
-            node.ternaryExpression = parseTernaryExpression();
+            mixin (nullCheck!`node.ternaryExpression = parseTernaryExpression()`);
         }
         return node;
     }
@@ -5751,7 +5721,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ThrowStatement;
         expect(tok!"throw");
-        node.expression = parseExpression();
+        mixin (nullCheck!`node.expression = parseExpression()`);
         expect(tok!";");
         return node;
     }
@@ -5775,9 +5745,9 @@ class Parser
         if (currentIs(tok!","))
         {
             advance();
-            if ((node.templateArgumentList = parseTemplateArgumentList()) is null) { deallocate(node); return null; }
+            mixin (nullCheck!`(node.templateArgumentList = parseTemplateArgumentList())`);
         }
-        if (expect(tok!")") is null) { deallocate(node); return null; }
+        mixin (nullCheck!`expect(tok!")")`);
         return node;
     }
 
@@ -5793,11 +5763,11 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!TryStatement;
         expect(tok!"try");
-        node.declarationOrStatement = parseDeclarationOrStatement();
+        mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
         if (currentIs(tok!"catch"))
-            node.catches = parseCatches();
+            mixin (nullCheck!`node.catches = parseCatches()`);
         if (currentIs(tok!"finally"))
-            node.finally_ = parseFinally();
+            mixin (nullCheck!`node.finally_ = parseFinally()`);
         return node;
     }
 
@@ -5824,12 +5794,12 @@ class Parser
         case tok!"inout":
         case tok!"shared":
             if (!peekIs(tok!"("))
-                node.typeConstructors = parseTypeConstructors();
+                mixin (nullCheck!`node.typeConstructors = parseTypeConstructors()`);
             break;
         default:
             break;
         }
-        node.type2 = parseType2();
+        mixin (nullCheck!`node.type2 = parseType2()`);
         if (node.type2 is null)
             return null;
         TypeSuffix[] typeSuffixes;
@@ -5889,7 +5859,7 @@ class Parser
             if (currentIs(tok!"."))
             {
                 advance();
-                node.identifierOrTemplateChain = parseIdentifierOrTemplateChain();
+                mixin (nullCheck!`node.identifierOrTemplateChain = parseIdentifierOrTemplateChain()`);
                 if (node.identifierOrTemplateChain is null)
                     return null;
             }
@@ -5899,9 +5869,9 @@ class Parser
         case tok!"inout":
         case tok!"shared":
             node.typeConstructor = advance().type;
-            if (expect(tok!"(") is null) { deallocate(node); return null; }
-            if ((node.type = parseType()) is null) { deallocate(node); return null; }
-            if (expect(tok!")") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!"(")`);
+            mixin (nullCheck!`(node.type = parseType())`);
+            mixin (nullCheck!`expect(tok!")")`);
             break;
         case tok!"__vector":
             if ((node.vector = parseVector()) is null)
@@ -6015,7 +5985,7 @@ class Parser
             }
             goto default;
         default:
-            node.type = parseType();
+            mixin (nullCheck!`node.type = parseType()`);
             break;
         }
         return node;
@@ -6060,21 +6030,21 @@ class Parser
             else
             {
                 goToBookmark(bookmark);
-                node.low = parseAssignExpression();
-                if (node.low is null) { deallocate(node); return null; }
+                mixin (nullCheck!`node.low = parseAssignExpression()`);
+                mixin (nullCheck!`node.low`);
                 if (currentIs(tok!".."))
                 {
                     advance();
-                    node.high = parseAssignExpression();
-                    if (node.high is null) { deallocate(node); return null; }
+                    mixin (nullCheck!`node.high = parseAssignExpression()`);
+                    mixin (nullCheck!`node.high`);
                 }
             }
-            if (expect(tok!"]") is null) { deallocate(node); return null; }
+            mixin (nullCheck!`expect(tok!"]")`);
             return node;
         case tok!"delegate":
         case tok!"function":
             node.delegateOrFunction = advance();
-            node.parameters = parseParameters();
+            mixin (nullCheck!`node.parameters = parseParameters()`);
             MemberFunctionAttribute[] memberFunctionAttributes;
             while (currentIsMemberFunctionAttribute())
                 memberFunctionAttributes ~= parseMemberFunctionAttribute();
@@ -6104,8 +6074,8 @@ class Parser
         if (t is null || !currentIs(tok!")"))
         {
             goToBookmark(b);
-            node.expression = parseExpression();
-            if (node.expression is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.expression = parseExpression()`);
+            mixin (nullCheck!`node.expression`);
         }
         else
         {
@@ -6132,7 +6102,7 @@ class Parser
         if (currentIs(tok!"return"))
             node.return_ = advance();
         else
-            node.expression = parseExpression();
+            mixin (nullCheck!`node.expression = parseExpression()`);
         expect(tok!")");
         return node;
     }
@@ -6206,19 +6176,19 @@ class Parser
         case tok!"++":
         case tok!"--":
             node.prefix = advance();
-            node.unaryExpression = parseUnaryExpression();
+            mixin (nullCheck!`node.unaryExpression = parseUnaryExpression()`);
             break;
         case tok!"new":
-            node.newExpression = parseNewExpression();
+            mixin (nullCheck!`node.newExpression = parseNewExpression()`);
             break;
         case tok!"delete":
-            node.deleteExpression = parseDeleteExpression();
+            mixin (nullCheck!`node.deleteExpression = parseDeleteExpression()`);
             break;
         case tok!"cast":
-            node.castExpression = parseCastExpression();
+            mixin (nullCheck!`node.castExpression = parseCastExpression()`);
             break;
         case tok!"assert":
-            node.assertExpression = parseAssertExpression();
+            mixin (nullCheck!`node.assertExpression = parseAssertExpression()`);
             break;
         case tok!"(":
             // handle (type).identifier
@@ -6240,7 +6210,7 @@ class Parser
                 node.type = t;
                 advance(); // )
                 advance(); // .
-                node.identifierOrTemplateInstance = parseIdentifierOrTemplateInstance();
+                mixin (nullCheck!`node.identifierOrTemplateInstance = parseIdentifierOrTemplateInstance()`);
                 break;
             }
             else
@@ -6328,10 +6298,10 @@ class Parser
             node.name = advance();
             if (currentIs(tok!"("))
             {
-                node.templateParameters = parseTemplateParameters();
+                mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
                 if (currentIs(tok!"if"))
-                    node.constraint = parseConstraint();
-                node.structBody = parseStructBody();
+                    mixin (nullCheck!`node.constraint = parseConstraint()`);
+                mixin (nullCheck!`node.structBody = parseStructBody()`);
             }
             else
                 goto semiOrStructBody;
@@ -6344,7 +6314,7 @@ class Parser
             if (currentIs(tok!";"))
                 advance();
             else
-                node.structBody = parseStructBody();
+                mixin (nullCheck!`node.structBody = parseStructBody()`);
         }
         return node;
     }
@@ -6379,7 +6349,7 @@ class Parser
         node.attributes = attributes;
         if (isAuto)
         {
-            node.autoDeclaration = parseAutoDeclaration();
+            mixin (nullCheck!`node.autoDeclaration = parseAutoDeclaration()`);
             if (node.autoDeclaration !is null)
             {
                 node.comment = node.autoDeclaration.comment;
@@ -6415,7 +6385,7 @@ class Parser
         while (true)
         {
             auto declarator = parseDeclarator();
-            if (declarator is null) { deallocate(node); return null; }
+            mixin (nullCheck!`declarator`);
             declarators ~= declarator;
             if (moreTokens() && currentIs(tok!","))
             {
@@ -6427,7 +6397,7 @@ class Parser
         }
         node.declarators = ownArray(declarators);
         auto semicolon = expect(tok!";");
-        if (semicolon is null) { deallocate(node); return null; }
+        mixin (nullCheck!`semicolon`);
         declarators[$ - 1].comment = semicolon.trailingComment;
         return node;
     }
@@ -6507,14 +6477,14 @@ class Parser
         expect(tok!"while");
         node.startIndex = current().index;
         expect(tok!"(");
-        node.expression = parseExpression();
+        mixin (nullCheck!`node.expression = parseExpression()`);
         expect(tok!")");
         if (currentIs(tok!"}"))
         {
             error("Statement expected", false);
             return node; // this line makes DCD better
         }
-        node.declarationOrStatement = parseDeclarationOrStatement();
+        mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
         return node;
     }
 
@@ -7287,6 +7257,11 @@ protected:
         void trace(lazy string) {}
     }
 
+    template nullCheck(string exp)
+    {
+        enum nullCheck = "if ((" ~ exp ~ ") is null) { deallocate(node); return null; }";
+    }
+
     // This list MUST BE MAINTAINED IN SORTED ORDER.
     static immutable string[] REGISTER_NAMES = [
         "AH", "AL", "AX", "BH", "BL", "BP", "BPL", "BX", "CH", "CL", "CR0", "CR2",
@@ -7303,7 +7278,6 @@ protected:
         "YMM1", "YMM10", "YMM11", "YMM12", "YMM13", "YMM14", "YMM15", "YMM2",
         "YMM3", "YMM4", "YMM5", "YMM6", "YMM7", "YMM8", "YMM9"
     ];
-
 
     enum string BUILTIN_TYPE_CASES = q{
         case tok!"int":
@@ -7331,6 +7305,7 @@ protected:
         case tok!"cfloat":
         case tok!"creal":
     };
+
     enum string LITERAL_CASES = q{
         case tok!"doubleLiteral":
         case tok!"floatLiteral":
@@ -7347,6 +7322,7 @@ protected:
         case tok!"dstringLiteral":
         case tok!"characterLiteral":
     };
+
     enum string SPECIAL_CASES = q{
         case tok!"__DATE__":
         case tok!"__EOF__":
@@ -7360,9 +7336,10 @@ protected:
         case tok!"__VENDOR__":
         case tok!"__VERSION__":
     };
+
     enum string PARSE_INTERFACE_OR_CLASS = q{
         auto ident = expect(tok!"identifier");
-        if (ident is null) { deallocate(node); return null; }
+        mixin (nullCheck!`ident`);
         node.name = *ident;
         node.comment = comment;
         comment = null;
@@ -7372,11 +7349,11 @@ protected:
             goto structBody;
         templateStuff: if (currentIs(tok!"("))
         {
-            node.templateParameters = parseTemplateParameters();
+            mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
             if (currentIs(tok!";"))
                 goto emptyBody;
             constraint: if (currentIs(tok!"if"))
-                node.constraint = parseConstraint();
+                mixin (nullCheck!`node.constraint = parseConstraint()`);
             if (node.baseClassList !is null)
             {
                 if (currentIs(tok!"{"))
@@ -7406,12 +7383,13 @@ protected:
                 goto constraint;
         }
     structBody:
-        node.structBody = parseStructBody();
+        mixin (nullCheck!`node.structBody = parseStructBody()`);
         return node;
     emptyBody:
         advance();
         return node;
     };
+
     const(Token)[] tokens;
     int suppressMessages;
     size_t index;
