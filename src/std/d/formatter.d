@@ -1301,7 +1301,7 @@ class Formatter(Sink)
             else put(";");
             space();
             if (test) format(test);
-            else put(";");
+            put(";");
             space();
             if (increment) format(increment);
             put(")");
@@ -2136,7 +2136,7 @@ class Formatter(Sink)
             if (newAnonClassExpression) format(newAnonClassExpression);
             else
             {
-                if (type) format(type);
+                if (type2) format(type2);
                 if (arguments) format(arguments);
                 if (assignExpression)
                 {

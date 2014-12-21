@@ -488,6 +488,7 @@ class Parser
      */
     AsmInstruction parseAsmInstruction()
     {
+        import std.range : assumeSorted;
         mixin (traceEnterAndExit!(__FUNCTION__));
         AsmInstruction node = allocate!AsmInstruction;
         if (currentIs(tok!"align"))
@@ -578,7 +579,7 @@ class Parser
      *       $(LITERAL IntegerLiteral)
      *     | $(LITERAL FloatLiteral)
      *     | $(LITERAL StringLiteral)
-     *     | $(RULE register) ($(LITERAL ':') $(RULE asmExp))?
+     *     | $(RULE register)
      *     | $(RULE identifierChain)
      *     | $(LITERAL '$')
      *     ;)
@@ -601,12 +602,8 @@ class Parser
         case tok!"identifier":
             if (assumeSorted(REGISTER_NAMES).equalRange(current().text).length > 0)
             {
+                trace("Found register");
                 if ((node.register = parseRegister()) is null) { deallocate(node); return null; }
-                if (currentIs(tok!":"))
-                {
-                    advance();
-                    if ((node.asmExp = parseAsmExp()) is null) { deallocate(node); return null; }
-                }
             }
             else if (peekIs(tok!"."))
                 node.identifierChain = parseIdentifierChain();
@@ -1846,7 +1843,7 @@ class Parser
             node.classDeclaration = parseClassDeclaration();
             break;
         case tok!"this":
-            if (startsWith(tok!"this", tok!"(", tok!"this"))
+            if (startsWith(tok!"this", tok!"(", tok!"this", tok!")"))
             {
                 node.postblit = parsePostblit();
                 if (node.postblit is null) { deallocate(node); return null; }
@@ -2101,8 +2098,20 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DeclarationsAndStatements;
         DeclarationOrStatement[] declarationsAndStatements;
-        while (!currentIsOneOf(tok!"}") && moreTokens() && suppressedErrorCount <= MAX_ERRORS)
+        while (!currentIsOneOf(tok!"}", tok!"else") && moreTokens() && suppressedErrorCount <= MAX_ERRORS)
         {
+            if (currentIs(tok!"while"))
+            {
+                auto b = setBookmark();
+                scope (exit) goToBookmark(b);
+                advance();
+                if (currentIs(tok!"("))
+                {
+                    auto p = peekPastParens();
+                    if (p !is null && *p == tok!";")
+                        break;
+                }
+            }
             auto dos = parseDeclarationOrStatement();
             if (dos !is null)
                 declarationsAndStatements ~= dos;
@@ -2555,7 +2564,7 @@ class Parser
      * Parses a ForStatement
      *
      * $(GRAMMAR $(RULEDEF forStatement):
-     *     $(LITERAL 'for') $(LITERAL '$(LPAREN)') $(RULE declarationOrStatement) $(RULE expression)? $(LITERAL ';') $(RULE expression)? $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement)
+     *     $(LITERAL 'for') $(LITERAL '$(LPAREN)') ($(RULE declaration) | $(RULE statementNoCaseNoDefault)) $(RULE expression)? $(LITERAL ';') $(RULE expression)? $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement)
      *     ;)
      */
     ForStatement parseForStatement()
@@ -2574,7 +2583,10 @@ class Parser
         if (currentIs(tok!";"))
             advance();
         else
-            node.test = parseExpressionStatement();
+        {
+            node.test = parseExpression();
+            expect(tok!";");
+        }
 
         if (!currentIs(tok!")"))
             node.increment = parseExpression();
@@ -2667,7 +2679,7 @@ class Parser
             advance();
         }
         if (currentIsOneOf(tok!"const", tok!"immutable",
-            tok!"inout") && !peekIs(tok!"("))
+            tok!"inout", tok!"shared") && !peekIs(tok!"("))
         {
             trace("\033[01;36mType constructor");
             if ((node.typeConstructors = parseTypeConstructors()) is null)
@@ -2779,7 +2791,8 @@ class Parser
      * Parses a FunctionCallExpression
      *
      * $(GRAMMAR $(RULEDEF functionCallExpression):
-     *      $(RULE unaryExpression) $(RULE templateArguments)? $(RULE arguments)
+     *      $(RULE symbol) $(RULE arguments)
+     *      $(RULE unaryExpression) $(RULE arguments)
      *     | $(RULE type) $(RULE arguments)
      *     ;)
      */
@@ -2807,7 +2820,11 @@ class Parser
             if (currentIs(tok!"!"))
                 node.templateArguments = parseTemplateArguments();
             if (unary !is null)
-                node.arguments = parseArguments();
+                if ((node.arguments = parseArguments()) is null)
+                {
+                    deallocate(node);
+                    return null;
+                }
         }
         if (node.arguments is null)
         {
@@ -3833,7 +3850,7 @@ class Parser
      * Parses a NewExpression
      *
      * $(GRAMMAR $(RULEDEF newExpression):
-     *       $(LITERAL 'new') $(RULE type) (($(LITERAL '[') $(RULE assignExpression) $(LITERAL ']')) | $(RULE arguments))?
+     *       $(LITERAL 'new') $(RULE type2) (($(LITERAL '[') $(RULE assignExpression) $(LITERAL ']')) | $(RULE arguments))?
      *     | $(RULE newAnonClassExpression)
      *     ;)
      */
@@ -3857,9 +3874,8 @@ class Parser
         else
         {
             expect(tok!"new");
-            if (!moreTokens())
-                return null;
-            node.type = parseType();
+            if (!moreTokens()) goto fail;
+            if ((node.type2 = parseType2()) is null) goto fail;
             if (currentIs(tok!"["))
             {
                 advance();
@@ -3870,6 +3886,9 @@ class Parser
                 node.arguments = parseArguments();
         }
         return node;
+    fail:
+        deallocate(node);
+        return null;
     }
 
     /**
@@ -4187,6 +4206,7 @@ class Parser
      */
     Postblit parsePostblit()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Postblit;
         expect(tok!"this");
         expect(tok!"(");
@@ -4345,7 +4365,11 @@ class Parser
                     node.primary = *t;
             }
             else if (currentIs(tok!"("))
-                node.arguments = parseArguments();
+                if ((node.arguments = parseArguments()) is null)
+                {
+                    deallocate(node);
+                    return null;
+                }
             break;
         case tok!"function":
         case tok!"delegate":
@@ -4748,7 +4772,7 @@ class Parser
         return node;
     }
 
-        /**
+    /**
      * Parses a StatementNoCaseNoDefault
      *
      * $(GRAMMAR $(RULEDEF statementNoCaseNoDefault):
@@ -4780,6 +4804,7 @@ class Parser
      */
     StatementNoCaseNoDefault parseStatementNoCaseNoDefault()
     {
+    mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!StatementNoCaseNoDefault;
         node.startLocation = current().index;
         switch (current.type)
@@ -5273,9 +5298,12 @@ class Parser
             {
                 node.identifier = advance();
             }
+            else
+                goto type;
         }
         else
         {
+        type:
             if ((node.type = parseType()) is null) { deallocate(node); return null; }
             auto ident = expect(tok!"identifier");
             if (ident is null) { deallocate(node); return null; }
@@ -6163,7 +6191,11 @@ class Parser
         case tok!"scope":
         case tok!"pure":
         case tok!"nothrow":
-            node.functionCallExpression = parseFunctionCallExpression();
+            if ((node.functionCallExpression = parseFunctionCallExpression()) is null)
+            {
+                deallocate(node);
+                return null;
+            }
             break;
         case tok!"&":
         case tok!"!":
@@ -6657,8 +6689,10 @@ protected:
         case tok!"final":
             return !peekIs(tok!"switch");
         case tok!"debug":
+            if (peekIs(tok!":"))
+                return true;
+            goto case;
         case tok!"version":
-        {
             if (peekIs(tok!"="))
                 return true;
             if (peekIs(tok!"("))
@@ -6675,7 +6709,6 @@ protected:
                 }
             }
             return false;
-        }
         case tok!"synchronized":
             if (peekIs(tok!"("))
                 return false;
@@ -6683,8 +6716,14 @@ protected:
             {
                 auto b = setBookmark();
                 scope (exit) goToBookmark(b);
-                advance(); // synchronized
-                return peekIs(tok!"(") || isDeclaration();
+                auto d = parseDeclaration(true);
+                if (d is null)
+                    return false;
+                else
+                {
+                    deallocate(d);
+                    return true;
+                }
             }
         case tok!"static":
             if (peekIs(tok!"if"))
@@ -6699,17 +6738,17 @@ protected:
         case tok!"inout":
         case tok!"shared":
             auto b = setBookmark();
-            auto p = parseFunctionCallExpression();
+            auto p = parseDeclaration();
             if (p is null)
             {
                 goToBookmark(b);
-                return true;
+                return false;
             }
             else
             {
-                goToBookmark(b);
                 deallocate(p);
-                return false;
+                goToBookmark(b);
+                return true;
             }
             break;
         case tok!"__gshared":

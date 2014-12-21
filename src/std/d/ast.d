@@ -1466,7 +1466,7 @@ public:
             declarationOrStatement));
     }
     /** */ DeclarationOrStatement initialization;
-    /** */ ExpressionStatement test;
+    /** */ Expression test;
     /** */ Expression increment;
     /** */ DeclarationOrStatement declarationOrStatement;
     /** */ size_t startIndex;
@@ -2080,10 +2080,10 @@ final class NewExpression : ExpressionNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(newAnonClassExpression, type, arguments,
+        mixin (visitIfNotNull!(newAnonClassExpression, type2, arguments,
             assignExpression));
     }
-    /** */ Type type;
+    /** */ Type2 type2;
     /** */ NewAnonClassExpression newAnonClassExpression;
     /** */ Arguments arguments;
     /** */ AssignExpression assignExpression;

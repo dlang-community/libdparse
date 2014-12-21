@@ -32,7 +32,6 @@ void doStuff()
 		mov RAX, offsetof a;
 		jge short L_largepositive;
 		lea EDX,[ECX][ECX*8];
-		mov EAX,ES:[0x1324];
 		in AL,6;
 		out AL,6;
 		int 3;
