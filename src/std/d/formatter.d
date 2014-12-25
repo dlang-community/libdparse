@@ -3564,7 +3564,7 @@ class Formatter(Sink)
 
     Sink sink;
 
-private:
+protected:
 
     import std.uni : isWhite;
 
