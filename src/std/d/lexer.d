@@ -1917,7 +1917,7 @@ body
                 while (i < j && (comment[i] == ' ' || comment[i] == '\t')) i++;
                 if (i < j && comment[i] == c) i++;
             }
-            for (size_t s = 0; (i < j) && (s <= whitespaceToSkip)
+            for (size_t s = 0; (i < j) && (s < whitespaceToSkip)
                 && (comment[i] == ' ' || comment[i] == '\t');)
             {
                 s++;
