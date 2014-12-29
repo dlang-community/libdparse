@@ -1515,13 +1515,18 @@ class Parser
         if (currentIs(tok!":"))
         {
             advance();
-            while (isDeclaration())
+            while (moreTokens() && !currentIs(tok!"}"))
             {
+                auto b = setBookmark();
                 auto d = parseDeclaration();
                 if (d !is null)
+                {
+                    abandonBookmark(b);
                     trueDeclarations ~= d;
+                }
                 else
                 {
+                    goToBookmark(b);
                     deallocate(node);
                     return null;
                 }
@@ -1794,6 +1799,24 @@ class Parser
 
         switch (current.type)
         {
+        case tok!"asm":
+        case tok!"break":
+        case tok!"case":
+        case tok!"continue":
+        case tok!"default":
+        case tok!"do":
+        case tok!"for":
+        case tok!"foreach":
+        case tok!"foreach_reverse":
+        case tok!"goto":
+        case tok!"if":
+        case tok!"return":
+        case tok!"switch":
+        case tok!"throw":
+        case tok!"try":
+        case tok!"while":
+        case tok!"assert":
+            goto default;
         case tok!";":
             // http://d.puremagic.com/issues/show_bug.cgi?id=4559
             warn("Empty declaration");
@@ -2119,22 +2142,17 @@ class Parser
         auto node = allocate!DeclarationOrStatement;
         // "Any ambiguities in the grammar between Statements and
         // Declarations are resolved by the declarations taking precedence."
-        if (isDeclaration())
+        auto b = setBookmark();
+        auto d = parseDeclaration(true);
+        if (d !is null)
         {
-            trace("\033[01;36mparsing declaration\033[0m");
-            mixin (nullCheck!`node.declaration = parseDeclaration()`);
+            abandonBookmark(b);
+            node.declaration = d;
         }
         else
         {
-            trace("\033[01;36mparsing statement\033[0m");
+            goToBookmark(b);
             mixin (nullCheck!`node.statement = parseStatement()`);
-        }
-
-        if (node.statement is null && node.declaration is null)
-        {
-            error("Could not parse declaration or statement");
-            deallocate(node);
-            return null;
         }
         return node;
     }
@@ -6721,48 +6739,48 @@ protected:
                 return true;
             }
             break;
-        case tok!"__gshared":
+        case tok!"@":
+        case tok!"abstract":
         case tok!"alias":
+        case tok!"align":
+        case tok!"auto":
         case tok!"class":
+        case tok!"deprecated":
         case tok!"enum":
+        case tok!"export":
+        case tok!"extern":
+        case tok!"__gshared":
         case tok!"interface":
+        case tok!"nothrow":
+        case tok!"override":
+        case tok!"package":
+        case tok!"private":
+        case tok!"protected":
+        case tok!"public":
+        case tok!"pure":
+        case tok!"ref":
         case tok!"struct":
         case tok!"union":
         case tok!"unittest":
-        case tok!"auto":
-        case tok!"ref":
-        case tok!"@":
-        case tok!"align":
-        case tok!"deprecated":
-        case tok!"private":
-        case tok!"package":
-        case tok!"protected":
-        case tok!"public":
-        case tok!"export":
-        case tok!"extern":
-        case tok!"override":
-        case tok!"abstract":
-        case tok!"pure":
-        case tok!"nothrow":
             return true;
         mixin(BUILTIN_TYPE_CASES);
             return !peekIsOneOf(tok!".", tok!"(");
+        case tok!"asm":
+        case tok!"break":
         case tok!"case":
+        case tok!"continue":
         case tok!"default":
-        case tok!"return":
-        case tok!"if":
-        case tok!"while":
         case tok!"do":
         case tok!"for":
         case tok!"foreach":
-        case tok!"switch":
-        case tok!"continue":
-        case tok!"break":
-        case tok!"goto":
-        case tok!"try":
-        case tok!"throw":
-        case tok!"asm":
         case tok!"foreach_reverse":
+        case tok!"goto":
+        case tok!"if":
+        case tok!"return":
+        case tok!"switch":
+        case tok!"throw":
+        case tok!"try":
+        case tok!"while":
         case tok!"{":
         case tok!"assert":
             return false;
@@ -7243,9 +7261,9 @@ protected:
     {
         void trace(lazy string message)
         {
-            auto depth = format("%4d ", _traceDepth);
             if (suppressMessages > 0)
                 return;
+			auto depth = format("%4d ", _traceDepth);
             if (index < tokens.length)
                 writeln(depth, message, "(", current.line, ":", current.column, ")");
             else
