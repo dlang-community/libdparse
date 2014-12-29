@@ -999,7 +999,7 @@ class Parser
             {
                 expect(tok!"(");
                 mixin (nullCheck!`node.identifierChain = parseIdentifierChain()`);
-                expect(tok!")");;
+                expect(tok!")");
             }
             break;
         case tok!"private":
@@ -6738,7 +6738,6 @@ protected:
                 goToBookmark(b);
                 return true;
             }
-            break;
         case tok!"@":
         case tok!"abstract":
         case tok!"alias":
