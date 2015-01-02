@@ -1969,7 +1969,7 @@ public:
      * Params: bucketCount = the initial number of buckets. Must be a
      * power of two
      */
-    this(size_t bucketCount)
+    this(size_t bucketCount) nothrow @trusted @nogc
     {
         buckets = (cast(Node**) calloc((Node*).sizeof, bucketCount))[0 .. bucketCount];
     }
@@ -2002,7 +2002,7 @@ public:
     /**
      * Caches a string.
      */
-    string intern(const(ubyte)[] str) pure nothrow @safe
+    string intern(const(ubyte)[] str) pure nothrow @safe @nogc
     {
         if (str is null || str.length == 0)
             return "";
@@ -2013,7 +2013,7 @@ public:
     /**
      * ditto
      */
-    string intern(string str) pure nothrow @trusted
+    string intern(string str) pure nothrow @trusted @nogc
     {
         return intern(cast(ubyte[]) str);
     }
@@ -2023,7 +2023,7 @@ public:
      * calculating one itself. Use this alongside $(LREF hashStep)() can reduce the
      * amount of work necessary when lexing dynamic tokens.
      */
-    string intern(const(ubyte)[] str, uint hash) pure nothrow @safe
+    string intern(const(ubyte)[] str, uint hash) pure nothrow @safe @nogc
     in
     {
         assert (str.length > 0);
@@ -2040,7 +2040,7 @@ public:
      *     h = the hash that has been calculated so far
      * Returns: the new hash code for the string.
      */
-    static uint hashStep(ubyte b, uint h) pure nothrow @safe
+    static uint hashStep(ubyte b, uint h) pure nothrow @safe @nogc
     {
         return (h ^ sbox[b]) * 3;
     }
@@ -2057,7 +2057,7 @@ public:
 
 private:
 
-    string _intern(const(ubyte)[] bytes, uint hash) pure nothrow @trusted
+    string _intern(const(ubyte)[] bytes, uint hash) pure nothrow @trusted @nogc
     {
         if (bytes is null || bytes.length == 0)
             return "";
@@ -2076,7 +2076,7 @@ private:
         return cast(string) mem;
     }
 
-    Node* find(const(ubyte)[] bytes, uint hash) pure nothrow @trusted
+    Node* find(const(ubyte)[] bytes, uint hash) pure nothrow @trusted @nogc
     {
         import std.algorithm : equal;
         immutable size_t index = hash & (buckets.length - 1);
@@ -2090,7 +2090,7 @@ private:
         return node;
     }
 
-    static uint hashBytes(const(ubyte)[] data) pure nothrow @trusted
+    static uint hashBytes(const(ubyte)[] data) pure nothrow @trusted @nogc
     in
     {
         assert (data !is null);
@@ -2107,7 +2107,7 @@ private:
         return hash;
     }
 
-    ubyte[] allocate(size_t numBytes) pure nothrow @trusted
+    ubyte[] allocate(size_t numBytes) pure nothrow @trusted @nogc
     in
     {
         assert (numBytes != 0);
@@ -2232,9 +2232,9 @@ private:
     Block* rootBlock;
 }
 
-private extern(C) void* calloc(size_t, size_t) nothrow pure;
-private extern(C) void* malloc(size_t) nothrow pure;
-private extern(C) void free(void*) nothrow pure;
+private extern(C) void* calloc(size_t, size_t) nothrow pure @nogc @trusted;
+private extern(C) void* malloc(size_t) nothrow pure @nogc @trusted;
+private extern(C) void free(void*) nothrow pure @nogc @trusted;
 
 unittest
 {
