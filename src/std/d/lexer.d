@@ -127,6 +127,15 @@ private enum extraFields = q{
 public alias Token = std.lexer.TokenStructure!(IdType, extraFields);
 
 /**
+ * Configure whitespace handling
+ */
+public enum WhitespaceBehavior : ubyte
+{
+    include = 0b0000_0000,
+    skip = 0b0000_0001,
+}
+
+/**
  * Configure string lexing behavior
  */
 public enum StringBehavior : ubyte
@@ -149,6 +158,7 @@ public struct LexerConfig
 {
     string fileName;
     StringBehavior stringBehavior;
+    WhitespaceBehavior whitespaceBehavior;
 }
 
 /**
@@ -431,7 +441,7 @@ public bool isProtection(IdType type) pure nothrow @safe
  * whitespace tokens are skipped and comments are attached to the token nearest
  * to them.
  */
-const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
+const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
     StringCache* cache)
 {
     enum CommentType : ubyte
@@ -451,6 +461,8 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, const LexerConfig config,
             return CommentType.block;
         return CommentType.notDoc;
     }
+
+    config.whitespaceBehavior = WhitespaceBehavior.skip;
 
     auto output = appender!(typeof(return))();
     auto lexer = DLexer(sourceCode, config, cache);
@@ -508,6 +520,7 @@ public struct DLexer
     mixin Lexer!(Token, lexIdentifier, isSeparating, operators, dynamicTokens,
         keywords, pseudoTokenHandlers);
 
+    ///
     @disable this();
 
     /**
@@ -517,7 +530,7 @@ public struct DLexer
      *     cache = the string interning cache for de-duplicating identifiers and
      *         other token text.
      */
-    this(ubyte[] range, const LexerConfig config, StringCache* cache)
+    this(ubyte[] range, const LexerConfig config, StringCache* cache) pure nothrow @safe
     {
         auto r = (range.length >= 3 && range[0] == 0xef && range[1] == 0xbb && range[2] == 0xbf)
             ? range[3 .. $] : range;
@@ -528,14 +541,16 @@ public struct DLexer
     }
 
     ///
-    public void popFront() pure
+    public void popFront() pure nothrow @safe
     {
         _popFront();
     }
 
-    bool isWhitespace() pure /*const*/ nothrow
+private pure nothrow @safe:
+
+    bool isWhitespace()
     {
-        switch (range.front)
+        switch (range.bytes[range.index])
         {
         case ' ':
         case '\r':
@@ -552,22 +567,25 @@ public struct DLexer
         }
     }
 
-    void popFrontWhitespaceAware() pure nothrow
+    void popFrontWhitespaceAware()
     {
-        switch (range.front)
+        switch (range.bytes[range.index])
         {
         case '\r':
-            range.popFront();
-            if (!range.empty && range.front == '\n')
+            range.index++;
+            range.column++;
+            if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '\n')
             {
-                range.popFront();
+                range.index++;
+                range.column++;
                 range.incrementLine();
             }
             else
                 range.incrementLine();
             return;
         case '\n':
-            range.popFront();
+            range.index++;
+            range.column++;
             range.incrementLine();
             return;
         case 0xe2:
@@ -575,180 +593,126 @@ public struct DLexer
             if (lookahead.length == 3 && lookahead[1] == 0x80
                 && (lookahead[2] == 0xa8 || lookahead[2] == 0xa9))
             {
-                range.popFront();
-                range.popFront();
-                range.popFront();
+                range.index+=3;
+                range.column+=3;
                 range.incrementLine();
                 return;
             }
             else
             {
-                range.popFront();
+                range.index++;
+                range.column++;
                 return;
             }
         default:
-            range.popFront();
+            range.index++;
+            range.column++;
             return;
         }
     }
 
-    Token lexWhitespace() pure nothrow
+    void lexWhitespace(ref Token token)
     {
         mixin (tokenStart);
-        version (none) while (index + 16 <= range.bytes.length)
-        {
-            ulong startAddr = (cast(ulong) range.bytes.ptr) + index;
-            enum space = (cast(ulong) ' ') * 0x0101010101010101L;
-            enum tab = (cast(ulong) '\t') * 0x0101010101010101L;
-            enum cr = (cast(ulong) '\r') * 0x0101010101010101L;
-            enum lf = (cast(ulong) '\n') * 0x0101010101010101L;
-            ulong charsSkipped;
-            ulong lineIncrement;
-            asm
-            {
-                mov R10, space;
-                mov R11, tab;
-                mov R12, cr;
-                mov R13, lf;
-                mov R8, startAddr;
-                movdqu XMM0, [R8];
-
-                mov R9, line;
-
-                // space pattern
-                movq XMM1, R10;
-                shufpd XMM1, XMM1, 0;
-                pcmpeqb XMM1, XMM0;
-
-                // tab pattern
-                movq XMM2, R11;
-                shufpd XMM2, XMM2, 0;
-                pcmpeqb XMM2, XMM0;
-
-                // CR pattern
-                movq XMM3, R12;
-                shufpd XMM3, XMM3, 0;
-                pcmpeqb XMM3, XMM0;
-
-                // LF pattern
-                movq XMM4, R13;
-                shufpd XMM4, XMM4, 0;
-                pcmpeqb XMM4, XMM0;
-
-                // Bit mask-of newlines to r10
-                pmovmskb R10, XMM4;
-
-                // and the masks together
-                por XMM1, XMM2;
-                por XMM1, XMM3;
-                por XMM1, XMM4;
-                pmovmskb RAX, XMM1;
-                not RAX;
-                bsf RCX, RAX;
-                mov charsSkipped, RCX;
-
-                mov RBX, 1;
-                inc CL;
-                shl RBX, CL;
-                sub RBX, 1;
-                and R10, RBX;
-                popcnt R10, R10;
-                mov lineIncrement, R10;
-            }
-            range.incrementLine(lineIncrement);
-            range.popFrontN(charsSkipped);
-            if (charsSkipped < 16)
-                goto end;
-            index += 16;
-        }
         loop: do
         {
-            switch (range.front)
+            switch (range.bytes[range.index])
             {
             case '\r':
-                range.popFront();
-                if (!range.empty && range.front == '\n')
-                    range.popFront();
-                range.incrementLine();
+                range.index++;
+                range.column++;
+                if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '\n')
+                {
+                    range.index++;
+                    range.column++;
+                }
+                range.column = 1;
+                range.line += 1;
                 break;
             case '\n':
-                range.popFront();
-                range.incrementLine();
+                range.index++;
+                range.column++;
+                range.column = 1;
+                range.line += 1;
                 break;
             case ' ':
             case '\t':
-                range.popFront();
+                range.index++;
+                range.column++;
                 break;
             case 0xe2:
-                auto lookahead = range.peek(3);
-                if (lookahead.length != 3)
+                if (range.index + 2 >= range.bytes.length)
                     break loop;
-                if (lookahead[1] != 0x80)
+                if (range.bytes[range.index + 1] != 0x80)
                     break loop;
-                if (lookahead[2] == 0xa8 || lookahead[2] == 0xa9)
+                if (range.bytes[range.index + 2] == 0xa8 || range.bytes[range.index + 2] == 0xa9)
                 {
-                    range.popFront();
-                    range.popFront();
-                    range.popFront();
-                    range.incrementLine();
+                    range.index += 3;
+                    range.column += 3;
+                    range.column = 1;
+                    range.line += 1;
                     break;
                 }
                 break loop;
             default:
                 break loop;
             }
-        } while (!range.empty);
+        } while (!(range.index >= range.bytes.length));
     end:
-        string text = /+config.whitespaceBehavior == WhitespaceBehavior.skip
-            ? null : +/cache.intern(range.slice(mark));
-        return Token(tok!"whitespace", text, line, column, index);
+        string text = config.whitespaceBehavior == WhitespaceBehavior.include
+            ? cache.intern(range.slice(mark)) : "";
+        token = Token(tok!"whitespace", text, line, column, index);
     }
 
-    Token lexNumber() pure nothrow
+    void lexNumber(ref Token token)
     {
         mixin (tokenStart);
-        if (range.front == '0' && range.canPeek(1))
+        if (range.bytes[range.index] == '0' && range.index + 1 < range.bytes.length)
         {
-            auto ahead = range.peek(1)[1];
+            auto ahead = range.bytes[range.index + 1];
             switch (ahead)
             {
             case 'x':
             case 'X':
-                range.popFront();
-                range.popFront();
-                return lexHex(mark, line, column, index);
+                range.index += 2;
+                range.column += 2;
+                lexHex(token, mark, line, column, index);
+                return;
             case 'b':
             case 'B':
-                range.popFront();
-                range.popFront();
-                return lexBinary(mark, line, column, index);
+                range.index += 2;
+                range.column += 2;
+                lexBinary(token, mark, line, column, index);
+                return;
             default:
-                return lexDecimal(mark, line, column, index);
+                lexDecimal(token, mark, line, column, index);
+                return;
             }
         }
         else
-            return lexDecimal(mark, line, column, index);
+            lexDecimal(token, mark, line, column, index);
     }
 
-    Token lexHex() pure nothrow
+    void lexHex(ref Token token)
     {
         mixin (tokenStart);
-        return lexHex(mark, line, column, index);
+        lexHex(token, mark, line, column, index);
     }
 
-    Token lexHex(size_t mark, size_t line, size_t column, size_t index) pure nothrow
+    void lexHex(ref Token token, size_t mark, size_t line, size_t column, size_t index)
     {
         IdType type = tok!"intLiteral";
         bool foundDot;
-        hexLoop: while (!range.empty)
+        hexLoop: while (!(range.index >= range.bytes.length))
         {
-            switch (range.front)
+            switch (range.bytes[range.index])
             {
             case 'a': .. case 'f':
             case 'A': .. case 'F':
             case '0': .. case '9':
             case '_':
-                range.popFront();
+                range.index++;
+                range.column++;
                 break;
             case 'u':
             case 'U':
@@ -769,14 +733,14 @@ public struct DLexer
                 lexExponent(type);
                 break hexLoop;
             case '.':
-                if (foundDot || !range.canPeek(1) || range.peekAt(1) == '.')
+                if (foundDot || !(range.index + 1 < range.bytes.length) || range.peekAt(1) == '.')
                     break hexLoop;
                 else
                 {
                     // The following bit of silliness tries to tell the
                     // difference between "int dot identifier" and
                     // "double identifier".
-                    if (range.canPeek(1))
+                    if ((range.index + 1 < range.bytes.length))
                     {
                         switch (range.peekAt(1))
                         {
@@ -791,7 +755,8 @@ public struct DLexer
                     else
                     {
                     doubleLiteral:
-                        range.popFront();
+                        range.index++;
+                        range.column++;
                         foundDot = true;
                         type = tok!"doubleLiteral";
                     }
@@ -801,27 +766,28 @@ public struct DLexer
                 break hexLoop;
             }
         }
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token = Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    Token lexBinary() pure nothrow
+    void lexBinary(ref Token token)
     {
         mixin (tokenStart);
-        return lexBinary(mark, line, column, index);
+        return lexBinary(token, mark, line, column, index);
     }
 
-    Token lexBinary(size_t mark, size_t line, size_t column, size_t index) pure nothrow
+    void lexBinary(ref Token token, size_t mark, size_t line, size_t column, size_t index)
     {
         IdType type = tok!"intLiteral";
-        binaryLoop: while (!range.empty)
+        binaryLoop: while (!(range.index >= range.bytes.length))
         {
-            switch (range.front)
+            switch (range.bytes[range.index])
             {
             case '0':
             case '1':
             case '_':
-                range.popFront();
+                range.index++;
+                range.column++;
                 break;
             case 'u':
             case 'U':
@@ -832,33 +798,35 @@ public struct DLexer
                 break binaryLoop;
             }
         }
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token = Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    Token lexDecimal() pure nothrow
+    void lexDecimal(ref Token token)
     {
         mixin (tokenStart);
-        return lexDecimal(mark, line, column, index);
+        lexDecimal(token, mark, line, column, index);
     }
 
-    Token lexDecimal(size_t mark, size_t line, size_t column, size_t index) pure nothrow
+    void lexDecimal(ref Token token, size_t mark, size_t line, size_t column, size_t index)
     {
-        bool foundDot = range.front == '.';
+        bool foundDot = range.bytes[range.index] == '.';
         IdType type = tok!"intLiteral";
         if (foundDot)
         {
-            range.popFront();
+            range.index++;
+            range.column++;
             type = tok!"doubleLiteral";
         }
 
-        decimalLoop: while (!range.empty)
+        decimalLoop: while (!(range.index >= range.bytes.length))
         {
-            switch (range.front)
+            switch (range.bytes[range.index])
             {
             case '0': .. case '9':
             case '_':
-                range.popFront();
+                range.index++;
+                range.column++;
                 break;
             case 'u':
             case 'U':
@@ -883,14 +851,14 @@ public struct DLexer
                 lexExponent(type);
                 break decimalLoop;
             case '.':
-                if (foundDot || !range.canPeek(1) || range.peekAt(1) == '.')
+                if (foundDot || !(range.index + 1 < range.bytes.length) || range.peekAt(1) == '.')
                     break decimalLoop;
                 else
                 {
                     // The following bit of silliness tries to tell the
                     // difference between "int dot identifier" and
                     // "double identifier".
-                    if (range.canPeek(1))
+                    if ((range.index + 1 < range.bytes.length))
                     {
                         auto ch = range.peekAt(1);
                         if (ch <= 0x2f
@@ -908,7 +876,8 @@ public struct DLexer
                     else
                     {
                     doubleLiteral:
-                        range.popFront();
+                        range.index++;
+                        range.column++;
                         foundDot = true;
                         type = tok!"doubleLiteral";
                     }
@@ -918,36 +887,38 @@ public struct DLexer
                 break decimalLoop;
             }
         }
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token = Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    void lexIntSuffix(ref IdType type) pure nothrow @safe
+    void lexIntSuffix(ref IdType type)
     {
         bool secondPass;
-        if (range.front == 'u' || range.front == 'U')
+        if (range.bytes[range.index] == 'u' || range.bytes[range.index] == 'U')
         {
     U:
             if (type == tok!"intLiteral")
                 type = tok!"uintLiteral";
             else
                 type = tok!"ulongLiteral";
-            range.popFront();
+            range.index++;
+            range.column++;
             if (secondPass)
                 return;
-            if (range.front == 'L' || range.front == 'l')
+            if (range.bytes[range.index] == 'L' || range.bytes[range.index] == 'l')
                 goto L;
             return;
         }
-        if (range.front == 'L' || range.front == 'l')
+        if (range.bytes[range.index] == 'L' || range.bytes[range.index] == 'l')
         {
     L:
             if (type == tok!"uintLiteral")
                 type = tok!"ulongLiteral";
             else
                 type = tok!"longLiteral";
-            range.popFront();
-            if (range.front == 'U' || range.front == 'u')
+            range.index++;
+            range.column++;
+            if (range.bytes[range.index] == 'U' || range.bytes[range.index] == 'u')
             {
                 secondPass = true;
                 goto U;
@@ -958,24 +929,27 @@ public struct DLexer
 
     void lexFloatSuffix(ref IdType type) pure nothrow @safe
     {
-        switch (range.front)
+        switch (range.bytes[range.index])
         {
         case 'L':
-            range.popFront();
+            range.index++;
+            range.column++;
             type = tok!"doubleLiteral";
             break;
         case 'f':
         case 'F':
-            range.popFront();
+            range.index++;
+            range.column++;
             type = tok!"floatLiteral";
             break;
         default:
             break;
         }
-        if (!range.empty && range.front == 'i')
+        if (!(range.index >= range.bytes.length) && range.bytes[range.index] == 'i')
         {
             warning("Complex number literals are deprecated");
-            range.popFront();
+            range.index++;
+            range.column++;
             if (type == tok!"floatLiteral")
                 type = tok!"ifloatLiteral";
             else
@@ -985,12 +959,13 @@ public struct DLexer
 
     void lexExponent(ref IdType type) pure nothrow @safe
     {
-        range.popFront();
+        range.index++;
+        range.column++;
         bool foundSign = false;
         bool foundDigit = false;
-        while (!range.empty)
+        while (!(range.index >= range.bytes.length))
         {
-            switch (range.front)
+            switch (range.bytes[range.index])
             {
             case '-':
             case '+':
@@ -1001,12 +976,14 @@ public struct DLexer
                     return;
                 }
                 foundSign = true;
-                range.popFront();
+                range.index++;
+                range.column++;
                 break;
             case '0': .. case '9':
             case '_':
                 foundDigit = true;
-                range.popFront();
+                range.index++;
+                range.column++;
                 break;
             case 'L':
             case 'f':
@@ -1022,119 +999,45 @@ public struct DLexer
         }
     }
 
-    Token lexScriptLine() pure
+    void lexScriptLine(ref Token token)
     {
         mixin (tokenStart);
-        while (!range.empty && !isNewline)
-            range.popFront();
-        return Token(tok!"scriptLine", cache.intern(range.slice(mark)),
+        while (!(range.index >= range.bytes.length) && !isNewline)
+        {
+            range.index++;
+            range.column++;
+        }
+        token = Token(tok!"scriptLine", cache.intern(range.slice(mark)),
             line, column, index);
     }
 
-    Token lexSpecialTokenSequence() pure
+    void lexSpecialTokenSequence(ref Token token)
     {
         mixin (tokenStart);
-        while (!range.empty && !isNewline)
-            range.popFront();
-        return Token(tok!"specialTokenSequence", cache.intern(range.slice(mark)),
+        while (!(range.index >= range.bytes.length) && !isNewline)
+        {
+            range.index++;
+            range.column++;
+        }
+        token = Token(tok!"specialTokenSequence", cache.intern(range.slice(mark)),
             line, column, index);
     }
 
-    Token lexSlashStarComment() pure
+    void lexSlashStarComment(ref Token token)
     {
         mixin (tokenStart);
         IdType type = tok!"comment";
         range.popFrontN(2);
-        version (none) while (range.index + 16 <= range.bytes.length)
+        while (!(range.index >= range.bytes.length))
         {
-            ulong startAddress = cast(ulong) range.bytes.ptr + range.index;
-            enum slash = (cast(ulong) '/') * 0x0101010101010101L;
-            enum star = (cast(ulong) '*') * 0x0101010101010101L;
-            enum lf = (cast(ulong) '\n') * 0x0101010101010101L;
-            ulong charsSkipped;
-            ulong newlineCount;
-            bool done;
-            asm
+            if (range.bytes[range.index] == '*')
             {
-                mov RAX, startAddress;
-                movdqu XMM0, [RAX];
-
-                mov R10, lf;
-                movq XMM2, R10;
-                shufpd XMM2, XMM2, 0;
-                pcmpeqb XMM2, XMM0;
-                pmovmskb R15, XMM2;
-
-                mov R10, star;
-                movq XMM3, R10;
-                shufpd XMM3, XMM3, 0;
-                pcmpeqb XMM3, XMM0;
-                pmovmskb R8, XMM3;
-
-                mov R10, slash;
-                movq XMM4, R10;
-                shufpd XMM4, XMM4, 0;
-                pcmpeqb XMM4, XMM0;
-                pmovmskb R9, XMM4;
-            loop:
-                cmp R8, 0;
-                je notFound;
-                cmp R9, 0;
-                je notFound;
-                bsf RAX, R8; // stIndex
-                bsf RBX, R9; // slIndex
-                mov RDX, RAX;
-                inc RDX;
-                cmp RDX, RBX;
-                je found;
-                cmp RAX, RBX;
-                jae maskSlash;
-            maskStar:
-                mov RCX, RAX;
-                mov R10, 1;
-                shl R10, CL;
-                xor R8, R10;
-                jmp loop;
-            maskSlash:
-                mov RCX, RBX;
-                mov R10, 1;
-                shl R10, CL;
-                xor R9, R10;
-                jmp loop;
-            notFound:
-                mov R14, 16;
-                mov charsSkipped, R14;
-                popcnt R14, R15;
-                mov newlineCount, R14;
-                jmp asmEnd;
-            found:
-                inc RBX;
-                mov charsSkipped, RBX;
-                mov RAX, 1;
-                mov done, AL;
-                mov RCX, RBX;
-                mov RBX, 1;
-                shl RBX, CL;
-                dec RBX;
-                and R15, RBX;
-                popcnt R14, R15;
-                mov newlineCount, R14;
-            asmEnd:
-                nop;
-            }
-            range.popFrontN(charsSkipped);
-            range.incrementLine(newlineCount);
-            if (done)
-                goto end;
-        }
-        while (!range.empty)
-        {
-            if (range.front == '*')
-            {
-                range.popFront();
-                if (!range.empty && range.front == '/')
+                range.index++;
+                range.column++;
+                if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '/')
                 {
-                    range.popFront();
+                    range.index++;
+                    range.column++;
                     break;
                 }
             }
@@ -1142,122 +1045,85 @@ public struct DLexer
                 popFrontWhitespaceAware();
         }
     end:
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token = Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    Token lexSlashSlashComment() pure nothrow
+    void lexSlashSlashComment(ref Token token)
     {
         mixin (tokenStart);
         IdType type = tok!"comment";
         range.popFrontN(2);
-        version (none) while (range.index + 16 <= range.bytes.length)
+        while (!(range.index >= range.bytes.length))
         {
-            ulong startAddress = cast(ulong) range.bytes.ptr + range.index;
-            enum cr = (cast(ulong) '\r') * 0x0101010101010101L;
-            enum lf = (cast(ulong) '\n') * 0x0101010101010101L;
-            ulong charsSkipped;
-            asm
-            {
-                mov RAX, startAddress;
-                movdqu XMM0, [RAX];
-
-                mov R10, cr;
-                movq XMM1, R10;
-                shufpd XMM1, XMM1, 0;
-                pcmpeqb XMM1, XMM0;
-
-                mov R10, lf;
-                movq XMM2, R10;
-                shufpd XMM2, XMM2, 0;
-                pcmpeqb XMM2, XMM0;
-
-                por XMM1, XMM2;
-                pmovmskb RBX, XMM1;
-                bsf RCX, RBX;
-                mov RDX, 16;
-                cmp RBX, 0;
-                cmove RCX, RDX;
-                mov charsSkipped, RCX;
-
-            }
-            if (charsSkipped < 16)
-            {
-                index += charsSkipped;
-                column += charsSkipped;
-                range.popFrontN(charsSkipped);
-                goto end;
-            }
-            else
-            {
-                assert (charsSkipped == 16);
-                index += 16;
-                column += 16;
-                range.popFrontN(16);
-            }
-        }
-        while (!range.empty)
-        {
-            if (range.front == '\r' || range.front == '\n')
+            if (range.bytes[range.index] == '\r' || range.bytes[range.index] == '\n')
                 break;
-            range.popFront();
+            range.index++;
+            range.column++;
         }
     end:
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token =  Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    Token lexSlashPlusComment() pure nothrow
+    void lexSlashPlusComment(ref Token token)
     {
         mixin (tokenStart);
         IdType type = tok!"comment";
-        range.popFront();
-        range.popFront();
+        range.index += 2;
+        range.column += 2;
         int depth = 1;
-        while (depth > 0 && !range.empty)
+        while (depth > 0 && !(range.index >= range.bytes.length))
         {
-            if (range.front == '+')
+            if (range.bytes[range.index] == '+')
             {
-                range.popFront();
-                if (!range.empty && range.front == '/')
+                range.index++;
+                range.column++;
+                if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '/')
                 {
-                    range.popFront();
+                    range.index++;
+                    range.column++;
                     depth--;
                 }
             }
-            else if (range.front == '/')
+            else if (range.bytes[range.index] == '/')
             {
-                range.popFront();
-                if (!range.empty && range.front == '+')
+                range.index++;
+                range.column++;
+                if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '+')
                 {
-                    range.popFront();
+                    range.index++;
+                    range.column++;
                     depth++;
                 }
             }
             else
                 popFrontWhitespaceAware();
         }
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token = Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    Token lexStringLiteral() pure nothrow
+    void lexStringLiteral(ref Token token)
     {
         mixin (tokenStart);
-        range.popFront();
+        range.index++;
+            range.column++;
         while (true)
         {
-            if (range.empty)
+            if ((range.index >= range.bytes.length))
             {
                 error("Error: unterminated string literal");
-                return Token();
+                token = Token(tok!"");
+                return;
             }
-            else if (range.front == '"')
+            else if (range.bytes[range.index] == '"')
             {
-                range.popFront();
+                range.index++;
+                range.column++;
                 break;
             }
-            else if (range.front == '\\')
+            else if (range.bytes[range.index] == '\\')
             {
                 lexEscapeSequence();
             }
@@ -1266,28 +1132,31 @@ public struct DLexer
         }
         IdType type = tok!"stringLiteral";
         lexStringSuffix(type);
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token = Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    Token lexWysiwygString() pure nothrow
+    void lexWysiwygString(ref Token token)
     {
         mixin (tokenStart);
         IdType type = tok!"stringLiteral";
-        bool backtick = range.front == '`';
+        bool backtick = range.bytes[range.index] == '`';
         if (backtick)
         {
-            range.popFront();
+            range.index++;
+            range.column++;
             while (true)
             {
-                if (range.empty)
+                if ((range.index >= range.bytes.length))
                 {
                     error("Error: unterminated string literal");
-                    return Token(tok!"");
+                    token = Token(tok!"");
+                    return;
                 }
-                else if (range.front == '`')
+                else if (range.bytes[range.index] == '`')
                 {
-                    range.popFront();
+                    range.index++;
+                    range.column++;
                     break;
                 }
                 else
@@ -1296,23 +1165,28 @@ public struct DLexer
         }
         else
         {
-            range.popFront();
-            if (range.empty)
+            range.index++;
+            range.column++;
+            if ((range.index >= range.bytes.length))
             {
                 error("Error: unterminated string literal");
-                return Token(tok!"");
+                token = Token(tok!"");
+                return;
             }
-            range.popFront();
+            range.index++;
+            range.column++;
             while (true)
             {
-                if (range.empty)
+                if ((range.index >= range.bytes.length))
                 {
                     error("Error: unterminated string literal");
-                    return Token(tok!"");
+                    token = Token(tok!"");
+                    return;
                 }
-                else if (range.front == '"')
+                else if (range.bytes[range.index] == '"')
                 {
-                    range.popFront();
+                    range.index++;
+                    range.column++;
                     break;
                 }
                 else
@@ -1320,87 +1194,101 @@ public struct DLexer
             }
         }
         lexStringSuffix(type);
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token = Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    ubyte lexStringSuffix(ref IdType type) pure nothrow
+    private ubyte lexStringSuffix(ref IdType type) pure nothrow @safe
     {
-        if (range.empty)
+        if ((range.index >= range.bytes.length))
         {
             type = tok!"stringLiteral";
             return 0;
         }
         else
         {
-            switch (range.front)
+            switch (range.bytes[range.index])
             {
-            case 'w': range.popFront(); type = tok!"wstringLiteral"; return 'w';
-            case 'd': range.popFront(); type = tok!"dstringLiteral"; return 'd';
-            case 'c': range.popFront(); type = tok!"stringLiteral"; return 'c';
+            case 'w': range.index++; range.column++; type = tok!"wstringLiteral"; return 'w';
+            case 'd': range.index++; range.column++; type = tok!"dstringLiteral"; return 'd';
+            case 'c': range.index++; range.column++; type = tok!"stringLiteral"; return 'c';
             default: type = tok!"stringLiteral"; return 0;
             }
         }
     }
 
-    Token lexDelimitedString() pure nothrow
+    void lexDelimitedString(ref Token token)
     {
         mixin (tokenStart);
-        range.popFront();
-        range.popFront();
+        range.index += 2;
+        range.column += 2;
         ubyte open;
         ubyte close;
-        switch (range.front)
+        switch (range.bytes[range.index])
         {
         case '<':
             open = '<';
             close = '>';
-            range.popFront();
-            return lexNormalDelimitedString(mark, line, column, index, open, close);
+            range.index++;
+            range.column++;
+            lexNormalDelimitedString(token, mark, line, column, index, open, close);
+            break;
         case '{':
             open = '{';
             close = '}';
-            range.popFront();
-            return lexNormalDelimitedString(mark, line, column, index, open, close);
+            range.index++;
+            range.column++;
+            lexNormalDelimitedString(token, mark, line, column, index, open, close);
+            break;
         case '[':
             open = '[';
             close = ']';
-            range.popFront();
-            return lexNormalDelimitedString(mark, line, column, index, open, close);
+            range.index++;
+            range.column++;
+            lexNormalDelimitedString(token, mark, line, column, index, open, close);
+            break;
         case '(':
             open = '(';
             close = ')';
-            range.popFront();
-            return lexNormalDelimitedString(mark, line, column, index, open, close);
+            range.index++;
+            range.column++;
+            lexNormalDelimitedString(token, mark, line, column, index, open, close);
+            break;
         default:
-            return lexHeredocString(mark, line, column, index);
+            lexHeredocString(token, mark, line, column, index);
+            break;
         }
     }
 
-    Token lexNormalDelimitedString(size_t mark, size_t line, size_t column,
+    void lexNormalDelimitedString(ref Token token, size_t mark, size_t line, size_t column,
         size_t index, ubyte open, ubyte close)
-        pure nothrow
     {
         int depth = 1;
-        while (!range.empty && depth > 0)
+        while (!(range.index >= range.bytes.length) && depth > 0)
         {
-            if (range.front == open)
+            if (range.bytes[range.index] == open)
             {
                 depth++;
-                range.popFront();
+                range.index++;
+                range.column++;
             }
-            else if (range.front == close)
+            else if (range.bytes[range.index] == close)
             {
                 depth--;
-                range.popFront();
+                range.index++;
+                range.column++;
                 if (depth <= 0)
                 {
-                    if (range.front == '"')
-                        range.popFront();
+                    if (range.bytes[range.index] == '"')
+                    {
+                        range.index++;
+                        range.column++;
+                    }
                     else
                     {
                         error("Error: \" expected to end delimited string literal");
-                        return Token(tok!"");
+                        token = Token(tok!"");
+                        return;
                     }
                 }
             }
@@ -1409,19 +1297,18 @@ public struct DLexer
         }
         IdType type = tok!"stringLiteral";
         lexStringSuffix(type);
-        return Token(type, cache.intern(range.slice(mark)), line, column, index);
+        token = Token(type, cache.intern(range.slice(mark)), line, column, index);
     }
 
-    Token lexHeredocString(size_t mark, size_t line, size_t column, size_t index)
-        pure nothrow
+    void lexHeredocString(ref Token token, size_t mark, size_t line, size_t column, size_t index)
     {
-        import std.regex;
-        Token ident = lexIdentifier();
+        Token ident;
+        lexIdentifier(ident);
         if (isNewline())
             popFrontWhitespaceAware();
         else
             error("Newline expected");
-        while (!range.empty)
+        while (!(range.index >= range.bytes.length))
         {
             if (isNewline())
             {
@@ -1438,29 +1325,47 @@ public struct DLexer
                 }
             }
             else
-                range.popFront();
+            {
+                range.index++;
+                range.column++;
+            }
         }
-        if (!range.empty() && range.front == '"')
-            range.popFront();
+        if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '"')
+        {
+            range.index++;
+            range.column++;
+        }
         else
             error(`" expected`);
         IdType type = tok!"stringLiteral";
         lexStringSuffix(type);
-        return Token(type, cache.intern(range.slice(mark)), line, column, index);
+        token = Token(type, cache.intern(range.slice(mark)), line, column, index);
     }
 
-    Token lexTokenString() pure
+    void lexTokenString(ref Token token)
     {
         mixin (tokenStart);
-        assert (range.front == 'q');
-        range.popFront();
-        assert (range.front == '{');
-        range.popFront();
+        assert (range.bytes[range.index] == 'q');
+        range.index++;
+        range.column++;
+        assert (range.bytes[range.index] == '{');
+        range.index++;
+        range.column++;
         auto app = appender!string();
         app.put("q{");
         int depth = 1;
 
-        _front = advance();
+        WhitespaceBehavior oldWhitespace = config.whitespaceBehavior;
+        StringBehavior oldString = config.stringBehavior;
+        config.whitespaceBehavior = WhitespaceBehavior.include;
+        config.stringBehavior = StringBehavior.source;
+        scope (exit)
+        {
+            config.whitespaceBehavior = oldWhitespace;
+            config.stringBehavior = oldString;
+        }
+
+        advance(_front);
         while (depth > 0 && !empty)
         {
             auto t = front();
@@ -1486,56 +1391,61 @@ public struct DLexer
         auto b = lexStringSuffix(type);
         if (b != 0)
             app.put(b);
-        return Token(type, cache.intern(cast(const(ubyte)[]) app.data), line,
+        token = Token(type, cache.intern(cast(const(ubyte)[]) app.data), line,
             column, index);
     }
 
-    Token lexHexString() pure nothrow
+    void lexHexString(ref Token token)
     {
         mixin (tokenStart);
-        range.popFront();
-        range.popFront();
+        range.index += 2;
+        range.column += 2;
 
         loop: while (true)
         {
-            if (range.empty)
+            if ((range.index >= range.bytes.length))
             {
                 error("Error: unterminated hex string literal");
-                return Token();
+                token = Token(tok!"");
+                return;
             }
             else if (isWhitespace())
                 popFrontWhitespaceAware();
-            else switch (range.front)
+            else switch (range.bytes[range.index])
             {
             case '0': .. case '9':
             case 'A': .. case 'F':
             case 'a': .. case 'f':
-                range.popFront();
+                range.index++;
+                range.column++;
                 break;
             case '"':
-                range.popFront();
+                range.index++;
+                range.column++;
                 break loop;
             default:
                 error("Error: invalid character in hex string");
-                return Token();
+                token = Token(tok!"");
+                return;
             }
         }
 
         IdType type = tok!"stringLiteral";
         lexStringSuffix(type);
-        return Token(type, cache.intern(range.slice(mark)), line, column,
+        token = Token(type, cache.intern(range.slice(mark)), line, column,
             index);
     }
 
-    bool lexEscapeSequence() pure nothrow
+    bool lexEscapeSequence()
     {
-        range.popFront();
-        if (range.empty)
+        range.index++;
+            range.column++;
+        if ((range.index >= range.bytes.length))
         {
             error("Error: non-terminated character escape sequence.");
             return false;
         }
-        switch (range.front)
+        switch (range.bytes[range.index])
         {
         case '\'':
         case '"':
@@ -1548,23 +1458,26 @@ public struct DLexer
         case 'r':
         case 't':
         case 'v':
-            range.popFront();
+            range.index++;
+            range.column++;
             break;
         case 'x':
-            range.popFront();
+            range.index++;
+            range.column++;
             foreach (i; 0 .. 2)
             {
-                if (range.empty)
+                if ((range.index >= range.bytes.length))
                 {
                     error("Error: 2 hex digits expected.");
                     return false;
                 }
-                switch (range.front)
+                switch (range.bytes[range.index])
                 {
                 case '0': .. case '9':
                 case 'a': .. case 'f':
                 case 'A': .. case 'F':
-                    range.popFront();
+                    range.index++;
+            range.column++;
                     break;
                 default:
                     error("Error: 2 hex digits expected.");
@@ -1573,31 +1486,35 @@ public struct DLexer
             }
             break;
         case '0':
-            if (!range.canPeek(1) || (range.canPeek(1) && range.peekAt(1) == '\''))
+            if (!(range.index + 1 < range.bytes.length) || ((range.index + 1 < range.bytes.length) && range.peekAt(1) == '\''))
             {
-                range.popFront();
+                range.index++;
+            range.column++;
                 break;
             }
             goto case;
         case '1': .. case '7':
-            for (size_t i = 0; i < 3 && !range.empty && range.front >= '0' && range.front <= '7'; i++)
-                range.popFront();
+            for (size_t i = 0; i < 3 && !(range.index >= range.bytes.length) && range.bytes[range.index] >= '0' && range.bytes[range.index] <= '7'; i++)
+                range.index++;
+            range.column++;
             break;
         case 'u':
-            range.popFront();
+            range.index++;
+            range.column++;
             foreach (i; 0 .. 4)
             {
-                if (range.empty)
+                if ((range.index >= range.bytes.length))
                 {
                     error("Error: at least 4 hex digits expected.");
                     return false;
                 }
-                switch (range.front)
+                switch (range.bytes[range.index])
                 {
                 case '0': .. case '9':
                 case 'a': .. case 'f':
                 case 'A': .. case 'F':
-                    range.popFront();
+                    range.index++;
+                    range.column++;
                     break;
                 default:
                     error("Error: at least 4 hex digits expected.");
@@ -1606,20 +1523,22 @@ public struct DLexer
             }
             break;
         case 'U':
-            range.popFront();
+            range.index++;
+            range.column++;
             foreach (i; 0 .. 8)
             {
-                if (range.empty)
+                if ((range.index >= range.bytes.length))
                 {
                     error("Error: at least 8 hex digits expected.");
                     return false;
                 }
-                switch (range.front)
+                switch (range.bytes[range.index])
                 {
                 case '0': .. case '9':
                 case 'a': .. case 'f':
                 case 'A': .. case 'F':
-                    range.popFront();
+                    range.index++;
+                    range.column++;
                     break;
                 default:
                     error("Error: at least 8 hex digits expected.");
@@ -1630,42 +1549,51 @@ public struct DLexer
         default:
             while (true)
             {
-                if (range.empty)
+                if ((range.index >= range.bytes.length))
                 {
                     error("Error: non-terminated character escape sequence.");
                     return false;
                 }
-                if (range.front == ';')
+                if (range.bytes[range.index] == ';')
                 {
-                    range.popFront();
+                    range.index++;
+                    range.column++;
                     break;
                 }
                 else
-                    range.popFront();
+                {
+                    range.index++;
+                    range.column++;
+                }
             }
         }
         return true;
     }
 
-    Token lexCharacterLiteral() pure nothrow
+    void lexCharacterLiteral(ref Token token)
     {
         mixin (tokenStart);
-        range.popFront();
-        if (range.front == '\\')
+        range.index++;
+        range.column++;
+        if (range.bytes[range.index] == '\\')
         {
             lexEscapeSequence();
             goto close;
         }
-        else if (range.front == '\'')
+        else if (range.bytes[range.index] == '\'')
         {
-            range.popFront();
-            return Token(tok!"characterLiteral", cache.intern(range.slice(mark)),
+            range.index++;
+            range.column++;
+            token = Token(tok!"characterLiteral", cache.intern(range.slice(mark)),
                 line, column, index);
         }
-        else if (range.front & 0x80)
+        else if (range.bytes[range.index] & 0x80)
         {
-            while (range.front & 0x80)
-                range.popFront();
+            while (range.bytes[range.index] & 0x80)
+            {
+                range.index++;
+                range.column++;
+            }
             goto close;
         }
         else
@@ -1674,104 +1602,139 @@ public struct DLexer
             goto close;
         }
     close:
-        if (range.front == '\'')
+        if (range.bytes[range.index] == '\'')
         {
-            range.popFront();
-            return Token(tok!"characterLiteral", cache.intern(range.slice(mark)),
+            range.index++;
+            range.column++;
+            token = Token(tok!"characterLiteral", cache.intern(range.slice(mark)),
                 line, column, index);
         }
         else
         {
             error("Error: Expected ' to end character literal");
-            return Token();
+            token = Token(tok!"");
         }
     }
 
-    Token lexIdentifier() pure nothrow
+    void lexIdentifier(ref Token token)
     {
         mixin (tokenStart);
-        uint hash = 0;
-        if (isSeparating(0) || range.empty)
+        if (isSeparating(0))
         {
             error("Invalid identifier");
-            range.popFront();
+            range.index++;
+            range.column++;
         }
-        while (!range.empty && !isSeparating(0))
+        do
         {
-            hash = StringCache.hashStep(range.front, hash);
-            range.popFront();
+            range.index++;
+            range.column++;
         }
-        return Token(tok!"identifier", cache.intern(range.slice(mark), hash), line,
+        while (!isSeparating(0));
+        token = Token(tok!"identifier", cache.intern(range.slice(mark)), line,
             column, index);
     }
 
-    Token lexDot() pure nothrow
+    void lexDot(ref Token token)
     {
         mixin (tokenStart);
-        if (!range.canPeek(1))
+        if (!(range.index + 1 < range.bytes.length))
         {
-            range.popFront();
-            return Token(tok!".", null, line, column, index);
+            range.index++;
+            range.column++;
+            token = Token(tok!".", null, line, column, index);
+            return;
         }
         switch (range.peekAt(1))
         {
         case '0': .. case '9':
-            return lexNumber();
+            lexNumber(token);
+            return;
         case '.':
-            range.popFront();
-            range.popFront();
-            if (!range.empty && range.front == '.')
+            range.index++;
+            range.column++;
+            range.index++;
+            range.column++;
+            if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '.')
             {
-                range.popFront();
-                return Token(tok!"...", null, line, column, index);
+                range.index++;
+                range.column++;
+                token = Token(tok!"...", null, line, column, index);
             }
             else
-                return Token(tok!"..", null, line, column, index);
+                token = Token(tok!"..", null, line, column, index);
+            return;
         default:
-            range.popFront();
-            return Token(tok!".", null, line, column, index);
+            range.index++;
+            range.column++;
+            token = Token(tok!".", null, line, column, index);
+            return;
         }
     }
 
-    Token lexLongNewline() pure nothrow
+    void lexLongNewline(ref Token token) @nogc
     {
         mixin (tokenStart);
-        range.popFront();
-        range.popFront();
-        range.popFront();
+        range.index++;
+            range.column++;
+        range.index++;
+            range.column++;
+        range.index++;
+            range.column++;
         range.incrementLine();
-        return Token(tok!"whitespace", cache.intern(range.slice(mark)), line,
+        string text = config.whitespaceBehavior == WhitespaceBehavior.include
+            ? cache.intern(range.slice(mark)) : "";
+        token = Token(tok!"whitespace", text, line,
             column, index);
     }
 
-    bool isNewline() pure @safe nothrow
+    bool isNewline() @nogc
     {
-        if (range.front == '\n') return true;
-        if (range.front == '\r') return true;
-        return (range.front & 0x80) && range.canPeek(2)
+        if (range.bytes[range.index] == '\n') return true;
+        if (range.bytes[range.index] == '\r') return true;
+        return (range.bytes[range.index] & 0x80) && (range.index + 2 < range.bytes.length)
             && (range.peek(2) == "\u2028" || range.peek(2) == "\u2029");
     }
 
-    bool isSeparating(size_t offset) pure nothrow @safe
+    bool isSeparating(size_t offset) @nogc
     {
-        if (!range.canPeek(offset)) return true;
-        auto c = range.peekAt(offset);
-        if (c >= 'A' && c <= 'Z') return false;
-        if (c >= 'a' && c <= 'z') return false;
-        if (c <= 0x2f) return true;
-        if (c >= ':' && c <= '@') return true;
-        if (c >= '[' && c <= '^') return true;
-        if (c >= '{' && c <= '~') return true;
-        if (c == '`') return true;
-        if (c & 0x80)
+        if (range.index + offset >= range.bytes.length)
+            return true;
+        auto c = range.bytes[range.index + offset];
+        static immutable ubyte[256] LOOKUP_TABLE = [
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+        ];
+        immutable ulong result = LOOKUP_TABLE[c];
+        if (result == 0)
+            return false;
+        if (result == 1)
+            return true;
+        if (result == 2)
         {
             auto r = range;
             range.popFrontN(offset);
             return (r.canPeek(2) && (r.peek(2) == "\u2028"
                 || r.peek(2) == "\u2029"));
         }
-        return false;
+        assert (false);
     }
+
+
 
     enum tokenStart = q{
         size_t index = range.index;
@@ -1780,18 +1743,18 @@ public struct DLexer
         auto mark = range.mark();
     };
 
-    void error(string message) pure nothrow @safe
+    void error(string message)
     {
         messages ~= Message(range.line, range.column, message, true);
     }
 
-    void warning(string message) pure nothrow @safe
+    void warning(string message)
     {
         messages ~= Message(range.line, range.column, message, false);
         assert (messages.length > 0);
     }
 
-    struct Message
+    static struct Message
     {
         size_t line;
         size_t column;
@@ -1960,7 +1923,7 @@ body
  */
 struct StringCache
 {
-public:
+public pure nothrow @nogc:
 
     @disable this();
     @disable this(this);
@@ -2002,47 +1965,19 @@ public:
     /**
      * Caches a string.
      */
-    string intern(const(ubyte)[] str) pure nothrow @safe @nogc
+    string intern(const(ubyte)[] str) @safe
     {
         if (str is null || str.length == 0)
             return "";
-        immutable uint hash = hashBytes(str);
-        return intern(str, hash);
+        return _intern(str);
     }
 
     /**
      * ditto
      */
-    string intern(string str) pure nothrow @trusted @nogc
+    string intern(string str) @trusted
     {
         return intern(cast(ubyte[]) str);
-    }
-
-    /**
-     * Caches a string as above, but uses the given hash code instead of
-     * calculating one itself. Use this alongside $(LREF hashStep)() can reduce the
-     * amount of work necessary when lexing dynamic tokens.
-     */
-    string intern(const(ubyte)[] str, uint hash) pure nothrow @safe @nogc
-    in
-    {
-        assert (str.length > 0);
-    }
-    body
-    {
-        return _intern(str, hash);
-    }
-
-    /**
-     * Incremental hashing.
-     * Params:
-     *     b = the byte to add to the hash
-     *     h = the hash that has been calculated so far
-     * Returns: the new hash code for the string.
-     */
-    static uint hashStep(ubyte b, uint h) pure nothrow @safe @nogc
-    {
-        return (h ^ sbox[b]) * 3;
     }
 
     /**
@@ -2050,22 +1985,17 @@ public:
      */
     static enum defaultBucketCount = 4096;
 
-    size_t allocated() pure nothrow @safe @property
-    {
-        return _allocated;
-    }
-
 private:
 
-    string _intern(const(ubyte)[] bytes, uint hash) pure nothrow @trusted @nogc
+    string _intern(const(ubyte)[] bytes) @trusted
     {
         if (bytes is null || bytes.length == 0)
             return "";
+        immutable uint hash = hashBytes(bytes);
         immutable size_t index = hash & (buckets.length - 1);
         Node* s = find(bytes, hash);
         if (s !is null)
             return cast(string) s.str;
-        _allocated += bytes.length;
         ubyte[] mem = allocate(bytes.length);
         mem[] = bytes[];
         Node* node = cast(Node*) malloc(Node.sizeof);
@@ -2076,14 +2006,14 @@ private:
         return cast(string) mem;
     }
 
-    Node* find(const(ubyte)[] bytes, uint hash) pure nothrow @trusted @nogc
+    Node* find(const(ubyte)[] bytes, uint hash) @trusted
     {
         import std.algorithm : equal;
         immutable size_t index = hash & (buckets.length - 1);
         Node* node = buckets[index];
         while (node !is null)
         {
-            if (node.hash == hash && bytes.equal(cast(ubyte[]) node.str))
+            if (node.hash == hash && bytes == cast(ubyte[]) node.str)
                 return node;
             node = node.next;
         }
@@ -2098,13 +2028,41 @@ private:
     }
     body
     {
-        uint hash = 0;
-        foreach (ubyte b; data)
+        immutable uint m = 0x5bd1e995;
+        immutable int r = 24;
+        uint h = cast(uint) data.length;
+        while (data.length >= 4)
         {
-            hash ^= sbox[b];
-            hash *= 3;
+            uint k = (cast(ubyte) data[3]) << 24
+                | (cast(ubyte) data[2]) << 16
+                | (cast(ubyte) data[1]) << 8
+                | (cast(ubyte) data[0]);
+            k *= m;
+            k ^= k >> r;
+            k *= m;
+            h *= m;
+            h ^= k;
+            data = data[4 .. $];
         }
-        return hash;
+        switch (data.length & 3)
+        {
+        case 3:
+            h ^= data[2] << 16;
+            goto case;
+        case 2:
+            h ^= data[1] << 8;
+            goto case;
+        case 1:
+            h ^= data[0];
+            h *= m;
+            break;
+        default:
+            break;
+        }
+        h ^= h >> 13;
+        h *= m;
+        h ^= h >> 15;
+        return h;
     }
 
     ubyte[] allocate(size_t numBytes) pure nothrow @trusted @nogc
@@ -2160,74 +2118,6 @@ private:
 
     static enum blockSize = 1024 * 16;
 
-    static immutable uint[] sbox = [
-        0xF53E1837, 0x5F14C86B, 0x9EE3964C, 0xFA796D53,
-        0x32223FC3, 0x4D82BC98, 0xA0C7FA62, 0x63E2C982,
-        0x24994A5B, 0x1ECE7BEE, 0x292B38EF, 0xD5CD4E56,
-        0x514F4303, 0x7BE12B83, 0x7192F195, 0x82DC7300,
-        0x084380B4, 0x480B55D3, 0x5F430471, 0x13F75991,
-        0x3F9CF22C, 0x2FE0907A, 0xFD8E1E69, 0x7B1D5DE8,
-        0xD575A85C, 0xAD01C50A, 0x7EE00737, 0x3CE981E8,
-        0x0E447EFA, 0x23089DD6, 0xB59F149F, 0x13600EC7,
-        0xE802C8E6, 0x670921E4, 0x7207EFF0, 0xE74761B0,
-        0x69035234, 0xBFA40F19, 0xF63651A0, 0x29E64C26,
-        0x1F98CCA7, 0xD957007E, 0xE71DDC75, 0x3E729595,
-        0x7580B7CC, 0xD7FAF60B, 0x92484323, 0xA44113EB,
-        0xE4CBDE08, 0x346827C9, 0x3CF32AFA, 0x0B29BCF1,
-        0x6E29F7DF, 0xB01E71CB, 0x3BFBC0D1, 0x62EDC5B8,
-        0xB7DE789A, 0xA4748EC9, 0xE17A4C4F, 0x67E5BD03,
-        0xF3B33D1A, 0x97D8D3E9, 0x09121BC0, 0x347B2D2C,
-        0x79A1913C, 0x504172DE, 0x7F1F8483, 0x13AC3CF6,
-        0x7A2094DB, 0xC778FA12, 0xADF7469F, 0x21786B7B,
-        0x71A445D0, 0xA8896C1B, 0x656F62FB, 0x83A059B3,
-        0x972DFE6E, 0x4122000C, 0x97D9DA19, 0x17D5947B,
-        0xB1AFFD0C, 0x6EF83B97, 0xAF7F780B, 0x4613138A,
-        0x7C3E73A6, 0xCF15E03D, 0x41576322, 0x672DF292,
-        0xB658588D, 0x33EBEFA9, 0x938CBF06, 0x06B67381,
-        0x07F192C6, 0x2BDA5855, 0x348EE0E8, 0x19DBB6E3,
-        0x3222184B, 0xB69D5DBA, 0x7E760B88, 0xAF4D8154,
-        0x007A51AD, 0x35112500, 0xC9CD2D7D, 0x4F4FB761,
-        0x694772E3, 0x694C8351, 0x4A7E3AF5, 0x67D65CE1,
-        0x9287DE92, 0x2518DB3C, 0x8CB4EC06, 0xD154D38F,
-        0xE19A26BB, 0x295EE439, 0xC50A1104, 0x2153C6A7,
-        0x82366656, 0x0713BC2F, 0x6462215A, 0x21D9BFCE,
-        0xBA8EACE6, 0xAE2DF4C1, 0x2A8D5E80, 0x3F7E52D1,
-        0x29359399, 0xFEA1D19C, 0x18879313, 0x455AFA81,
-        0xFADFE838, 0x62609838, 0xD1028839, 0x0736E92F,
-        0x3BCA22A3, 0x1485B08A, 0x2DA7900B, 0x852C156D,
-        0xE8F24803, 0x00078472, 0x13F0D332, 0x2ACFD0CF,
-        0x5F747F5C, 0x87BB1E2F, 0xA7EFCB63, 0x23F432F0,
-        0xE6CE7C5C, 0x1F954EF6, 0xB609C91B, 0x3B4571BF,
-        0xEED17DC0, 0xE556CDA0, 0xA7846A8D, 0xFF105F94,
-        0x52B7CCDE, 0x0E33E801, 0x664455EA, 0xF2C70414,
-        0x73E7B486, 0x8F830661, 0x8B59E826, 0xBB8AEDCA,
-        0xF3D70AB9, 0xD739F2B9, 0x4A04C34A, 0x88D0F089,
-        0xE02191A2, 0xD89D9C78, 0x192C2749, 0xFC43A78F,
-        0x0AAC88CB, 0x9438D42D, 0x9E280F7A, 0x36063802,
-        0x38E8D018, 0x1C42A9CB, 0x92AAFF6C, 0xA24820C5,
-        0x007F077F, 0xCE5BC543, 0x69668D58, 0x10D6FF74,
-        0xBE00F621, 0x21300BBE, 0x2E9E8F46, 0x5ACEA629,
-        0xFA1F86C7, 0x52F206B8, 0x3EDF1A75, 0x6DA8D843,
-        0xCF719928, 0x73E3891F, 0xB4B95DD6, 0xB2A42D27,
-        0xEDA20BBF, 0x1A58DBDF, 0xA449AD03, 0x6DDEF22B,
-        0x900531E6, 0x3D3BFF35, 0x5B24ABA2, 0x472B3E4C,
-        0x387F2D75, 0x4D8DBA36, 0x71CB5641, 0xE3473F3F,
-        0xF6CD4B7F, 0xBF7D1428, 0x344B64D0, 0xC5CDFCB6,
-        0xFE2E0182, 0x2C37A673, 0xDE4EB7A3, 0x63FDC933,
-        0x01DC4063, 0x611F3571, 0xD167BFAF, 0x4496596F,
-        0x3DEE0689, 0xD8704910, 0x7052A114, 0x068C9EC5,
-        0x75D0E766, 0x4D54CC20, 0xB44ECDE2, 0x4ABC653E,
-        0x2C550A21, 0x1A52C0DB, 0xCFED03D0, 0x119BAFE2,
-        0x876A6133, 0xBC232088, 0x435BA1B2, 0xAE99BBFA,
-        0xBB4F08E4, 0xA62B5F49, 0x1DA4B695, 0x336B84DE,
-        0xDC813D31, 0x00C134FB, 0x397A98E6, 0x151F0E64,
-        0xD9EB3E69, 0xD3C7DF60, 0xD2F2C336, 0x2DDD067B,
-        0xBD122835, 0xB0B3BD3A, 0xB0D54E46, 0x8641F1E4,
-        0xA0B38F96, 0x51D39199, 0x37A6AD75, 0xDF84EE41,
-        0x3C034CBA, 0xACDA62FC, 0x11923B8B, 0x45EF170A,
-    ];
-
-    size_t _allocated;
     Node*[] buckets;
     Block* rootBlock;
 }

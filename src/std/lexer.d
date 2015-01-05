@@ -249,9 +249,9 @@ template TokenId(IdType, alias staticTokens, alias dynamicTokens,
  */
 struct TokenStructure(IdType, string extraFields = "")
 {
-public:
+public pure nothrow @safe @nogc:
 
-    bool opEquals(ref const typeof(this) other) const pure nothrow @safe
+    bool opEquals(ref const typeof(this) other) const
     {
         return this.type == other.type && this.text == other.text;
     }
@@ -259,7 +259,7 @@ public:
     /**
      * Returs: true if the token has the given type, false otherwise.
      */
-    bool opEquals(IdType type) const pure nothrow @safe
+    bool opEquals(IdType type) const
     {
         return this.type == type;
     }
@@ -411,7 +411,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
 
     static string generateMask(const ubyte[] arr)
     {
-        import std.string;
+        import std.string : format;
         ulong u;
         for (size_t i = 0; i < arr.length && i < 8; i++)
         {
@@ -422,7 +422,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
 
     private static string generateByteMask(size_t l)
     {
-        import std.string;
+        import std.string : format;
         return format("0x%016x", ulong.max >> ((8 - l) * 8));
     }
 
@@ -457,24 +457,22 @@ mixin template Lexer(Token, alias defaultTokenFunction,
 
     private static string generateStatements()
     {
-        import std.algorithm;
-        import std.conv;
-        import std.string;
-        import std.range;
+        import std.algorithm : sort;
+        import std.range : stride;
 
-        string[] pseudoTokens = stupidToArray(tokenHandlers.stride(2));
-        string[] allTokens = stupidToArray(sort(staticTokens ~ possibleDefaultTokens ~ pseudoTokens).uniq);
+        string[] pseudoTokens = array(tokenHandlers.stride(2));
+        string[] allTokens = array(sort(staticTokens ~ possibleDefaultTokens ~ pseudoTokens).uniq);
         // Array consisting of a sorted list of the first characters of the
         // tokens.
         char[] beginningChars = getBeginningChars(allTokens);
-        size_t i = calcSplitCount(beginningChars.length, 8);
+        size_t i = calcSplitCount(beginningChars.length, 128);
         return generateStatementsStep(allTokens, pseudoTokens, beginningChars, i);
     }
 
     private static string generateStatementsStep(string[] allTokens,
         string[] pseudoTokens, char[] chars, size_t i, string indent = "")
     {
-        import std.string;
+        import std.string : format;
         string code;
         if (i > 0)
         {
@@ -514,63 +512,70 @@ mixin template Lexer(Token, alias defaultTokenFunction,
 
     private static string printCase(string[] tokens, string[] pseudoTokens, string indent)
     {
-        import std.algorithm;
-        string[] sortedTokens = stupidToArray(sort!"a.length > b.length"(tokens));
-        import std.conv;
+        import std.algorithm : countUntil;
+        import std.conv : text;
+        string[] sortedTokens = array(sort!"a.length > b.length"(tokens));
+
 
         if (tokens.length == 1 && tokens[0].length == 1)
         {
             if (pseudoTokens.countUntil(tokens[0]) >= 0)
             {
-                return indent ~ "return "
-                    ~ tokenHandlers[tokenHandlers.countUntil(tokens[0]) + 1]
-                    ~ "();\n";
+                return indent ~ tokenHandlers[tokenHandlers.countUntil(tokens[0]) + 1]
+                    ~ "(token);\n" ~ indent ~ "return;\n";
             }
             else if (staticTokens.countUntil(tokens[0]) >= 0)
             {
-                return indent ~ "range.popFront();\n"
-                    ~ indent ~ "return Token(_tok!\"" ~ escape(tokens[0]) ~ "\", null, line, column, index);\n";
+                return indent ~ "range.index++; range.column++;\n"
+                    ~ indent ~ "token= Token(_tok!\"" ~ escape(tokens[0]) ~ "\", null, line, column, index);\n"
+                    ~ indent ~ "return;";
             }
             else if (pseudoTokens.countUntil(tokens[0]) >= 0)
             {
-                return indent ~ "return "
-                    ~ tokenHandlers[tokenHandlers.countUntil(tokens[0]) + 1]
-                    ~ "();\n";
+                return indent ~ tokenHandlers[tokenHandlers.countUntil(tokens[0]) + 1]
+                    ~ "(token);\n" ~ indent ~ "return;\n";
+
             }
         }
 
         string code;
 
+        bool insertTrailingGoto = true;
         foreach (i, token; sortedTokens)
         {
             immutable mask = generateMask(cast (const ubyte[]) token);
             if (token.length >= 8)
                 code ~= indent ~ "if (frontBytes == " ~ mask ~ ")\n";
-            else
+            else if (token.length != 1)
                 code ~= indent ~ "if ((frontBytes & " ~ generateByteMask(token.length) ~ ") == " ~ mask ~ ")\n";
-            code ~= indent ~ "{\n";
+            if (token.length != 1)
+                code ~= indent ~ "{\n";
             if (pseudoTokens.countUntil(token) >= 0)
             {
                 if (token.length <= 8)
                 {
-                    code ~= indent ~ "    return "
+                    code ~= indent ~ "    "
                         ~ tokenHandlers[tokenHandlers.countUntil(token) + 1]
-                        ~ "();\n";
+                        ~ "(token);\n";
+                    code ~= indent ~ "return;\n";
                 }
                 else
                 {
-                    code ~= indent ~ "    if (range.peek(" ~ text(token.length - 1) ~ ") == \"" ~ escape(token) ~"\")\n";
-                    code ~= indent ~ "        return "
+                    code ~= indent ~ "    if (range.startsWith(cast (ubyte[]) \"" ~ escape(token) ~ "\")\n";
+                    code ~= indent ~ "        "
                         ~ tokenHandlers[tokenHandlers.countUntil(token) + 1]
                         ~ "();\n";
+                    code ~= indent ~ "return;\n";
                 }
             }
             else if (staticTokens.countUntil(token) >= 0)
             {
                 if (token.length <= 8)
                 {
-                    code ~= indent ~ "    range.popFrontN(" ~ text(token.length) ~ ");\n";
-                    code ~= indent ~ "    return Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
+                    insertTrailingGoto = false;
+                    code ~= indent ~ (token.length != 1 ? "    " : "") ~ "range.index += " ~ text(token.length) ~ "; range.column += " ~ text(token.length) ~ ";\n";
+                    code ~= indent ~ (token.length != 1 ? "    " : "") ~ "token = Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
+                    code ~= indent ~ (token.length != 1 ? "    " : "") ~ "return;\n";
                 }
                 else
                 {
@@ -584,34 +589,39 @@ mixin template Lexer(Token, alias defaultTokenFunction,
                 {
                     code ~= indent ~ "    if (tokenSeparatingFunction(" ~ text(token.length) ~ "))\n";
                     code ~= indent ~ "    {\n";
-                    code ~= indent ~ "        range.popFrontN(" ~ text(token.length) ~ ");\n";
-                    code ~= indent ~ "        return Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
+                    code ~= indent ~ "        range.index += " ~ text(token.length) ~ "; range.column += " ~ text(token.length) ~ ";\n";
+                    code ~= indent ~ "        token = Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
+                    code ~= indent ~ "        return;\n";
                     code ~= indent ~ "    }\n";
                     code ~= indent ~ "    else\n";
                     code ~= indent ~ "        goto _defaultTokenFunction;\n";
                 }
                 else
                 {
-                    code ~= indent ~ "    if (range.peek(" ~ text(token.length - 1) ~ ") == \"" ~ escape(token) ~"\" && isSeparating(" ~ text(token.length) ~ "))\n";
+                    code ~= indent ~ "    if (range.startsWith(cast (ubyte[]) \"" ~ escape(token) ~"\") && isSeparating(" ~ text(token.length) ~ "))\n";
                     code ~= indent ~ "    {\n";
-                    code ~= indent ~ "        range.popFrontN(" ~ text(token.length) ~ ");\n";
-                    code ~= indent ~ "        return Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
+                    code ~= indent ~ "        range.index += " ~ text(token.length) ~ "; range.column += " ~ text(token.length) ~ ";\n";
+                    code ~= indent ~ "        token =  Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
+                    code ~= indent ~ "        return;\n";
                     code ~= indent ~ "    }\n";
                     code ~= indent ~ "    else\n";
                     code ~= indent ~ "        goto _defaultTokenFunction;\n";
                 }
             }
-            code ~= indent ~ "}\n";
+            if (token.length != 1)
+            {
+                code ~= indent ~ "}\n";
+            }
         }
-        code ~= indent ~ "else\n";
-        code ~= indent ~ "    goto _defaultTokenFunction;\n";
+        if (insertTrailingGoto)
+            code ~= indent ~ "goto _defaultTokenFunction;\n";
         return code;
     }
 
     /**
      * Implements the range primitive _front.
      */
-    ref const(Token) front() pure nothrow const @property
+    ref const(Token) front() pure nothrow const @property @safe
     {
         return _front;
     }
@@ -620,20 +630,20 @@ mixin template Lexer(Token, alias defaultTokenFunction,
      * Advances the lexer to the next token and stores the new current token in
      * the _front variable.
      */
-    void _popFront() pure
+    void _popFront() pure nothrow @safe
     {
-        _front = advance();
+        advance(_front);
     }
 
     /**
      * Implements the range primitive _empty.
      */
-    bool empty() pure const nothrow @property
+    bool empty() pure const nothrow @property @safe @nogc
     {
         return _front.type == _tok!"\0";
     }
 
-    static string escape(string input)
+    static string escape(string input) pure @trusted
     {
         string retVal;
         foreach (ubyte c; cast(ubyte[]) input)
@@ -652,38 +662,33 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         return retVal;
     }
 
-    // This only exists because the real array() can't be called at compile-time
-    static string[] stupidToArray(R)(R range)
-    {
-        string[] retVal;
-        foreach (v; range)
-            retVal ~= v;
-        return retVal;
-    }
-
     enum tokenSearch = generateStatements();
 
     static ulong getFront(const ubyte[] arr) pure nothrow @trusted
     {
-        import std.stdio;
         immutable importantBits = *(cast (ulong*) arr.ptr);
         immutable filler = ulong.max >> ((8 - arr.length) * 8);
         return importantBits & filler;
     }
 
-    Token advance() pure
+    void advance(ref Token token) pure nothrow @trusted
     {
-        if (range.empty)
-            return Token(_tok!"\0");
+        if (range.index >= range.bytes.length)
+        {
+            token.type = _tok!"\0";
+            return;
+        }
         immutable size_t index = range.index;
         immutable size_t column = range.column;
         immutable size_t line = range.line;
-        immutable ulong frontBytes = getFront(range.peek(7));
+        immutable ulong frontBytes = range.index + 8 <= range.bytes.length
+            ? getFront(range.bytes[range.index .. range.index + 8])
+            : getFront(range.bytes[range.index .. $]);
         ubyte f = frontBytes & 0xff;
 //        pragma(msg, tokenSearch);
         mixin(tokenSearch);
     _defaultTokenFunction:
-        return defaultTokenFunction();
+        defaultTokenFunction(token);
     }
 
     /**
@@ -702,6 +707,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
  */
 struct LexerRange
 {
+public nothrow pure @safe @nogc:
     /**
      * Params:
      *     bytes = the _lexer input
@@ -709,7 +715,7 @@ struct LexerRange
      *     column = the initial _column number
      *     line = the initial _line number
      */
-    this(const(ubyte)[] bytes, size_t index = 0, size_t column = 1, size_t line = 1) pure nothrow @safe
+    this(const(ubyte)[] bytes, size_t index = 0, size_t column = 1, size_t line = 1)
     {
         this.bytes = bytes;
         this.index = index;
@@ -720,7 +726,7 @@ struct LexerRange
     /**
      * Returns: a mark at the current position that can then be used with slice.
      */
-    size_t mark() const nothrow pure @safe
+    size_t mark() const
     {
         return index;
     }
@@ -729,7 +735,7 @@ struct LexerRange
      * Sets the range to the given position.
      * Params: m = the position to seek to
      */
-    void seek(size_t m) nothrow pure @safe
+    void seek(size_t m)
     {
         index = m;
     }
@@ -739,7 +745,7 @@ struct LexerRange
      * current position.
      * Params m = the beginning index of the slice to return
      */
-    const(ubyte)[] slice(size_t m) const nothrow pure @safe
+    const(ubyte)[] slice(size_t m) const
     {
         return bytes[m .. index];
     }
@@ -747,7 +753,7 @@ struct LexerRange
     /**
      * Implements the range primitive _empty.
      */
-    bool empty() const nothrow pure @safe
+    bool empty() const
     {
         return index >= bytes.length;
     }
@@ -755,7 +761,7 @@ struct LexerRange
     /**
      * Implements the range primitive _front.
      */
-    ubyte front() const nothrow pure @safe
+    ubyte front() const
     {
         return bytes[index];
     }
@@ -763,7 +769,7 @@ struct LexerRange
     /**
      * Returns: the current item as well as the items $(D_PARAM p) items ahead.
      */
-    const(ubyte)[] peek(size_t p) const nothrow pure @safe
+    const(ubyte)[] peek(size_t p) const
     {
         return index + p + 1 > bytes.length
             ? bytes[index .. $]
@@ -771,9 +777,22 @@ struct LexerRange
     }
 
     /**
+     * Returns: true if the range starts with the given byte sequence
+     */
+    bool startsWith(const(ubyte[]) needle) const
+    {
+        if (needle.length + index >= bytes.length)
+            return false;
+        foreach (i; 0 .. needle.length)
+            if (needle[i] != bytes[index + i])
+                return false;
+        return true;
+    }
+
+    /**
      *
      */
-    ubyte peekAt(size_t offset) const nothrow pure @safe
+    ubyte peekAt(size_t offset) const
     {
         return bytes[index + offset];
     }
@@ -781,7 +800,7 @@ struct LexerRange
     /**
      * Returns: true if it is possible to peek $(D_PARAM p) bytes ahead.
      */
-    bool canPeek(size_t p) const nothrow pure @safe
+    bool canPeek(size_t p) const
     {
         return index + p < bytes.length;
     }
@@ -789,7 +808,7 @@ struct LexerRange
     /**
      * Implements the range primitive _popFront.
      */
-    void popFront() pure nothrow @safe
+    void popFront()
     {
         index++;
         column++;
@@ -799,7 +818,7 @@ struct LexerRange
      * Implements the algorithm _popFrontN more efficiently. This function does
      * not detect or handle newlines.
      */
-    void popFrontN(size_t n) pure nothrow @safe
+    void popFrontN(size_t n)
     {
         index += n;
         column += n;
@@ -808,7 +827,7 @@ struct LexerRange
     /**
      * Increments the range's line number and resets the column counter.
      */
-    void incrementLine(size_t i = 1) pure nothrow @safe
+    void incrementLine(size_t i = 1)
     {
         column = 1;
         line += i;
