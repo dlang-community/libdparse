@@ -2136,7 +2136,7 @@ class Formatter(Sink)
             if (newAnonClassExpression) format(newAnonClassExpression);
             else
             {
-                if (type2) format(type2);
+                if (type) format(type);
                 if (arguments) format(arguments);
                 if (assignExpression)
                 {

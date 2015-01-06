@@ -858,11 +858,6 @@ class Parser
         node.line = current().line;
         node.column = current().column;
         mixin (nullCheck!`node.ternaryExpression = parseTernaryExpression()`);
-        if (node.ternaryExpression is null)
-        {
-            deallocate(node);
-            return null;
-        }
         if (currentIsOneOf(tok!"=", tok!">>>=",
             tok!">>=", tok!"<<=",
             tok!"+=", tok!"-=", tok!"*=",
@@ -1098,11 +1093,7 @@ class Parser
         node.startLocation = openBrace.index;
         if (!currentIs(tok!"}"))
         {
-            if ((node.declarationsAndStatements = parseDeclarationsAndStatements()) is null)
-            {
-                deallocate(node);
-                return null;
-            }
+            mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements()`);
         }
         auto closeBrace = expect(tok!"}");
         if (closeBrace !is null)
@@ -3838,7 +3829,7 @@ class Parser
      * Parses a NewExpression
      *
      * $(GRAMMAR $(RULEDEF newExpression):
-     *       $(LITERAL 'new') $(RULE type2) (($(LITERAL '[') $(RULE assignExpression) $(LITERAL ']')) | $(RULE arguments))?
+     *       $(LITERAL 'new') $(RULE type) (($(LITERAL '[') $(RULE assignExpression) $(LITERAL ']')) | $(RULE arguments))?
      *     | $(RULE newAnonClassExpression)
      *     ;)
      */
@@ -3849,6 +3840,7 @@ class Parser
         //              ^^^^^^^
         // auto a = new int[10];
         //              ^^^****
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!NewExpression;
         if (peekIsOneOf(tok!"class", tok!"("))
         {
@@ -3863,7 +3855,7 @@ class Parser
         {
             expect(tok!"new");
             if (!moreTokens()) goto fail;
-            if ((node.type2 = parseType2()) is null) goto fail;
+            if ((node.type = parseType()) is null) goto fail;
             if (currentIs(tok!"["))
             {
                 advance();
@@ -5712,11 +5704,6 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         TernaryExpression node = allocate!TernaryExpression;
         mixin (nullCheck!`node.orOrExpression = parseOrOrExpression()`);
-        if (node.orOrExpression is null)
-        {
-            deallocate(node);
-            return null;
-        }
         if (currentIs(tok!"?"))
         {
             advance();
@@ -5823,8 +5810,24 @@ class Parser
         TypeSuffix[] typeSuffixes;
         loop: while (moreTokens()) switch (current.type)
         {
-        case tok!"*":
         case tok!"[":
+            // Allow this to fail because of the madness that is the
+            // newExpression rule. Something starting with '[' may be arguments
+            // to the newExpression instead of part of the type
+            auto newBookmark = setBookmark();
+            auto suffix = parseTypeSuffix();
+            if (suffix !is null)
+            {
+                abandonBookmark(newBookmark);
+                typeSuffixes ~= suffix;
+            }
+            else
+            {
+                goToBookmark(newBookmark);
+                break loop;
+            }
+            break;
+        case tok!"*":
         case tok!"delegate":
         case tok!"function":
             auto suffix = parseTypeSuffix();
@@ -6588,7 +6591,7 @@ protected:
 
     uint suppressedErrorCount;
 
-    enum MAX_ERRORS = 10;
+    enum MAX_ERRORS = 500;
 
     T[] ownArray(T)(T[] from)
     {
@@ -7190,7 +7193,7 @@ protected:
         return index;
     }
 
-    void abandonBookmark(Bookmark bookmark) nothrow
+    void abandonBookmark(Bookmark) nothrow
     {
         --suppressMessages;
         if (suppressMessages == 0)
@@ -7262,7 +7265,7 @@ protected:
         {
             if (suppressMessages > 0)
                 return;
-			auto depth = format("%4d ", _traceDepth);
+            auto depth = format("%4d ", _traceDepth);
             if (index < tokens.length)
                 writeln(depth, message, "(", current.line, ":", current.column, ")");
             else

@@ -2080,10 +2080,10 @@ final class NewExpression : ExpressionNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(newAnonClassExpression, type2, arguments,
+        mixin (visitIfNotNull!(newAnonClassExpression, type, arguments,
             assignExpression));
     }
-    /** */ Type2 type2;
+    /** */ Type type;
     /** */ NewAnonClassExpression newAnonClassExpression;
     /** */ Arguments arguments;
     /** */ AssignExpression assignExpression;
