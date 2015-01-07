@@ -54,3 +54,4 @@ int a = typeid(int).alignof;
 int a = typeid(10).alignof;
 int a = (int).sizeof;
 enum string STRING_CONSTANT = "abc";
+Size[][] minSizes = new Size[][](cols, rows);
