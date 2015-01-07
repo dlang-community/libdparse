@@ -718,7 +718,6 @@ class Formatter(Sink)
 
         if (decl.baseClassList)
         {
-            put(": ");
             format(decl.baseClassList);
         }
 
@@ -1813,7 +1812,6 @@ class Formatter(Sink)
             }
             if (baseClassList)
             {
-                put(": ");
                 format(baseClassList);
             }
 
