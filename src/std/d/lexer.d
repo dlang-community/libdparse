@@ -1933,6 +1933,22 @@ public pure nothrow @nogc:
      * power of two
      */
     this(size_t bucketCount) nothrow @trusted @nogc
+    in
+    {
+        import core.bitop : popcnt;
+        static if (size_t.sizeof == 8)
+        {
+            immutable low = popcnt(cast(uint) bucketCount);
+            immutable high = popcnt(cast(uint) (bucketCount >> 32));
+            assert ((low == 0 && high == 1) || (low == 1 && high == 0));
+        }
+        else
+        {
+            static assert (size_t.sizeof == 4);
+            assert (popcnt(cast(uint) bucketCount) == 1);
+        }
+    }
+    body
     {
         buckets = (cast(Node**) calloc((Node*).sizeof, bucketCount))[0 .. bucketCount];
     }
