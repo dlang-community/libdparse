@@ -2005,8 +2005,6 @@ private:
 
     string _intern(const(ubyte)[] bytes) @trusted
     {
-        if (bytes is null || bytes.length == 0)
-            return "";
         immutable uint hash = hashBytes(bytes);
         immutable size_t index = hash & (buckets.length - 1);
         Node* s = find(bytes, hash);
@@ -2092,7 +2090,7 @@ private:
     }
     body
     {
-        if (numBytes > (blockSize / 4))
+        if (numBytes > BIG_STRING)
             return (cast(ubyte*) malloc(numBytes))[0 .. numBytes];
         Block* r = rootBlock;
         size_t i = 0;
@@ -2111,7 +2109,7 @@ private:
             r = r.next;
         }
         Block* b = cast(Block*) malloc(Block.sizeof);
-        b.bytes = (cast(ubyte*) malloc(blockSize))[0 .. blockSize];
+        b.bytes = (cast(ubyte*) malloc(BLOCK_SIZE))[0 .. BLOCK_SIZE];
         b.used = numBytes;
         b.next = rootBlock;
         rootBlock = b;
@@ -2132,7 +2130,11 @@ private:
         Block* next;
     }
 
-    static enum blockSize = 1024 * 16;
+    enum BLOCK_SIZE = 1024 * 16;
+
+    // If a string would take up more than 1/4 of a block, allocate it outside
+    // of the block.
+    enum BIG_STRING = BLOCK_SIZE / 4;
 
     Node*[] buckets;
     Block* rootBlock;
