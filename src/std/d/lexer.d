@@ -1912,7 +1912,7 @@ body
 /**
  * The string cache is used for string interning.
  *
- * It will only story a single copy of any string that it is asked to hold.
+ * It will only store a single copy of any string that it is asked to hold.
  * Interned strings can be compared for equality by comparing their $(B .ptr)
  * field.
  *
