@@ -2764,7 +2764,7 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("Symbol");
 
-        if (symbol.dot != tok!"")
+        if (symbol.dot)
             put(".");
         format(symbol.identifierOrTemplateChain);
     }
@@ -3214,6 +3214,11 @@ class Formatter(Sink)
         else if (type2.typeofExpression !is null)
         {
             format(type2.typeofExpression);
+            if (type2.identifierOrTemplateChain)
+            {
+                put(".");
+                format(type2.identifierOrTemplateChain);
+            }
             return;
         }
         else if (type2.typeConstructor != tok!"")
@@ -3226,12 +3231,6 @@ class Formatter(Sink)
         else
         {
             put(tokenRep(type2.builtinType));
-        }
-
-        if (type2.identifierOrTemplateChain)
-        {
-            put(".");
-            format(type2.identifierOrTemplateChain);
         }
     }
 
