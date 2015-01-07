@@ -465,7 +465,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         // Array consisting of a sorted list of the first characters of the
         // tokens.
         char[] beginningChars = getBeginningChars(allTokens);
-        size_t i = calcSplitCount(beginningChars.length, 128);
+        size_t i = calcSplitCount(beginningChars.length, 8);
         return generateStatementsStep(allTokens, pseudoTokens, beginningChars, i);
     }
 
