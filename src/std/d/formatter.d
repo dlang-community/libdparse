@@ -2069,6 +2069,7 @@ class Formatter(Sink)
     void format(const ModuleDeclaration moduleDeclaration)
     {
         debug(verbose) writeln("ModuleDeclaration");
+        if (moduleDeclaration is null) return;
 
         /**
         IdentifierChain moduleName;
@@ -3722,6 +3723,7 @@ protected:
             case allman: newline(); break;
             case otbs: space(); break;
         }
+        putIndent();
         put("{");
         indent();
     }
@@ -3730,6 +3732,7 @@ protected:
     {
         outdent();
         newline();
+        putIndent();
         put("}");
     }
 
@@ -3747,8 +3750,7 @@ protected:
     {
         import std.string : splitLines;
         if (!c.length) return;
-        lineGap(1);
-        put(c.splitLines().map!(l => getIndent() ~ l).join("\n"));
+        put(c.splitLines().join("\n" ~ getIndent()));
         newlineIndent();
     }
 
@@ -3758,7 +3760,6 @@ protected:
         {
             foreach(count, attr; attrs)
             {
-                space();
                 format(attr);
                 space();
             }
