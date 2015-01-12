@@ -6030,8 +6030,7 @@ class Parser
         switch (current.type)
         {
         case tok!"*":
-            node.star = true;
-            advance();
+            node.star = advance();
             return node;
         case tok!"[":
             node.array = true;

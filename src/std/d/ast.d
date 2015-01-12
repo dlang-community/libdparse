@@ -2994,7 +2994,7 @@ public:
     }
 
     /** */ Token delegateOrFunction;
-    /** */ bool star;
+    /** */ Token star;
     /** */ bool array;
     /** */ Type type;
     /** */ AssignExpression low;

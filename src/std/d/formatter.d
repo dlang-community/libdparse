@@ -3266,7 +3266,7 @@ class Formatter(Sink)
         MemberFunctionAttribute[] memberFunctionAttributes;
         **/
 
-        if (typeSuffix.star)
+        if (typeSuffix.star.type != tok!"")
         {
             put("*");
             return;
