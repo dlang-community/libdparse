@@ -543,7 +543,10 @@ public struct DLexer
     ///
     public void popFront() pure nothrow @safe
     {
-        _popFront();
+        do
+            _popFront();
+        while (config.whitespaceBehavior == WhitespaceBehavior.skip
+            && _front.type == tok!"whitespace");
     }
 
 private pure nothrow @safe:
