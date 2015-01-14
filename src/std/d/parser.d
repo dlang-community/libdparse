@@ -2645,7 +2645,8 @@ class Parser
      * Parses a ForeachType
      *
      * $(GRAMMAR $(RULEDEF foreachType):
-     *     $(RULE typeConstructors)? $(RULE type)? $(LITERAL Identifier)
+     *       $(LITERAL 'ref')? $(RULE typeConstructors)? $(RULE type)? $(LITERAL Identifier)
+     *     | $(RULE typeConstructors)? $(LITERAL 'ref')? $(RULE type)? $(LITERAL Identifier)
      *     ;)
      */
     ForeachType parseForeachType()
@@ -2663,6 +2664,11 @@ class Parser
             trace("\033[01;36mType constructor");
             if ((node.typeConstructors = parseTypeConstructors()) is null)
                 return null;
+        }
+        if (currentIs(tok!"ref"))
+        {
+            node.isRef = true;
+            advance();
         }
         if (currentIs(tok!"identifier") && peekIsOneOf(tok!",", tok!";"))
         {

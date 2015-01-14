@@ -28,6 +28,8 @@ deprecated void foo()
 	foreach (a, b; c) {}
 	foreach (a; c .. d) {}
 	foreach (ref a; c .. d) {}
+	foreach (ref const a; c .. d) {}
+	foreach (const ref a; c .. d) {}
 	foreach (inout a; c .. d) {}
 	scope(failure) complain();
 	scope(success) celebrate();
