@@ -462,6 +462,7 @@ class Formatter(Sink)
             }
             if (deprecated_) format(deprecated_);
             if (atAttribute) format(atAttribute);
+            if (linkageAttribute) format(linkageAttribute);
         }
     }
 
@@ -718,7 +719,6 @@ class Formatter(Sink)
 
         if (decl.baseClassList)
         {
-            put(": ");
             format(decl.baseClassList);
         }
 
@@ -1462,6 +1462,9 @@ class Formatter(Sink)
         putComment(decl.comment);
         putAttrs(attrs);
 
+        foreach (sc; decl.storageClasses)
+            format(sc);
+
         if (decl.returnType)
             format(decl.returnType);
 
@@ -1813,7 +1816,6 @@ class Formatter(Sink)
             }
             if (baseClassList)
             {
-                put(": ");
                 format(baseClassList);
             }
 
@@ -2631,6 +2633,7 @@ class Formatter(Sink)
         /**
         AtAttribute atAttribute;
         Deprecated deprecated_;
+        LinkageAttribute linkageAttribute;
         Token token;
         **/
 
@@ -2638,6 +2641,7 @@ class Formatter(Sink)
         {
             if (atAttribute) format(atAttribute);
             else if (deprecated_) format(deprecated_);
+            else if (linkageAttribute) format(linkageAttribute);
             else format(token);
         }
     }
