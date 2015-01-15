@@ -1462,6 +1462,9 @@ class Formatter(Sink)
         putComment(decl.comment);
         putAttrs(attrs);
 
+        foreach (sc; decl.storageClasses)
+            format(sc);
+
         if (decl.returnType)
             format(decl.returnType);
 
