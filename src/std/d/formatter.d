@@ -462,6 +462,7 @@ class Formatter(Sink)
             }
             if (deprecated_) format(deprecated_);
             if (atAttribute) format(atAttribute);
+            if (linkageAttribute) format(linkageAttribute);
         }
     }
 
