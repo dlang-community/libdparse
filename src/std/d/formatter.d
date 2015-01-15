@@ -2633,6 +2633,7 @@ class Formatter(Sink)
         /**
         AtAttribute atAttribute;
         Deprecated deprecated_;
+        LinkageAttribute linkageAttribute;
         Token token;
         **/
 
@@ -2640,6 +2641,7 @@ class Formatter(Sink)
         {
             if (atAttribute) format(atAttribute);
             else if (deprecated_) format(deprecated_);
+            else if (linkageAttribute) format(linkageAttribute);
             else format(token);
         }
     }
