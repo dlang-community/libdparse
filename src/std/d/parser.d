@@ -3623,6 +3623,7 @@ class Parser
      *     | $(LITERAL 'inout')
      *     | $(LITERAL 'shared')
      *     | $(LITERAL 'const')
+     *     | $(LITERAL 'return')
      *     ;)
      */
     MemberFunctionAttribute parseMemberFunctionAttribute()
@@ -3640,6 +3641,7 @@ class Parser
         case tok!"const":
         case tok!"pure":
         case tok!"nothrow":
+        case tok!"return":
             node.tokenType = advance().type;
             break;
         default:
@@ -4104,6 +4106,7 @@ class Parser
      *     | $(LITERAL 'ref')
      *     | $(LITERAL 'scope')
      *     | $(LITERAL 'auto')
+     *     | $(LITERAL 'return')
      *     ;)
      */
     IdType parseParameterAttribute(bool validate = false)
@@ -4126,6 +4129,7 @@ class Parser
         case tok!"ref":
         case tok!"scope":
         case tok!"auto":
+        case tok!"return":
             return advance().type;
         default:
             if (validate)
@@ -6913,6 +6917,7 @@ protected:
         case tok!"@":
         case tok!"pure":
         case tok!"nothrow":
+        case tok!"return":
             return true;
         default:
             return false;
