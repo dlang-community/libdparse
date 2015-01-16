@@ -5714,7 +5714,9 @@ class Parser
         {
             advance();
             mixin (nullCheck!`node.expression = parseExpression()`);
-            if (expect(tok!":") is null) { deallocate(node); return null; }
+            auto colon = expect(tok!":");
+            if (colon is null) { deallocate(node); return null; }
+            node.colon = *colon;
             mixin (nullCheck!`node.ternaryExpression = parseTernaryExpression()`);
         }
         return node;
