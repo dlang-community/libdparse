@@ -621,7 +621,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
     /**
      * Implements the range primitive _front.
      */
-    ref const(Token) front() pure nothrow const @property @safe
+    ref const(Token) front()() pure nothrow const @property @safe
     {
         return _front;
     }
@@ -630,7 +630,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
      * Advances the lexer to the next token and stores the new current token in
      * the _front variable.
      */
-    void _popFront() pure nothrow @safe
+    void _popFront()() pure nothrow @safe
     {
         advance(_front);
     }
@@ -638,7 +638,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
     /**
      * Implements the range primitive _empty.
      */
-    bool empty() pure const nothrow @property @safe @nogc
+    bool empty()() pure const nothrow @property @safe @nogc
     {
         return _front.type == _tok!"\0";
     }
@@ -707,6 +707,9 @@ mixin template Lexer(Token, alias defaultTokenFunction,
  */
 struct LexerRange
 {
+    // TODO: When D gets @forceinline the template inline hack (i.e
+    // `void front()() { ... }` )should be removed.
+
 public nothrow pure @safe @nogc:
     /**
      * Params:
@@ -726,7 +729,7 @@ public nothrow pure @safe @nogc:
     /**
      * Returns: a mark at the current position that can then be used with slice.
      */
-    size_t mark() const
+    size_t mark()() const
     {
         return index;
     }
@@ -735,7 +738,7 @@ public nothrow pure @safe @nogc:
      * Sets the range to the given position.
      * Params: m = the position to seek to
      */
-    void seek(size_t m)
+    void seek()(size_t m)
     {
         index = m;
     }
@@ -745,7 +748,7 @@ public nothrow pure @safe @nogc:
      * current position.
      * Params m = the beginning index of the slice to return
      */
-    const(ubyte)[] slice(size_t m) const
+    const(ubyte)[] slice()(size_t m) const
     {
         return bytes[m .. index];
     }
@@ -753,7 +756,7 @@ public nothrow pure @safe @nogc:
     /**
      * Implements the range primitive _empty.
      */
-    bool empty() const
+    bool empty()() const
     {
         return index >= bytes.length;
     }
@@ -761,7 +764,7 @@ public nothrow pure @safe @nogc:
     /**
      * Implements the range primitive _front.
      */
-    ubyte front() const
+    ubyte front()() const
     {
         return bytes[index];
     }
@@ -792,7 +795,7 @@ public nothrow pure @safe @nogc:
     /**
      *
      */
-    ubyte peekAt(size_t offset) const
+    ubyte peekAt()(size_t offset) const
     {
         return bytes[index + offset];
     }
@@ -800,7 +803,7 @@ public nothrow pure @safe @nogc:
     /**
      * Returns: true if it is possible to peek $(D_PARAM p) bytes ahead.
      */
-    bool canPeek(size_t p) const
+    bool canPeek()(size_t p) const
     {
         return index + p < bytes.length;
     }
@@ -808,7 +811,7 @@ public nothrow pure @safe @nogc:
     /**
      * Implements the range primitive _popFront.
      */
-    void popFront()
+    void popFront()()
     {
         index++;
         column++;
@@ -818,7 +821,7 @@ public nothrow pure @safe @nogc:
      * Implements the algorithm _popFrontN more efficiently. This function does
      * not detect or handle newlines.
      */
-    void popFrontN(size_t n)
+    void popFrontN()(size_t n)
     {
         index += n;
         column += n;
@@ -827,7 +830,7 @@ public nothrow pure @safe @nogc:
     /**
      * Increments the range's line number and resets the column counter.
      */
-    void incrementLine(size_t i = 1)
+    void incrementLine()(size_t i = 1)
     {
         column = 1;
         line += i;

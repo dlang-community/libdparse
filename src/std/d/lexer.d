@@ -541,7 +541,7 @@ public struct DLexer
     }
 
     ///
-    public void popFront() pure nothrow @safe
+    public void popFront()() pure nothrow @safe
     {
         do
             _popFront();
@@ -575,20 +575,17 @@ private pure nothrow @safe:
         switch (range.bytes[range.index])
         {
         case '\r':
-            range.index++;
-            range.column++;
+            range.popFront();
             if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '\n')
             {
-                range.index++;
-                range.column++;
+                range.popFront();
                 range.incrementLine();
             }
             else
                 range.incrementLine();
             return;
         case '\n':
-            range.index++;
-            range.column++;
+            range.popFront();
             range.incrementLine();
             return;
         case 0xe2:
@@ -603,13 +600,11 @@ private pure nothrow @safe:
             }
             else
             {
-                range.index++;
-                range.column++;
+                range.popFront();
                 return;
             }
         default:
-            range.index++;
-            range.column++;
+            range.popFront();
             return;
         }
     }
@@ -622,26 +617,22 @@ private pure nothrow @safe:
             switch (range.bytes[range.index])
             {
             case '\r':
-                range.index++;
-                range.column++;
+                range.popFront();
                 if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '\n')
                 {
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                 }
                 range.column = 1;
                 range.line += 1;
                 break;
             case '\n':
-                range.index++;
-                range.column++;
+                range.popFront();
                 range.column = 1;
                 range.line += 1;
                 break;
             case ' ':
             case '\t':
-                range.index++;
-                range.column++;
+                range.popFront();
                 break;
             case 0xe2:
                 if (range.index + 2 >= range.bytes.length)
@@ -714,8 +705,7 @@ private pure nothrow @safe:
             case 'A': .. case 'F':
             case '0': .. case '9':
             case '_':
-                range.index++;
-                range.column++;
+                range.popFront();
                 break;
             case 'u':
             case 'U':
@@ -758,8 +748,7 @@ private pure nothrow @safe:
                     else
                     {
                     doubleLiteral:
-                        range.index++;
-                        range.column++;
+                        range.popFront();
                         foundDot = true;
                         type = tok!"doubleLiteral";
                     }
@@ -789,8 +778,7 @@ private pure nothrow @safe:
             case '0':
             case '1':
             case '_':
-                range.index++;
-                range.column++;
+                range.popFront();
                 break;
             case 'u':
             case 'U':
@@ -817,8 +805,7 @@ private pure nothrow @safe:
         IdType type = tok!"intLiteral";
         if (foundDot)
         {
-            range.index++;
-            range.column++;
+            range.popFront();
             type = tok!"doubleLiteral";
         }
 
@@ -828,8 +815,7 @@ private pure nothrow @safe:
             {
             case '0': .. case '9':
             case '_':
-                range.index++;
-                range.column++;
+                range.popFront();
                 break;
             case 'u':
             case 'U':
@@ -879,8 +865,7 @@ private pure nothrow @safe:
                     else
                     {
                     doubleLiteral:
-                        range.index++;
-                        range.column++;
+                        range.popFront();
                         foundDot = true;
                         type = tok!"doubleLiteral";
                     }
@@ -904,8 +889,7 @@ private pure nothrow @safe:
                 type = tok!"uintLiteral";
             else
                 type = tok!"ulongLiteral";
-            range.index++;
-            range.column++;
+            range.popFront();
             if (secondPass)
                 return;
             if (range.bytes[range.index] == 'L' || range.bytes[range.index] == 'l')
@@ -919,8 +903,7 @@ private pure nothrow @safe:
                 type = tok!"ulongLiteral";
             else
                 type = tok!"longLiteral";
-            range.index++;
-            range.column++;
+            range.popFront();
             if (range.bytes[range.index] == 'U' || range.bytes[range.index] == 'u')
             {
                 secondPass = true;
@@ -935,14 +918,12 @@ private pure nothrow @safe:
         switch (range.bytes[range.index])
         {
         case 'L':
-            range.index++;
-            range.column++;
+            range.popFront();
             type = tok!"doubleLiteral";
             break;
         case 'f':
         case 'F':
-            range.index++;
-            range.column++;
+            range.popFront();
             type = tok!"floatLiteral";
             break;
         default:
@@ -951,8 +932,7 @@ private pure nothrow @safe:
         if (!(range.index >= range.bytes.length) && range.bytes[range.index] == 'i')
         {
             warning("Complex number literals are deprecated");
-            range.index++;
-            range.column++;
+            range.popFront();
             if (type == tok!"floatLiteral")
                 type = tok!"ifloatLiteral";
             else
@@ -962,8 +942,7 @@ private pure nothrow @safe:
 
     void lexExponent(ref IdType type) pure nothrow @safe
     {
-        range.index++;
-        range.column++;
+        range.popFront();
         bool foundSign = false;
         bool foundDigit = false;
         while (!(range.index >= range.bytes.length))
@@ -979,14 +958,12 @@ private pure nothrow @safe:
                     return;
                 }
                 foundSign = true;
-                range.index++;
-                range.column++;
+                range.popFront();
                 break;
             case '0': .. case '9':
             case '_':
                 foundDigit = true;
-                range.index++;
-                range.column++;
+                range.popFront();
                 break;
             case 'L':
             case 'f':
@@ -1007,8 +984,7 @@ private pure nothrow @safe:
         mixin (tokenStart);
         while (!(range.index >= range.bytes.length) && !isNewline)
         {
-            range.index++;
-            range.column++;
+            range.popFront();
         }
         token = Token(tok!"scriptLine", cache.intern(range.slice(mark)),
             line, column, index);
@@ -1019,8 +995,7 @@ private pure nothrow @safe:
         mixin (tokenStart);
         while (!(range.index >= range.bytes.length) && !isNewline)
         {
-            range.index++;
-            range.column++;
+            range.popFront();
         }
         token = Token(tok!"specialTokenSequence", cache.intern(range.slice(mark)),
             line, column, index);
@@ -1035,12 +1010,10 @@ private pure nothrow @safe:
         {
             if (range.bytes[range.index] == '*')
             {
-                range.index++;
-                range.column++;
+                range.popFront();
                 if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '/')
                 {
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                     break;
                 }
             }
@@ -1061,8 +1034,7 @@ private pure nothrow @safe:
         {
             if (range.bytes[range.index] == '\r' || range.bytes[range.index] == '\n')
                 break;
-            range.index++;
-            range.column++;
+            range.popFront();
         }
     end:
         token =  Token(type, cache.intern(range.slice(mark)), line, column,
@@ -1080,23 +1052,19 @@ private pure nothrow @safe:
         {
             if (range.bytes[range.index] == '+')
             {
-                range.index++;
-                range.column++;
+                range.popFront();
                 if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '/')
                 {
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                     depth--;
                 }
             }
             else if (range.bytes[range.index] == '/')
             {
-                range.index++;
-                range.column++;
+                range.popFront();
                 if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '+')
                 {
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                     depth++;
                 }
             }
@@ -1110,8 +1078,7 @@ private pure nothrow @safe:
     void lexStringLiteral(ref Token token)
     {
         mixin (tokenStart);
-        range.index++;
-            range.column++;
+        range.popFront();
         while (true)
         {
             if ((range.index >= range.bytes.length))
@@ -1122,8 +1089,7 @@ private pure nothrow @safe:
             }
             else if (range.bytes[range.index] == '"')
             {
-                range.index++;
-                range.column++;
+                range.popFront();
                 break;
             }
             else if (range.bytes[range.index] == '\\')
@@ -1146,8 +1112,7 @@ private pure nothrow @safe:
         bool backtick = range.bytes[range.index] == '`';
         if (backtick)
         {
-            range.index++;
-            range.column++;
+            range.popFront();
             while (true)
             {
                 if ((range.index >= range.bytes.length))
@@ -1158,8 +1123,7 @@ private pure nothrow @safe:
                 }
                 else if (range.bytes[range.index] == '`')
                 {
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                     break;
                 }
                 else
@@ -1168,16 +1132,14 @@ private pure nothrow @safe:
         }
         else
         {
-            range.index++;
-            range.column++;
+            range.popFront();
             if ((range.index >= range.bytes.length))
             {
                 error("Error: unterminated string literal");
                 token = Token(tok!"");
                 return;
             }
-            range.index++;
-            range.column++;
+            range.popFront();
             while (true)
             {
                 if ((range.index >= range.bytes.length))
@@ -1188,8 +1150,7 @@ private pure nothrow @safe:
                 }
                 else if (range.bytes[range.index] == '"')
                 {
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                     break;
                 }
                 else
@@ -1212,9 +1173,9 @@ private pure nothrow @safe:
         {
             switch (range.bytes[range.index])
             {
-            case 'w': range.index++; range.column++; type = tok!"wstringLiteral"; return 'w';
-            case 'd': range.index++; range.column++; type = tok!"dstringLiteral"; return 'd';
-            case 'c': range.index++; range.column++; type = tok!"stringLiteral"; return 'c';
+            case 'w': range.popFront(); type = tok!"wstringLiteral"; return 'w';
+            case 'd': range.popFront(); type = tok!"dstringLiteral"; return 'd';
+            case 'c': range.popFront(); type = tok!"stringLiteral"; return 'c';
             default: type = tok!"stringLiteral"; return 0;
             }
         }
@@ -1232,29 +1193,25 @@ private pure nothrow @safe:
         case '<':
             open = '<';
             close = '>';
-            range.index++;
-            range.column++;
+            range.popFront();
             lexNormalDelimitedString(token, mark, line, column, index, open, close);
             break;
         case '{':
             open = '{';
             close = '}';
-            range.index++;
-            range.column++;
+            range.popFront();
             lexNormalDelimitedString(token, mark, line, column, index, open, close);
             break;
         case '[':
             open = '[';
             close = ']';
-            range.index++;
-            range.column++;
+            range.popFront();
             lexNormalDelimitedString(token, mark, line, column, index, open, close);
             break;
         case '(':
             open = '(';
             close = ')';
-            range.index++;
-            range.column++;
+            range.popFront();
             lexNormalDelimitedString(token, mark, line, column, index, open, close);
             break;
         default:
@@ -1272,20 +1229,17 @@ private pure nothrow @safe:
             if (range.bytes[range.index] == open)
             {
                 depth++;
-                range.index++;
-                range.column++;
+                range.popFront();
             }
             else if (range.bytes[range.index] == close)
             {
                 depth--;
-                range.index++;
-                range.column++;
+                range.popFront();
                 if (depth <= 0)
                 {
                     if (range.bytes[range.index] == '"')
                     {
-                        range.index++;
-                        range.column++;
+                        range.popFront();
                     }
                     else
                     {
@@ -1329,14 +1283,12 @@ private pure nothrow @safe:
             }
             else
             {
-                range.index++;
-                range.column++;
+                range.popFront();
             }
         }
         if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '"')
         {
-            range.index++;
-            range.column++;
+            range.popFront();
         }
         else
             error(`" expected`);
@@ -1349,11 +1301,9 @@ private pure nothrow @safe:
     {
         mixin (tokenStart);
         assert (range.bytes[range.index] == 'q');
-        range.index++;
-        range.column++;
+        range.popFront();
         assert (range.bytes[range.index] == '{');
-        range.index++;
-        range.column++;
+        range.popFront();
         auto app = appender!string();
         app.put("q{");
         int depth = 1;
@@ -1419,12 +1369,10 @@ private pure nothrow @safe:
             case '0': .. case '9':
             case 'A': .. case 'F':
             case 'a': .. case 'f':
-                range.index++;
-                range.column++;
+                range.popFront();
                 break;
             case '"':
-                range.index++;
-                range.column++;
+                range.popFront();
                 break loop;
             default:
                 error("Error: invalid character in hex string");
@@ -1441,8 +1389,7 @@ private pure nothrow @safe:
 
     bool lexEscapeSequence()
     {
-        range.index++;
-            range.column++;
+        range.popFront();
         if ((range.index >= range.bytes.length))
         {
             error("Error: non-terminated character escape sequence.");
@@ -1461,12 +1408,10 @@ private pure nothrow @safe:
         case 'r':
         case 't':
         case 'v':
-            range.index++;
-            range.column++;
+            range.popFront();
             break;
         case 'x':
-            range.index++;
-            range.column++;
+            range.popFront();
             foreach (i; 0 .. 2)
             {
                 if ((range.index >= range.bytes.length))
@@ -1479,8 +1424,7 @@ private pure nothrow @safe:
                 case '0': .. case '9':
                 case 'a': .. case 'f':
                 case 'A': .. case 'F':
-                    range.index++;
-            range.column++;
+                    range.popFront();
                     break;
                 default:
                     error("Error: 2 hex digits expected.");
@@ -1491,19 +1435,16 @@ private pure nothrow @safe:
         case '0':
             if (!(range.index + 1 < range.bytes.length) || ((range.index + 1 < range.bytes.length) && range.peekAt(1) == '\''))
             {
-                range.index++;
-            range.column++;
+                range.popFront();
                 break;
             }
             goto case;
         case '1': .. case '7':
             for (size_t i = 0; i < 3 && !(range.index >= range.bytes.length) && range.bytes[range.index] >= '0' && range.bytes[range.index] <= '7'; i++)
-                range.index++;
-            range.column++;
+                range.popFront();
             break;
         case 'u':
-            range.index++;
-            range.column++;
+            range.popFront();
             foreach (i; 0 .. 4)
             {
                 if ((range.index >= range.bytes.length))
@@ -1516,8 +1457,7 @@ private pure nothrow @safe:
                 case '0': .. case '9':
                 case 'a': .. case 'f':
                 case 'A': .. case 'F':
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                     break;
                 default:
                     error("Error: at least 4 hex digits expected.");
@@ -1526,8 +1466,7 @@ private pure nothrow @safe:
             }
             break;
         case 'U':
-            range.index++;
-            range.column++;
+            range.popFront();
             foreach (i; 0 .. 8)
             {
                 if ((range.index >= range.bytes.length))
@@ -1540,8 +1479,7 @@ private pure nothrow @safe:
                 case '0': .. case '9':
                 case 'a': .. case 'f':
                 case 'A': .. case 'F':
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                     break;
                 default:
                     error("Error: at least 8 hex digits expected.");
@@ -1559,14 +1497,12 @@ private pure nothrow @safe:
                 }
                 if (range.bytes[range.index] == ';')
                 {
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                     break;
                 }
                 else
                 {
-                    range.index++;
-                    range.column++;
+                    range.popFront();
                 }
             }
         }
@@ -1576,8 +1512,7 @@ private pure nothrow @safe:
     void lexCharacterLiteral(ref Token token)
     {
         mixin (tokenStart);
-        range.index++;
-        range.column++;
+        range.popFront();
         if (range.bytes[range.index] == '\\')
         {
             lexEscapeSequence();
@@ -1585,8 +1520,7 @@ private pure nothrow @safe:
         }
         else if (range.bytes[range.index] == '\'')
         {
-            range.index++;
-            range.column++;
+            range.popFront();
             token = Token(tok!"characterLiteral", cache.intern(range.slice(mark)),
                 line, column, index);
         }
@@ -1594,8 +1528,7 @@ private pure nothrow @safe:
         {
             while (range.bytes[range.index] & 0x80)
             {
-                range.index++;
-                range.column++;
+                range.popFront();
             }
             goto close;
         }
@@ -1607,8 +1540,7 @@ private pure nothrow @safe:
     close:
         if (range.bytes[range.index] == '\'')
         {
-            range.index++;
-            range.column++;
+            range.popFront();
             token = Token(tok!"characterLiteral", cache.intern(range.slice(mark)),
                 line, column, index);
         }
@@ -1625,13 +1557,11 @@ private pure nothrow @safe:
         if (isSeparating(0))
         {
             error("Invalid identifier");
-            range.index++;
-            range.column++;
+            range.popFront();
         }
         do
         {
-            range.index++;
-            range.column++;
+            range.popFront();
         }
         while (!isSeparating(0));
         token = Token(tok!"identifier", cache.intern(range.slice(mark)), line,
@@ -1643,8 +1573,7 @@ private pure nothrow @safe:
         mixin (tokenStart);
         if (!(range.index + 1 < range.bytes.length))
         {
-            range.index++;
-            range.column++;
+            range.popFront();
             token = Token(tok!".", null, line, column, index);
             return;
         }
@@ -1654,22 +1583,18 @@ private pure nothrow @safe:
             lexNumber(token);
             return;
         case '.':
-            range.index++;
-            range.column++;
-            range.index++;
-            range.column++;
+            range.popFront();
+            range.popFront();
             if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '.')
             {
-                range.index++;
-                range.column++;
+                range.popFront();
                 token = Token(tok!"...", null, line, column, index);
             }
             else
                 token = Token(tok!"..", null, line, column, index);
             return;
         default:
-            range.index++;
-            range.column++;
+            range.popFront();
             token = Token(tok!".", null, line, column, index);
             return;
         }
@@ -1678,12 +1603,9 @@ private pure nothrow @safe:
     void lexLongNewline(ref Token token) @nogc
     {
         mixin (tokenStart);
-        range.index++;
-            range.column++;
-        range.index++;
-            range.column++;
-        range.index++;
-            range.column++;
+        range.popFront();
+        range.popFront();
+        range.popFront();
         range.incrementLine();
         string text = config.whitespaceBehavior == WhitespaceBehavior.include
             ? cache.intern(range.slice(mark)) : "";
