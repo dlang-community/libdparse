@@ -2893,6 +2893,8 @@ public:
     /** */ ExpressionNode orOrExpression;
     /** */ ExpressionNode expression;
     /** */ ExpressionNode ternaryExpression;
+    /// Store this so that we know where the ':' is
+    Token colon;
     mixin OpEquals;
 }
 
