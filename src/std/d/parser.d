@@ -590,10 +590,8 @@ class Parser
                 trace("Found register");
                 mixin (nullCheck!`(node.register = parseRegister())`);
             }
-            else if (peekIs(tok!"."))
-                mixin (nullCheck!`node.identifierChain = parseIdentifierChain()`);
             else
-                node.token = advance();
+                mixin (nullCheck!`node.identifierChain = parseIdentifierChain()`);
             break;
         default:
             error("Float literal, integer literal, $, or identifier expected.");
