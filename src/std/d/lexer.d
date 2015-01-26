@@ -1058,33 +1058,14 @@ private pure nothrow @safe:
         mixin (tokenStart);
         IdType type = tok!"comment";
         range.popFrontN(2);
-        version (iasm64NotWindows)
+        while (range.index < range.bytes.length)
         {
-            enum ushort STAR_SLASH = '*' + ('/' << 8);
-            ubyte* src = cast(ubyte*) range.bytes.ptr + range.index;
-            const ubyte* srcEnd = src + range.bytes.length;
-            ulong commentEnd = 0;
-            while (haveSSE42 && src + 16 < srcEnd)
+            version (iasm64NotWindows)
             {
-                commentEnd = firstIndexOf(src, STAR_SLASH);
-                if (commentEnd >= 15)
-                {
-                    range.line += popcnt(newlineMask(src));
-                    range.index += 14;
-                    src += 14;
-                }
-                else
-                {
-                    size_t m = (1 << commentEnd) - 1;
-                    range.line += popcnt(newlineMask(src) & m);
-                    range.index += commentEnd;
-                    src += commentEnd;
-                    goto end;
-                }
+                if (haveSSE42 && range.index + 16 < range.bytes.length)
+                    skip!(false, '\r', '\n', '/', '*', 0x80)(range.bytes.ptr + range.index,
+                        &range.index, &range.column);
             }
-        }
-        while (!(range.index >= range.bytes.length))
-        {
             if (range.bytes[range.index] == '*')
             {
                 range.popFront();
@@ -2312,24 +2293,6 @@ version (D_InlineAsm_X86_64) version (linux)
     }
 
     /**
-     *
-     */
-    ulong firstIndexOf(const ubyte*, ubyte) pure nothrow @trusted @nogc
-    {
-        asm
-        {
-            naked;
-            movdqu XMM1, [RSI];
-            movq XMM2, RDI;
-            mov RAX, 1;
-            mov RDX, 16;
-            pcmpestri XMM2, XMM1, 0;
-            mov RAX, RCX;
-            ret;
-        }
-    }
-
-    /**
      * Skips between 0 and 16 bytes that match (or do not match) the ranges
      * specified by $(B chars).
      */
@@ -2352,35 +2315,6 @@ version (D_InlineAsm_X86_64) version (linux)
             mov RDX, 16;
             pcmpestri XMM2, XMM1, matchAheadFlags;
             mov RAX, RCX;
-            ret;
-        }
-    }
-
-    /**
-     *
-     */
-    ulong firstIndexOf(const ubyte*, ushort) pure nothrow @trusted @nogc
-    {
-        asm
-        {
-            naked;
-            movdqu XMM0, [RSI];
-            and RDI, 0xffff;
-            movq XMM1, RDI;
-            pcmpistri XMM1, XMM0, 0b0000_1100;
-            mov RAX, RCX;
-            add RAX, 2;
-            ret;
-        }
-    }
-
-    ulong popcnt(ulong) pure nothrow @trusted @nogc
-    {
-        asm
-        {
-            naked;
-            mov RAX, RDI;
-            popcnt RAX, RAX;
             ret;
         }
     }
