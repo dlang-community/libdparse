@@ -6,6 +6,12 @@ import std.array;
 import std.algorithm;
 import std.range;
 import std.lexer;
+import core.cpuid : sse42;
+version (D_InlineAsm_X86_64)
+{
+    version (Windows) {}
+    else version = iasm64NotWindows;
+}
 
 /// Operators
 private enum operators = [
@@ -530,8 +536,10 @@ public struct DLexer
      *     cache = the string interning cache for de-duplicating identifiers and
      *         other token text.
      */
-    this(ubyte[] range, const LexerConfig config, StringCache* cache) pure nothrow @safe
+    this(ubyte[] range, const LexerConfig config, StringCache* cache,
+        bool haveSSE42 = sse42()) pure nothrow @safe
     {
+        this.haveSSE42 = haveSSE42;
         auto r = (range.length >= 3 && range[0] == 0xef && range[1] == 0xbb && range[2] == 0xbf)
             ? range[3 .. $] : range;
         this.range = LexerRange(r);
@@ -609,11 +617,19 @@ private pure nothrow @safe:
         }
     }
 
-    void lexWhitespace(ref Token token)
+    void lexWhitespace(ref Token token) @trusted
     {
         mixin (tokenStart);
         loop: do
         {
+            version (iasm64NotWindows)
+            {
+                if (haveSSE42 && range.index + 16 < range.bytes.length)
+                {
+                    skip!(true, '\t', ' ', '\v', '\f')(range.bytes.ptr + range.index,
+                        &range.index, &range.column);
+                }
+            }
             switch (range.bytes[range.index])
             {
             case '\r':
@@ -693,7 +709,8 @@ private pure nothrow @safe:
         lexHex(token, mark, line, column, index);
     }
 
-    void lexHex(ref Token token, size_t mark, size_t line, size_t column, size_t index)
+    void lexHex(ref Token token, size_t mark, size_t line, size_t column,
+        size_t index) @trusted
     {
         IdType type = tok!"intLiteral";
         bool foundDot;
@@ -705,7 +722,15 @@ private pure nothrow @safe:
             case 'A': .. case 'F':
             case '0': .. case '9':
             case '_':
-                range.popFront();
+//                if (haveSSE42 && range.index + 16 < range.bytes.length)
+//                {
+//                    immutable ulong i = matchAhead!(true, '0', '9', 'a', 'f', 'A', 'F', '_', '_')
+//                        (range.bytes.ptr + range.index);
+//                    range.column += i;
+//                    range.index += i;
+//                }
+//                else
+                    range.popFront();
                 break;
             case 'u':
             case 'U':
@@ -768,7 +793,8 @@ private pure nothrow @safe:
         return lexBinary(token, mark, line, column, index);
     }
 
-    void lexBinary(ref Token token, size_t mark, size_t line, size_t column, size_t index)
+    void lexBinary(ref Token token, size_t mark, size_t line, size_t column,
+        size_t index) @trusted
     {
         IdType type = tok!"intLiteral";
         binaryLoop: while (!(range.index >= range.bytes.length))
@@ -778,7 +804,20 @@ private pure nothrow @safe:
             case '0':
             case '1':
             case '_':
-                range.popFront();
+                version (iasm64NotWindows)
+                {
+                    if (haveSSE42 && range.index + 16 < range.bytes.length)
+                    {
+                        immutable ulong i = matchAhead!(true, '0', '1', '_', '_')(
+                            range.bytes.ptr + range.index);
+                        range.column += i;
+                        range.index += i;
+                    }
+                    else
+                        range.popFront();
+                }
+                else
+                    range.popFront();
                 break;
             case 'u':
             case 'U':
@@ -799,7 +838,8 @@ private pure nothrow @safe:
         lexDecimal(token, mark, line, column, index);
     }
 
-    void lexDecimal(ref Token token, size_t mark, size_t line, size_t column, size_t index)
+    void lexDecimal(ref Token token, size_t mark, size_t line, size_t column,
+        size_t index) @trusted
     {
         bool foundDot = range.bytes[range.index] == '.';
         IdType type = tok!"intLiteral";
@@ -815,7 +855,19 @@ private pure nothrow @safe:
             {
             case '0': .. case '9':
             case '_':
-                range.popFront();
+                version (iasm64NotWindows)
+                {
+                    if (haveSSE42 && range.index + 16 < range.bytes.length)
+                    {
+                        ulong i = matchAhead!(true, '0', '9', '_', '_')(range.bytes.ptr + range.index);
+                        range.column += i;
+                        range.index += i;
+                    }
+                    else
+                        range.popFront();
+                }
+                else
+                    range.popFront();
                 break;
             case 'u':
             case 'U':
@@ -1001,11 +1053,36 @@ private pure nothrow @safe:
             line, column, index);
     }
 
-    void lexSlashStarComment(ref Token token)
+    void lexSlashStarComment(ref Token token) @trusted
     {
         mixin (tokenStart);
         IdType type = tok!"comment";
         range.popFrontN(2);
+        version (iasm64NotWindows)
+        {
+            enum ushort STAR_SLASH = '*' + ('/' << 8);
+            ubyte* src = cast(ubyte*) range.bytes.ptr + range.index;
+            const ubyte* srcEnd = src + range.bytes.length;
+            ulong commentEnd = 0;
+            while (haveSSE42 && src + 16 < srcEnd)
+            {
+                commentEnd = firstIndexOf(src, STAR_SLASH);
+                if (commentEnd >= 15)
+                {
+                    range.line += popcnt(newlineMask(src));
+                    range.index += 14;
+                    src += 14;
+                }
+                else
+                {
+                    size_t m = (1 << commentEnd) - 1;
+                    range.line += popcnt(newlineMask(src) & m);
+                    range.index += commentEnd;
+                    src += commentEnd;
+                    goto end;
+                }
+            }
+        }
         while (!(range.index >= range.bytes.length))
         {
             if (range.bytes[range.index] == '*')
@@ -1025,13 +1102,21 @@ private pure nothrow @safe:
             index);
     }
 
-    void lexSlashSlashComment(ref Token token)
+    void lexSlashSlashComment(ref Token token) @trusted
     {
         mixin (tokenStart);
         IdType type = tok!"comment";
         range.popFrontN(2);
-        while (!(range.index >= range.bytes.length))
+        while (range.index < range.bytes.length)
         {
+            version (iasm64NotWindows)
+            {
+                if (haveSSE42 && range.index + 16 < range.bytes.length)
+                {
+                    skip!(false, '\r', '\n', 0x80)(range.bytes.ptr + range.index,
+                        &range.index, &range.column);
+                }
+            }
             if (range.bytes[range.index] == '\r' || range.bytes[range.index] == '\n')
                 break;
             range.popFront();
@@ -1041,7 +1126,7 @@ private pure nothrow @safe:
             index);
     }
 
-    void lexSlashPlusComment(ref Token token)
+    void lexSlashPlusComment(ref Token token) @trusted
     {
         mixin (tokenStart);
         IdType type = tok!"comment";
@@ -1050,6 +1135,14 @@ private pure nothrow @safe:
         int depth = 1;
         while (depth > 0 && !(range.index >= range.bytes.length))
         {
+            version (iasm64NotWindows)
+            {
+                if (haveSSE42 && range.index + 16 < range.bytes.length)
+                {
+                    skip!(false, '+', '/', '\\', '\r', '\n', 0x80)(range.bytes.ptr + range.index,
+                        &range.index, &range.column);
+                }
+            }
             if (range.bytes[range.index] == '+')
             {
                 range.popFront();
@@ -1075,7 +1168,7 @@ private pure nothrow @safe:
             index);
     }
 
-    void lexStringLiteral(ref Token token)
+    void lexStringLiteral(ref Token token) @trusted
     {
         mixin (tokenStart);
         range.popFront();
@@ -1087,7 +1180,15 @@ private pure nothrow @safe:
                 token = Token(tok!"");
                 return;
             }
-            else if (range.bytes[range.index] == '"')
+            version (iasm64NotWindows)
+            {
+                if (haveSSE42 && range.index + 16 < range.bytes.length)
+                {
+                    skip!(false, '"', '\\', '\r', '\n', 0x80)(range.bytes.ptr + range.index,
+                        &range.index, &range.column);
+                }
+            }
+            if (range.bytes[range.index] == '"')
             {
                 range.popFront();
                 break;
@@ -1105,7 +1206,7 @@ private pure nothrow @safe:
             index);
     }
 
-    void lexWysiwygString(ref Token token)
+    void lexWysiwygString(ref Token token) @trusted
     {
         mixin (tokenStart);
         IdType type = tok!"stringLiteral";
@@ -1121,7 +1222,15 @@ private pure nothrow @safe:
                     token = Token(tok!"");
                     return;
                 }
-                else if (range.bytes[range.index] == '`')
+                version (iasm64NotWindows)
+                {
+                    if (haveSSE42 && range.index + 16 < range.bytes.length)
+                    {
+                        skip!(false, '\r', '\n', 0x80, '`')(range.bytes.ptr + range.index,
+                            &range.index, &range.column);
+                    }
+                }
+                if (range.bytes[range.index] == '`')
                 {
                     range.popFront();
                     break;
@@ -1308,8 +1417,8 @@ private pure nothrow @safe:
         app.put("q{");
         int depth = 1;
 
-        WhitespaceBehavior oldWhitespace = config.whitespaceBehavior;
-        StringBehavior oldString = config.stringBehavior;
+        immutable WhitespaceBehavior oldWhitespace = config.whitespaceBehavior;
+        immutable StringBehavior oldString = config.stringBehavior;
         config.whitespaceBehavior = WhitespaceBehavior.include;
         config.stringBehavior = StringBehavior.source;
         scope (exit)
@@ -1551,7 +1660,7 @@ private pure nothrow @safe:
         }
     }
 
-    void lexIdentifier(ref Token token)
+    void lexIdentifier(ref Token token) @trusted
     {
         mixin (tokenStart);
         if (isSeparating(0))
@@ -1559,11 +1668,23 @@ private pure nothrow @safe:
             error("Invalid identifier");
             range.popFront();
         }
-        do
+        while (true)
         {
-            range.popFront();
+            version (iasm64NotWindows)
+            {
+                if (haveSSE42)
+                {
+                    immutable ulong i = matchAhead!(true,'a', 'z', 'A', 'Z', '_', '_')
+                        (range.bytes.ptr + range.index);
+                    range.column += i;
+                    range.index += i;
+                }
+            }
+            if (isSeparating(0))
+                break;
+            else
+                range.popFront();
         }
-        while (!isSeparating(0));
         token = Token(tok!"identifier", cache.intern(range.slice(mark)), line,
             column, index);
     }
@@ -1690,8 +1811,13 @@ private pure nothrow @safe:
     Message[] messages;
     StringCache* cache;
     LexerConfig config;
+    bool haveSSE42;
 }
 
+/**
+ * Creates a token range from the given source code. Creates a default lexer
+ * configuration and a GC-managed string cache.
+ */
 public auto byToken(ubyte[] range)
 {
     LexerConfig config;
@@ -1699,12 +1825,20 @@ public auto byToken(ubyte[] range)
     return DLexer(range, config, cache);
 }
 
+/**
+ * Creates a token range from the given source code. Uses the given string
+ * cache.
+ */
 public auto byToken(ubyte[] range, StringCache* cache)
 {
     LexerConfig config;
     return DLexer(range, config, cache);
 }
 
+/**
+ * Creates a token range from the given source code. Uses the provided lexer
+ * configuration and string cache.
+ */
 public auto byToken(ubyte[] range, const LexerConfig config, StringCache* cache)
 {
     return DLexer(range, config, cache);
@@ -2099,3 +2233,163 @@ unittest
     assert (toks(`'\xXX'`).messages[0] == DLexer.Message(1,4,"Error: 2 hex digits expected.",true));
 }
 
+version (D_InlineAsm_X86_64) version (linux)
+{
+    /**
+     * Returns:
+     */
+    ushort newlineMask(const ubyte*) pure nothrow @trusted @nogc
+    {
+        asm
+        {
+            naked;
+            movdqu XMM1, [RDI];
+            mov RAX, 3;
+            mov RDX, 16;
+            mov R8, 0x0d0d0d0d0d0d0d0dL;
+            movq XMM2, R8;
+            shufpd XMM2, XMM2, 0;
+            pcmpeqb XMM2, XMM1;
+            mov R9, 0x0a0a0a0a0a0a0a0aL;
+            movq XMM3, R9;
+            shufpd XMM3, XMM3, 0;
+            pcmpeqb XMM3, XMM1;
+            mov R10, 0xe280a8L;
+            movq XMM4, R10;
+            pcmpestrm XMM4, XMM1, 0b01001100;
+            movdqa XMM4, XMM0;
+            mov R11, 0xe280a9L;
+            movq XMM5, R11;
+            pcmpestrm XMM5, XMM1, 0b01001100;
+            movdqa XMM5, XMM0;
+            mov RCX, 0x0a0d;
+            dec RAX;
+            movq XMM6, RCX;
+            pcmpestrm XMM6, XMM1, 0b01001100;
+            movdqa XMM6, XMM0;
+            movdqa XMM7, XMM6;
+            pslldq XMM7, 1;
+            movdqa XMM0, XMM4;
+            por XMM0, XMM5;
+            por XMM7, XMM6;
+            movdqa XMM1, XMM2;
+            por XMM1, XMM3;
+            pxor XMM7, XMM1;
+            por XMM7, XMM0;
+            por XMM7, XMM6;
+            pmovmskb RAX, XMM7;
+            and RAX, 0b0011_1111_1111_1111;
+            ret;
+        }
+    }
+
+    /**
+     * Skips between 0 and 16 bytes that match (or do not match) one of the
+     * given $(B chars).
+     */
+    void skip(bool matching, chars...)(const ubyte*, ulong*, ulong*) pure nothrow
+        @trusted @nogc if (chars.length <= 8)
+    {
+        enum constant = ByteCombine!chars;
+        enum charsLength = chars.length;
+        static if (matching)
+            enum flags = 0b0001_0000;
+        else
+            enum flags = 0b0000_0000;
+        asm
+        {
+            naked;
+            movdqu XMM1, [RDX];
+            mov R10, constant;
+            movq XMM2, R10;
+            mov RAX, charsLength;
+            mov RDX, 16;
+            pcmpestri XMM2, XMM1, flags;
+            add [RSI], RCX;
+            add [RDI], RCX;
+            ret;
+        }
+    }
+
+    /**
+     *
+     */
+    ulong firstIndexOf(const ubyte*, ubyte) pure nothrow @trusted @nogc
+    {
+        asm
+        {
+            naked;
+            movdqu XMM1, [RSI];
+            movq XMM2, RDI;
+            mov RAX, 1;
+            mov RDX, 16;
+            pcmpestri XMM2, XMM1, 0;
+            mov RAX, RCX;
+            ret;
+        }
+    }
+
+    /**
+     * Skips between 0 and 16 bytes that match (or do not match) the ranges
+     * specified by $(B chars).
+     */
+    ulong matchAhead(bool invert, chars...)(const ubyte*) pure nothrow @trusted @nogc
+    {
+        static assert (chars.length % 2 == 0);
+        enum constant = ByteCombine!chars;
+        static if (invert)
+            enum matchAheadFlags = 0b0001_0100;
+        else
+            enum matchAheadFlags = 0b0000_0100;
+        enum charsLength = chars.length;
+        asm
+        {
+            naked;
+            movdqu XMM1, [RDI];
+            mov R10, constant;
+            movq XMM2, R10;
+            mov RAX, charsLength;
+            mov RDX, 16;
+            pcmpestri XMM2, XMM1, matchAheadFlags;
+            mov RAX, RCX;
+            ret;
+        }
+    }
+
+    /**
+     *
+     */
+    ulong firstIndexOf(const ubyte*, ushort) pure nothrow @trusted @nogc
+    {
+        asm
+        {
+            naked;
+            movdqu XMM0, [RSI];
+            and RDI, 0xffff;
+            movq XMM1, RDI;
+            pcmpistri XMM1, XMM0, 0b0000_1100;
+            mov RAX, RCX;
+            add RAX, 2;
+            ret;
+        }
+    }
+
+    ulong popcnt(ulong) pure nothrow @trusted @nogc
+    {
+        asm
+        {
+            naked;
+            mov RAX, RDI;
+            popcnt RAX, RAX;
+            ret;
+        }
+    }
+
+    template ByteCombine(c...)
+    {
+        static if (c.length > 1)
+            enum ByteCombine = c[0] | (ByteCombine!(c[1..$]) << 8);
+        else
+            enum ByteCombine = c[0];
+    }
+}

@@ -11,7 +11,7 @@ CYAN="\033[36m"
 DMD=${DMD:=dmd}
 
 echo -en "Compiling tester... "
-${DMD} tester.d ../src/std/*.d ../src/std/d/*.d  -I../src/ || exit 1
+${DMD} tester.d ../src/std/*.d ../src/std/d/*.d -g -I../src/ || exit 1
 echo -e "${GREEN}DONE${NORMAL}"
 
 for i in $PASS_FILES; do
