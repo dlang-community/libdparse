@@ -78,6 +78,8 @@ private enum pseudoTokenHandlers = [
     "\t", "lexWhitespace",
     "\r", "lexWhitespace",
     "\n", "lexWhitespace",
+    "\v", "lexWhitespace",
+    "\f", "lexWhitespace",
     "\u2028", "lexLongNewline",
     "\u2029", "lexLongNewline",
     "#!", "lexScriptLine",
@@ -567,6 +569,8 @@ private pure nothrow @safe:
         case '\r':
         case '\n':
         case '\t':
+        case '\v':
+        case '\f':
             return true;
         case 0xe2:
             auto peek = range.peek(2);
@@ -1725,33 +1729,38 @@ private pure nothrow @safe:
 
     bool isSeparating(size_t offset) @nogc
     {
+        enum : ubyte
+        {
+            n, y, m // no, yes, maybe
+        }
+
         if (range.index + offset >= range.bytes.length)
             return true;
         auto c = range.bytes[range.index + offset];
         static immutable ubyte[256] LOOKUP_TABLE = [
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+            y, y, y, y, y, y, y, y, y, y, y, y, y, y, y, y,
+            y, y, y, y, y, y, y, y, y, y, y, y, y, y, y, y,
+            y, y, y, y, y, y, y, y, y, y, y, y, y, y, y, y,
+            n, n, n, n, n, n, n, n, n, n, y, y, y, y, y, y,
+            y, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+            n, n, n, n, n, n, n, n, n, n, n, y, y, y, y, n,
+            y, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+            n, n, n, n, n, n, n, n, n, n, n, y, y, y, y, y,
+            m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m,
+            m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m,
+            m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m,
+            m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m,
+            m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m,
+            m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m,
+            m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m,
+            m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m
         ];
         immutable ulong result = LOOKUP_TABLE[c];
-        if (result == 0)
+        if (result == n)
             return false;
-        if (result == 1)
+        if (result == y)
             return true;
-        if (result == 2)
+        if (result == m)
         {
             auto r = range;
             range.popFrontN(offset);
