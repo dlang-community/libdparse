@@ -2378,7 +2378,8 @@ class Parser
      * Parses an EnumDeclaration
      *
      * $(GRAMMAR $(RULEDEF enumDeclaration):
-     *     $(LITERAL 'enum') $(LITERAL Identifier)? ($(LITERAL ':') $(RULE type))? $(RULE enumBody)
+     *       $(LITERAL 'enum') $(LITERAL Identifier)? ($(LITERAL ':') $(RULE type))? ($(RULE enumBody) | $(LITERAL ';'))
+     *     | $(RULE AnonymousEnumDeclaration)
      *     ;)
      */
     EnumDeclaration parseEnumDeclaration()
@@ -2386,16 +2387,25 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!EnumDeclaration;
         mixin (nullCheck!`expect(tok!"enum")`);
-        if (currentIs(tok!"identifier"))
-            node.name = advance();
-        else
+        immutable bool isAnonymous = !currentIs(tok!"identifier");
+        if (isAnonymous)
             node.name.line = tokens[index - 1].line; // preserve line number if anonymous
+        else
+            node.name = advance();
         node.comment = comment;
         comment = null;
+        if (currentIs(tok!";"))
+            return node;
         if (currentIs(tok!":"))
         {
-            advance();
+            advance(); // skip ':'
             mixin (nullCheck!`node.type = parseType()`);
+        }
+        if (isAnonymous && !currentIs(tok!"{"))
+        {
+            error("Non-empty enum body required for anonymous enums");
+            deallocate(node);
+            return null;
         }
         mixin (nullCheck!`node.enumBody = parseEnumBody()`);
         return node;

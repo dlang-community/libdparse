@@ -4,3 +4,4 @@ __dummy.html
 *.o
 *.obj
 test/coverage/*
+test/tester

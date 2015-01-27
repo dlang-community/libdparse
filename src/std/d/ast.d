@@ -92,6 +92,7 @@ public:
     /** */ void visit(const AlignAttribute alignAttribute) { alignAttribute.accept(this); }
     /** */ void visit(const AndAndExpression andAndExpression) { andAndExpression.accept(this); }
     /** */ void visit(const AndExpression andExpression) { andExpression.accept(this); }
+    /** */ void visit(const AnonymousEnumDeclaration anonymousEnumDeclaration) { anonymousEnumDeclaration.accept(this); }
     /** */ void visit(const ArgumentList argumentList) { argumentList.accept(this); }
     /** */ void visit(const Arguments arguments) { arguments.accept(this); }
     /** */ void visit(const ArrayInitializer arrayInitializer) { arrayInitializer.accept(this); }
@@ -453,6 +454,18 @@ public:
     }
     mixin OpEquals;
     mixin BinaryExpressionBody;
+}
+
+///
+final class AnonymousEnumDeclaration : ASTNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(baseType, enumBody));
+    }
+    mixin opEquals;
+    /** */ Type baseType;
+    /** */ EnumBody enumBody;
 }
 
 ///
