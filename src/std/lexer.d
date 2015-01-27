@@ -856,4 +856,3 @@ public nothrow pure @safe @nogc:
      */
     size_t line;
 }
-
