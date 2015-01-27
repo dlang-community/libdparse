@@ -27,7 +27,6 @@ body
 alias eggplant() = const creal;
 enum pineapple() = 100;
 enum remote(boom)(...) {}
-enum;
 
 align tape()(bool* boom...)
 {
@@ -88,13 +87,12 @@ unittest
 {
 version (88876)
 default:
-enum;
 synchronized invariant
 {
 	switch ("migrane" ^^ new class ubyte {
 		enum : ireal
 		{
-		const ubyte zelda = 4488, ouchMyFinger.freedom carton = delete 27010.9
+		zelda = 4488, carton = delete 27010.9
 		}
 		enum discworld;
 	})
