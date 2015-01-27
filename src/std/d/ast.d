@@ -92,6 +92,8 @@ public:
     /** */ void visit(const AlignAttribute alignAttribute) { alignAttribute.accept(this); }
     /** */ void visit(const AndAndExpression andAndExpression) { andAndExpression.accept(this); }
     /** */ void visit(const AndExpression andExpression) { andExpression.accept(this); }
+    /** */ void visit(const AnonymousEnumDeclaration anonymousEnumDeclaration) { anonymousEnumDeclaration.accept(this); }
+    /** */ void visit(const AnonymousEnumMember anonymousEnumMember) { anonymousEnumMember.accept(this); }
     /** */ void visit(const ArgumentList argumentList) { argumentList.accept(this); }
     /** */ void visit(const Arguments arguments) { arguments.accept(this); }
     /** */ void visit(const ArrayInitializer arrayInitializer) { arrayInitializer.accept(this); }
@@ -453,6 +455,31 @@ public:
     }
     mixin OpEquals;
     mixin BinaryExpressionBody;
+}
+
+///
+final class AnonymousEnumDeclaration : ASTNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(baseType, members));
+    }
+    mixin OpEquals;
+    /** */ Type baseType;
+    /** */ AnonymousEnumMember[] members;
+}
+
+///
+final class AnonymousEnumMember : ASTNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(type, name, assignExpression));
+    }
+    /** */ Type type;
+    /** */ Token name;
+    /** */ AssignExpression assignExpression;
+    /** */ string comment;
 }
 
 ///
@@ -1169,11 +1196,12 @@ public:
             sharedStaticDestructor, sharedStaticConstructor,
             conditionalDeclaration, pragmaDeclaration, versionSpecification,
             invariant_, postblit, declarations, debugSpecification,
-            eponymousTemplateDeclaration));
+            eponymousTemplateDeclaration, anonymousEnumDeclaration));
     }
 
     /** */ AliasDeclaration aliasDeclaration;
     /** */ AliasThisDeclaration aliasThisDeclaration;
+    /** */ AnonymousEnumDeclaration anonymousEnumDeclaration;
     /** */ Attribute[] attributes;
     /** */ AttributeDeclaration attributeDeclaration;
     /** */ ClassDeclaration classDeclaration;

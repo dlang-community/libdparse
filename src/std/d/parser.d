@@ -1718,6 +1718,7 @@ class Parser
      * $(RULEDEF declaration2):
      *       $(RULE aliasDeclaration)
      *     | $(RULE aliasThisDeclaration)
+     *     | $(RULE anonymousEnumDeclaration)
      *     | $(RULE attributeDeclaration)
      *     | $(RULE classDeclaration)
      *     | $(RULE conditionalDeclaration)
@@ -1853,8 +1854,11 @@ class Parser
         case tok!"enum":
             auto b = setBookmark();
             advance(); // enum
-            if (currentIsOneOf(tok!";", tok!":", tok!"{"))
-                goto enumDeclaration;
+            if (currentIsOneOf(tok!":", tok!"{"))
+            {
+                goToBookmark(b);
+                mixin (nullCheck!`node.anonymousEnumDeclaration = parseAnonymousEnumDeclaration()`);
+            }
             else if (currentIs(tok!"identifier"))
             {
                 advance();
@@ -1873,7 +1877,6 @@ class Parser
                     {
                         goToBookmark(b);
                         mixin (nullCheck!`node.eponymousTemplateDeclaration = parseEponymousTemplateDeclaration()`);
-                        mixin (nullCheck!`node.eponymousTemplateDeclaration`);
                     }
                 }
                 else if (currentIsOneOf(tok!":", tok!"{", tok!";"))
@@ -1881,7 +1884,6 @@ class Parser
             enumDeclaration:
                     goToBookmark(b);
                     mixin (nullCheck!`node.enumDeclaration = parseEnumDeclaration()`);
-                    mixin (nullCheck!`node.enumDeclaration`);
                 }
                 else
                 {
@@ -1894,16 +1896,13 @@ class Parser
             {
                 goToBookmark(b);
                 mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration()`);
-                mixin (nullCheck!`node.variableDeclaration`);
             }
             break;
         case tok!"import":
             mixin (nullCheck!`node.importDeclaration = parseImportDeclaration()`);
-            mixin (nullCheck!`node.importDeclaration`);
             break;
         case tok!"interface":
             mixin (nullCheck!`node.interfaceDeclaration = parseInterfaceDeclaration()`);
-            mixin (nullCheck!`node.interfaceDeclaration`);
             break;
         case tok!"mixin":
             if (peekIs(tok!"template"))
@@ -2321,56 +2320,130 @@ class Parser
      * Parses an EnumBody
      *
      * $(GRAMMAR $(RULEDEF enumBody):
-     *       $(LITERAL ';')
-     *     | $(LITERAL '{') $(RULE enumMember) ($(LITERAL ',') $(RULE enumMember)?)* $(LITERAL '}')
+     *     $(LITERAL '{') $(RULE enumMember) ($(LITERAL ',') $(RULE enumMember)?)* $(LITERAL '}')
      *     ;)
      */
     EnumBody parseEnumBody()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         EnumBody node = allocate!EnumBody;
-        if (!currentIs(tok!";"))
+        auto open = expect(tok!"{");
+        mixin (nullCheck!`open`);
+        node.startLocation = open.index;
+        EnumMember[] enumMembers;
+        while (moreTokens())
         {
-            auto open = expect (tok!"{");
-            if (open is null) goto ret;
-            node.startLocation = open.index;
-            EnumMember[] enumMembers;
-            while (moreTokens())
+            if (currentIs(tok!","))
             {
-                if (!currentIsOneOf(tok!",", tok!"}"))
-                {
-                    auto member = parseEnumMember();
-                    if (member is null)
-                        return null;
-                    enumMembers ~= member;
-                }
-                else if (currentIs(tok!","))
-                {
-                    if (enumMembers.length > 0 && enumMembers[$ - 1].comment is null)
-                        enumMembers[$ - 1].comment = current.trailingComment;
-                    advance();
-                    continue;
-                }
-                else if (currentIs(tok!"}"))
-                {
-                    if (enumMembers.length > 0 && enumMembers[$ - 1].comment is null)
-                        enumMembers[$ - 1].comment = tokens[index - 1].trailingComment;
-                    break;
-                }
-                else
-                {
-                    error(`",", "}", or enum member expected`);
-                    goto ret;
-                }
+                if (enumMembers.length > 0 && enumMembers[$ - 1].comment is null)
+                    enumMembers[$ - 1].comment = current.trailingComment;
+                advance();
+                continue;
             }
-            node.enumMembers = ownArray(enumMembers);
-            auto close = expect (tok!"}");
-            if (close !is null)
-                node.endLocation = close.index;
+            else if (currentIs(tok!"}"))
+            {
+                if (enumMembers.length > 0 && enumMembers[$ - 1].comment is null)
+                    enumMembers[$ - 1].comment = tokens[index - 1].trailingComment;
+                break;
+            }
+            else
+            {
+                auto member = parseEnumMember();
+                if (member is null)
+                    return null;
+                enumMembers ~= member;
+            }
+        }
+        node.enumMembers = ownArray(enumMembers);
+        auto close = expect (tok!"}");
+        if (close !is null)
+            node.endLocation = close.index;
+        return node;
+    }
+
+    /**
+     * $(GRAMMAR $(RULEDEF anonymousEnumMember):
+     *       $(Rule type) $(LITERAL identifier) $(LITERAL '=') $(RULE assignExpression)
+     *     | $(LITERAL identifier) $(LITERAL '=') $(RULE assignExpression)
+     *     | $(LITERAL identifier)
+     *     ;)
+     */
+    AnonymousEnumMember parseAnonymousEnumMember(bool typeAllowed)
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocate!AnonymousEnumMember;
+
+        if (currentIs(tok!"identifier") && peekIsOneOf(tok!",", tok!"=", tok!"}"))
+        {
+            node.comment = current.comment;
+            mixin (tokenCheck!(`node.name`, `identifier`));
+            if (currentIs(tok!"="))
+            {
+                advance(); // =
+                goto assign;
+            }
+        }
+        else if (typeAllowed)
+        {
+            node.comment = current.comment;
+            mixin (nullCheck!`node.type = parseType()`);
+            mixin (tokenCheck!(`node.name`, `identifier`));
+            mixin (nullCheck!`expect(tok!"=")`);
+    assign:
+            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         }
         else
+        {
+            error("Cannot specify anonymous enum member type if anonymous enum has a base type.");
+            deallocate(node);
+            return null;
+        }
+        return node;
+    }
+
+    /**
+     * $(GRAMMAR $(RULEDEF anonymousEnumDeclaration):
+     *     $(LITERAL 'enum') ($(LITERAL ':') $(RULE type))? $(LITERAL '{') $(RULE anonymousEnumMember)+ $(LITERAL '}')
+     *     ;)
+     */
+    AnonymousEnumDeclaration parseAnonymousEnumDeclaration()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocate!AnonymousEnumDeclaration;
+        mixin (nullCheck!`expect(tok!"enum")`);
+        immutable bool hasBaseType = currentIs(tok!":");
+        if (hasBaseType)
+        {
             advance();
-    ret:
+            mixin (nullCheck!`node.baseType = parseType()`);
+        }
+        mixin (nullCheck!`expect(tok!"{")`);
+        AnonymousEnumMember[] members;
+        while (moreTokens())
+        {
+            if (currentIs(tok!","))
+            {
+                if (members.length > 0 && members[$ - 1].comment is null)
+                    members[$ - 1].comment = current.trailingComment;
+                advance();
+                continue;
+            }
+            else if (currentIs(tok!"}"))
+            {
+                if (members.length > 0 && members[$ - 1].comment is null)
+                    members[$ - 1].comment = tokens[index - 1].trailingComment;
+                break;
+            }
+            else
+            {
+                auto member = parseAnonymousEnumMember(!hasBaseType);
+                if (member is null)
+                    return null;
+                members ~= member;
+            }
+        }
+        node.members = ownArray(members);
+        mixin (nullCheck!`expect(tok!"}")`);
         return node;
     }
 
@@ -2378,7 +2451,8 @@ class Parser
      * Parses an EnumDeclaration
      *
      * $(GRAMMAR $(RULEDEF enumDeclaration):
-     *     $(LITERAL 'enum') $(LITERAL Identifier)? ($(LITERAL ':') $(RULE type))? $(RULE enumBody)
+     *       $(LITERAL 'enum') $(LITERAL Identifier) ($(LITERAL ':') $(RULE type))? $(LITERAL ';')
+     *     | $(LITERAL 'enum') $(LITERAL Identifier) ($(LITERAL ':') $(RULE type))? $(RULE enumBody)
      *     ;)
      */
     EnumDeclaration parseEnumDeclaration()
@@ -2386,15 +2460,17 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!EnumDeclaration;
         mixin (nullCheck!`expect(tok!"enum")`);
-        if (currentIs(tok!"identifier"))
-            node.name = advance();
-        else
-            node.name.line = tokens[index - 1].line; // preserve line number if anonymous
+        mixin (tokenCheck!(`node.name`, `identifier`));
         node.comment = comment;
         comment = null;
-        if (currentIs(tok!":"))
+        if (currentIs(tok!";"))
         {
             advance();
+            return node;
+        }
+        if (currentIs(tok!":"))
+        {
+            advance(); // skip ':'
             mixin (nullCheck!`node.type = parseType()`);
         }
         mixin (nullCheck!`node.enumBody = parseEnumBody()`);
@@ -2406,7 +2482,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF enumMember):
      *       $(LITERAL Identifier)
-     *     | $(RULE type)? $(LITERAL Identifier) $(LITERAL '=') $(RULE assignExpression)
+     *     | $(LITERAL Identifier) $(LITERAL '=') $(RULE assignExpression)
      *     ;)
      */
     EnumMember parseEnumMember()
@@ -2414,28 +2490,10 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!EnumMember;
         node.comment = current.comment;
-        const(Token)* ident;
-        if (currentIs(tok!"identifier"))
+        mixin (tokenCheck!(`node.name`, `identifier`));
+        if (currentIs(tok!"="))
         {
-            if (peekIsOneOf(tok!",", tok!"}"))
-                node.name = advance();
-            else if (peekIs(tok!"="))
-            {
-                node.name = advance();
-                goto assign;
-            }
-            else
-                goto type;
-        }
-        else
-        {
-    type:
-            mixin (nullCheck!`node.type = parseType()`);
-            ident = expect(tok!"identifier");
-            mixin (nullCheck!`ident`);
-            node.name = *ident;
-    assign:
-            mixin (nullCheck!`expect(tok!"=")`);
+            advance();
             mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         }
         return node;
@@ -7289,7 +7347,14 @@ protected:
 
     template nullCheck(string exp)
     {
-        enum nullCheck = "if ((" ~ exp ~ ") is null) { deallocate(node); return null; }";
+        enum nullCheck = "{if ((" ~ exp ~ ") is null) { deallocate(node); return null; }}";
+    }
+
+    template tokenCheck(string exp, string tok)
+    {
+        enum tokenCheck = `{auto t = expect(tok!"` ~ tok ~ `");`
+            ~ `if (t is null) { deallocate(node); return null;}`
+            ~ `else {` ~ exp ~ ` = *t; }}`;
     }
 
     // This list MUST BE MAINTAINED IN SORTED ORDER.
