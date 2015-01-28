@@ -652,6 +652,8 @@ private pure nothrow @safe:
                 break;
             case ' ':
             case '\t':
+            case '\v':
+            case '\f':
                 range.popFront();
                 break;
             case 0xe2:
@@ -1067,7 +1069,7 @@ private pure nothrow @safe:
             version (iasm64NotWindows)
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
-                    skip!(false, '\r', '\n', '/', '*', 0x80)(range.bytes.ptr + range.index,
+                    skip!(false, '\r', '\n', '/', '*', 0xe2)(range.bytes.ptr + range.index,
                         &range.index, &range.column);
             }
             if (range.bytes[range.index] == '*')
@@ -1098,7 +1100,7 @@ private pure nothrow @safe:
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
-                    skip!(false, '\r', '\n', 0x80)(range.bytes.ptr + range.index,
+                    skip!(false, '\r', '\n', 0xe2)(range.bytes.ptr + range.index,
                         &range.index, &range.column);
                 }
             }
@@ -1124,7 +1126,7 @@ private pure nothrow @safe:
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
-                    skip!(false, '+', '/', '\\', '\r', '\n', 0x80)(range.bytes.ptr + range.index,
+                    skip!(false, '+', '/', '\\', '\r', '\n', 0xe2)(range.bytes.ptr + range.index,
                         &range.index, &range.column);
                 }
             }
@@ -1169,7 +1171,7 @@ private pure nothrow @safe:
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
-                    skip!(false, '"', '\\', '\r', '\n', 0x80)(range.bytes.ptr + range.index,
+                    skip!(false, '"', '\\', '\r', '\n', 0xe2)(range.bytes.ptr + range.index,
                         &range.index, &range.column);
                 }
             }
@@ -1211,7 +1213,7 @@ private pure nothrow @safe:
                 {
                     if (haveSSE42 && range.index + 16 < range.bytes.length)
                     {
-                        skip!(false, '\r', '\n', 0x80, '`')(range.bytes.ptr + range.index,
+                        skip!(false, '\r', '\n', 0xe2, '`')(range.bytes.ptr + range.index,
                             &range.index, &range.column);
                     }
                 }
