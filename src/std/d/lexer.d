@@ -2223,7 +2223,7 @@ unittest
     assert (toks(`'\xXX'`).messages[0] == DLexer.Message(1,4,"Error: 2 hex digits expected.",true));
 }
 
-version (D_InlineAsm_X86_64) version (linux)
+version (iasm64NotWindows)
 {
     /**
      * Returns:
