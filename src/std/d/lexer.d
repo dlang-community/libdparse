@@ -728,14 +728,19 @@ private pure nothrow @safe:
             case 'A': .. case 'F':
             case '0': .. case '9':
             case '_':
-//                if (haveSSE42 && range.index + 16 < range.bytes.length)
-//                {
-//                    immutable ulong i = matchAhead!(true, '0', '9', 'a', 'f', 'A', 'F', '_', '_')
-//                        (range.bytes.ptr + range.index);
-//                    range.column += i;
-//                    range.index += i;
-//                }
-//                else
+                version (iasm64NotWindows)
+                {
+                    if (haveSSE42 && range.index + 16 < range.bytes.length)
+                    {
+                        immutable ulong i = matchAhead!(true, '0', '9', 'a', 'f', 'A', 'F', '_', '_')
+                            (range.bytes.ptr + range.index);
+                        range.column += i;
+                        range.index += i;
+                    }
+                    else
+                        range.popFront();
+                }
+                else
                     range.popFront();
                 break;
             case 'u':
@@ -1659,9 +1664,9 @@ private pure nothrow @safe:
         {
             version (iasm64NotWindows)
             {
-                if (haveSSE42)
+                if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
-                    immutable ulong i = matchAhead!(true,'a', 'z', 'A', 'Z', '_', '_')
+                    immutable ulong i = matchAhead!(true, 'a', 'z', 'A', 'Z', '_', '_')
                         (range.bytes.ptr + range.index);
                     range.column += i;
                     range.index += i;
@@ -2332,9 +2337,10 @@ version (iasm64NotWindows)
 
     template ByteCombine(c...)
     {
+        static assert (c.length <= 8);
         static if (c.length > 1)
-            enum ByteCombine = c[0] | (ByteCombine!(c[1..$]) << 8);
+            enum ulong ByteCombine = c[0] | (ByteCombine!(c[1..$]) << 8);
         else
-            enum ByteCombine = c[0];
+            enum ulong ByteCombine = c[0];
     }
 }
