@@ -844,18 +844,17 @@ class Parser
      *     | $(LITERAL '~=')
      *     ;)
      */
-    AssignExpression parseAssignExpression()
+    ExpressionNode parseAssignExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!AssignExpression;
         if (!moreTokens)
         {
             error("Assign expression expected instead of EOF");
             return null;
         }
-        node.line = current().line;
-        node.column = current().column;
-        mixin (nullCheck!`node.ternaryExpression = parseTernaryExpression()`);
+        auto ternary = parseTernaryExpression();
+        if (ternary is null)
+            return null;
         if (currentIsOneOf(tok!"=", tok!">>>=",
             tok!">>=", tok!"<<=",
             tok!"+=", tok!"-=", tok!"*=",
@@ -863,10 +862,15 @@ class Parser
             tok!"|=", tok!"^^=", tok!"^=",
             tok!"~="))
         {
+            auto node = allocate!AssignExpression;
+            node.line = current().line;
+            node.column = current().column;
+            node.ternaryExpression = ternary;
             node.operator = advance().type;
             mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
+            return node;
         }
-        return node;
+        return ternary;
     }
 
     /**
@@ -1225,7 +1229,7 @@ class Parser
      *     $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(LITERAL '...') $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(RULE declarationsAndStatements)
      *     ;)
      */
-    CaseRangeStatement parseCaseRangeStatement(AssignExpression low)
+    CaseRangeStatement parseCaseRangeStatement(ExpressionNode low)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CaseRangeStatement;
@@ -1406,29 +1410,28 @@ class Parser
     ExpressionNode parseCmpExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!CmpExpression;
         auto shift = parseShiftExpression();
         if (shift is null)
-        {
-            deallocate(node);
             return null;
-        }
         if (!moreTokens())
             return shift;
         switch (current.type)
         {
         case tok!"is":
-            node.identityExpression = parseIdentityExpression(shift);
-            break;
+            auto node = allocate!CmpExpression;
+            mixin (nullCheck!`node.identityExpression = parseIdentityExpression(shift)`);
+            return node;
         case tok!"in":
-            node.inExpression = parseInExpression(shift);
-            break;
+            auto node = allocate!CmpExpression;
+            mixin (nullCheck!`node.inExpression = parseInExpression(shift)`);
+            return node;
         case tok!"!":
+            auto node = allocate!CmpExpression;
             if (peekIs(tok!"is"))
-                node.identityExpression = parseIdentityExpression(shift);
+                mixin (nullCheck!`node.identityExpression = parseIdentityExpression(shift)`);
             else if (peekIs(tok!"in"))
-                node.inExpression = parseInExpression(shift);
-            break;
+                mixin (nullCheck!`node.inExpression = parseInExpression(shift)`);
+            return node;
         case tok!"<":
         case tok!"<=":
         case tok!">":
@@ -1441,17 +1444,18 @@ class Parser
         case tok!"!>=":
         case tok!"!<":
         case tok!"!<=":
-            node.relExpression = parseRelExpression(shift);
-            break;
+            auto node = allocate!CmpExpression;
+            mixin (nullCheck!`node.relExpression = parseRelExpression(shift)`);
+            return node;
         case tok!"==":
         case tok!"!=":
-            node.equalExpression = parseEqualExpression(shift);
+            auto node = allocate!CmpExpression;
+            mixin (nullCheck!`node.equalExpression = parseEqualExpression(shift)`);
+            return node;
             break;
         default:
-            node.shiftExpression = shift;
-            break;
+            return shift;
         }
-        return node;
     }
 
     /**
@@ -2552,7 +2556,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         if (suppressedErrorCount > MAX_ERRORS) return null;
-        return parseCommaSeparatedRule!(Expression, AssignExpression)();
+        return parseCommaSeparatedRule!(Expression, AssignExpression, true)();
     }
 
     /**
@@ -5746,18 +5750,23 @@ class Parser
     ExpressionNode parseTernaryExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        TernaryExpression node = allocate!TernaryExpression;
-        mixin (nullCheck!`node.orOrExpression = parseOrOrExpression()`);
+
+        auto orOrExpression = parseOrOrExpression();
+        if (orOrExpression is null)
+            return null;
         if (currentIs(tok!"?"))
         {
+            TernaryExpression node = allocate!TernaryExpression;
+            node.orOrExpression = orOrExpression;
             advance();
             mixin (nullCheck!`node.expression = parseExpression()`);
             auto colon = expect(tok!":");
             if (colon is null) { deallocate(node); return null; }
             node.colon = *colon;
             mixin (nullCheck!`node.ternaryExpression = parseTernaryExpression()`);
+            return node;
         }
-        return node;
+        return orOrExpression;
     }
 
     /**
@@ -6968,10 +6977,19 @@ protected:
         return node;
     }
 
-    ListType parseCommaSeparatedRule(alias ListType, alias ItemType)(bool allowTrailingComma = false)
+    ListType parseCommaSeparatedRule(alias ListType, alias ItemType, bool setLineAndColumn = false)
+        (bool allowTrailingComma = false)
     {
         auto node = allocate!ListType;
-        ItemType[] items;
+        static if (setLineAndColumn)
+        {
+            node.line = current.line;
+            node.column = current.column;
+        }
+        static if (is(ItemType : ExpressionNode))
+            ExpressionNode[] items;
+        else
+            ItemType[] items;
         while (moreTokens())
         {
             mixin ("auto i = parse" ~ ItemType.stringof ~ "();");
