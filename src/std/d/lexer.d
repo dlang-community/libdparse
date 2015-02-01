@@ -172,7 +172,7 @@ public struct LexerConfig
 /**
  * Returns: true if the given ID is for a basic type.
  */
-public bool isBasicType(IdType type) nothrow pure @safe
+public bool isBasicType(IdType type) nothrow pure @safe @nogc
 {
     switch (type)
     {
@@ -209,7 +209,7 @@ public bool isBasicType(IdType type) nothrow pure @safe
 /**
  * Returns: true if the given ID type is for a number literal.
  */
-public bool isNumberLiteral(IdType type) nothrow pure @safe
+public bool isNumberLiteral(IdType type) nothrow pure @safe @nogc
 {
     switch (type)
     {
@@ -232,7 +232,7 @@ public bool isNumberLiteral(IdType type) nothrow pure @safe
 /**
  * Returns: true if the given ID type is for an operator.
  */
-public bool isOperator(IdType type) nothrow pure @safe
+public bool isOperator(IdType type) nothrow pure @safe @nogc
 {
     switch (type)
     {
@@ -307,7 +307,7 @@ public bool isOperator(IdType type) nothrow pure @safe
 /**
  * Returns: true if the given ID type is for a keyword.
  */
-public bool isKeyword(IdType type) pure nothrow @safe
+public bool isKeyword(IdType type) pure nothrow @safe @nogc
 {
     switch (type)
     {
@@ -413,7 +413,7 @@ public bool isKeyword(IdType type) pure nothrow @safe
 /**
  * Returns: true if the given ID type is for a string literal.
  */
-public bool isStringLiteral(IdType type) pure nothrow @safe
+public bool isStringLiteral(IdType type) pure nothrow @safe @nogc
 {
     switch (type)
     {
@@ -429,7 +429,7 @@ public bool isStringLiteral(IdType type) pure nothrow @safe
 /**
  * Returns: true if the given ID type is for a protection attribute.
  */
-public bool isProtection(IdType type) pure nothrow @safe
+public bool isProtection(IdType type) pure nothrow @safe @nogc
 {
     switch (type)
     {
