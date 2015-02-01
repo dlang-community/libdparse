@@ -1452,7 +1452,6 @@ class Parser
             auto node = allocate!CmpExpression;
             mixin (nullCheck!`node.equalExpression = parseEqualExpression(shift)`);
             return node;
-            break;
         default:
             return shift;
         }
