@@ -2516,9 +2516,8 @@ class Parser
         node.name = *ident;
         mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
         expect(tok!"=");
-        if (isExpression())
-            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
-        else
+        node.assignExpression = parseAssignExpression();
+        if (node.assignExpression is null)
             mixin (nullCheck!`node.type = parseType()`);
         expect(tok!";");
         return node;
@@ -3957,23 +3956,16 @@ class Parser
             {
                 assert (currentIs(tok!"{"));
                 auto m = setBookmark();
-                if (parseStructInitializer() !is null)
+                auto initializer = parseStructInitializer();
+                if (initializer !is null)
                 {
-                    goToBookmark(m);
-                    if ((node.structInitializer = parseStructInitializer()) is null)
-                    {
-                        deallocate(node);
-                        return null;
-                    }
+                    node.structInitializer = initializer;
+                    abandonBookmark(m);
                 }
                 else
                 {
                     goToBookmark(m);
-                    if ((node.assignExpression = parseAssignExpression()) is null)
-                    {
-                        deallocate(node);
-                        return null;
-                    }
+                    mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
                 }
             }
         }
@@ -5189,16 +5181,8 @@ class Parser
             advance();
         else
         {
-            if ((node.structMemberInitializers = parseStructMemberInitializers()) is null)
-            {
-                deallocate(node);
-                return null;
-            }
-            if (expect(tok!"}") is null)
-            {
-                deallocate(node);
-                return null;
-            }
+            mixin (nullCheck!`node.structMemberInitializers = parseStructMemberInitializers()`);
+            mixin (nullCheck!`expect(tok!"}")`);
         }
         return node;
     }
@@ -5219,11 +5203,7 @@ class Parser
             node.identifier = tokens[index++];
             index++;
         }
-        if ((node.nonVoidInitializer = parseNonVoidInitializer()) is null)
-        {
-            deallocate(node);
-            return null;
-        }
+        mixin (nullCheck!`node.nonVoidInitializer = parseNonVoidInitializer()`);
         return node;
     }
 
@@ -5242,13 +5222,14 @@ class Parser
         do
         {
             auto structMemberInitializer = parseStructMemberInitializer();
-            if (structMemberInitializer !is null)
-                structMemberInitializers ~= structMemberInitializer;
-            else
+            if (structMemberInitializer is null)
             {
                 deallocate(node);
                 return null;
             }
+            else
+                structMemberInitializers ~= structMemberInitializer;
+
             if (currentIs(tok!","))
             {
                 advance();
@@ -5339,17 +5320,14 @@ class Parser
         expect(tok!"alias");
         if (currentIs(tok!"identifier") && !peekIs(tok!"."))
         {
-            if (peekIsOneOf(tok!",", tok!")", tok!"=",
-                tok!":"))
-            {
+            if (peekIsOneOf(tok!",", tok!")", tok!"=", tok!":"))
                 node.identifier = advance();
-            }
             else
                 goto type;
         }
         else
         {
-        type:
+    type:
             if ((node.type = parseType()) is null) { deallocate(node); return null; }
             auto ident = expect(tok!"identifier");
             if (ident is null) { deallocate(node); return null; }
@@ -6713,10 +6691,16 @@ protected:
     bool isAssociativeArrayLiteral()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        static bool[typeof(current.index)] cached;
+        if (auto p = current.index in cached)
+            return *p;
+        size_t currentIndex = current.index;
         auto b = setBookmark();
         scope(exit) goToBookmark(b);
         advance();
-        return !currentIs(tok!"]") && parseExpression() !is null && currentIs(tok!":");
+        bool result = !currentIs(tok!"]") && parseExpression() !is null && currentIs(tok!":");
+        cached[currentIndex] = result;
+        return result;
     }
 
     bool hasMagicDelimiter(alias L, alias T)()
@@ -6771,18 +6755,7 @@ protected:
             if (peekIs(tok!"("))
                 return false;
             else
-            {
-                auto b = setBookmark();
-                scope (exit) goToBookmark(b);
-                auto d = parseDeclaration(true);
-                if (d is null)
-                    return false;
-                else
-                {
-                    deallocate(d);
-                    return true;
-                }
-            }
+                goto default;
         case tok!"static":
             if (peekIs(tok!"if"))
                 return false;
@@ -6795,19 +6768,7 @@ protected:
         case tok!"immutable":
         case tok!"inout":
         case tok!"shared":
-            auto b = setBookmark();
-            auto p = parseDeclaration();
-            if (p is null)
-            {
-                goToBookmark(b);
-                return false;
-            }
-            else
-            {
-                deallocate(p);
-                goToBookmark(b);
-                return true;
-            }
+            goto default;
         case tok!"@":
         case tok!"abstract":
         case tok!"alias":
@@ -6854,20 +6815,20 @@ protected:
         case tok!"assert":
             return false;
         default:
-            break;
+            auto b = setBookmark();
+            auto p = parseDeclaration();
+            if (p is null)
+            {
+                goToBookmark(b);
+                return false;
+            }
+            else
+            {
+                deallocate(p);
+                goToBookmark(b);
+                return true;
+            }
         }
-        auto b = setBookmark();
-        scope(exit) goToBookmark(b);
-
-        return parseDeclaration(true) !is null;
-    }
-
-    bool isExpression()
-    {
-        if (!moreTokens()) return false;
-        auto b = setBookmark();
-        scope (exit) goToBookmark(b);
-        return parseExpression() !is null;
     }
 
     /// Only use this in template parameter parsing
@@ -6876,7 +6837,8 @@ protected:
         if (!moreTokens()) return false;
         auto b = setBookmark();
         scope (exit) goToBookmark(b);
-        if (parseType() is null) return false;
+        auto t = parseType();
+        if (t is null) return false; else deallocate(t);
         if (currentIsOneOf(tok!",", tok!")", tok!"=")) return true;
         return false;
     }
@@ -7053,7 +7015,7 @@ protected:
 
     void error(string message, bool shouldAdvance = true)
     {
-        import std.stdio;
+        import std.stdio : stderr;
         if (suppressMessages == 0)
         {
             ++errorCount;
@@ -7329,7 +7291,7 @@ protected:
 
     version (std_parser_verbose)
     {
-        void trace(lazy string message)
+        void trace(string message)
         {
             if (suppressMessages > 0)
                 return;
