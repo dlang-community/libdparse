@@ -728,14 +728,19 @@ private pure nothrow @safe:
             case 'A': .. case 'F':
             case '0': .. case '9':
             case '_':
-//                if (haveSSE42 && range.index + 16 < range.bytes.length)
-//                {
-//                    immutable ulong i = matchAhead!(true, '0', '9', 'a', 'f', 'A', 'F', '_', '_')
-//                        (range.bytes.ptr + range.index);
-//                    range.column += i;
-//                    range.index += i;
-//                }
-//                else
+                version (iasm64NotWindows)
+                {
+                    if (haveSSE42 && range.index + 16 < range.bytes.length)
+                    {
+                        immutable ulong i = rangeMatch!(false, '0', '9', 'a', 'f', 'A', 'F', '_', '_')
+                            (range.bytes.ptr + range.index);
+                        range.column += i;
+                        range.index += i;
+                    }
+                    else
+                        range.popFront();
+                }
+                else
                     range.popFront();
                 break;
             case 'u':
@@ -814,7 +819,7 @@ private pure nothrow @safe:
                 {
                     if (haveSSE42 && range.index + 16 < range.bytes.length)
                     {
-                        immutable ulong i = matchAhead!(true, '0', '1', '_', '_')(
+                        immutable ulong i = rangeMatch!(false, '0', '1', '_', '_')(
                             range.bytes.ptr + range.index);
                         range.column += i;
                         range.index += i;
@@ -865,7 +870,7 @@ private pure nothrow @safe:
                 {
                     if (haveSSE42 && range.index + 16 < range.bytes.length)
                     {
-                        ulong i = matchAhead!(true, '0', '9', '_', '_')(range.bytes.ptr + range.index);
+                        ulong i = rangeMatch!(false, '0', '9', '_', '_')(range.bytes.ptr + range.index);
                         range.column += i;
                         range.index += i;
                     }
@@ -1659,9 +1664,9 @@ private pure nothrow @safe:
         {
             version (iasm64NotWindows)
             {
-                if (haveSSE42)
+                if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
-                    immutable ulong i = matchAhead!(true,'a', 'z', 'A', 'Z', '_', '_')
+                    immutable ulong i = rangeMatch!(false, 'a', 'z', 'A', 'Z', '_', '_')
                         (range.bytes.ptr + range.index);
                     range.column += i;
                     range.index += i;
@@ -2304,17 +2309,17 @@ version (iasm64NotWindows)
     }
 
     /**
-     * Skips between 0 and 16 bytes that match (or do not match) the ranges
-     * specified by $(B chars).
+     * Returns: the number of bytes starting at the given location that match
+     *     (or do not match if $(B invert) is true) the byte ranges in $(B chars).
      */
-    ulong matchAhead(bool invert, chars...)(const ubyte*) pure nothrow @trusted @nogc
+    ulong rangeMatch(bool invert, chars...)(const ubyte*) pure nothrow @trusted @nogc
     {
         static assert (chars.length % 2 == 0);
         enum constant = ByteCombine!chars;
         static if (invert)
-            enum matchAheadFlags = 0b0001_0100;
+            enum rangeMatchFlags = 0b0000_0100;
         else
-            enum matchAheadFlags = 0b0000_0100;
+            enum rangeMatchFlags = 0b0001_0100;
         enum charsLength = chars.length;
         asm
         {
@@ -2324,7 +2329,7 @@ version (iasm64NotWindows)
             movq XMM2, R10;
             mov RAX, charsLength;
             mov RDX, 16;
-            pcmpestri XMM2, XMM1, matchAheadFlags;
+            pcmpestri XMM2, XMM1, rangeMatchFlags;
             mov RAX, RCX;
             ret;
         }
@@ -2332,9 +2337,10 @@ version (iasm64NotWindows)
 
     template ByteCombine(c...)
     {
+        static assert (c.length <= 8);
         static if (c.length > 1)
-            enum ByteCombine = c[0] | (ByteCombine!(c[1..$]) << 8);
+            enum ulong ByteCombine = c[0] | (ByteCombine!(c[1..$]) << 8);
         else
-            enum ByteCombine = c[0];
+            enum ulong ByteCombine = c[0];
     }
 }
