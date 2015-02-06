@@ -1761,7 +1761,8 @@ class Parser
             error("declaration expected instead of EOF");
             return null;
         }
-        comment = current.comment;
+        if (current.comment !is null)
+            comment = current.comment;
         Attribute[] attributes;
         do
         {
@@ -2028,32 +2029,13 @@ class Parser
                     node.variableDeclaration = parseVariableDeclaration(type, false, node.attributes);
             }
             else
-            {
-                if ((node.variableDeclaration = parseVariableDeclaration(type)) is null)
-                {
-                    deallocate(node);
-                    return null;
-                }
-            }
-
+                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(type)`);
             break;
         case tok!"version":
             if (peekIs(tok!"("))
-            {
-                if ((node.conditionalDeclaration = parseConditionalDeclaration()) is null)
-                {
-                    deallocate(node);
-                    return null;
-                }
-            }
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration()`);
             else if (peekIs(tok!"="))
-            {
-                if ((node.versionSpecification = parseVersionSpecification()) is null)
-                {
-                    deallocate(node);
-                    return null;
-                }
-            }
+                mixin (nullCheck!`node.versionSpecification = parseVersionSpecification()`);
             else
             {
                 error(`"=" or "(" expected following "version"`);
@@ -2063,15 +2045,9 @@ class Parser
             break;
         case tok!"debug":
             if (peekIs(tok!"="))
-            {
                 mixin (nullCheck!`node.debugSpecification = parseDebugSpecification()`);
-                mixin (nullCheck!`node.debugSpecification`);
-            }
             else
-            {
                 mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration()`);
-                mixin (nullCheck!`node.conditionalDeclaration`);
-            }
             break;
         default:
             error("Declaration expected");
@@ -6453,6 +6429,7 @@ class Parser
 
         node.type = type is null ? parseType() : type;
         node.comment = comment;
+        comment = null;
 
         // TODO: handle function bodies correctly
 
