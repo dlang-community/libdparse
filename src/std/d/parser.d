@@ -1037,6 +1037,8 @@ class Parser
     AttributeDeclaration parseAttributeDeclaration(Attribute attribute = null)
     {
         auto node = allocate!AttributeDeclaration;
+        node.line = current.line;
+        node.index = current.index;
         node.attribute = attribute is null ? parseAttribute() : attribute;
         expect(tok!":");
         return node;
