@@ -856,7 +856,6 @@ final class AttributeDeclaration : ASTNode
         mixin (visitIfNotNull!(attribute));
     }
     /** */ Attribute attribute;
-    /** */ size_t index;
     /** */ size_t line;
     mixin OpEquals;
 }
