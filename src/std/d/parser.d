@@ -1240,7 +1240,13 @@ class Parser
         mixin (nullCheck!`expect(tok!"..")`);
         expect(tok!"case");
         mixin (nullCheck!`node.high = parseAssignExpression()`);
-        mixin (nullCheck!`expect(tok!":")`);
+        auto colon = expect(tok!":");
+        if (colon is null)
+        {
+            deallocate(node);
+            return null;
+        }
+        node.colonLocation = colon.index;
         mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements()`);
         return node;
     }
@@ -1257,7 +1263,13 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!CaseStatement;
         node.argumentList = argumentList;
-        mixin (nullCheck!`expect(tok!":")`);
+        auto colon = expect(tok!":");
+        if (colon is null)
+        {
+            deallocate(node);
+            return null;
+        }
+        node.colonLocation = colon.index;
         mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements()`);
         return node;
     }
@@ -2184,7 +2196,13 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DefaultStatement;
         mixin (nullCheck!`expect(tok!"default")`);
-        mixin (nullCheck!`expect(tok!":")`);
+        auto colon = expect(tok!":");
+        if (colon is null)
+        {
+            deallocate(node);
+            return null;
+        }
+        node.colonLocation = colon.index;
         mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements()`);
         return node;
     }
