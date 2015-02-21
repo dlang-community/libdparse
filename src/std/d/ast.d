@@ -328,7 +328,7 @@ template generateOpEquals(T)
             enum opEqualsPart = "";
         else static if (!isSomeFunction!(__traits(getMember, T, p[0]))
             && p[0] != "line" && p[0] != "column" && p[0] != "startLocation"
-            && p[0] != "endLocation")
+            && p[0] != "endLocation" && p[0] != "index")
         {
             static if (typeof(__traits(getMember, T, p[0])).stringof[$ - 2 .. $] == "[]")
             {
