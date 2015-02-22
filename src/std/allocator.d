@@ -488,7 +488,6 @@ void deallocate(T, Allocator)(auto ref Allocator a, T* structInstance)
 unittest
 {
     auto allocator = Mallocator.it;
-    bool d = false;
     struct TestStruct { float f; }
     TestStruct* ts = allocate!TestStruct(allocator);
     deallocate(allocator, ts);
@@ -507,11 +506,11 @@ void deallocate(T, Allocator)(auto ref Allocator a, T classInstance)
 ///
 unittest
 {
-	import std.math;
+    import std.math : isNaN;
     auto allocator = Mallocator.it;
     class TestClass { double z; }
     TestClass tc = allocate!TestClass(allocator);
-    assert (isnan(tc.z));
+    assert (isNaN(tc.z));
     deallocate(allocator, tc);
 }
 
