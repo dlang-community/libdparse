@@ -5174,13 +5174,19 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!StructInitializer;
-        expect(tok!"{");
+        auto a = expect(tok!"{");
+        node.startLocation = a.index;
         if (currentIs(tok!"}"))
+        {
+            node.endLocation = current.index;
             advance();
+        }
         else
         {
             mixin (nullCheck!`node.structMemberInitializers = parseStructMemberInitializers()`);
-            mixin (nullCheck!`expect(tok!"}")`);
+            auto e = expect(tok!"}");
+            mixin (nullCheck!`e`);
+            node.endLocation = e.index;
         }
         return node;
     }
