@@ -29,6 +29,12 @@ debug = identifier;
 version(AArch64) enum x = 100;
 version = coverage;
 
+debug {
+	version(A) {} else:
+	int a;
+}
+else:
+
 static if (true):
 mixin ("int a;");
 mixin something;

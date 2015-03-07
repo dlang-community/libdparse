@@ -779,35 +779,61 @@ class Formatter(Sink)
         putAttrs(attrs);
         format(decl.compileCondition);
 
-        assert(decl.trueDeclarations.length <= 1); // spec bug?
+        assert(decl.trueDeclarations.length > 0);
 
-        if (decl.trueDeclarations.length)
+        if (decl.trueDeclarations.length == 1)
         {
             if (isEmptyDeclaration(decl.trueDeclarations[0]))
             {
                 space();
                 put("{}");
             }
+            else if (decl.trueDeclarations[0].conditionalDeclaration !is null)
+            {
+                format(decl.trueDeclarations[0].conditionalDeclaration);
+            }
             else
+            {
                 maybeIndent(decl.trueDeclarations[0]);
+            }
+        }
+        else
+        {
+            put(":");
+            foreach (d; decl.trueDeclarations)
+                format(d);
+
+            assert(decl.falseDeclarations.length == 0);
+            return;
         }
 
-        if (decl.falseDeclaration)
+        if (decl.falseDeclarations.length > 0)
         {
             newThing(What.else_);
-            sink.put("else ");
+            sink.put("else");
 
-            if (isEmptyDeclaration(decl.falseDeclaration))
+            if (decl.falseDeclarations.length == 1)
             {
-                space();
-                put("{}");
-                return;
+                if (isEmptyDeclaration(decl.falseDeclarations[0]))
+                {
+                    space();
+                    put("{}");
+                }
+                else if (decl.falseDeclarations[0].conditionalDeclaration !is null)
+                {
+                    format(decl.falseDeclarations[0]);
+                }
+                else
+                {
+                    maybeIndent(decl.falseDeclarations[0]);
+                }
             }
-
-            if (decl.falseDeclaration.conditionalDeclaration)
-                format(decl.falseDeclaration);
             else
-                maybeIndent(decl.falseDeclaration);
+            {
+                put(":");
+                foreach (d; decl.falseDeclarations)
+                    format(d);
+            }
         }
     }
 

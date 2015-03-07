@@ -1507,7 +1507,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF conditionalDeclaration):
      *       $(RULE compileCondition) $(RULE declaration)
      *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+
-     *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') $(RULE declaration)
+     *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') ($(RULE declaration) | $(LITERAL ':') $(RULE declaration)+)
      *     ;)
      */
     ConditionalDeclaration parseConditionalDeclaration()
@@ -1546,15 +1546,29 @@ class Parser
         node.trueDeclarations = ownArray(trueDeclarations);
 
         if (currentIs(tok!"else"))
-            advance();
-        else
-            return node;
-
-        if ((node.falseDeclaration = parseDeclaration(suppressMessages > 0)) is null)
         {
-            deallocate(node);
-            return null;
+            advance();
+            if (currentIs(tok!":"))
+            {
+                advance();
+
+                while (moreTokens() && !currentIs(tok!"}"))
+                {
+                    auto decl = parseDeclaration(suppressMessages > 0);
+                    mixin (nullCheck!"decl");
+                    node.falseDeclarations ~= decl;
+                }
+                node.falseDeclarations = ownArray(node.falseDeclarations);
+            }
+            else
+            {
+                auto elseDec = parseDeclaration(suppressMessages > 0);
+                mixin (nullCheck!"elseDec");
+                node.falseDeclarations ~= elseDec;
+                node.falseDeclarations = ownArray(node.falseDeclarations);
+            }
         }
+
         return node;
     }
 
