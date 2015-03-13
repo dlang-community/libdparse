@@ -2617,7 +2617,8 @@ public:
         mixin (visitIfNotNull!(structMemberInitializers));
     }
     /** */ StructMemberInitializers structMemberInitializers;
-
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     mixin OpEquals;
 }
 
