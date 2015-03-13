@@ -1683,7 +1683,11 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DebugCondition;
-        mixin (nullCheck!`expect(tok!"debug")`);
+
+        auto d = expect(tok!"debug");
+        mixin (nullCheck!`d`);
+        node.debugIndex = d.index;
+
         if (currentIs(tok!"("))
         {
             advance();
@@ -6502,7 +6506,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!VersionCondition;
-        mixin (expectSequence!(tok!"version", tok!"("));
+        auto v = expect(tok!"version");
+        mixin (nullCheck!`v`);
+        node.versionIndex = v.index;
+        mixin (nullCheck!`expect(tok!"(")`);
         if (currentIsOneOf(tok!"intLiteral", tok!"identifier",
             tok!"unittest", tok!"assert"))
         {
