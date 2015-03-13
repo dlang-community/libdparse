@@ -1165,6 +1165,7 @@ public:
     {
         mixin (visitIfNotNull!(identifierOrInteger));
     }
+    /** */ size_t debugIndex;
     /** */ Token identifierOrInteger;
     mixin OpEquals;
 }
@@ -3164,6 +3165,7 @@ public:
     {
         mixin (visitIfNotNull!(token));
     }
+    /** */ size_t versionIndex;
     /** */ Token token;
     mixin OpEquals;
 }
