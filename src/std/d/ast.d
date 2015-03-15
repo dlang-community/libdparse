@@ -517,6 +517,8 @@ public:
         mixin (visitIfNotNull!(arrayMemberInitializations));
     }
     mixin OpEquals;
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     /** */ ArrayMemberInitialization[] arrayMemberInitializations;
 }
 

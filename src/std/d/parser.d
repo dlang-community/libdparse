@@ -268,7 +268,9 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ArrayInitializer;
-        mixin (nullCheck!`expect(tok!"[")`);
+        auto open = expect(tok!"[");
+        mixin (nullCheck!`open`);
+        node.startLocation = open.index;
         ArrayMemberInitialization[] arrayMemberInitializations;
         while (moreTokens())
         {
@@ -281,7 +283,9 @@ class Parser
                 break;
         }
         node.arrayMemberInitializations = ownArray(arrayMemberInitializations);
-        mixin (nullCheck!`expect(tok!"]")`);
+        auto close = expect(tok!"]");
+        mixin (nullCheck!`close`);
+        node.endLocation = close.index;
         return node;
     }
 
