@@ -3557,7 +3557,7 @@ class Parser
      * Parses a LabeledStatement
      *
      * $(GRAMMAR $(RULEDEF labeledStatement):
-     *     $(LITERAL Identifier) $(LITERAL ':') $(RULE declarationOrStatement)
+     *     $(LITERAL Identifier) $(LITERAL ':') $(RULE declarationOrStatement)?
      *     ;)
      */
     LabeledStatement parseLabeledStatement()
@@ -3568,7 +3568,8 @@ class Parser
         if (ident is null) { deallocate(node); return null; }
         node.identifier = *ident;
         expect(tok!":");
-        mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
+        if (!currentIs(tok!"}"))
+            mixin (nullCheck!`node.declarationOrStatement = parseDeclarationOrStatement()`);
         return node;
     }
 

@@ -59,4 +59,5 @@ deprecated void foo()
 	{
 		i++;
 	}
+label:
 }
