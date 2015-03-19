@@ -2329,7 +2329,7 @@ public:
         mixin (visitIfNotNull!(basicType, typeConstructor, type, primary,
             typeofExpression, typeidExpression, arrayLiteral, assocArrayLiteral,
             expression, dot, identifierOrTemplateInstance, isExpression,
-            lambdaExpression, functionLiteralExpression,
+            lambdaExpression, functionLiteralExpression, traitsExpression,
             mixinExpression, importExpression, vector, arguments));
     }
     /** */ Token dot;
