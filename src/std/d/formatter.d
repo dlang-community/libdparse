@@ -1971,12 +1971,20 @@ class Formatter(Sink)
         /**
         Token identifier;
         bool hasPlusPlus;
+        IdentifierChain identifierChain;
         **/
 
         put("extern (");
         format(linkageAttribute.identifier);
         if (linkageAttribute.hasPlusPlus)
+        {
             put("++");
+            if (linkageAttribute.identifierChain && linkageAttribute.identifierChain.identifiers.length > 0)
+            {
+                put(", ");
+                format(linkageAttribute.identifierChain);
+            }
+        }
         put(")");
     }
 
