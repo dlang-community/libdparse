@@ -1037,13 +1037,18 @@ class Formatter(Sink)
 
     void format(const Deprecated deprecated_)
     {
-        debug(verbose) writeln("Deprecated");
-
+        debug (verbose)
+            writeln("Deprecated");
         put("deprecated");
-        if (deprecated_.stringLiteral.type != tok!"")
+        if (deprecated_.stringLiterals.length > 0)
         {
             put("(");
-            put(deprecated_.stringLiteral.text);
+            foreach (i, literal; deprecated_.stringLiterals)
+            {
+                if (i > 0)
+                    put(", ");
+                put(literal.text);
+            }
             put(")");
             newlineIndent();
         }
