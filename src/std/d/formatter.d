@@ -1046,7 +1046,7 @@ class Formatter(Sink)
             foreach (i, literal; deprecated_.stringLiterals)
             {
                 if (i > 0)
-                    put(", ");
+                    put(" ");
                 put(literal.text);
             }
             put(")");
