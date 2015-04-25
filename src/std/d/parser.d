@@ -2168,13 +2168,8 @@ class Parser
             while (moreTokens() && currentIs(tok!"["))
             {
                 auto suffix = parseTypeSuffix();
-                if (suffix !is null)
-                    typeSuffixes ~= suffix;
-                else
-                {
-                    deallocate(node);
-                    return null;
-                }
+                mixin (nullCheck!`suffix`);
+                typeSuffixes ~= suffix;
             }
             node.cstyle = ownArray(typeSuffixes);
         }
@@ -2861,16 +2856,7 @@ class Parser
             if (currentIs(tok!"!"))
                 mixin (nullCheck!`node.templateArguments = parseTemplateArguments()`);
             if (unary !is null)
-                if ((node.arguments = parseArguments()) is null)
-                {
-                    deallocate(node);
-                    return null;
-                }
-        }
-        if (node.arguments is null)
-        {
-            deallocate(node);
-            return null;
+                mixin (nullCheck!`node.arguments = parseArguments()`);
         }
         return node;
     }
@@ -3990,7 +3976,7 @@ class Parser
         else
             mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
         if (node.assignExpression is null && node.arrayInitializer is null
-        && node.structInitializer is null)
+            && node.structInitializer is null)
         {
             deallocate(node);
             return null;
@@ -4409,11 +4395,7 @@ class Parser
                     node.primary = *t;
             }
             else if (currentIs(tok!"("))
-                if ((node.arguments = parseArguments()) is null)
-                {
-                    deallocate(node);
-                    return null;
-                }
+                mixin (nullCheck!`node.arguments = parseArguments()`);
             break;
         case tok!"function":
         case tok!"delegate":
@@ -4513,7 +4495,7 @@ class Parser
                 goToBookmark(b);
                 advance();
                 mixin (nullCheck!`node.expression = parseExpression()`);
-                expect(tok!")");
+                mixin (nullCheck!`expect(tok!")")`);
             }
             break;
         case tok!"is":
@@ -6244,11 +6226,7 @@ class Parser
         case tok!"scope":
         case tok!"pure":
         case tok!"nothrow":
-            if ((node.functionCallExpression = parseFunctionCallExpression()) is null)
-            {
-                deallocate(node);
-                return null;
-            }
+            mixin (nullCheck!`node.functionCallExpression = parseFunctionCallExpression()`);
             break;
         case tok!"&":
         case tok!"!":
@@ -6303,11 +6281,7 @@ class Parser
                 goto default;
             }
         default:
-            if ((node.primaryExpression = parsePrimaryExpression()) is null)
-            {
-                deallocate(node);
-                return null;
-            }
+            mixin (nullCheck!`node.primaryExpression = parsePrimaryExpression()`);
             break;
         }
 
@@ -6330,7 +6304,7 @@ class Parser
                 break loop;
         case tok!"(":
             auto newUnary = allocate!UnaryExpression();
-            newUnary.functionCallExpression = parseFunctionCallExpression(node);
+            mixin (nullCheck!`newUnary.functionCallExpression = parseFunctionCallExpression(node)`);
             node = newUnary;
             break;
         case tok!"++":
@@ -6433,16 +6407,8 @@ class Parser
         if (isAuto)
         {
             mixin (nullCheck!`node.autoDeclaration = parseAutoDeclaration()`);
-            if (node.autoDeclaration !is null)
-            {
-                node.comment = node.autoDeclaration.comment;
-                return node;
-            }
-            else
-            {
-                deallocate(node);
-                return null;
-            }
+            node.comment = node.autoDeclaration.comment;
+            return node;
         }
 
         StorageClass[] storageClasses;
