@@ -3402,7 +3402,9 @@ class Parser
     InStatement parseInStatement()
     {
         auto node = allocate!InStatement;
-        if (expect(tok!"in") is null) { deallocate(node); return null; }
+        auto i = expect(tok!"in");
+        mixin(nullCheck!`i`);
+        node.inTokenLocation = i.index;
         mixin (nullCheck!`node.blockStatement = parseBlockStatement()`);
         if (node.blockStatement is null)
             return null;
@@ -4064,7 +4066,9 @@ class Parser
     OutStatement parseOutStatement()
     {
         auto node = allocate!OutStatement;
-        expect(tok!"out");
+        auto o = expect(tok!"out");
+        mixin(nullCheck!`o`);
+        node.outTokenLocation = o.index;
         if (currentIs(tok!"("))
         {
             advance();
