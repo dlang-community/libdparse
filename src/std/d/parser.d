@@ -919,7 +919,8 @@ class Parser
             if (currentIs(tok!"("))
             {
                 advance(); // (
-                mixin (nullCheck!`node.argumentList = parseArgumentList()`);
+                if (!currentIs(tok!")"))
+                    mixin (nullCheck!`node.argumentList = parseArgumentList()`);
                 expect(tok!")");
             }
             break;

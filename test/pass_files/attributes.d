@@ -6,6 +6,7 @@ extern int a;
 @uda int a;
 @("uda") int a;
 @uda(42) int a;
+@uda() int a;
 private int a;
 public int a;
 protected int a;
