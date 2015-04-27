@@ -1825,6 +1825,7 @@ public:
     {
         mixin (visitIfNotNull!(blockStatement));
     }
+    /** */ size_t inTokenLocation;
     /** */ BlockStatement blockStatement;
     mixin OpEquals;
 }
@@ -2232,6 +2233,7 @@ public:
     {
         mixin (visitIfNotNull!(parameter, blockStatement));
     }
+    /** */ size_t outTokenLocation;
     /** */ Token parameter;
     /** */ BlockStatement blockStatement;
     mixin OpEquals;
