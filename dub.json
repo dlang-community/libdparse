@@ -2,6 +2,7 @@
 	"name": "libdparse",
 	"description": "Library for lexing and parsing D source code",
 	"license": "BSL-1.0",
+        "version": "0.2.1",
 	"importPaths": ["src"],
 	"sourcePaths": ["src"]
 }
