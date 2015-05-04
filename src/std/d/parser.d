@@ -1843,11 +1843,14 @@ class Parser
             Declaration[] declarations;
             while (moreTokens() && !currentIs(tok!"}"))
             {
-                auto declaration = parseDeclaration();
+                auto declaration = parseDeclaration(strict);
                 if (declaration !is null)
                     declarations ~= declaration;
                 else if (strict)
+                {
+                    deallocate(node);
                     return null;
+                }
             }
             node.declarations = ownArray(declarations);
             mixin (nullCheck!`expect(tok!"}")`);
@@ -7019,9 +7022,7 @@ protected:
             auto column = index < tokens.length ? tokens[index].column : tokens[$ - 1].column;
             auto line = index < tokens.length ? tokens[index].line : tokens[$ - 1].line;
             if (messageFunction is null)
-            {
                 stderr.writefln("%s(%d:%d)[error]: %s", fileName, line, column, message);
-            }
             else
                 messageFunction(fileName, line, column, message, true);
         }
