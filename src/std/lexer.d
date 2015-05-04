@@ -461,7 +461,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         import std.range : stride;
 
         string[] pseudoTokens = array(tokenHandlers.stride(2));
-        string[] allTokens = array(sort(staticTokens ~ possibleDefaultTokens ~ pseudoTokens).uniq);
+        string[] allTokens = array(sort(staticTokens ~ possibleDefaultTokens ~ pseudoTokens).uniq());
         // Array consisting of a sorted list of the first characters of the
         // tokens.
         char[] beginningChars = getBeginningChars(allTokens);
