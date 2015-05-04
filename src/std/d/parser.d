@@ -1052,7 +1052,7 @@ class Parser
      * Parses an AutoDeclaration
      *
      * $(GRAMMAR $(RULEDEF autoDeclaration):
-     *     $(RULE storageClass) $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer) ($(LITERAL ',') $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer))* $(LITERAL ';')
+     *     $(RULE storageClass)+ $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer) ($(LITERAL ',') $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer))* $(LITERAL ';')
      *     ;)
      */
     AutoDeclaration parseAutoDeclaration()
@@ -1061,8 +1061,14 @@ class Parser
         auto node = allocate!AutoDeclaration;
         node.comment = comment;
         comment = null;
-        if (isStorageClass())
-            mixin (nullCheck!`node.storageClass = parseStorageClass()`);
+        StorageClass[] storageClasses;
+        while (isStorageClass())
+        {
+            auto s = parseStorageClass();
+            mixin(nullCheck!`s`);
+            storageClasses ~= s;
+        }
+        node.storageClasses = ownArray(storageClasses);
         Token[] identifiers;
         Initializer[] initializers;
         do
@@ -1916,15 +1922,16 @@ class Parser
                 }
                 else
                 {
-                    auto eq = currentIs(tok!"=");
+                    immutable bool eq = currentIs(tok!"=");
                     goToBookmark(b);
                     mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, eq)`);
                 }
             }
             else
             {
+                immutable bool s = isStorageClass();
                 goToBookmark(b);
-                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration()`);
+                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, s)`);
             }
             break;
         case tok!"import":
@@ -1942,7 +1949,7 @@ class Parser
                 advance();
                 if (currentIs(tok!"("))
                 {
-                    auto t = peekPastParens();
+                    const t = peekPastParens();
                     if (t !is null && t.type == tok!";")
                     {
                         goToBookmark(b);

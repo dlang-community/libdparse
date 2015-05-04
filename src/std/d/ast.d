@@ -868,8 +868,8 @@ final class AutoDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        if (storageClass !is null)
-            visitor.visit(storageClass);
+        foreach (sc; storageClasses)
+            visitor.visit(sc);
         foreach (i; 0 .. initializers.length)
         {
             visitor.visit(initializers[i]);
@@ -877,7 +877,7 @@ public:
     }
     /** */ Token[] identifiers;
     /** */ Initializer[] initializers;
-    /** */ StorageClass storageClass;
+    /** */ StorageClass[] storageClasses;
     /** */ string comment;
     mixin OpEquals;
 }
