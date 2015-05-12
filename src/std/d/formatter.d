@@ -3,7 +3,7 @@ module std.d.formatter;
 import std.algorithm;
 import std.range;
 import std.stdio;
-import std.typetuple;
+import std.typetuple:TypeTuple;
 
 import std.d.ast;
 import std.d.lexer;
