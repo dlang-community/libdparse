@@ -7246,15 +7246,26 @@ protected:
     template simpleParse(NodeType, parts ...)
     {
         static if (__traits(hasMember, NodeType, "comment"))
-            enum simpleParse = "auto node = allocate!" ~ NodeType.stringof ~ ";\n"
-                ~ "node.comment = comment;\n"
-                ~ "comment = null;\n"
-                ~ simpleParseItems!(parts)
-                ~ "\nreturn node;\n";
-        else
-            enum simpleParse = "auto node = allocate!" ~ NodeType.stringof ~ ";\n"
-                ~ simpleParseItems!(parts)
-                ~ "\nreturn node;\n";
+            enum nodeComm = "node.comment = comment;\n"
+                        ~ "comment = null;\n";
+        else enum nodeComm = "";
+                        
+        static if (__traits(hasMember, NodeType, "line"))
+            enum nodeLine = "node.line = current().line;\n";
+        else enum nodeLine = "";
+            
+        static if (__traits(hasMember, NodeType, "column"))
+            enum nodeColumn = "node.column = current().column;\n";
+        else enum nodeColumn = "";
+        
+        static if (__traits(hasMember, NodeType, "location"))
+            enum nodeLoc = "node.location = current().index;\n";
+        else enum nodeLoc = "";
+        
+        enum simpleParse = "auto node = allocate!" ~ NodeType.stringof ~ ";\n"
+                        ~ nodeComm ~ nodeLine ~ nodeColumn ~ nodeLoc 
+                        ~ simpleParseItems!(parts)
+                        ~ "\nreturn node;\n";                        
     }
 
     template simpleParseItems(items ...)
