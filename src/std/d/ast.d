@@ -2528,6 +2528,8 @@ public:
     }
     /** */ FunctionBody functionBody;
     /** */ size_t location;
+    /** */ size_t line;
+    /** */ size_t column;
     /** */ string comment;
     mixin OpEquals;
 }
@@ -2542,6 +2544,8 @@ public:
     }
     /** */ FunctionBody functionBody;
     /** */ size_t location;
+    /** */ size_t line;
+    /** */ size_t column;
     /** */ string comment;
     mixin OpEquals;
 }
