@@ -1,7 +1,8 @@
 .dub
 docs.json
 __dummy.html
-*.o
+*.[oa]
 *.obj
 test/coverage/*
 test/tester
+dub.selections.json
