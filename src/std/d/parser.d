@@ -2143,8 +2143,12 @@ class Parser
         auto d = parseDeclaration(true);
         if (d !is null)
         {
-            abandonBookmark(b);
-            node.declaration = d;
+            // TODO: Make this more efficient. Right now we parse the declaration
+            // twice, once with errors and warnings ignored, and once with them
+            // printed. Maybe store messages to then be abandoned or written later?
+            deallocate(d);
+            goToBookmark(b);
+            node.declaration = parseDeclaration();
         }
         else
         {
