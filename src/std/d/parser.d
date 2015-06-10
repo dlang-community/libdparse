@@ -6624,12 +6624,6 @@ class Parser
         return index < tokens.length;
     }
 
-protected:
-
-    uint suppressedErrorCount;
-
-    enum MAX_ERRORS = 500;
-
     bool isSliceExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
@@ -6637,6 +6631,12 @@ protected:
             return true;
         return hasMagicDelimiter!(tok!"[", tok!"..")();
     }
+
+protected:
+
+    uint suppressedErrorCount;
+
+    enum MAX_ERRORS = 500;
 
     T[] ownArray(T)(T[] from)
     {
