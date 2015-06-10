@@ -512,6 +512,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
 
     private static string printCase(string[] tokens, string[] pseudoTokens, string indent)
     {
+        import std.array : array;
         import std.algorithm : countUntil;
         import std.conv : text;
         string[] sortedTokens = array(sort!"a.length > b.length"(tokens));
