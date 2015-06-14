@@ -22,7 +22,60 @@ import std.algorithm;
 import std.array;
 import std.string;
 
-// TODO: Many of these classes can be simplified by using std.variant.Algebraic
+private immutable uint[TypeInfo] typeMap;
+
+shared static this()
+{
+    typeMap[typeid(AddExpression)] = 1;
+    typeMap[typeid(AndAndExpression)] = 2;
+    typeMap[typeid(AndExpression)] = 3;
+    typeMap[typeid(AsmAddExp)] = 4;
+    typeMap[typeid(AsmAndExp)] = 5;
+    typeMap[typeid(AsmBrExp)] = 6;
+    typeMap[typeid(AsmExp)] = 7;
+    typeMap[typeid(AsmEqualExp)] = 8;
+    typeMap[typeid(AsmLogAndExp)] = 9;
+    typeMap[typeid(AsmLogOrExp)] = 10;
+    typeMap[typeid(AsmMulExp)] = 11;
+    typeMap[typeid(AsmOrExp)] = 12;
+    typeMap[typeid(AsmRelExp)] = 13;
+    typeMap[typeid(AsmUnaExp)] = 14;
+    typeMap[typeid(AsmShiftExp)] = 15;
+    typeMap[typeid(AsmXorExp)] = 16;
+    typeMap[typeid(AssertExpression)] = 17;
+    typeMap[typeid(AssignExpression)] = 18;
+    typeMap[typeid(CmpExpression)] = 19;
+    typeMap[typeid(DeleteExpression)] = 20;
+    typeMap[typeid(EqualExpression)] = 21;
+    typeMap[typeid(Expression)] = 22;
+    typeMap[typeid(FunctionCallExpression)] = 23;
+    typeMap[typeid(FunctionLiteralExpression)] = 24;
+    typeMap[typeid(IdentityExpression)] = 25;
+    typeMap[typeid(ImportExpression)] = 26;
+    typeMap[typeid(IndexExpression)] = 27;
+    typeMap[typeid(InExpression)] = 28;
+    typeMap[typeid(IsExpression)] = 29;
+    typeMap[typeid(LambdaExpression)] = 30;
+    typeMap[typeid(MixinExpression)] = 31;
+    typeMap[typeid(MulExpression)] = 32;
+    typeMap[typeid(NewAnonClassExpression)] = 33;
+    typeMap[typeid(NewExpression)] = 34;
+    typeMap[typeid(OrExpression)] = 35;
+    typeMap[typeid(OrOrExpression)] = 36;
+    typeMap[typeid(PowExpression)] = 37;
+    typeMap[typeid(PragmaExpression)] = 38;
+    typeMap[typeid(PrimaryExpression)] = 39;
+    typeMap[typeid(RelExpression)] = 40;
+    typeMap[typeid(ShiftExpression)] = 41;
+    typeMap[typeid(SliceExpression)] = 42;
+    typeMap[typeid(TemplateMixinExpression)] = 43;
+    typeMap[typeid(TernaryExpression)] = 44;
+    typeMap[typeid(TraitsExpression)] = 45;
+    typeMap[typeid(TypeidExpression)] = 46;
+    typeMap[typeid(TypeofExpression)] = 47;
+    typeMap[typeid(UnaryExpression)] = 48;
+    typeMap[typeid(XorExpression)] = 49;
+}
 
 /**
  * Implements the $(LINK2 http://en.wikipedia.org/wiki/Visitor_pattern, Visitor Pattern)
@@ -32,57 +85,62 @@ abstract class ASTVisitor
 {
 public:
 
+    /** */
     void visit(const ExpressionNode n)
     {
-        if (cast(AddExpression) n) visit(cast(AddExpression) n);
-        else if (cast(AndAndExpression) n) visit(cast(AndAndExpression) n);
-        else if (cast(AndExpression) n) visit(cast(AndExpression) n);
-        else if (cast(AsmAddExp) n) visit(cast(AsmAddExp) n);
-        else if (cast(AsmAndExp) n) visit(cast(AsmAndExp) n);
-        else if (cast(AsmBrExp) n) visit(cast(AsmBrExp) n);
-        else if (cast(AsmExp) n) visit(cast(AsmExp) n);
-        else if (cast(AsmEqualExp) n) visit(cast(AsmEqualExp) n);
-        else if (cast(AsmLogAndExp) n) visit(cast(AsmLogAndExp) n);
-        else if (cast(AsmLogOrExp) n) visit(cast(AsmLogOrExp) n);
-        else if (cast(AsmMulExp) n) visit(cast(AsmMulExp) n);
-        else if (cast(AsmOrExp) n) visit(cast(AsmOrExp) n);
-        else if (cast(AsmRelExp) n) visit(cast(AsmRelExp) n);
-        else if (cast(AsmUnaExp) n) visit(cast(AsmUnaExp) n);
-        else if (cast(AsmShiftExp) n) visit(cast(AsmShiftExp) n);
-        else if (cast(AsmXorExp) n) visit(cast(AsmXorExp) n);
-        else if (cast(AssertExpression) n) visit(cast(AssertExpression) n);
-        else if (cast(AssignExpression) n) visit(cast(AssignExpression) n);
-        else if (cast(CmpExpression) n) visit(cast(CmpExpression) n);
-        else if (cast(DeleteExpression) n) visit(cast(DeleteExpression) n);
-        else if (cast(EqualExpression) n) visit(cast(EqualExpression) n);
-        else if (cast(Expression) n) visit(cast(Expression) n);
-        else if (cast(FunctionCallExpression) n) visit(cast(FunctionCallExpression) n);
-        else if (cast(FunctionLiteralExpression) n) visit(cast(FunctionLiteralExpression) n);
-        else if (cast(IdentityExpression) n) visit(cast(IdentityExpression) n);
-        else if (cast(ImportExpression) n) visit(cast(ImportExpression) n);
-        else if (cast(IndexExpression) n) visit(cast(IndexExpression) n);
-        else if (cast(InExpression) n) visit(cast(InExpression) n);
-        else if (cast(IsExpression) n) visit(cast(IsExpression) n);
-        else if (cast(LambdaExpression) n) visit(cast(LambdaExpression) n);
-        else if (cast(MixinExpression) n) visit(cast(MixinExpression) n);
-        else if (cast(MulExpression) n) visit(cast(MulExpression) n);
-        else if (cast(NewAnonClassExpression) n) visit(cast(NewAnonClassExpression) n);
-        else if (cast(NewExpression) n) visit(cast(NewExpression) n);
-        else if (cast(OrExpression) n) visit(cast(OrExpression) n);
-        else if (cast(OrOrExpression) n) visit(cast(OrOrExpression) n);
-        else if (cast(PowExpression) n) visit(cast(PowExpression) n);
-        else if (cast(PragmaExpression) n) visit(cast(PragmaExpression) n);
-        else if (cast(PrimaryExpression) n) visit(cast(PrimaryExpression) n);
-        else if (cast(RelExpression) n) visit(cast(RelExpression) n);
-        else if (cast(ShiftExpression) n) visit(cast(ShiftExpression) n);
-        else if (cast(SliceExpression) n) visit(cast(SliceExpression) n);
-        else if (cast(TemplateMixinExpression) n) visit(cast(TemplateMixinExpression) n);
-        else if (cast(TernaryExpression) n) visit(cast(TernaryExpression) n);
-        else if (cast(TraitsExpression) n) visit(cast(TraitsExpression) n);
-        else if (cast(TypeidExpression) n) visit(cast(TypeidExpression) n);
-        else if (cast(TypeofExpression) n) visit(cast(TypeofExpression) n);
-        else if (cast(UnaryExpression) n) visit(cast(UnaryExpression) n);
-        else if (cast(XorExpression) n) visit(cast(XorExpression) n);
+        switch (typeMap[typeid(n)])
+        {
+        case 1: visit(cast(AddExpression) n); break;
+        case 2: visit(cast(AndAndExpression) n); break;
+        case 3: visit(cast(AndExpression) n); break;
+        case 4: visit(cast(AsmAddExp) n); break;
+        case 5: visit(cast(AsmAndExp) n); break;
+        case 6: visit(cast(AsmBrExp) n); break;
+        case 7: visit(cast(AsmExp) n); break;
+        case 8: visit(cast(AsmEqualExp) n); break;
+        case 9: visit(cast(AsmLogAndExp) n); break;
+        case 10: visit(cast(AsmLogOrExp) n); break;
+        case 11: visit(cast(AsmMulExp) n); break;
+        case 12: visit(cast(AsmOrExp) n); break;
+        case 13: visit(cast(AsmRelExp) n); break;
+        case 14: visit(cast(AsmUnaExp) n); break;
+        case 15: visit(cast(AsmShiftExp) n); break;
+        case 16: visit(cast(AsmXorExp) n); break;
+        case 17: visit(cast(AssertExpression) n); break;
+        case 18: visit(cast(AssignExpression) n); break;
+        case 19: visit(cast(CmpExpression) n); break;
+        case 20: visit(cast(DeleteExpression) n); break;
+        case 21: visit(cast(EqualExpression) n); break;
+        case 22: visit(cast(Expression) n); break;
+        case 23: visit(cast(FunctionCallExpression) n); break;
+        case 24: visit(cast(FunctionLiteralExpression) n); break;
+        case 25: visit(cast(IdentityExpression) n); break;
+        case 26: visit(cast(ImportExpression) n); break;
+        case 27: visit(cast(IndexExpression) n); break;
+        case 28: visit(cast(InExpression) n); break;
+        case 29: visit(cast(IsExpression) n); break;
+        case 30: visit(cast(LambdaExpression) n); break;
+        case 31: visit(cast(MixinExpression) n); break;
+        case 32: visit(cast(MulExpression) n); break;
+        case 33: visit(cast(NewAnonClassExpression) n); break;
+        case 34: visit(cast(NewExpression) n); break;
+        case 35: visit(cast(OrExpression) n); break;
+        case 36: visit(cast(OrOrExpression) n); break;
+        case 37: visit(cast(PowExpression) n); break;
+        case 38: visit(cast(PragmaExpression) n); break;
+        case 39: visit(cast(PrimaryExpression) n); break;
+        case 40: visit(cast(RelExpression) n); break;
+        case 41: visit(cast(ShiftExpression) n); break;
+        case 42: visit(cast(SliceExpression) n); break;
+        case 43: visit(cast(TemplateMixinExpression) n); break;
+        case 44: visit(cast(TernaryExpression) n); break;
+        case 45: visit(cast(TraitsExpression) n); break;
+        case 46: visit(cast(TypeidExpression) n); break;
+        case 47: visit(cast(TypeofExpression) n); break;
+        case 48: visit(cast(UnaryExpression) n); break;
+        case 49: visit(cast(XorExpression) n); break;
+        default: assert(false, __MODULE__ ~ " has a bug");
+        }
     }
 
     /** */ void visit(const AddExpression addExpression) { addExpression.accept(this); }
