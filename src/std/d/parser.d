@@ -4,7 +4,7 @@ module std.d.parser;
 
 import std.d.lexer;
 import std.d.ast;
-import std.allocator;
+import std.experimental.allocator;
 import std.conv;
 import std.algorithm;
 import std.array;
@@ -26,7 +26,7 @@ alias ParseAllocator = CAllocatorImpl!(Mallocator);
  *         means warning).
  * Returns: the parsed module
  */
-Module parseModule(const(Token)[] tokens, string fileName, CAllocator allocator = null,
+Module parseModule(const(Token)[] tokens, string fileName, IAllocator allocator = null,
     void function(string, size_t, size_t, string, bool) messageFunction = null,
     uint* errorCount = null, uint* warningCount = null)
 {
@@ -6602,7 +6602,7 @@ class Parser
     /**
      * Allocator used for creating AST nodes
      */
-    CAllocator allocator;
+    IAllocator allocator;
 
     /**
      * Function that is called when a warning or error is encountered.
