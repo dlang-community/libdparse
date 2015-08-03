@@ -1249,53 +1249,92 @@ public:
 
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(attributes, attributeDeclaration,
-            importDeclaration, functionDeclaration,
-            variableDeclaration, aliasThisDeclaration, structDeclaration,
-            classDeclaration, interfaceDeclaration, unionDeclaration,
-            enumDeclaration, aliasDeclaration, mixinDeclaration,
-            mixinTemplateDeclaration, unittest_, staticAssertDeclaration,
-            templateDeclaration, constructor,
-            destructor, staticConstructor, staticDestructor,
-            sharedStaticDestructor, sharedStaticConstructor,
-            conditionalDeclaration, pragmaDeclaration, versionSpecification,
-            invariant_, postblit, declarations, debugSpecification,
-            eponymousTemplateDeclaration, anonymousEnumDeclaration));
+
+        foreach (attr; attributes)
+            visitor.visit(attr);
+        foreach (dec; declarations)
+            visitor.visit(dec);
+        foreach (Type; DeclarationTypes)
+        {
+            const(Type)* value = storage.peek!Type;
+            if (value)
+            {
+                static if (isArray!Type)
+                    foreach (item; *(cast(Type*) value))
+                        visitor.visit(item);
+                else if (*value !is null)
+                    visitor.visit(*(cast(Type*) value));
+            }
+        }
     }
 
-    /** */ AliasDeclaration aliasDeclaration;
-    /** */ AliasThisDeclaration aliasThisDeclaration;
-    /** */ AnonymousEnumDeclaration anonymousEnumDeclaration;
+    private import std.variant:Algebraic;
+    private import std.typetuple:TypeTuple;
+
+    alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasThisDeclaration,
+        AnonymousEnumDeclaration, Attribute[], AttributeDeclaration,
+        ClassDeclaration, ConditionalDeclaration, Constructor, DebugSpecification,
+        /+Declaration[],+/ Destructor, EnumDeclaration, EponymousTemplateDeclaration,
+        FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, Invariant,
+        MixinDeclaration, MixinTemplateDeclaration, Postblit, PragmaDeclaration,
+        SharedStaticConstructor, SharedStaticDestructor, StaticAssertDeclaration,
+        StaticConstructor, StaticDestructor, StructDeclaration,
+        TemplateDeclaration, UnionDeclaration, Unittest, VariableDeclaration,
+        VersionSpecification);
+
+    private Algebraic!(DeclarationTypes) storage;
+
+    private static string generateProperty(string type, string name)
+    {
+        return "const(" ~ type ~ ") " ~ name ~ "() const @property { auto p = storage.peek!" ~ type ~ "; return p is null? null : *p;}\n"
+            ~ "const(" ~ type ~ ") " ~ name ~ "(" ~ type ~ " node) @property { storage = node; return node; }";
+    }
+
     /** */ Attribute[] attributes;
-    /** */ AttributeDeclaration attributeDeclaration;
-    /** */ ClassDeclaration classDeclaration;
-    /** */ ConditionalDeclaration conditionalDeclaration;
-    /** */ Constructor constructor;
-    /** */ DebugSpecification debugSpecification;
     /** */ Declaration[] declarations;
-    /** */ Destructor destructor;
-    /** */ EnumDeclaration enumDeclaration;
-    /** */ EponymousTemplateDeclaration eponymousTemplateDeclaration;
-    /** */ FunctionDeclaration functionDeclaration;
-    /** */ ImportDeclaration importDeclaration;
-    /** */ InterfaceDeclaration interfaceDeclaration;
-    /** */ Invariant invariant_;
-    /** */ MixinDeclaration mixinDeclaration;
-    /** */ MixinTemplateDeclaration mixinTemplateDeclaration;
-    /** */ Postblit postblit;
-    /** */ PragmaDeclaration pragmaDeclaration;
-    /** */ SharedStaticConstructor sharedStaticConstructor;
-    /** */ SharedStaticDestructor sharedStaticDestructor;
-    /** */ StaticAssertDeclaration staticAssertDeclaration;
-    /** */ StaticConstructor staticConstructor;
-    /** */ StaticDestructor staticDestructor;
-    /** */ StructDeclaration structDeclaration;
-    /** */ TemplateDeclaration templateDeclaration;
-    /** */ UnionDeclaration unionDeclaration;
-    /** */ Unittest unittest_;
-    /** */ VariableDeclaration variableDeclaration;
-    /** */ VersionSpecification versionSpecification;
-    mixin OpEquals;
+
+    mixin(generateProperty("AliasDeclaration", "aliasDeclaration"));
+    mixin(generateProperty("AliasThisDeclaration", "aliasThisDeclaration"));
+    mixin(generateProperty("AnonymousEnumDeclaration", "anonymousEnumDeclaration"));
+    mixin(generateProperty("AttributeDeclaration", "attributeDeclaration"));
+    mixin(generateProperty("ClassDeclaration", "classDeclaration"));
+    mixin(generateProperty("ConditionalDeclaration", "conditionalDeclaration"));
+    mixin(generateProperty("Constructor", "constructor"));
+    mixin(generateProperty("DebugSpecification", "debugSpecification"));
+    /+mixin(generateProperty("Declaration[]", "declarations"));+/
+    mixin(generateProperty("Destructor", "destructor"));
+    mixin(generateProperty("EnumDeclaration", "enumDeclaration"));
+    mixin(generateProperty("EponymousTemplateDeclaration", "eponymousTemplateDeclaration"));
+    mixin(generateProperty("FunctionDeclaration", "functionDeclaration"));
+    mixin(generateProperty("ImportDeclaration", "importDeclaration"));
+    mixin(generateProperty("InterfaceDeclaration", "interfaceDeclaration"));
+    mixin(generateProperty("Invariant", "invariant_"));
+    mixin(generateProperty("MixinDeclaration", "mixinDeclaration"));
+    mixin(generateProperty("MixinTemplateDeclaration", "mixinTemplateDeclaration"));
+    mixin(generateProperty("Postblit", "postblit"));
+    mixin(generateProperty("PragmaDeclaration", "pragmaDeclaration"));
+    mixin(generateProperty("SharedStaticConstructor", "sharedStaticConstructor"));
+    mixin(generateProperty("SharedStaticDestructor", "sharedStaticDestructor"));
+    mixin(generateProperty("StaticAssertDeclaration", "staticAssertDeclaration"));
+    mixin(generateProperty("StaticConstructor", "staticConstructor"));
+    mixin(generateProperty("StaticDestructor", "staticDestructor"));
+    mixin(generateProperty("StructDeclaration", "structDeclaration"));
+    mixin(generateProperty("TemplateDeclaration", "templateDeclaration"));
+    mixin(generateProperty("UnionDeclaration", "unionDeclaration"));
+    mixin(generateProperty("Unittest", "unittest_"));
+    mixin(generateProperty("VariableDeclaration", "variableDeclaration"));
+    mixin(generateProperty("VersionSpecification", "versionSpecification"));
+
+
+    bool opEquals(const Object other) const
+    {
+        auto otherDeclaration = cast(Declaration) other;
+        if (otherDeclaration is null)
+            return false;
+        return attributes == otherDeclaration.attributes
+            && declarations == otherDeclaration.declarations
+            && storage == otherDeclaration.storage;
+    }
 }
 
 ///
