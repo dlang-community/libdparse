@@ -4,6 +4,7 @@ module std.d.parser;
 
 import std.d.lexer;
 import std.d.ast;
+import std.experimental.allocator.mallocator;
 import std.experimental.allocator;
 import std.conv;
 import std.algorithm;
