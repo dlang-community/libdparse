@@ -1744,7 +1744,7 @@ class Parser
      * Params: strict = if true, do not return partial AST nodes on errors.
      *
      * $(GRAMMAR $(RULEDEF declaration):
-     *     $(RULE attribute)* $(declaration2)
+     *     $(RULE attribute)* $(RULE declaration2)
      *     ;
      * $(RULEDEF declaration2):
      *       $(RULE aliasDeclaration)
@@ -2373,7 +2373,7 @@ class Parser
 
     /**
      * $(GRAMMAR $(RULEDEF anonymousEnumMember):
-     *       $(Rule type) $(LITERAL identifier) $(LITERAL '=') $(RULE assignExpression)
+     *       $(RULE type) $(LITERAL identifier) $(LITERAL '=') $(RULE assignExpression)
      *     | $(LITERAL identifier) $(LITERAL '=') $(RULE assignExpression)
      *     | $(LITERAL identifier)
      *     ;)
