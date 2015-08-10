@@ -9,7 +9,7 @@ GREEN="\033[32m"
 RED="\033[31m"
 CYAN="\033[36m"
 DMD=${DMD:=dmd}
-ALLOCATOR_SOURCE=$(find ../src/std/experimental -name "*.d")
+ALLOCATOR_SOURCE=$(find ../experimental_allocator/src/std/experimental -name "*.d")
 
 echo -en "Compiling tester... "
 ${DMD} tester.d ../src/std/*.d ../src/std/d/*.d ${ALLOCATOR_SOURCE} -g -I../src/ || exit 1
