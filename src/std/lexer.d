@@ -667,9 +667,12 @@ mixin template Lexer(Token, alias defaultTokenFunction,
 
     static ulong getFront(const ubyte[] arr) pure nothrow @trusted
     {
-        immutable importantBits = *(cast (ulong*) arr.ptr);
-        immutable filler = ulong.max >> ((8 - arr.length) * 8);
-        return importantBits & filler;
+        static union ByteArr { ulong l; ubyte[8] arr; }
+        static assert(ByteArr.sizeof == ulong.sizeof);
+        ByteArr b;
+        b.l = ulong.max;
+        b.arr[0 .. arr.length] = arr[];
+        return b.l;
     }
 
     void advance(ref Token token) pure nothrow @trusted
@@ -685,7 +688,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         immutable ulong frontBytes = range.index + 8 <= range.bytes.length
             ? getFront(range.bytes[range.index .. range.index + 8])
             : getFront(range.bytes[range.index .. $]);
-        ubyte f = frontBytes & 0xff;
+        ubyte f = cast(ubyte) frontBytes;
 //        pragma(msg, tokenSearch);
         mixin(tokenSearch);
     _defaultTokenFunction:
