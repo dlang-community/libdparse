@@ -1517,7 +1517,7 @@ class Formatter(Sink)
             if (type) format(type);
             if (parameters) format(parameters);
 
-            foreach(att; functionAttributes)
+            foreach(att; memberFunctionAttributes)
             {
                 space();
                 format(att);

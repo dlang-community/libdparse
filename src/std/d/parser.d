@@ -2988,16 +2988,16 @@ class Parser
         {
             mixin (nullCheck!`node.parameters = parseParameters()`);
             if (node.parameters is null) { deallocate(node); return null; }
-            FunctionAttribute[] functionAttributes;
-            do
+            MemberFunctionAttribute[] memberFunctionAttributes;
+            while (currentIsMemberFunctionAttribute())
             {
-                auto attr = parseFunctionAttribute(false);
+                auto attr = parseMemberFunctionAttribute();
                 if (attr is null)
                     break;
                 else
-                    functionAttributes ~= attr;
-            } while (moreTokens());
-            node.functionAttributes = ownArray(functionAttributes);
+                    memberFunctionAttributes ~= attr;
+            }
+            node.memberFunctionAttributes = ownArray(memberFunctionAttributes);
         }
         if ((node.functionBody = parseFunctionBody()) is null) { deallocate(node); return null; }
         return node;

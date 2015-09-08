@@ -1632,13 +1632,13 @@ final class FunctionLiteralExpression : ExpressionNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(type, parameters, functionAttributes,
+        mixin (visitIfNotNull!(type, parameters, memberFunctionAttributes,
             functionBody));
     }
     /** */ IdType functionOrDelegate;
     /** */ Type type;
     /** */ Parameters parameters;
-    /** */ FunctionAttribute[] functionAttributes;
+    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
     /** */ FunctionBody functionBody;
     mixin OpEquals;
 }
