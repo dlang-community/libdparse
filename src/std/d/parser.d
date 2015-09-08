@@ -4,7 +4,8 @@ module std.d.parser;
 
 import std.d.lexer;
 import std.d.ast;
-import std.allocator;
+import std.experimental.allocator.mallocator;
+import std.experimental.allocator;
 import std.conv;
 import std.algorithm;
 import std.array;
@@ -26,7 +27,7 @@ alias ParseAllocator = CAllocatorImpl!(Mallocator);
  *         means warning).
  * Returns: the parsed module
  */
-Module parseModule(const(Token)[] tokens, string fileName, CAllocator allocator = null,
+Module parseModule(const(Token)[] tokens, string fileName, IAllocator allocator = null,
     void function(string, size_t, size_t, string, bool) messageFunction = null,
     uint* errorCount = null, uint* warningCount = null)
 {
@@ -1743,7 +1744,7 @@ class Parser
      * Params: strict = if true, do not return partial AST nodes on errors.
      *
      * $(GRAMMAR $(RULEDEF declaration):
-     *     $(RULE attribute)* $(declaration2)
+     *     $(RULE attribute)* $(RULE declaration2)
      *     ;
      * $(RULEDEF declaration2):
      *       $(RULE aliasDeclaration)
@@ -2372,7 +2373,7 @@ class Parser
 
     /**
      * $(GRAMMAR $(RULEDEF anonymousEnumMember):
-     *       $(Rule type) $(LITERAL identifier) $(LITERAL '=') $(RULE assignExpression)
+     *       $(RULE type) $(LITERAL identifier) $(LITERAL '=') $(RULE assignExpression)
      *     | $(LITERAL identifier) $(LITERAL '=') $(RULE assignExpression)
      *     | $(LITERAL identifier)
      *     ;)
@@ -6602,7 +6603,7 @@ class Parser
     /**
      * Allocator used for creating AST nodes
      */
-    CAllocator allocator;
+    IAllocator allocator;
 
     /**
      * Function that is called when a warning or error is encountered.
@@ -6624,12 +6625,6 @@ class Parser
         return index < tokens.length;
     }
 
-protected:
-
-    uint suppressedErrorCount;
-
-    enum MAX_ERRORS = 500;
-
     bool isSliceExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
@@ -6637,6 +6632,12 @@ protected:
             return true;
         return hasMagicDelimiter!(tok!"[", tok!"..")();
     }
+
+protected:
+
+    uint suppressedErrorCount;
+
+    enum MAX_ERRORS = 500;
 
     T[] ownArray(T)(T[] from)
     {

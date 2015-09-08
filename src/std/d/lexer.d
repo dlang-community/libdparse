@@ -2016,7 +2016,6 @@ public pure nothrow @nogc:
         {
             Block* prev = current;
             current = current.next;
-            free(cast(void*) prev.bytes.ptr);
             free(cast(void*) prev);
         }
         foreach (nodePointer; buckets)
@@ -2024,6 +2023,8 @@ public pure nothrow @nogc:
             Node* currentNode = nodePointer;
             while (currentNode !is null)
             {
+                if (currentNode.mallocated)
+                    free(currentNode.str.ptr);
                 Node* prev = currentNode;
                 currentNode = currentNode.next;
                 free(prev);
@@ -2066,12 +2067,18 @@ private:
         Node* s = find(bytes, hash);
         if (s !is null)
             return cast(string) s.str;
-        ubyte[] mem = allocate(bytes.length);
+        ubyte[] mem = void;
+        bool mallocated = bytes.length > BIG_STRING;
+        if (mallocated)
+            mem = (cast(ubyte*) malloc(bytes.length))[0 .. bytes.length];
+        else
+            mem = allocate(bytes.length);
         mem[] = bytes[];
         Node* node = cast(Node*) malloc(Node.sizeof);
         node.str = mem;
         node.hash = hash;
         node.next = buckets[index];
+        node.mallocated = mallocated;
         buckets[index] = node;
         return cast(string) mem;
     }
@@ -2146,13 +2153,10 @@ private:
     }
     body
     {
-        if (numBytes > BIG_STRING)
-            return (cast(ubyte*) malloc(numBytes))[0 .. numBytes];
         Block* r = rootBlock;
         size_t i = 0;
         while  (i <= 3 && r !is null)
         {
-
             immutable size_t available = r.bytes.length;
             immutable size_t oldUsed = r.used;
             immutable size_t newUsed = oldUsed + numBytes;
@@ -2164,8 +2168,7 @@ private:
             i++;
             r = r.next;
         }
-        Block* b = cast(Block*) malloc(Block.sizeof);
-        b.bytes = (cast(ubyte*) malloc(BLOCK_SIZE))[0 .. BLOCK_SIZE];
+        Block* b = cast(Block*) calloc(Block.sizeof, 1);
         b.used = numBytes;
         b.next = rootBlock;
         rootBlock = b;
@@ -2174,17 +2177,21 @@ private:
 
     static struct Node
     {
-        ubyte[] str;
-        uint hash;
-        Node* next;
+        ubyte[] str = void;
+        Node* next = void;
+        uint hash = void;
+        bool mallocated = void;
     }
 
     static struct Block
     {
-        ubyte[] bytes;
-        size_t used;
         Block* next;
+        size_t used;
+        enum BLOCK_CAPACITY = BLOCK_SIZE - size_t.sizeof - (void*).sizeof;
+        ubyte[BLOCK_CAPACITY] bytes;
     }
+
+    static assert (BLOCK_SIZE == Block.sizeof);
 
     enum BLOCK_SIZE = 1024 * 16;
 
@@ -2237,7 +2244,7 @@ version (iasm64NotWindows)
      */
     ushort newlineMask(const ubyte*) pure nothrow @trusted @nogc
     {
-        asm
+        asm pure nothrow @nogc
         {
             naked;
             movdqu XMM1, [RDI];
@@ -2293,7 +2300,7 @@ version (iasm64NotWindows)
             enum flags = 0b0001_0000;
         else
             enum flags = 0b0000_0000;
-        asm
+        asm pure nothrow @nogc
         {
             naked;
             movdqu XMM1, [RDX];
@@ -2321,7 +2328,7 @@ version (iasm64NotWindows)
         else
             enum rangeMatchFlags = 0b0001_0100;
         enum charsLength = chars.length;
-        asm
+        asm pure nothrow @nogc
         {
             naked;
             movdqu XMM1, [RDI];
