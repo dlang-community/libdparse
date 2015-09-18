@@ -852,10 +852,10 @@ final class AssignExpression : ExpressionNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(ternaryExpression, assignExpression));
+        mixin (visitIfNotNull!(ternaryExpression, expression));
     }
     /** */ ExpressionNode ternaryExpression;
-    /** */ ExpressionNode assignExpression;
+    /** */ ExpressionNode expression;
     /** */ IdType operator;
     /** */ size_t line;
     /** */ size_t column;
