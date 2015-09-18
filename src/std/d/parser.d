@@ -1871,6 +1871,19 @@ class Parser
             mixin (nullCheck!`node.classDeclaration = parseClassDeclaration()`);
             break;
         case tok!"this":
+            if (strict && peekIs(tok!"("))
+            {
+                // If we are in strict mode, do not parse as a declaration.
+                // Instead this should be parsed as a function call.
+                ++index;
+                const past = peekPastParens();
+                --index;
+                if (past !is null && past.type == tok!";")
+                {
+                    deallocate(node);
+                    return null;
+                }
+            }
             if (startsWith(tok!"this", tok!"(", tok!"this", tok!")"))
             {
                 mixin (nullCheck!`node.postblit = parsePostblit()`);
@@ -2142,7 +2155,12 @@ class Parser
         // Declarations are resolved by the declarations taking precedence."
         auto b = setBookmark();
         auto d = parseDeclaration(true);
-        if (d !is null)
+        if (d is null)
+        {
+            goToBookmark(b);
+            mixin (nullCheck!`node.statement = parseStatement()`);
+        }
+        else
         {
             // TODO: Make this more efficient. Right now we parse the declaration
             // twice, once with errors and warnings ignored, and once with them
@@ -2150,11 +2168,6 @@ class Parser
             deallocate(d);
             goToBookmark(b);
             node.declaration = parseDeclaration();
-        }
-        else
-        {
-            goToBookmark(b);
-            mixin (nullCheck!`node.statement = parseStatement()`);
         }
         return node;
     }
@@ -7310,15 +7323,16 @@ protected:
 
     version (std_parser_verbose)
     {
+        import std.stdio : stderr;
         void trace(string message)
         {
             if (suppressMessages > 0)
                 return;
             auto depth = format("%4d ", _traceDepth);
             if (index < tokens.length)
-                writeln(depth, message, "(", current.line, ":", current.column, ")");
+                stderr.writeln(depth, message, "(", current.line, ":", current.column, ")");
             else
-                writeln(depth, message, "(EOF:0)");
+                stderr.writeln(depth, message, "(EOF:0)");
         }
     }
     else
