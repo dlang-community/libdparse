@@ -1762,7 +1762,7 @@ private pure nothrow @safe:
             m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m,
             m, m, m, m, m, m, m, m, m, m, m, m, m, m, m, m
         ];
-        immutable ulong result = LOOKUP_TABLE[c];
+        immutable ubyte result = LOOKUP_TABLE[c];
         if (result == n)
             return false;
         if (result == y)
