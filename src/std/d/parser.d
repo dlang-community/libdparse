@@ -829,7 +829,7 @@ class Parser
      * Parses an AssignExpression
      *
      * $(GRAMMAR $(RULEDEF assignExpression):
-     *     $(RULE ternaryExpression) ($(RULE assignOperator) $(RULE assignExpression))?
+     *     $(RULE ternaryExpression) ($(RULE assignOperator) $(RULE expression))?
      *     ;
      *$(RULEDEF assignOperator):
      *       $(LITERAL '=')
@@ -871,7 +871,7 @@ class Parser
             node.column = current().column;
             node.ternaryExpression = ternary;
             node.operator = advance().type;
-            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
+            mixin (nullCheck!`node.expression = parseExpression()`);
             return node;
         }
         return ternary;
@@ -1871,6 +1871,19 @@ class Parser
             mixin (nullCheck!`node.classDeclaration = parseClassDeclaration()`);
             break;
         case tok!"this":
+            if (strict && peekIs(tok!"("))
+            {
+                // If we are in strict mode, do not parse as a declaration.
+                // Instead this should be parsed as a function call.
+                ++index;
+                const past = peekPastParens();
+                --index;
+                if (past !is null && past.type == tok!";")
+                {
+                    deallocate(node);
+                    return null;
+                }
+            }
             if (startsWith(tok!"this", tok!"(", tok!"this", tok!")"))
             {
                 mixin (nullCheck!`node.postblit = parsePostblit()`);
@@ -2142,7 +2155,12 @@ class Parser
         // Declarations are resolved by the declarations taking precedence."
         auto b = setBookmark();
         auto d = parseDeclaration(true);
-        if (d !is null)
+        if (d is null)
+        {
+            goToBookmark(b);
+            mixin (nullCheck!`node.statement = parseStatement()`);
+        }
+        else
         {
             // TODO: Make this more efficient. Right now we parse the declaration
             // twice, once with errors and warnings ignored, and once with them
@@ -2150,11 +2168,6 @@ class Parser
             deallocate(d);
             goToBookmark(b);
             node.declaration = parseDeclaration();
-        }
-        else
-        {
-            goToBookmark(b);
-            mixin (nullCheck!`node.statement = parseStatement()`);
         }
         return node;
     }
@@ -2989,16 +3002,16 @@ class Parser
         {
             mixin (nullCheck!`node.parameters = parseParameters()`);
             if (node.parameters is null) { deallocate(node); return null; }
-            FunctionAttribute[] functionAttributes;
-            do
+            MemberFunctionAttribute[] memberFunctionAttributes;
+            while (currentIsMemberFunctionAttribute())
             {
-                auto attr = parseFunctionAttribute(false);
+                auto attr = parseMemberFunctionAttribute();
                 if (attr is null)
                     break;
                 else
-                    functionAttributes ~= attr;
-            } while (moreTokens());
-            node.functionAttributes = ownArray(functionAttributes);
+                    memberFunctionAttributes ~= attr;
+            }
+            node.memberFunctionAttributes = ownArray(memberFunctionAttributes);
         }
         if ((node.functionBody = parseFunctionBody()) is null) { deallocate(node); return null; }
         return node;
@@ -7310,15 +7323,16 @@ protected:
 
     version (std_parser_verbose)
     {
+        import std.stdio : stderr;
         void trace(string message)
         {
             if (suppressMessages > 0)
                 return;
             auto depth = format("%4d ", _traceDepth);
             if (index < tokens.length)
-                writeln(depth, message, "(", current.line, ":", current.column, ")");
+                stderr.writeln(depth, message, "(", current.line, ":", current.column, ")");
             else
-                writeln(depth, message, "(EOF:0)");
+                stderr.writeln(depth, message, "(EOF:0)");
         }
     }
     else

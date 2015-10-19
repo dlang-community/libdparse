@@ -398,12 +398,12 @@ class Formatter(Sink)
         if (assignExpression.ternaryExpression)
             format(assignExpression.ternaryExpression);
 
-        if(assignExpression.assignExpression)
+        if(assignExpression.expression)
         {
             space();
             put(tokenRep(assignExpression.operator));
             space();
-            format(assignExpression.assignExpression);
+            format(assignExpression.expression);
         }
     }
 
@@ -1517,7 +1517,7 @@ class Formatter(Sink)
             if (type) format(type);
             if (parameters) format(parameters);
 
-            foreach(att; functionAttributes)
+            foreach(att; memberFunctionAttributes)
             {
                 space();
                 format(att);
