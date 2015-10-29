@@ -1,9 +1,9 @@
 // Written in the D programming language
 
-module std.d.parser;
+module dparse.parser;
 
-import std.d.lexer;
-import std.d.ast;
+import dparse.lexer;
+import dparse.ast;
 import std.experimental.allocator.mallocator;
 import std.experimental.allocator;
 import std.conv;
@@ -19,7 +19,7 @@ alias ParseAllocator = CAllocatorImpl!(Mallocator);
 
 /**
  * Params:
- *     tokens = the tokens parsed by std.d.lexer
+ *     tokens = the tokens parsed by dparse.lexer
  *     fileName = the name of the file being parsed
  *     messageFunction = a function to call on error or warning messages.
  *         The parameters are the file name, line number, column number,

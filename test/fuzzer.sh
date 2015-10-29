@@ -1,10 +1,10 @@
 TOTALRUNS=10000
 
 echo "Compiling fuzzer"
-dmd fuzzer.d -I../src/ ../src/std/d/*.d ../src/std/*.d || exit 1
+dmd fuzzer.d -I../src/ ../src/dparse/*.d ../src/std/experimental/*.d || exit 1
 echo "Done"
 echo "Compiling parser"
-dmd -O -inline -g tester.d ../src/std/*.d ../src/std/d/*.d  -I../src/ || exit 1
+dmd -O -inline -g tester.d ../src/dparse/*.d ../src/std/experimental/*.d  -I../src/ || exit 1
 echo "Done"
 printf "           "
 for i in $(seq $TOTALRUNS); do

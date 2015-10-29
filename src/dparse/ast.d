@@ -11,12 +11,11 @@
  * Copyright: Brian Schott 2013
  * License: $(LINK2 http://www.boost.org/LICENSE_1_0.txt Boost, License 1.0)
  * Authors: Brian Schott
- * Source: $(PHOBOSSRC std/d/_ast.d)
  */
 
-module std.d.ast;
+module dparse.ast;
 
-import std.d.lexer;
+import dparse.lexer;
 import std.traits;
 import std.algorithm;
 import std.array;

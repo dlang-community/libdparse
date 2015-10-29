@@ -109,10 +109,10 @@
  * Copyright: Brian Schott 2013
  * License: $(LINK2 http://www.boost.org/LICENSE_1_0.txt Boost, License 1.0)
  * Authors: Brian Schott, with ideas shamelessly stolen from Andrei Alexandrescu
- * Source: $(PHOBOSSRC std/_lexer.d)
+ * Source: $(PHOBOSSRC std/experimental/_lexer.d)
  */
 
-module std.lexer;
+module std.experimental.lexer;
 
 /**
  * Template for determining the type used for a token type.

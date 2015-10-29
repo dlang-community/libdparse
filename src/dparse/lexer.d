@@ -1,11 +1,11 @@
-module std.d.lexer;
+module dparse.lexer;
 
 import std.typecons;
 import std.typetuple;
 import std.array;
 import std.algorithm;
 import std.range;
-import std.lexer;
+import std.experimental.lexer;
 import core.cpuid : sse42;
 version (D_InlineAsm_X86_64)
 {
@@ -107,7 +107,7 @@ public alias str = tokenStringRepresentation!(IdType, operators, dynamicTokens, 
  * values that can be passed to this template.
  * Example:
  * ---
- * import std.d.lexer;
+ * import dparse.lexer;
  * IdType t = tok!"floatLiteral";
  * ---
  */
@@ -132,7 +132,7 @@ private enum extraFields = q{
 };
 
 /// The token type in the D lexer
-public alias Token = std.lexer.TokenStructure!(IdType, extraFields);
+public alias Token = std.experimental.lexer.TokenStructure!(IdType, extraFields);
 
 /**
  * Configure whitespace handling

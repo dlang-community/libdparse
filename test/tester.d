@@ -2,9 +2,9 @@ import std.array;
 import std.exception;
 import std.file;
 import std.stdio;
-import std.d.ast;
-import std.d.lexer;
-import std.d.parser;
+import dparse.ast;
+import dparse.lexer;
+import dparse.parser;
 
 int errorCount = 0;
 int warningCount = 0;

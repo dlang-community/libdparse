@@ -1,4 +1,4 @@
-import std.d.lexer;
+import dparse.lexer;
 import std.random;
 import std.stdio;
 

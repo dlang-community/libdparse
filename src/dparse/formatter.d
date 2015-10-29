@@ -1,12 +1,12 @@
-module std.d.formatter;
+module dparse.formatter;
 
 import std.algorithm;
 import std.range;
 import std.stdio;
 import std.typetuple:TypeTuple;
 
-import std.d.ast;
-import std.d.lexer;
+import dparse.ast;
+import dparse.lexer;
 
 //debug = verbose;
 
@@ -1253,7 +1253,6 @@ class Formatter(Sink)
         else if (cast(PrimaryExpression) n) format(cast(PrimaryExpression) n);
         else if (cast(RelExpression) n) format(cast(RelExpression) n);
         else if (cast(ShiftExpression) n) format(cast(ShiftExpression) n);
-        else if (cast(SliceExpression) n) format(cast(SliceExpression) n);
         else if (cast(TemplateMixinExpression) n) format(cast(TemplateMixinExpression) n);
         else if (cast(TernaryExpression) n) format(cast(TernaryExpression) n);
         else if (cast(TraitsExpression) n) format(cast(TraitsExpression) n);
