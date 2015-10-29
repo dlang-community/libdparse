@@ -1741,6 +1741,16 @@ class Formatter(Sink)
         put(");");
     }
 
+    void format(const Index index)
+    {
+        format(index.low);
+        if (index.high !is null)
+        {
+            put(" .. ");
+            format(index.high);
+        }
+    }
+
     void format(const IndexExpression indexExpression)
     {
         debug(verbose) writeln("IndexExpression");
@@ -1754,7 +1764,12 @@ class Formatter(Sink)
         {
             format(indexExpression.unaryExpression);
             put("[");
-            format(argumentList);
+            foreach (i, index; indexes)
+            {
+                if (i != 0)
+                    put(", ");
+                format(index);
+            }
             put("]");
         }
     }
@@ -2499,30 +2514,6 @@ class Formatter(Sink)
             put(" = ");
         }
         format(singleImport.identifierChain);
-    }
-
-    void format(const SliceExpression sliceExpression)
-    {
-        debug(verbose) writeln("SliceExpression");
-
-        /**
-        UnaryExpression unaryExpression;
-        AssignExpression lower;
-        AssignExpression upper;
-        **/
-
-        with(sliceExpression)
-        {
-            format(unaryExpression);
-            put("[");
-            if (lower && upper)
-            {
-                format(lower);
-                put("..");
-                format(upper);
-            }
-            put("]");
-        }
     }
 
     void format(const Statement statement)
@@ -3416,7 +3407,6 @@ class Formatter(Sink)
             if (castExpression) format(castExpression);
             if (functionCallExpression) format(functionCallExpression);
             if (assertExpression) format(assertExpression);
-            if (sliceExpression) format(sliceExpression);
             if (indexExpression) format(indexExpression);
 
             if (unaryExpression) format(unaryExpression);
