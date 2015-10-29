@@ -67,7 +67,7 @@ shared static this()
     typeMap[typeid(PrimaryExpression)] = 39;
     typeMap[typeid(RelExpression)] = 40;
     typeMap[typeid(ShiftExpression)] = 41;
-    typeMap[typeid(SliceExpression)] = 42;
+    typeMap[typeid(Index)] = 42;
     typeMap[typeid(TemplateMixinExpression)] = 43;
     typeMap[typeid(TernaryExpression)] = 44;
     typeMap[typeid(TraitsExpression)] = 45;
@@ -131,7 +131,7 @@ public:
         case 39: visit(cast(PrimaryExpression) n); break;
         case 40: visit(cast(RelExpression) n); break;
         case 41: visit(cast(ShiftExpression) n); break;
-        case 42: visit(cast(SliceExpression) n); break;
+        case 42: visit(cast(Index) n); break;
         case 43: visit(cast(TemplateMixinExpression) n); break;
         case 44: visit(cast(TernaryExpression) n); break;
         case 45: visit(cast(TraitsExpression) n); break;
@@ -285,7 +285,7 @@ public:
     /** */ void visit(const SharedStaticDestructor sharedStaticDestructor) { sharedStaticDestructor.accept(this); }
     /** */ void visit(const ShiftExpression shiftExpression) { shiftExpression.accept(this); }
     /** */ void visit(const SingleImport singleImport) { singleImport.accept(this); }
-    /** */ void visit(const SliceExpression sliceExpression) { sliceExpression.accept(this); }
+    /** */ void visit(const Index index) { index.accept(this); }
     /** */ void visit(const Statement statement) { statement.accept(this); }
     /** */ void visit(const StatementNoCaseNoDefault statementNoCaseNoDefault) { statementNoCaseNoDefault.accept(this); }
     /** */ void visit(const StaticAssertDeclaration staticAssertDeclaration) { staticAssertDeclaration.accept(this); }
@@ -1889,15 +1889,28 @@ public:
 }
 
 ///
+final class Index : ASTNode
+{
+public:
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(low, high));
+    }
+    /** */ ExpressionNode low;
+    /** */ ExpressionNode high;
+    mixin OpEquals;
+}
+
+///
 final class IndexExpression : ExpressionNode
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(unaryExpression, argumentList));
+        mixin (visitIfNotNull!(unaryExpression, indexes));
     }
     /** */ UnaryExpression unaryExpression;
-    /** */ ArgumentList argumentList;
+    /** */ Index[] indexes;
     mixin OpEquals;
 }
 
@@ -2562,20 +2575,6 @@ public:
 }
 
 ///
-final class SliceExpression : ExpressionNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(unaryExpression, lower, upper));
-    }
-    /** */ UnaryExpression unaryExpression;
-    /** */ ExpressionNode lower;
-    /** */ ExpressionNode upper;
-    mixin OpEquals;
-}
-
-///
 final class Statement : ASTNode
 {
 public:
@@ -3180,10 +3179,9 @@ public:
     override void accept(ASTVisitor visitor) const
     {
         // TODO prefix, postfix, unary
-        mixin (visitIfNotNull!(primaryExpression, newExpression,
-            deleteExpression, castExpression, functionCallExpression, argumentList,
-            unaryExpression, type, identifierOrTemplateInstance, assertExpression,
-            sliceExpression, indexExpression));
+        mixin (visitIfNotNull!(primaryExpression, newExpression, deleteExpression,
+            castExpression, functionCallExpression, argumentList, unaryExpression,
+            type, identifierOrTemplateInstance, assertExpression, indexExpression));
     }
 
     /** */ Type type;
@@ -3198,7 +3196,6 @@ public:
     /** */ ArgumentList argumentList;
     /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
     /** */ AssertExpression assertExpression;
-    /** */ SliceExpression sliceExpression;
     /** */ IndexExpression indexExpression;
     mixin OpEquals;
 }

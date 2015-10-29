@@ -3185,7 +3185,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF ifStatement):
      *     $(LITERAL 'if') $(LITERAL '$(LPAREN)') $(RULE ifCondition) $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement) ($(LITERAL 'else') $(RULE declarationOrStatement))?
-     * $(RULEDEF ifCondition):
+     *$(RULEDEF ifCondition):
      *       $(LITERAL 'auto') $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE type) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE expression)
@@ -3367,21 +3367,64 @@ class Parser
     }
 
     /**
+     * Parses an Index
+     *
+     * $(GRAMMAR $(RULEDEF index):
+     *     $(RULE assignExpression) ($(LITERAL '..') $(RULE assignExpression))?
+     *     ;
+     * )
+     */
+    Index parseIndex()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocate!Index();
+        mixin (nullCheck!`node.low = parseAssignExpression()`);
+        if (currentIs(tok!".."))
+        {
+            advance();
+            mixin (nullCheck!`node.high = parseAssignExpression()`);
+        }
+        return node;
+    }
+
+    /**
      * Parses an IndexExpression
      *
      * $(GRAMMAR $(RULEDEF indexExpression):
-     *     $(RULE unaryExpression) $(LITERAL '[') $(RULE argumentList) $(LITERAL ']')
-     *     ;)
+     *       $(RULE unaryExpression) $(LITERAL '[') $(LITERAL ']')
+     *     | $(RULE unaryExpression) $(LITERAL '[') $(RULE index) ($(LITERAL ',') $(RULE index))* $(LITERAL ']')
+     *     ;
+     * )
      */
     IndexExpression parseIndexExpression(UnaryExpression unaryExpression = null)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!IndexExpression;
         node.unaryExpression = unaryExpression is null ? parseUnaryExpression() : unaryExpression;
-        if (expect(tok!"[") is null) { deallocate(node); return null; }
-        mixin (nullCheck!`node.argumentList = parseArgumentList()`);
-        if (expect(tok!"]") is null) { deallocate(node); return null; }
-        return node;
+        mixin(nullCheck!`node.unaryExpression`);
+        mixin(nullCheck!`expect(tok!"[")`);
+        Index[] indexes;
+        while (true)
+        {
+            if (!moreTokens())
+            {
+                error("Expected unary expression instead of EOF");
+                deallocate(node);
+                return null;
+            }
+            if (currentIs(tok!"]"))
+				break;
+            auto index = parseIndex();
+            mixin(nullCheck!`index`);
+            indexes ~= index;
+			if (currentIs(tok!","))
+				advance();
+			else
+				break;
+        }
+        node.indexes = ownArray(indexes);
+		advance(); // ]
+		return node;
     }
 
     /**
@@ -4740,40 +4783,6 @@ class Parser
         mixin (nullCheck!`node.identifierChain = parseIdentifierChain()`);
         if (node.identifierChain is null)
             return null;
-        return node;
-    }
-
-    /**
-     * Parses a SliceExpression
-     *
-     * $(GRAMMAR $(RULEDEF sliceExpression):
-     *       $(RULE unaryExpression) $(LITERAL '[') $(RULE assignExpression) $(LITERAL '..') $(RULE assignExpression) $(LITERAL ']')
-     *     | $(RULE unaryExpression) $(LITERAL '[') $(LITERAL ']')
-     *     ;)
-     */
-    SliceExpression parseSliceExpression(UnaryExpression unary = null)
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocate!SliceExpression;
-        node.unaryExpression = unary is null ? parseUnaryExpression() : unary;
-        if (expect(tok!"[") is null) { deallocate(node); return null; }
-        if (!currentIs(tok!"]"))
-        {
-            mixin (nullCheck!`node.lower = parseAssignExpression()`);
-            if (node.lower is null)
-            {
-                error("assignExpression expected");
-                return null;
-            }
-            expect(tok!"..");
-            mixin (nullCheck!`node.upper = parseAssignExpression()`);
-            if (node.upper is null)
-            {
-                error("assignExpression expected");
-                return null;
-            }
-        }
-        if (expect(tok!"]") is null) { deallocate(node); return null; }
         return node;
     }
 
@@ -6217,7 +6226,6 @@ class Parser
      *     | $(RULE castExpression)
      *     | $(RULE assertExpression)
      *     | $(RULE functionCallExpression)
-     *     | $(RULE sliceExpression)
      *     | $(RULE indexExpression)
      *     | $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)') $(LITERAL '.') $(RULE identifierOrTemplateInstance)
      *     | $(RULE unaryExpression) $(LITERAL '.') $(RULE identifierOrTemplateInstance)
@@ -6343,10 +6351,7 @@ class Parser
             break;
         case tok!"[":
             auto n = allocate!UnaryExpression;
-            if (isSliceExpression())
-                n.sliceExpression = parseSliceExpression(node);
-            else
-                n.indexExpression = parseIndexExpression(node);
+			n.indexExpression = parseIndexExpression(node);
             node = n;
             break;
         case tok!".":
@@ -6636,14 +6641,6 @@ class Parser
     bool moreTokens() const nothrow pure @safe
     {
         return index < tokens.length;
-    }
-
-    bool isSliceExpression()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        if (startsWith(tok!"[", tok!"]"))
-            return true;
-        return hasMagicDelimiter!(tok!"[", tok!"..")();
     }
 
 protected:
@@ -7166,7 +7163,7 @@ protected:
 
     /**
      * Returns a token of the specified type if it was the next token, otherwise
-     * calls the error function and returns null.
+     * calls the error function and returns null. Advances the lexer by one token.
      */
     const(Token)* expect(IdType type)
     {
@@ -7176,7 +7173,7 @@ protected:
         {
             string tokenString = str(type) is null
                 ? to!string(type) : str(type);
-            bool shouldNotAdvance = index < tokens.length
+            immutable bool shouldNotAdvance = index < tokens.length
                 && (tokens[index].type == tok!")"
                 || tokens[index].type == tok!";"
                 || tokens[index].type == tok!"}");
