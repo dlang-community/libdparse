@@ -5,4 +5,8 @@ __dummy.html
 *.obj
 test/coverage/*
 test/tester
+test/fuzzer
+test/output.txt
+test/tokens-newlines.txt
+test/tokens.txt
 dub.selections.json
