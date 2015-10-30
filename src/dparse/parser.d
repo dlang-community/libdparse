@@ -2574,7 +2574,13 @@ class Parser
     Expression parseExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        if (suppressedErrorCount > MAX_ERRORS) return null;
+        if (suppressedErrorCount > MAX_ERRORS)
+            return null;
+        if (!moreTokens())
+        {
+            error("Expected expression instead of EOF");
+            return null;
+        }
         return parseCommaSeparatedRule!(Expression, AssignExpression, true)();
     }
 
