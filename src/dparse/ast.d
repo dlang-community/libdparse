@@ -840,6 +840,8 @@ public:
     {
         mixin (visitIfNotNull!(assertion, message));
     }
+    /** */ size_t line;
+    /** */ size_t column;
     /** */ ExpressionNode assertion;
     /** */ ExpressionNode message;
     mixin OpEquals;
