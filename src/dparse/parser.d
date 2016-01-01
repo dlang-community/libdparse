@@ -17,24 +17,27 @@ import std.string : format;
 
 alias ParseAllocator = CAllocatorImpl!(Mallocator);
 
+alias MessageFunction = void function(string, size_t, size_t, string, bool, void*);
+
 /**
  * Params:
  *     tokens = the tokens parsed by dparse.lexer
  *     fileName = the name of the file being parsed
  *     messageFunction = a function to call on error or warning messages.
  *         The parameters are the file name, line number, column number,
- *         the error or warning message, and a boolean (true means error, false
- *         means warning).
+ *         the error or warning message, a boolean (true means error, false
+ *         means warning) and a user parameter.
  * Returns: the parsed module
  */
 Module parseModule(const(Token)[] tokens, string fileName, IAllocator allocator = null,
-    void function(string, size_t, size_t, string, bool) messageFunction = null,
-    uint* errorCount = null, uint* warningCount = null)
+    MessageFunction messageFunction = null,
+    uint* errorCount = null, uint* warningCount = null, void* userParameter = null)
 {
     auto parser = new Parser();
     parser.fileName = fileName;
     parser.tokens = tokens;
     parser.messageFunction = messageFunction;
+    parser.userParameter = userParameter;
     parser.allocator = allocator;
     auto mod = parser.parseModule();
     if (warningCount !is null)
@@ -6636,7 +6639,12 @@ class Parser
      * The parameters are the file name, line number, column number,
      * and the error or warning message.
      */
-    void function(string, size_t, size_t, string, bool) messageFunction;
+    MessageFunction messageFunction;
+
+    /**
+     * The user parameter passed with messageFunction.
+     */
+    void* userParameter;
 
     void setTokens(const(Token)[] tokens)
     {
@@ -7038,7 +7046,7 @@ protected:
         if (messageFunction is null)
             stderr.writefln("%s(%d:%d)[warn]: %s", fileName, line, column, message);
         else
-            messageFunction(fileName, line, column, message, false);
+            messageFunction(fileName, line, column, message, false, userParameter);
     }
 
     void error(string message, bool shouldAdvance = true)
@@ -7052,7 +7060,7 @@ protected:
             if (messageFunction is null)
                 stderr.writefln("%s(%d:%d)[error]: %s", fileName, line, column, message);
             else
-                messageFunction(fileName, line, column, message, true);
+                messageFunction(fileName, line, column, message, true, userParameter);
         }
         else
             ++suppressedErrorCount;
