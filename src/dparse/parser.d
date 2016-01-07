@@ -112,8 +112,7 @@ class Parser
             mixin (nullCheck!`node.type = parseType()`);
             mixin (nullCheck!`node.identifierList = parseIdentifierList()`);
         }
-        mixin (nullCheck!`expect(tok!";")`);
-        return node;
+        return attachCommentFromSemicolon(node);
     }
 
     /**
@@ -158,8 +157,7 @@ class Parser
         mixin (nullCheck!`ident`);
         node.identifier = *ident;
         mixin (nullCheck!`expect(tok!"this")`);
-        mixin (nullCheck!`expect(tok!";")`);
-        return node;
+        return attachCommentFromSemicolon(node);
     }
 
     /**
@@ -1089,8 +1087,7 @@ class Parser
         } while (moreTokens());
         node.identifiers = ownArray(identifiers);
         node.initializers = ownArray(initializers);
-        mixin (nullCheck!`expect(tok!";")`);
-        return node;
+        return attachCommentFromSemicolon(node);
     }
 
     /**
@@ -1736,8 +1733,7 @@ class Parser
             error("Integer literal or identifier expected");
             return null;
         }
-        mixin (nullCheck!`expect(tok!";")`);
-        return node;
+        return attachCommentFromSemicolon(node);
     }
 
     /**
@@ -2337,8 +2333,7 @@ class Parser
         mixin (nullCheck!`expect(tok!"(")`);
         mixin (nullCheck!`node.expression = parseExpression()`);
         mixin (nullCheck!`expect(tok!")")`);
-        mixin (nullCheck!`expect(tok!";")`);
-        return node;
+        return attachCommentFromSemicolon(node);
     }
 
     /**
@@ -7355,6 +7350,19 @@ protected:
         enum tokenCheck = `{auto t = expect(tok!"` ~ tok ~ `");`
             ~ `if (t is null) { deallocate(node); return null;}`
             ~ `else {` ~ exp ~ ` = *t; }}`;
+    }
+
+    T attachCommentFromSemicolon(T)(T node)
+    {
+        auto semicolon = expect(tok!";");
+        if (semicolon is null)
+        {
+            deallocate(node);
+            return null;
+        }
+        if (semicolon.trailingComment !is null)
+            node.comment ~= semicolon.trailingComment;
+        return null;
     }
 
     // This list MUST BE MAINTAINED IN SORTED ORDER.
