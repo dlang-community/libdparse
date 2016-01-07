@@ -7361,8 +7361,16 @@ protected:
             return null;
         }
         if (semicolon.trailingComment !is null)
-            node.comment ~= semicolon.trailingComment;
-        return null;
+        {
+            if (node.comment is null)
+                node.comment = semicolon.trailingComment;
+            else
+            {
+                node.comment ~= "\n";
+                node.comment ~= semicolon.trailingComment;
+            }
+        }
+        return node;
     }
 
     // This list MUST BE MAINTAINED IN SORTED ORDER.
