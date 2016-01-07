@@ -1733,7 +1733,8 @@ class Parser
             error("Integer literal or identifier expected");
             return null;
         }
-        return attachCommentFromSemicolon(node);
+        mixin (nullCheck!`expect(tok!";")`);
+        return node;
     }
 
     /**
@@ -2333,7 +2334,8 @@ class Parser
         mixin (nullCheck!`expect(tok!"(")`);
         mixin (nullCheck!`node.expression = parseExpression()`);
         mixin (nullCheck!`expect(tok!")")`);
-        return attachCommentFromSemicolon(node);
+        mixin (nullCheck!`expect(tok!";")`);
+        return node;
     }
 
     /**
@@ -6474,7 +6476,10 @@ class Parser
             declarators ~= declarator;
             if (moreTokens() && currentIs(tok!","))
             {
-                declarator.comment = current.trailingComment;
+                if (node.comment !is null)
+                    declarator.comment = node.comment ~ "\n" ~ current.trailingComment;
+                else
+                    declarator.comment = current.trailingComment;
                 advance();
             }
             else
@@ -6483,7 +6488,16 @@ class Parser
         node.declarators = ownArray(declarators);
         const semicolon = expect(tok!";");
         mixin (nullCheck!`semicolon`);
-        declarators[$ - 1].comment = semicolon.trailingComment;
+        if (node.comment !is null)
+        {
+            if (semicolon.trailingComment is null)
+                declarators[$ - 1].comment = semicolon.trailingComment;
+            else
+                declarators[$ - 1].comment = node.comment ~ "\n" ~ semicolon.trailingComment;
+        }
+        else
+            declarators[$ - 1].comment = semicolon.trailingComment;
+
         return node;
     }
 
