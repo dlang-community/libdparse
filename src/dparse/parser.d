@@ -6233,6 +6233,7 @@ class Parser
      *     | $(RULE functionCallExpression)
      *     | $(RULE indexExpression)
      *     | $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)') $(LITERAL '.') $(RULE identifierOrTemplateInstance)
+     *     | $(RULE unaryExpression) $(LITERAL '.') $(RULE newExpression)
      *     | $(RULE unaryExpression) $(LITERAL '.') $(RULE identifierOrTemplateInstance)
      *     | $(RULE unaryExpression) $(LITERAL '--')
      *     | $(RULE unaryExpression) $(LITERAL '++')
@@ -6363,7 +6364,10 @@ class Parser
             advance();
             auto n = allocate!UnaryExpression();
             n.unaryExpression = node;
-            n.identifierOrTemplateInstance = parseIdentifierOrTemplateInstance();
+            if (currentIs(tok!"new"))
+                mixin (nullCheck!`node.newExpression = parseNewExpression()`);
+            else
+                n.identifierOrTemplateInstance = parseIdentifierOrTemplateInstance();
             node = n;
             break;
         default:
@@ -7521,4 +7525,3 @@ protected:
     int _traceDepth;
     string comment;
 }
-
