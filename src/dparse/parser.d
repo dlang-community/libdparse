@@ -112,8 +112,7 @@ class Parser
             mixin (nullCheck!`node.type = parseType()`);
             mixin (nullCheck!`node.identifierList = parseIdentifierList()`);
         }
-        mixin (nullCheck!`expect(tok!";")`);
-        return node;
+        return attachCommentFromSemicolon(node);
     }
 
     /**
@@ -158,8 +157,7 @@ class Parser
         mixin (nullCheck!`ident`);
         node.identifier = *ident;
         mixin (nullCheck!`expect(tok!"this")`);
-        mixin (nullCheck!`expect(tok!";")`);
-        return node;
+        return attachCommentFromSemicolon(node);
     }
 
     /**
@@ -1089,8 +1087,7 @@ class Parser
         } while (moreTokens());
         node.identifiers = ownArray(identifiers);
         node.initializers = ownArray(initializers);
-        mixin (nullCheck!`expect(tok!";")`);
-        return node;
+        return attachCommentFromSemicolon(node);
     }
 
     /**
@@ -6479,7 +6476,10 @@ class Parser
             declarators ~= declarator;
             if (moreTokens() && currentIs(tok!","))
             {
-                declarator.comment = current.trailingComment;
+                if (node.comment !is null)
+                    declarator.comment = node.comment ~ "\n" ~ current.trailingComment;
+                else
+                    declarator.comment = current.trailingComment;
                 advance();
             }
             else
@@ -6488,7 +6488,16 @@ class Parser
         node.declarators = ownArray(declarators);
         const semicolon = expect(tok!";");
         mixin (nullCheck!`semicolon`);
-        declarators[$ - 1].comment = semicolon.trailingComment;
+        if (node.comment !is null)
+        {
+            if (semicolon.trailingComment is null)
+                declarators[$ - 1].comment = semicolon.trailingComment;
+            else
+                declarators[$ - 1].comment = node.comment ~ "\n" ~ semicolon.trailingComment;
+        }
+        else
+            declarators[$ - 1].comment = semicolon.trailingComment;
+
         return node;
     }
 
@@ -7355,6 +7364,27 @@ protected:
         enum tokenCheck = `{auto t = expect(tok!"` ~ tok ~ `");`
             ~ `if (t is null) { deallocate(node); return null;}`
             ~ `else {` ~ exp ~ ` = *t; }}`;
+    }
+
+    T attachCommentFromSemicolon(T)(T node)
+    {
+        auto semicolon = expect(tok!";");
+        if (semicolon is null)
+        {
+            deallocate(node);
+            return null;
+        }
+        if (semicolon.trailingComment !is null)
+        {
+            if (node.comment is null)
+                node.comment = semicolon.trailingComment;
+            else
+            {
+                node.comment ~= "\n";
+                node.comment ~= semicolon.trailingComment;
+            }
+        }
+        return node;
     }
 
     // This list MUST BE MAINTAINED IN SORTED ORDER.

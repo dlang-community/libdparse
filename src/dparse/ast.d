@@ -476,6 +476,7 @@ public:
     }
     mixin OpEquals;
     /** */ Token identifier;
+    /** */ string comment;
 }
 
 ///
