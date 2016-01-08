@@ -159,6 +159,11 @@ public enum StringBehavior : ubyte
     source = includeQuoteChars | notEscaped
 }
 
+public enum CommentBehavior : bool
+{
+    intern = true,
+    noIntern = false
+}
 /**
  * Lexer configuration struct
  */
@@ -167,6 +172,7 @@ public struct LexerConfig
     string fileName;
     StringBehavior stringBehavior;
     WhitespaceBehavior whitespaceBehavior;
+    CommentBehavior commentBehavior = CommentBehavior.intern;
 }
 
 /**
@@ -471,10 +477,14 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
     }
 
     config.whitespaceBehavior = WhitespaceBehavior.skip;
+    config.commentBehavior = CommentBehavior.noIntern;
 
+    auto leadingCommentAppender = appender!(char[])();
+    leadingCommentAppender.reserve(1024);
+    auto trailingCommentAppender = appender!(char[])();
+    trailingCommentAppender.reserve(1024);
     auto output = appender!(typeof(return))();
     auto lexer = DLexer(sourceCode, config, cache);
-    string blockComment;
     size_t tokenCount;
     loop: while (!lexer.empty) switch (lexer.front.type)
     {
@@ -486,18 +496,18 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
         final switch (commentType(lexer.front.text))
         {
         case CommentType.block:
-            blockComment = lexer.front.text;
-            lexer.popFront();
-            break;
         case CommentType.line:
             if (tokenCount > 0 && lexer.front.line == output.data[tokenCount - 1].line)
             {
-                (cast() output.data[tokenCount - 1]).trailingComment = lexer.front.text;
+                if (!trailingCommentAppender.data.empty)
+                    trailingCommentAppender.put('\n');
+                unDecorateComment(lexer.front.text, trailingCommentAppender);
             }
             else
             {
-                blockComment = cache.intern(blockComment.length == 0 ? lexer.front.text
-                    : blockComment ~ "\n" ~ lexer.front.text);
+                if (!leadingCommentAppender.data.empty)
+                    leadingCommentAppender.put('\n');
+                unDecorateComment(lexer.front.text, leadingCommentAppender);
             }
             lexer.popFront();
             break;
@@ -507,13 +517,18 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
         }
         break;
     case tok!"__EOF__":
+        if (!trailingCommentAppender.data.empty)
+            (cast() output.data[$ - 1].trailingComment) = cache.intern(cast(string) trailingCommentAppender.data);
         break loop;
     default:
         Token t = lexer.front;
         lexer.popFront();
         tokenCount++;
-        t.comment = blockComment;
-        blockComment = null;
+        if (!trailingCommentAppender.data.empty)
+            (cast() output.data[$ - 1].trailingComment) = cache.intern(cast(string) trailingCommentAppender.data);
+        t.comment = cache.intern(cast(string) leadingCommentAppender.data);
+        leadingCommentAppender.clear();
+        trailingCommentAppender.clear();
         output.put(t);
         break;
     }
@@ -674,7 +689,6 @@ private pure nothrow @safe:
                 break loop;
             }
         } while (!(range.index >= range.bytes.length));
-    end:
         string text = config.whitespaceBehavior == WhitespaceBehavior.include
             ? cache.intern(range.slice(mark)) : "";
         token = Token(tok!"whitespace", text, line, column, index);
@@ -685,7 +699,7 @@ private pure nothrow @safe:
         mixin (tokenStart);
         if (range.bytes[range.index] == '0' && range.index + 1 < range.bytes.length)
         {
-            auto ahead = range.bytes[range.index + 1];
+            immutable ahead = range.bytes[range.index + 1];
             switch (ahead)
             {
             case 'x':
@@ -769,7 +783,7 @@ private pure nothrow @safe:
                     // The following bit of silliness tries to tell the
                     // difference between "int dot identifier" and
                     // "double identifier".
-                    if ((range.index + 1 < range.bytes.length))
+                    if (range.index + 1 < range.bytes.length)
                     {
                         switch (range.peekAt(1))
                         {
@@ -870,7 +884,7 @@ private pure nothrow @safe:
                 {
                     if (haveSSE42 && range.index + 16 < range.bytes.length)
                     {
-                        ulong i = rangeMatch!(false, '0', '9', '_', '_')(range.bytes.ptr + range.index);
+                        immutable ulong i = rangeMatch!(false, '0', '9', '_', '_')(range.bytes.ptr + range.index);
                         range.column += i;
                         range.index += i;
                     }
@@ -910,9 +924,9 @@ private pure nothrow @safe:
                     // The following bit of silliness tries to tell the
                     // difference between "int dot identifier" and
                     // "double identifier".
-                    if ((range.index + 1 < range.bytes.length))
+                    if (range.index + 1 < range.bytes.length)
                     {
-                        auto ch = range.peekAt(1);
+                        immutable ch = range.peekAt(1);
                         if (ch <= 0x2f
                             || (ch >= '0' && ch <= '9')
                             || (ch >= ':' && ch <= '@')
@@ -1089,9 +1103,10 @@ private pure nothrow @safe:
             else
                 popFrontWhitespaceAware();
         }
-    end:
-        token = Token(type, cache.intern(range.slice(mark)), line, column,
-            index);
+        if (config.commentBehavior == CommentBehavior.intern)
+            token = Token(type, cache.intern(range.slice(mark)), line, column, index);
+        else
+            token = Token(type, cast(string) range.slice(mark), line, column, index);
     }
 
     void lexSlashSlashComment(ref Token token) @trusted
@@ -1113,9 +1128,10 @@ private pure nothrow @safe:
                 break;
             range.popFront();
         }
-    end:
-        token =  Token(type, cache.intern(range.slice(mark)), line, column,
-            index);
+        if (config.commentBehavior == CommentBehavior.intern)
+            token = Token(type, cache.intern(range.slice(mark)), line, column, index);
+        else
+            token = Token(type, cast(string) range.slice(mark), line, column, index);
     }
 
     void lexSlashPlusComment(ref Token token) @trusted
@@ -1156,8 +1172,10 @@ private pure nothrow @safe:
             else
                 popFrontWhitespaceAware();
         }
-        token = Token(type, cache.intern(range.slice(mark)), line, column,
-            index);
+        if (config.commentBehavior == CommentBehavior.intern)
+            token = Token(type, cache.intern(range.slice(mark)), line, column, index);
+        else
+            token = Token(type, cast(string) range.slice(mark), line, column, index);
     }
 
     void lexStringLiteral(ref Token token) @trusted
@@ -1166,7 +1184,7 @@ private pure nothrow @safe:
         range.popFront();
         while (true)
         {
-            if ((range.index >= range.bytes.length))
+            if (range.index >= range.bytes.length)
             {
                 error("Error: unterminated string literal");
                 token = Token(tok!"");
@@ -1202,13 +1220,13 @@ private pure nothrow @safe:
     {
         mixin (tokenStart);
         IdType type = tok!"stringLiteral";
-        bool backtick = range.bytes[range.index] == '`';
+        immutable bool backtick = range.bytes[range.index] == '`';
         if (backtick)
         {
             range.popFront();
             while (true)
             {
-                if ((range.index >= range.bytes.length))
+                if (range.index >= range.bytes.length)
                 {
                     error("Error: unterminated string literal");
                     token = Token(tok!"");
@@ -1234,7 +1252,7 @@ private pure nothrow @safe:
         else
         {
             range.popFront();
-            if ((range.index >= range.bytes.length))
+            if (range.index >= range.bytes.length)
             {
                 error("Error: unterminated string literal");
                 token = Token(tok!"");
@@ -1243,7 +1261,7 @@ private pure nothrow @safe:
             range.popFront();
             while (true)
             {
-                if ((range.index >= range.bytes.length))
+                if (range.index >= range.bytes.length)
                 {
                     error("Error: unterminated string literal");
                     token = Token(tok!"");
@@ -1265,7 +1283,7 @@ private pure nothrow @safe:
 
     private ubyte lexStringSuffix(ref IdType type) pure nothrow @safe
     {
-        if ((range.index >= range.bytes.length))
+        if (range.index >= range.bytes.length)
         {
             type = tok!"stringLiteral";
             return 0;
@@ -1457,7 +1475,7 @@ private pure nothrow @safe:
 
         loop: while (true)
         {
-            if ((range.index >= range.bytes.length))
+            if (range.index >= range.bytes.length)
             {
                 error("Error: unterminated hex string literal");
                 token = Token(tok!"");
@@ -1491,7 +1509,7 @@ private pure nothrow @safe:
     bool lexEscapeSequence()
     {
         range.popFront();
-        if ((range.index >= range.bytes.length))
+        if (range.index >= range.bytes.length)
         {
             error("Error: non-terminated character escape sequence.");
             return false;
@@ -1515,7 +1533,7 @@ private pure nothrow @safe:
             range.popFront();
             foreach (i; 0 .. 2)
             {
-                if ((range.index >= range.bytes.length))
+                if (range.index >= range.bytes.length)
                 {
                     error("Error: 2 hex digits expected.");
                     return false;
@@ -1534,21 +1552,23 @@ private pure nothrow @safe:
             }
             break;
         case '0':
-            if (!(range.index + 1 < range.bytes.length) || ((range.index + 1 < range.bytes.length) && range.peekAt(1) == '\''))
+            if (!(range.index + 1 < range.bytes.length)
+                || ((range.index + 1 < range.bytes.length) && range.peekAt(1) == '\''))
             {
                 range.popFront();
                 break;
             }
             goto case;
         case '1': .. case '7':
-            for (size_t i = 0; i < 3 && !(range.index >= range.bytes.length) && range.bytes[range.index] >= '0' && range.bytes[range.index] <= '7'; i++)
+            for (size_t i = 0; i < 3 && !(range.index >= range.bytes.length)
+                    && range.bytes[range.index] >= '0' && range.bytes[range.index] <= '7'; i++)
                 range.popFront();
             break;
         case 'u':
             range.popFront();
             foreach (i; 0 .. 4)
             {
-                if ((range.index >= range.bytes.length))
+                if (range.index >= range.bytes.length)
                 {
                     error("Error: at least 4 hex digits expected.");
                     return false;
@@ -1570,7 +1590,7 @@ private pure nothrow @safe:
             range.popFront();
             foreach (i; 0 .. 8)
             {
-                if ((range.index >= range.bytes.length))
+                if (range.index >= range.bytes.length)
                 {
                     error("Error: at least 8 hex digits expected.");
                     return false;
@@ -1591,7 +1611,7 @@ private pure nothrow @safe:
         default:
             while (true)
             {
-                if ((range.index >= range.bytes.length))
+                if (range.index >= range.bytes.length)
                 {
                     error("Error: non-terminated character escape sequence.");
                     return false;
