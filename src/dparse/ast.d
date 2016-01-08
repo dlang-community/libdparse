@@ -1158,8 +1158,6 @@ public:
     /** */ Declaration[] trueDeclarations;
     /** */ Declaration[] falseDeclarations;
     /** */
-    deprecated("Please use `falseDeclarations` (array) instead")
-    Declaration falseDeclaration;
     mixin OpEquals;
 }
 

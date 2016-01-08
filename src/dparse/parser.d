@@ -1516,9 +1516,13 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF conditionalDeclaration):
      *       $(RULE compileCondition) $(RULE declaration)
+     *     | $(RULE compileCondition) $(LITERAL '{') $(RULE declaration)* $(LITERAL '}')
      *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+
      *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') $(LITERAL ':') $(RULE declaration)*
      *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') $(RULE declaration)
+     *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') $(LITERAL '{') $(RULE declaration)* $(LITERAL '}')
+     *     | $(RULE compileCondition) $(LITERAL '{') $(RULE declaration)* $(LITERAL '}') $(LITERAL 'else') $(RULE declaration)
+     *     | $(RULE compileCondition) $(LITERAL '{') $(RULE declaration)* $(LITERAL '}') $(LITERAL 'else') $(LITERAL '{') $(RULE declaration)* $(LITERAL '}')
      *     ;)
      */
     ConditionalDeclaration parseConditionalDeclaration()
@@ -1528,10 +1532,11 @@ class Parser
         mixin (nullCheck!`node.compileCondition = parseCompileCondition()`);
 
         Declaration[] trueDeclarations;
-        if (currentIs(tok!":"))
+        if (currentIs(tok!":") || currentIs(tok!"{"))
         {
+            immutable bool brace = currentIs(tok!"{");
             advance();
-            while (moreTokens() && !currentIs(tok!"}"))
+            while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 auto b = setBookmark();
                 auto d = parseDeclaration();
@@ -1547,13 +1552,18 @@ class Parser
                     return null;
                 }
             }
-            node.trueDeclarations = ownArray(trueDeclarations);
-            return node;
+            if (brace)
+                mixin(nullCheck!`expect(tok!"}")`);
+            else
+                return node;
+        }
+        else
+        {
+            auto dec = parseDeclaration(suppressMessages > 0);
+            mixin (nullCheck!`dec`);
+            trueDeclarations ~= dec;
         }
 
-        auto dec = parseDeclaration(suppressMessages > 0);
-        mixin (nullCheck!`dec`);
-        trueDeclarations ~= dec;
         node.trueDeclarations = ownArray(trueDeclarations);
 
         if (currentIs(tok!"else"))
@@ -1561,9 +1571,11 @@ class Parser
         else
             return node;
 
-        if (currentIs(tok!":"))
+        Declaration[] falseDeclarations;
+
+        if (currentIs(tok!":") || currentIs(tok!"{"))
         {
-            Declaration[] falseDeclarations;
+            immutable bool brace = currentIs(tok!"{");
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
             {
@@ -1581,19 +1593,18 @@ class Parser
                     return null;
                 }
             }
-            node.falseDeclarations = ownArray(falseDeclarations);
-        }
-        else if ((node.falseDeclaration = parseDeclaration(suppressMessages > 0)) is null)
-        {
-            deallocate(node);
-            return null;
+            if (brace)
+                mixin(nullCheck!`expect(tok!"}")`);
+            else
+                return node;
         }
         else
         {
-            // Compatibility with code that uses the single `falseDeclaration`
-            node.falseDeclarations ~= node.falseDeclaration;
+            auto dec = parseDeclaration(suppressMessages > 0);
+            mixin(nullCheck!`dec`);
+            falseDeclarations ~= dec;
         }
-
+        node.falseDeclarations = ownArray(falseDeclarations);
         return node;
     }
 
@@ -1772,7 +1783,8 @@ class Parser
      * Params: strict = if true, do not return partial AST nodes on errors.
      *
      * $(GRAMMAR $(RULEDEF declaration):
-     *     $(RULE attribute)* $(RULE declaration2)
+     *       $(RULE attribute)* $(RULE declaration2)
+     *     | $(RULE attribute)+ $(LITERAL '{') $(RULE declaration)* $(LITERAL '}')
      *     ;
      * $(RULEDEF declaration2):
      *       $(RULE aliasDeclaration)
@@ -1804,7 +1816,6 @@ class Parser
      *     | $(RULE unittest)
      *     | $(RULE variableDeclaration)
      *     | $(RULE versionSpecification)
-     *     | $(LITERAL '{') $(RULE declaration)+ $(LITERAL '}')
      *     ;)
      */
     Declaration parseDeclaration(bool strict = false)
@@ -1873,6 +1884,12 @@ class Parser
             advance();
             break;
         case tok!"{":
+            if (node.attributes.empty)
+            {
+                error("declaration expected instead of '{'");
+                deallocate(node);
+                return null;
+            }
             advance();
             Declaration[] declarations;
             while (moreTokens() && !currentIs(tok!"}"))

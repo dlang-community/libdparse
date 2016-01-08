@@ -41,9 +41,7 @@ template mix(){
 mixin .mix;
 __vector(int[4]) intVector;
 ;
-{
-	int a;
-}
+
 enum a = 1;
 SomeStruct a = { a : 10, b : 20 };
 int[a .. b] c;

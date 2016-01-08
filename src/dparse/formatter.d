@@ -772,43 +772,39 @@ class Formatter(Sink)
         /**
         CompileCondition compileCondition;
         Declaration[] trueDeclarations;
-        Declaration falseDeclaration;
+        Declaration[] falseDeclaration;
         **/
 
         newThing(What.conditionalDecl);
         putAttrs(attrs);
         format(decl.compileCondition);
 
-        assert(decl.trueDeclarations.length <= 1); // spec bug?
-
-        if (decl.trueDeclarations.length)
+        if (decl.trueDeclarations.length > 1)
         {
-            if (isEmptyDeclaration(decl.trueDeclarations[0]))
-            {
-                space();
-                put("{}");
-            }
-            else
-                maybeIndent(decl.trueDeclarations[0]);
+            startBlock();
+            foreach (d; decl.trueDeclarations)
+                format(d);
+            endBlock();
         }
+        else if (decl.trueDeclarations.length == 0)
+            maybeIndent(decl.trueDeclarations[0]);
+        else
+            put("{}");
 
-        if (decl.falseDeclaration)
+        if (decl.falseDeclarations.length > 0)
+            put("else");
+
+        if (decl.falseDeclarations.length > 1)
         {
-            newThing(What.else_);
-            sink.put("else ");
-
-            if (isEmptyDeclaration(decl.falseDeclaration))
-            {
-                space();
-                put("{}");
-                return;
-            }
-
-            if (decl.falseDeclaration.conditionalDeclaration)
-                format(decl.falseDeclaration);
-            else
-                maybeIndent(decl.falseDeclaration);
+            startBlock();
+            foreach (d; decl.falseDeclarations)
+                format(d);
+            endBlock();
         }
+        else if (decl.falseDeclarations.length == 0)
+            maybeIndent(decl.falseDeclarations[0]);
+        else
+            put("{}");
     }
 
     void format(const ConditionalStatement stmnt)
