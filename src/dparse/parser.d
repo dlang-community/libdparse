@@ -1520,6 +1520,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF conditionalDeclaration):
      *       $(RULE compileCondition) $(RULE declaration)
      *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+
+     *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') $(LITERAL ':') $(RULE declaration)*
      *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') $(RULE declaration)
      *     ;)
      */
@@ -1563,11 +1564,39 @@ class Parser
         else
             return node;
 
-        if ((node.falseDeclaration = parseDeclaration(suppressMessages > 0)) is null)
+        if (currentIs(tok!":"))
+        {
+            Declaration[] falseDeclarations;
+            advance();
+            while (moreTokens() && !currentIs(tok!"}"))
+            {
+                auto b = setBookmark();
+                auto d = parseDeclaration();
+                if (d !is null)
+                {
+                    abandonBookmark(b);
+                    falseDeclarations ~= d;
+                }
+                else
+                {
+                    goToBookmark(b);
+                    deallocate(node);
+                    return null;
+                }
+            }
+            node.falseDeclarations = ownArray(falseDeclarations);
+        }
+        else if ((node.falseDeclaration = parseDeclaration(suppressMessages > 0)) is null)
         {
             deallocate(node);
             return null;
         }
+        else
+        {
+            // Compatibility with code that uses the single `falseDeclaration`
+            node.falseDeclarations ~= node.falseDeclaration;
+        }
+
         return node;
     }
 
@@ -7491,4 +7520,3 @@ protected:
     int _traceDepth;
     string comment;
 }
-

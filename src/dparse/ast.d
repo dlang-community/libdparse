@@ -1151,11 +1151,14 @@ final class ConditionalDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(compileCondition, trueDeclarations, falseDeclaration));
+        mixin (visitIfNotNull!(compileCondition, trueDeclarations, falseDeclarations));
     }
     /** */ CompileCondition compileCondition;
     /** */ Declaration[] trueDeclarations;
-    /** */ Declaration falseDeclaration;
+    /** */ Declaration[] falseDeclarations;
+    /** */
+    deprecated("Please use `falseDeclarations` (array) instead")
+    Declaration falseDeclaration;
     mixin OpEquals;
 }
 
