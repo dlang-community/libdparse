@@ -6491,7 +6491,7 @@ class Parser
         if (node.comment !is null)
         {
             if (semicolon.trailingComment is null)
-                declarators[$ - 1].comment = semicolon.trailingComment;
+                declarators[$ - 1].comment = node.comment;
             else
                 declarators[$ - 1].comment = node.comment ~ "\n" ~ semicolon.trailingComment;
         }

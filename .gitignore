@@ -9,4 +9,5 @@ test/fuzzer
 test/output.txt
 test/tokens-newlines.txt
 test/tokens.txt
+test/unittests
 dub.selections.json

@@ -11,6 +11,13 @@ CYAN="\033[36m"
 DMD=${DMD:=dmd}
 ALLOCATOR_SOURCE=$(find ../experimental_allocator/src/std/experimental -name "*.d")
 
+echo -en "Compiling unit tests..."
+${DMD} -ofunittests -unittest -main ../src/std/experimental/*.d ../src/dparse/*.d ${ALLOCATOR_SOURCE} -g -I../src/ || exit 1
+echo -e "${GREEN}DONE${NORMAL}"
+echo "Running unit tests..."
+./unittests || exit 1
+echo -e "${GREEN}DONE${NORMAL}"
+
 echo -en "Compiling tester... "
 ${DMD} tester.d ../src/std/experimental/*.d ../src/dparse/*.d ${ALLOCATOR_SOURCE} -g -I../src/ || exit 1
 echo -e "${GREEN}DONE${NORMAL}"

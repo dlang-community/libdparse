@@ -1853,115 +1853,140 @@ in
 }
 body
 {
+    import std.string : lineSplitter, stripRight;
+
+    static void adjustBeginningAndEnd(string s, ref size_t a, ref size_t b) pure nothrow @nogc @safe
+    {
+        immutable char c = s[1];
+        while (a < b && s[a] == c) a++;
+        while (b > a && s[b] == c) b--;
+        b++;
+    }
+
+    string leadingChars;
+    size_t i = 3;
+    size_t j;
+    bool hasOutput = false;
     switch (comment[0 .. 3])
     {
     case "///":
-        size_t i = 3;
-        if (i < comment.length)
+        j = comment.length;
+
+        foreach (line; lineSplitter(comment))
         {
-        again:
-            while (i < comment.length && (comment[i] == ' ' || comment[i] == '\t'))
-                i++;
-            size_t j = i + 1;
-            while (j < comment.length)
+            auto l = line[3 .. $];
+            if (leadingChars.empty)
             {
-                if (comment[j] == '\r')
-                    j++;
-                if (j >= comment.length)
-                    break;
-                if (comment[j] == '\n')
-                {
-                    outputRange.put(comment[i .. j]);
-                    j++;
-                    while (j < comment.length && comment[j] == '/')
-                        j++;
-                    outputRange.put('\n');
-                    i = j;
-                    goto again;
-                }
-                j++;
+                size_t k = 0;
+                while (k < l.length && (l[k] == ' ' || l[k] == '\t')) k++;
+                leadingChars = l[0 .. k];
             }
-            if (i < comment.length && j <= comment.length)
-                outputRange.put(comment[i .. j]);
+            immutable string stripped = l.stripRight();
+            if (hasOutput)
+                outputRange.put('\n');
+            else
+                hasOutput = true;
+            if (stripped.length >= leadingChars.length && stripped.startsWith(leadingChars))
+                outputRange.put(stripped[leadingChars.length .. $]);
+            else
+                outputRange.put(stripped);
         }
         break;
     case "/++":
     case "/**":
-        size_t i = 3;
-        immutable char c = comment[1];
-        // Skip leading * and + characters
-        while (comment[i] == c) i++;
-        // Skip trailing * and + characters
-        size_t j = comment.length - 2;
-        while (j > i && comment[j] == c)
-            j--;
-        while (j > i && (comment[j] == ' ' || comment[j] == '\t'))
-            j--;
-        j++;
-        size_t k = i;
-        while (k < j)
+        j = comment.length - 2;
+        // Skip beginning and ending stars and plusses
+        adjustBeginningAndEnd(comment, i, j);
+        foreach (line; lineSplitter(comment[i .. j]))
         {
-            if (comment[k] == '\n')
+            immutable string stripped = line.stripRight();
+            if (leadingChars.empty)
             {
-                k++;
-                break;
-            }
-            k++;
-        }
-        outputRange.put(comment[i .. k]);
-        i = k;
-        if (comment[i] == '\r') i++;
-        if (comment[i] == '\n') i++;
-        while (comment[i] == ' ' || comment[i] == '\t') i++;
-        immutable bool skipBeginningChar = comment[i] == c;
-        if (skipBeginningChar)
-            i++;
-        size_t whitespaceToSkip;
-        while (comment[i] == ' ' || comment[i] == '\t')
-        {
-            whitespaceToSkip++;
-            i++;
-        }
-        size_t l = i;
-        while (i < j)
-        {
-            if (comment[i++] == '\n')
-                break;
-        }
-        outputRange.put(comment[l .. i]);
-        while (true)
-        {
-            if (skipBeginningChar)
-            {
-                while (i < j && (comment[i] == ' ' || comment[i] == '\t')) i++;
-                if (i < j && comment[i] == c) i++;
-            }
-            for (size_t s = 0; (i < j) && (s < whitespaceToSkip)
-                && (comment[i] == ' ' || comment[i] == '\t');)
-            {
-                s++;
-                i++;
-            }
-            k = i;
-            inner: while (k < j)
-            {
-                if (comment[k] == '\n')
+                size_t k = 0;
+                while (k < line.length && (line[k] == ' ' || line[k] == '\t')) k++;
+                if (k < line.length && line[k] == comment[1])
                 {
                     k++;
-                    break inner;
+                    while (k < line.length && (line[k] == ' ' || line[k] == '\t')) k++;
                 }
-                k++;
+                if (k == stripped.length)
+                    continue;
+                leadingChars = line[0 .. k];
             }
-            outputRange.put(comment[i .. k]);
-            i = k;
-            if (i >= j)
-                break;
+            if (stripped.startsWith(leadingChars))
+            {
+                if (stripped.length > leadingChars.length)
+                {
+                    if (hasOutput)
+                        outputRange.put('\n');
+                    else
+                        hasOutput = true;
+                    outputRange.put(stripped[leadingChars.length .. $]);
+                }
+            }
+            else if (!stripped.empty && !leadingChars.startsWith(stripped))
+            {
+                if (hasOutput)
+                    outputRange.put('\n');
+                else
+                    hasOutput = true;
+                outputRange.put(stripped);
+            }
         }
         break;
     default:
         outputRange.put(comment);
         break;
     }
+}
+
+///
+unittest
+{
+    import std.array:array, appender;
+    import std.stdio:stderr;
+    stderr.writeln("Running unittest for unDecorateComment...");
+
+
+    string[] inputs = [
+        "/***************\n*******************/",
+        "/***************\n *\n ******************/",
+        "/**\n*/",
+        "/** */",
+        "/***/",
+        "/** abcde */",
+        "/// abcde\n/// abcde",
+        "/**\n * stuff\n */",
+        "/**\n *\n * stuff\n */",
+        "/**\n *\n * stuff\n *\n */",
+        "/**\n *\n * stuff\n *\n*/",
+        "/**\n *  abcde\n *    abcde \n */"
+    ];
+    string[] outputs = [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "abcde",
+        "abcde\nabcde",
+        "stuff",
+        "stuff",
+        "stuff",
+        "stuff",
+        "abcde\n  abcde"
+    ];
+    assert(inputs.length == outputs.length);
+    foreach (pair; zip(inputs, outputs))
+    {
+        foreach (b; [true, false])
+        {
+            auto app = appender!string();
+            unDecorateComment(b ? pair[0] : pair[0].replace("*", "+"), app);
+            assert(pair[1] == app.data, "[[" ~ pair[0] ~ "]] => [[" ~ app.data ~ "]]");
+        }
+    }
+    stderr.writeln("Unittest for unDecorateComment passed.");
 }
 
 
