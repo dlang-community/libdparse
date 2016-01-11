@@ -882,9 +882,10 @@ final class AtAttribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(argumentList));
+        mixin (visitIfNotNull!(argumentList, templateInstance));
     }
     /** */ ArgumentList argumentList;
+    /** */ TemplateInstance templateInstance;
     /** */ Token identifier;
     /** */ size_t startLocation;
     /** */ size_t endLocation;
