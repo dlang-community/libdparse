@@ -1573,7 +1573,10 @@ class Parser
         node.trueDeclarations = ownArray(trueDeclarations);
 
         if (currentIs(tok!"else"))
+        {
+            node.hasElse = true;
             advance();
+        }
         else
             return node;
 

@@ -1158,7 +1158,7 @@ public:
     /** */ CompileCondition compileCondition;
     /** */ Declaration[] trueDeclarations;
     /** */ Declaration[] falseDeclarations;
-    /** */
+    /** */ bool hasElse;
     mixin OpEquals;
 }
 
