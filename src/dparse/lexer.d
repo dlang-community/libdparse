@@ -526,7 +526,9 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
         tokenCount++;
         if (!trailingCommentAppender.data.empty)
             (cast() output.data[$ - 1].trailingComment) = cache.intern(cast(string) trailingCommentAppender.data);
-        t.comment = cache.intern(cast(string) leadingCommentAppender.data);
+        t.comment = leadingCommentAppender.data.length > 0
+			? cache.intern(cast(string) leadingCommentAppender.data) : null;
+
         leadingCommentAppender.clear();
         trailingCommentAppender.clear();
         output.put(t);
