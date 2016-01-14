@@ -1588,19 +1588,9 @@ class Parser
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
             {
-                auto b = setBookmark();
-                auto d = parseDeclaration();
-                if (d !is null)
-                {
-                    abandonBookmark(b);
-                    falseDeclarations ~= d;
-                }
-                else
-                {
-                    goToBookmark(b);
-                    deallocate(node);
-                    return null;
-                }
+                auto d = parseDeclaration(true);
+                mixin(nullCheck!`d`);
+                falseDeclarations ~= d;
             }
             if (brace)
                 mixin(nullCheck!`expect(tok!"}")`);
@@ -1838,9 +1828,13 @@ class Parser
         }
         if (current.comment !is null)
             comment = current.comment;
+        size_t autoStorageClassStart = size_t.max;
+        immutable DecType isAuto = isAutoDeclaration(autoStorageClassStart);
         Attribute[] attributes;
         do
         {
+            if (isAuto != DecType.other && index == autoStorageClassStart)
+                break;
             if (!isAttribute())
                 break;
             auto attr = parseAttribute();
@@ -1865,6 +1859,17 @@ class Parser
             error("declaration expected instead of EOF");
             deallocate(node);
             return null;
+        }
+
+        if (isAuto == DecType.autoVar)
+        {
+            mixin(nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, true)`);
+            return node;
+        }
+        else if (isAuto == DecType.autoFun)
+        {
+            mixin(nullCheck!`node.functionDeclaration = parseFunctionDeclaration(null, true)`);
+            return node;
         }
 
         switch (current.type)
@@ -2075,27 +2080,6 @@ class Parser
             mixin (nullCheck!`node.unittest_ = parseUnittest()`);
             break;
         case tok!"identifier":
-            if (node.attributes.length > 0)
-            {
-                if (peekIs(tok!"="))
-                    node.variableDeclaration = parseVariableDeclaration(null, true, node.attributes);
-                else if (peekIs(tok!"("))
-                {
-                    auto b = setBookmark();
-                    advance();
-                    const t = peekPastParens();
-                    goToBookmark(b);
-                    if (t !is null && *t == tok!"=")
-                        node.variableDeclaration = parseVariableDeclaration(null, true, node.attributes);
-                    else
-                        node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);
-                }
-                else
-                    goto type;
-            }
-            else
-                goto type;
-            break;
         case tok!".":
         case tok!"const":
         case tok!"immutable":
@@ -2108,25 +2092,13 @@ class Parser
             Type type = parseType();
             if (type is null || !currentIs(tok!"identifier"))
             {
-                trace("Returning null on %d".format(__LINE__));
                 deallocate(node);
                 return null;
             }
             if (peekIs(tok!"("))
-            {
-                auto b = setBookmark();
-                advance();
-                const t = peekPastParens();
-                goToBookmark(b);
-                if (t is null)
-                    return null;
-                if (*t != tok!"=")
-                    node.functionDeclaration = parseFunctionDeclaration(type, false, node.attributes);
-                else
-                    node.variableDeclaration = parseVariableDeclaration(type, false, node.attributes);
-            }
+                mixin (nullCheck!`node.functionDeclaration = parseFunctionDeclaration(type, false)`);
             else
-                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(type)`);
+                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(type, false)`);
             break;
         case tok!"version":
             if (peekIs(tok!"("))
@@ -3473,18 +3445,18 @@ class Parser
                 return null;
             }
             if (currentIs(tok!"]"))
-				break;
+                break;
             auto index = parseIndex();
             mixin(nullCheck!`index`);
             indexes ~= index;
-			if (currentIs(tok!","))
-				advance();
-			else
-				break;
+            if (currentIs(tok!","))
+                advance();
+            else
+                break;
         }
         node.indexes = ownArray(indexes);
-		advance(); // ]
-		return node;
+        advance(); // ]
+        return node;
     }
 
     /**
@@ -6412,7 +6384,7 @@ class Parser
             break;
         case tok!"[":
             auto n = allocate!UnaryExpression;
-			n.indexExpression = parseIndexExpression(node);
+            n.indexExpression = parseIndexExpression(node);
             node = n;
             break;
         case tok!".":
@@ -6494,12 +6466,11 @@ class Parser
      *     | $(RULE autoDeclaration)
      *     ;)
      */
-    VariableDeclaration parseVariableDeclaration(Type type = null, bool isAuto = false,
-        Attribute[] attributes = null)
+    VariableDeclaration parseVariableDeclaration(Type type = null, bool isAuto = false)
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!VariableDeclaration;
-        node.attributes = attributes;
+
         if (isAuto)
         {
             mixin (nullCheck!`node.autoDeclaration = parseAutoDeclaration()`);
@@ -6714,7 +6685,7 @@ class Parser
     /**
      * Returns: true if there are more tokens
      */
-    bool moreTokens() const nothrow pure @safe
+    bool moreTokens() const nothrow pure @safe @nogc
     {
         return index < tokens.length;
     }
@@ -6806,6 +6777,110 @@ protected:
         default: advance(); break;
         }
         return false;
+    }
+
+    enum DecType
+    {
+        autoVar,
+        autoFun,
+        other
+    }
+
+    DecType isAutoDeclaration(ref size_t beginIndex) nothrow @nogc @safe
+    {
+        immutable b = setBookmark();
+        scope(exit) goToBookmark(b);
+
+        loop: while (moreTokens()) switch (current().type)
+        {
+        case tok!"pragma":
+            beginIndex = size_t.max;
+            advance();
+            if (currentIs(tok!"("))
+            {
+                skipParens();
+                break;
+            }
+            else
+                return DecType.other;
+        case tok!"package":
+        case tok!"private":
+        case tok!"protected":
+        case tok!"public":
+            beginIndex = size_t.max;
+            advance();
+            break;
+        case tok!"@":
+            beginIndex = min(beginIndex, index);
+            advance();
+            if (currentIs(tok!"("))
+                skipParens();
+            else if (currentIs(tok!"identifier"))
+            {
+                advance();
+                if (currentIs(tok!"!"))
+                {
+                    advance();
+                    if (currentIs(tok!"("))
+                        skipParens();
+                    else
+                        advance();
+                }
+                if (currentIs(tok!"("))
+                    skipParens();
+            }
+            else
+                return DecType.other;
+            break;
+        case tok!"deprecated":
+        case tok!"align":
+        case tok!"extern":
+            beginIndex = min(beginIndex, index);
+            advance();
+            if (currentIs(tok!"("))
+                skipParens();
+            break;
+        case tok!"const":
+        case tok!"immutable":
+        case tok!"inout":
+        case tok!"synchronized":
+            if (peekIs(tok!"("))
+                return DecType.other;
+            else
+            {
+                beginIndex = min(beginIndex, index);
+                advance();
+                break;
+            }
+        case tok!"auto":
+        case tok!"enum":
+        case tok!"export":
+        case tok!"final":
+        case tok!"__gshared":
+        case tok!"nothrow":
+        case tok!"override":
+        case tok!"pure":
+        case tok!"ref":
+        case tok!"scope":
+        case tok!"shared":
+        case tok!"static":
+            beginIndex = min(beginIndex, index);
+            advance();
+            break;
+        default:
+            break loop;
+        }
+        if (index <= b)
+            return DecType.other;
+        if (startsWith(tok!"identifier", tok!"="))
+            return DecType.autoVar;
+        if (startsWith(tok!"identifier", tok!"("))
+        {
+            advance();
+            auto past = peekPastParens();
+            return (past !is null && past.type == tok!"=") ? DecType.other : DecType.autoFun;
+        }
+        return DecType.other;
     }
 
     bool isDeclaration()
@@ -7163,28 +7238,27 @@ protected:
         }
     }
 
-    void skipBraces()
+    void skipBraces() pure nothrow @safe @nogc
     {
         skip!(tok!"{", tok!"}")();
     }
 
-    void skipParens()
+    void skipParens() pure nothrow @safe @nogc
     {
-        mixin(traceEnterAndExit!(__FUNCTION__));
         skip!(tok!"(", tok!")")();
     }
 
-    void skipBrackets()
+    void skipBrackets() pure nothrow @safe @nogc
     {
         skip!(tok!"[", tok!"]")();
     }
 
-    const(Token)* peek() const
+    const(Token)* peek() const pure nothrow @safe @nogc
     {
         return index + 1 < tokens.length ? &tokens[index + 1] : null;
     }
 
-    const(Token)* peekPast(alias O, alias C)() const nothrow
+    const(Token)* peekPast(alias O, alias C)() const pure nothrow @safe @nogc
     {
         if (index >= tokens.length)
             return null;
@@ -7211,27 +7285,27 @@ protected:
         return i >= tokens.length ? null : depth == 0 ? &tokens[i] : null;
     }
 
-    const(Token)* peekPastParens() const nothrow
+    const(Token)* peekPastParens() const pure nothrow @safe @nogc
     {
         return peekPast!(tok!"(", tok!")")();
     }
 
-    const(Token)* peekPastBrackets() const nothrow
+    const(Token)* peekPastBrackets() const pure nothrow @safe @nogc
     {
         return peekPast!(tok!"[", tok!"]")();
     }
 
-    const(Token)* peekPastBraces() const nothrow
+    const(Token)* peekPastBraces() const pure nothrow @safe @nogc
     {
         return peekPast!(tok!"{", tok!"}")();
     }
 
-    bool peekIs(IdType t) const nothrow
+    bool peekIs(IdType t) const pure nothrow @safe @nogc
     {
         return index + 1 < tokens.length && tokens[index + 1].type == t;
     }
 
-    bool peekIsOneOf(IdType[] types...) const nothrow
+    bool peekIsOneOf(IdType[] types...) const pure nothrow @safe @nogc
     {
         if (index + 1 >= tokens.length) return false;
         return canFind(types, tokens[index + 1].type);
@@ -7265,7 +7339,7 @@ protected:
     /**
      * Returns: the _current token
      */
-    Token current() const pure nothrow @nogc @property
+    Token current() const pure nothrow @safe @nogc @property
     {
         return tokens[index];
     }
@@ -7273,15 +7347,20 @@ protected:
     /**
      * Advances to the next token and returns the current token
      */
-    Token advance() pure nothrow @nogc
+    Token advance() pure nothrow @nogc @safe
     {
         return tokens[index++];
+    }
+
+    void retreat() pure nothrow @nogc @safe
+    {
+        index--;
     }
 
     /**
      * Returns: true if the current token has the given type
      */
-    bool currentIs(IdType type) const pure nothrow @nogc
+    bool currentIs(IdType type) const pure nothrow @safe @nogc
     {
         return index < tokens.length && tokens[index] == type;
     }
@@ -7289,14 +7368,14 @@ protected:
     /**
      * Returns: true if the current token is one of the given types
      */
-    bool currentIsOneOf(IdType[] types...) const pure nothrow @nogc
+    bool currentIsOneOf(IdType[] types...) const pure nothrow @safe @nogc
     {
         if (index >= tokens.length)
             return false;
         return canFind(types, current.type);
     }
 
-    bool startsWith(IdType[] types...) const pure nothrow @nogc
+    bool startsWith(IdType[] types...) const pure nothrow @safe @nogc
     {
         if (index + types.length >= tokens.length)
             return false;
@@ -7310,21 +7389,21 @@ protected:
 
     alias Bookmark = size_t;
 
-    Bookmark setBookmark()
+    Bookmark setBookmark() pure nothrow @safe @nogc
     {
 //        mixin(traceEnterAndExit!(__FUNCTION__));
         ++suppressMessages;
         return index;
     }
 
-    void abandonBookmark(Bookmark) nothrow
+    void abandonBookmark(Bookmark) pure nothrow @safe @nogc
     {
         --suppressMessages;
         if (suppressMessages == 0)
             suppressedErrorCount = 0;
     }
 
-    void goToBookmark(Bookmark bookmark) nothrow
+    void goToBookmark(Bookmark bookmark) pure nothrow @safe @nogc
     {
         --suppressMessages;
         if (suppressMessages == 0)
