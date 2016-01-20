@@ -1185,6 +1185,7 @@ public:
         mixin (visitIfNotNull!(expression));
     }
     /** */ Expression expression;
+    /** */ size_t location;
     mixin OpEquals;
 }
 

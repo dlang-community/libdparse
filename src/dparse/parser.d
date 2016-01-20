@@ -1639,7 +1639,9 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Constraint;
-        mixin (nullCheck!`expect(tok!"if")`);
+        auto ifToken = expect(tok!"if");
+        mixin (nullCheck!`ifToken`);
+        node.location = ifToken.index;
         mixin (nullCheck!`expect(tok!"(")`);
         mixin (nullCheck!`node.expression = parseExpression()`);
         mixin (nullCheck!`expect(tok!")")`);
