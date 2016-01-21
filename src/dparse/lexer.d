@@ -483,6 +483,8 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
     leadingCommentAppender.reserve(1024);
     auto trailingCommentAppender = appender!(char[])();
     trailingCommentAppender.reserve(1024);
+    bool hadDdoc;
+    string empty = cache.intern("");
     auto output = appender!(typeof(return))();
     auto lexer = DLexer(sourceCode, config, cache);
     size_t tokenCount;
@@ -502,12 +504,14 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
                 if (!trailingCommentAppender.data.empty)
                     trailingCommentAppender.put('\n');
                 unDecorateComment(lexer.front.text, trailingCommentAppender);
+                hadDdoc = true;
             }
             else
             {
                 if (!leadingCommentAppender.data.empty)
                     leadingCommentAppender.put('\n');
                 unDecorateComment(lexer.front.text, leadingCommentAppender);
+                hadDdoc = true;
             }
             lexer.popFront();
             break;
@@ -527,10 +531,11 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
         if (!trailingCommentAppender.data.empty)
             (cast() output.data[$ - 1].trailingComment) = cache.intern(cast(string) trailingCommentAppender.data);
         t.comment = leadingCommentAppender.data.length > 0
-			? cache.intern(cast(string) leadingCommentAppender.data) : null;
+            ? cache.intern(cast(string) leadingCommentAppender.data) : (hadDdoc ? empty : null);
 
         leadingCommentAppender.clear();
         trailingCommentAppender.clear();
+        hadDdoc = false;
         output.put(t);
         break;
     }
