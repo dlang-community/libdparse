@@ -1286,7 +1286,7 @@ class Parser
             return null;
         }
         node.colonLocation = colon.index;
-        mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements()`);
+        mixin (nullCheck!`node.declarationsAndStatements = parseDeclarationsAndStatements(false)`);
         return node;
     }
 
@@ -2135,13 +2135,15 @@ class Parser
      *     $(RULE declarationOrStatement)+
      *     ;)
      */
-    DeclarationsAndStatements parseDeclarationsAndStatements()
+    DeclarationsAndStatements parseDeclarationsAndStatements(bool includeCases = true)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!DeclarationsAndStatements;
         DeclarationOrStatement[] declarationsAndStatements;
         while (!currentIsOneOf(tok!"}", tok!"else") && moreTokens() && suppressedErrorCount <= MAX_ERRORS)
         {
+            if (currentIs(tok!"case") && !includeCases)
+                break;
             if (currentIs(tok!"while"))
             {
                 auto b = setBookmark();
