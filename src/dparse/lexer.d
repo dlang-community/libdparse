@@ -1894,6 +1894,7 @@ body
     size_t i = 3;
     size_t j;
     bool hasOutput = false;
+    bool lastWasBlank = false;
     switch (comment[0 .. 3])
     {
     case "///":
@@ -1940,25 +1941,34 @@ body
                     continue;
                 leadingChars = line[0 .. k];
             }
+
             if (stripped.startsWith(leadingChars))
             {
                 if (stripped.length > leadingChars.length)
                 {
                     if (hasOutput)
                         outputRange.put('\n');
-                    else
-                        hasOutput = true;
+                    hasOutput = true;
+                    if (lastWasBlank)
+                        outputRange.put('\n');
+                    lastWasBlank = false;
                     outputRange.put(stripped[leadingChars.length .. $]);
                 }
             }
+            else if (hasOutput && stripped.length == leadingChars.stripRight().length)
+                lastWasBlank = true;
             else if (!stripped.empty && !leadingChars.startsWith(stripped))
             {
                 if (hasOutput)
                     outputRange.put('\n');
-                else
-                    hasOutput = true;
+                hasOutput = true;
+                if (lastWasBlank)
+                    outputRange.put('\n');
+                lastWasBlank = false;
                 outputRange.put(stripped);
             }
+            else
+                lastWasBlank = false;
         }
         break;
     default:
@@ -1987,7 +1997,8 @@ unittest
         "/**\n *\n * stuff\n */",
         "/**\n *\n * stuff\n *\n */",
         "/**\n *\n * stuff\n *\n*/",
-        "/**\n *  abcde\n *    abcde \n */"
+        "/**\n *  abcde\n *    abcde \n */",
+        "/**\n * abcde\n *\n * abcde\n */",
     ];
     string[] outputs = [
         "",
@@ -2001,7 +2012,8 @@ unittest
         "stuff",
         "stuff",
         "stuff",
-        "abcde\n  abcde"
+        "abcde\n  abcde",
+        "abcde\n\nabcde"
     ];
     assert(inputs.length == outputs.length);
     foreach (pair; zip(inputs, outputs))
