@@ -1529,6 +1529,10 @@ class Parser
      *     | $(RULE compileCondition) $(RULE declaration) $(LITERAL 'else') $(LITERAL '{') $(RULE declaration)* $(LITERAL '}')
      *     | $(RULE compileCondition) $(LITERAL '{') $(RULE declaration)* $(LITERAL '}') $(LITERAL 'else') $(RULE declaration)
      *     | $(RULE compileCondition) $(LITERAL '{') $(RULE declaration)* $(LITERAL '}') $(LITERAL 'else') $(LITERAL '{') $(RULE declaration)* $(LITERAL '}')
+     *     | $(RULE compileCondition) $(LITERAL '{') $(RULE declaration)* $(LITERAL '}') $(LITERAL 'else') $(LITERAL ':') $(RULE declaration)*
+     *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+ $(LITERAL 'else') $(RULE declaration)
+     *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+ $(LITERAL 'else') $(LITERAL '{') $(RULE declaration)* $(LITERAL '}')
+     *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+ $(LITERAL 'else') $(LITERAL ':') $(RULE declaration)*
      *     ;)
      */
     ConditionalDeclaration parseConditionalDeclaration()
@@ -1540,8 +1544,7 @@ class Parser
         Declaration[] trueDeclarations;
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
-            immutable bool brace = currentIs(tok!"{");
-            advance();
+            immutable bool brace = advance() == tok!"{";
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 auto b = setBookmark();
@@ -1560,8 +1563,6 @@ class Parser
             }
             if (brace)
                 mixin(nullCheck!`expect(tok!"}")`);
-            else
-                return node;
         }
         else
         {
@@ -1594,8 +1595,6 @@ class Parser
             }
             if (brace)
                 mixin(nullCheck!`expect(tok!"}")`);
-            else
-                return node;
         }
         else
         {
