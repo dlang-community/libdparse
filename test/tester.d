@@ -19,7 +19,7 @@ void messageFunction(string fileName, size_t line, size_t column,
     }
     else
     {
-        stdout.writefln("%s(%d:%d)[warn ]: %s", fileName, line, column, message);
+        stderr.writefln("%s(%d:%d)[warn ]: %s", fileName, line, column, message);
         warningCount++;
     }
 }
