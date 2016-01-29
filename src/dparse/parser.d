@@ -120,7 +120,6 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF aliasInitializer):
      *       $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE storageClass)* $(RULE type)
-     *     | $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE lambdaExpression)
      *     | $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE functionLiteralExpression)
      *     ;)
      */
