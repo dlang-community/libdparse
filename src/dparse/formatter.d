@@ -1495,14 +1495,6 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("FunctionLiteralExpression");
 
-        /**
-        IdType functionOrDelegate;
-        Type type;
-        Parameters parameters;
-        FunctionAttribute[] functionAttributes;
-        FunctionBody functionBody;
-        **/
-
         with(functionLiteralExpression)
         {
             put(tokenRep(functionOrDelegate));
@@ -1518,7 +1510,13 @@ class Formatter(Sink)
             }
 
             ignoreNewlines = true;
-            format(functionBody);
+            if (functionBody)
+                format(functionBody);
+            else
+            {
+                put(" => ");
+                format(assignExpression);
+            }
             ignoreNewlines = false;
         }
     }
