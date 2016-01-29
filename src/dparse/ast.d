@@ -54,26 +54,25 @@ shared static this()
     typeMap[typeid(IndexExpression)] = 27;
     typeMap[typeid(InExpression)] = 28;
     typeMap[typeid(IsExpression)] = 29;
-    typeMap[typeid(LambdaExpression)] = 30;
-    typeMap[typeid(MixinExpression)] = 31;
-    typeMap[typeid(MulExpression)] = 32;
-    typeMap[typeid(NewAnonClassExpression)] = 33;
-    typeMap[typeid(NewExpression)] = 34;
-    typeMap[typeid(OrExpression)] = 35;
-    typeMap[typeid(OrOrExpression)] = 36;
-    typeMap[typeid(PowExpression)] = 37;
-    typeMap[typeid(PragmaExpression)] = 38;
-    typeMap[typeid(PrimaryExpression)] = 39;
-    typeMap[typeid(RelExpression)] = 40;
-    typeMap[typeid(ShiftExpression)] = 41;
-    typeMap[typeid(Index)] = 42;
-    typeMap[typeid(TemplateMixinExpression)] = 43;
-    typeMap[typeid(TernaryExpression)] = 44;
-    typeMap[typeid(TraitsExpression)] = 45;
-    typeMap[typeid(TypeidExpression)] = 46;
-    typeMap[typeid(TypeofExpression)] = 47;
-    typeMap[typeid(UnaryExpression)] = 48;
-    typeMap[typeid(XorExpression)] = 49;
+    typeMap[typeid(MixinExpression)] = 30;
+    typeMap[typeid(MulExpression)] = 31;
+    typeMap[typeid(NewAnonClassExpression)] = 32;
+    typeMap[typeid(NewExpression)] = 33;
+    typeMap[typeid(OrExpression)] = 34;
+    typeMap[typeid(OrOrExpression)] = 35;
+    typeMap[typeid(PowExpression)] = 36;
+    typeMap[typeid(PragmaExpression)] = 37;
+    typeMap[typeid(PrimaryExpression)] = 38;
+    typeMap[typeid(RelExpression)] = 39;
+    typeMap[typeid(ShiftExpression)] = 40;
+    typeMap[typeid(Index)] = 41;
+    typeMap[typeid(TemplateMixinExpression)] = 42;
+    typeMap[typeid(TernaryExpression)] = 43;
+    typeMap[typeid(TraitsExpression)] = 44;
+    typeMap[typeid(TypeidExpression)] = 45;
+    typeMap[typeid(TypeofExpression)] = 46;
+    typeMap[typeid(UnaryExpression)] = 47;
+    typeMap[typeid(XorExpression)] = 48;
 }
 
 /**
@@ -118,26 +117,25 @@ public:
         case 27: visit(cast(IndexExpression) n); break;
         case 28: visit(cast(InExpression) n); break;
         case 29: visit(cast(IsExpression) n); break;
-        case 30: visit(cast(LambdaExpression) n); break;
-        case 31: visit(cast(MixinExpression) n); break;
-        case 32: visit(cast(MulExpression) n); break;
-        case 33: visit(cast(NewAnonClassExpression) n); break;
-        case 34: visit(cast(NewExpression) n); break;
-        case 35: visit(cast(OrExpression) n); break;
-        case 36: visit(cast(OrOrExpression) n); break;
-        case 37: visit(cast(PowExpression) n); break;
-        case 38: visit(cast(PragmaExpression) n); break;
-        case 39: visit(cast(PrimaryExpression) n); break;
-        case 40: visit(cast(RelExpression) n); break;
-        case 41: visit(cast(ShiftExpression) n); break;
-        case 42: visit(cast(Index) n); break;
-        case 43: visit(cast(TemplateMixinExpression) n); break;
-        case 44: visit(cast(TernaryExpression) n); break;
-        case 45: visit(cast(TraitsExpression) n); break;
-        case 46: visit(cast(TypeidExpression) n); break;
-        case 47: visit(cast(TypeofExpression) n); break;
-        case 48: visit(cast(UnaryExpression) n); break;
-        case 49: visit(cast(XorExpression) n); break;
+        case 30: visit(cast(MixinExpression) n); break;
+        case 31: visit(cast(MulExpression) n); break;
+        case 32: visit(cast(NewAnonClassExpression) n); break;
+        case 33: visit(cast(NewExpression) n); break;
+        case 34: visit(cast(OrExpression) n); break;
+        case 35: visit(cast(OrOrExpression) n); break;
+        case 36: visit(cast(PowExpression) n); break;
+        case 37: visit(cast(PragmaExpression) n); break;
+        case 38: visit(cast(PrimaryExpression) n); break;
+        case 39: visit(cast(RelExpression) n); break;
+        case 40: visit(cast(ShiftExpression) n); break;
+        case 41: visit(cast(Index) n); break;
+        case 42: visit(cast(TemplateMixinExpression) n); break;
+        case 43: visit(cast(TernaryExpression) n); break;
+        case 44: visit(cast(TraitsExpression) n); break;
+        case 45: visit(cast(TypeidExpression) n); break;
+        case 46: visit(cast(TypeofExpression) n); break;
+        case 47: visit(cast(UnaryExpression) n); break;
+        case 48: visit(cast(XorExpression) n); break;
         default: assert(false, __MODULE__ ~ " has a bug");
         }
     }
@@ -251,7 +249,6 @@ public:
     /** */ void visit(const KeyValuePair keyValuePair) { keyValuePair.accept(this); }
     /** */ void visit(const KeyValuePairs keyValuePairs) { keyValuePairs.accept(this); }
     /** */ void visit(const LabeledStatement labeledStatement) { labeledStatement.accept(this); }
-    /** */ void visit(const LambdaExpression lambdaExpression) { lambdaExpression.accept(this); }
     /** */ void visit(const LastCatch lastCatch) { lastCatch.accept(this); }
     /** */ void visit(const LinkageAttribute linkageAttribute) { linkageAttribute.accept(this); }
     /** */ void visit(const MemberFunctionAttribute memberFunctionAttribute) { memberFunctionAttribute.accept(this); }
@@ -457,13 +454,15 @@ final class AliasInitializer : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(name, templateParameters, storageClasses, type));
+        mixin (visitIfNotNull!(name, templateParameters, storageClasses, type,
+                functionLiteralExpression));
     }
     mixin OpEquals;
     /** */ Token name;
     /** */ StorageClass[] storageClasses;
     /** */ TemplateParameters templateParameters;
     /** */ Type type;
+    /** */ FunctionLiteralExpression functionLiteralExpression;
 }
 
 ///
@@ -1734,14 +1733,17 @@ final class FunctionLiteralExpression : ExpressionNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(type, parameters, memberFunctionAttributes,
-            functionBody));
+        mixin (visitIfNotNull!(returnType, parameters, functionAttributes,
+                memberFunctionAttributes, functionBody, assignExpression));
     }
-    /** */ IdType functionOrDelegate;
-    /** */ Type type;
-    /** */ Parameters parameters;
-    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
+    /** */ ExpressionNode assignExpression;
+    /** */ FunctionAttribute[] functionAttributes;
     /** */ FunctionBody functionBody;
+    /** */ IdType functionOrDelegate;
+    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
+    /** */ Parameters parameters;
+    /** */ Token identifier;
+    /** */ Type returnType;
     mixin OpEquals;
 }
 
@@ -2054,24 +2056,6 @@ public:
     }
     Token identifier;
     /** */ DeclarationOrStatement declarationOrStatement;
-    mixin OpEquals;
-}
-
-///
-final class LambdaExpression : ExpressionNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(identifier, returnType, parameters, functionAttributes,
-            assignExpression));
-    }
-    /** */ IdType functionType;
-    /** */ Token identifier;
-    /** */ Parameters parameters;
-    /** */ FunctionAttribute[] functionAttributes;
-    /** */ ExpressionNode assignExpression;
-    /** */ Type returnType;
     mixin OpEquals;
 }
 
@@ -2443,11 +2427,11 @@ final class PrimaryExpression : ExpressionNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(basicType, typeConstructor, type, primary,
-            typeofExpression, typeidExpression, arrayLiteral, assocArrayLiteral,
-            expression, dot, identifierOrTemplateInstance, isExpression,
-            lambdaExpression, functionLiteralExpression, traitsExpression,
-            mixinExpression, importExpression, vector, arguments));
+        mixin(visitIfNotNull!(basicType, typeConstructor, type, primary,
+                typeofExpression, typeidExpression, arrayLiteral, assocArrayLiteral,
+                expression, dot, identifierOrTemplateInstance, isExpression,
+                functionLiteralExpression,traitsExpression, mixinExpression,
+                importExpression, vector, arguments));
     }
     /** */ Token dot;
     /** */ Token primary;
@@ -2459,7 +2443,6 @@ public:
     /** */ AssocArrayLiteral assocArrayLiteral;
     /** */ Expression expression;
     /** */ IsExpression isExpression;
-    /** */ LambdaExpression lambdaExpression;
     /** */ FunctionLiteralExpression functionLiteralExpression;
     /** */ TraitsExpression traitsExpression;
     /** */ MixinExpression mixinExpression;

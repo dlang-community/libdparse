@@ -1237,7 +1237,6 @@ class Formatter(Sink)
         else if (cast(IndexExpression) n) format(cast(IndexExpression) n);
         else if (cast(InExpression) n) format(cast(InExpression) n);
         else if (cast(IsExpression) n) format(cast(IsExpression) n);
-        else if (cast(LambdaExpression) n) format(cast(LambdaExpression) n);
         else if (cast(MixinExpression) n) format(cast(MixinExpression) n);
         else if (cast(MulExpression) n) format(cast(MulExpression) n);
         else if (cast(NewAnonClassExpression) n) format(cast(NewAnonClassExpression) n);
@@ -1509,7 +1508,7 @@ class Formatter(Sink)
             put(tokenRep(functionOrDelegate));
 
             space();
-            if (type) format(type);
+            if (returnType) format(returnType);
             if (parameters) format(parameters);
 
             foreach(att; memberFunctionAttributes)
@@ -1938,37 +1937,6 @@ class Formatter(Sink)
         put(":");
         if (stmt.declarationOrStatement)
             format(stmt.declarationOrStatement);
-    }
-
-    void format(const LambdaExpression lambdaExpression)
-    {
-        debug(verbose) writeln("LambdaExpression");
-
-        /**
-        IdType functionType;
-        Token identifier;
-        Parameters parameters;
-        FunctionAttribute[] functionAttributes;
-        AssignExpression assignExpression;
-        **/
-
-        with(lambdaExpression)
-        {
-            if (identifier != tok!"")
-                format(identifier);
-            else
-            {
-                if (functionType) put(tokenRep(functionType));
-                format(parameters);
-                foreach(count, attr; functionAttributes)
-                {
-                    space();
-                    format(attr);
-                }
-            }
-            put(" => ");
-            format(assignExpression);
-        }
     }
 
     void format(const LastCatch lastCatch)
@@ -2407,7 +2375,6 @@ class Formatter(Sink)
             else if (arrayLiteral) format(arrayLiteral);
             else if (assocArrayLiteral) format(assocArrayLiteral);
             else if (isExpression) format(isExpression);
-            else if (lambdaExpression) format(lambdaExpression);
             else if (functionLiteralExpression) format(functionLiteralExpression);
             else if (traitsExpression) format(traitsExpression);
             else if (mixinExpression) format(mixinExpression);
