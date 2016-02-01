@@ -1616,7 +1616,7 @@ class Parser
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
             {
-                auto d = parseDeclaration(true);
+                auto d = parseDeclaration();
                 mixin(nullCheck!`d`);
                 falseDeclarations ~= d;
             }
