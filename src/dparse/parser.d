@@ -830,7 +830,7 @@ class Parser
      * Parses an AssertExpression
      *
      * $(GRAMMAR $(RULEDEF assertExpression):
-     *     $(LITERAL 'assert') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'assert') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     AssertExpression parseAssertExpression()
@@ -845,8 +845,15 @@ class Parser
         if (currentIs(tok!","))
         {
             advance();
+            if (currentIs(tok!")"))
+            {
+                advance();
+                return node;
+            }
             mixin (nullCheck!`node.message = parseAssignExpression()`);
         }
+        if (currentIs(tok!","))
+            advance();
         mixin (nullCheck!`expect(tok!")")`);
         return node;
     }

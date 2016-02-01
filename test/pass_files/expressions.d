@@ -78,7 +78,9 @@ void foo()
 	auto a = new (x, y, z) class (c, d) {};
 	auto a = new (x, y, z) class A, B {};
 	assert (a);
+	assert (a,);
 	assert (a, "b");
+	assert (a, "b",);
 	assert((lower & upper).empty);
 	auto ptr = cast(const shared int*) &val;
 	(cast(Node*) data.ptr).next = null;
