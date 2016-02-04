@@ -1708,7 +1708,7 @@ final class FunctionDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(storageClasses, returnType, parameters,
+        mixin (visitIfNotNull!(attributes, storageClasses, returnType, parameters,
             templateParameters, constraint, memberFunctionAttributes,
             functionBody));
     }
