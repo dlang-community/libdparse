@@ -3200,6 +3200,11 @@ class Formatter(Sink)
         else
         {
             put(tokenRep(type2.builtinType));
+            if (type2.identifierOrTemplateChain !is null)
+            {
+                put(".");
+                format(type2.identifierOrTemplateChain);
+            }
         }
     }
 
