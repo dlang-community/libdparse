@@ -5490,16 +5490,16 @@ class Parser
     }
 
     /**
-     * Parses an TemplateParameterList
+     * Parses a TemplateParameterList
      *
      * $(GRAMMAR $(RULEDEF templateParameterList):
-     *     $(RULE templateParameter) ($(LITERAL ',') $(RULE templateParameter)?)*
+     *     $(RULE templateParameter) ($(LITERAL ',') $(RULE templateParameter)?)* $(LITERAL ',')?
      *     ;)
      */
     TemplateParameterList parseTemplateParameterList()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        return parseCommaSeparatedRule!(TemplateParameterList, TemplateParameter)();
+        return parseCommaSeparatedRule!(TemplateParameterList, TemplateParameter)(true);
     }
 
     /**
@@ -5515,7 +5515,8 @@ class Parser
         auto node = allocate!TemplateParameters;
         mixin(nullCheck!`expect(tok!"(")`);
         if (!currentIs(tok!")"))
-            if ((node.templateParameterList = parseTemplateParameterList()) is null) { deallocate(node); return null; }
+            mixin (nullCheck!`node.templateParameterList = parseTemplateParameterList()`);
+
         mixin(nullCheck!`expect(tok!")")`);
         return node;
     }
