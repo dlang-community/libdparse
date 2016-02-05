@@ -3091,6 +3091,7 @@ public:
     }
 
     /** */ IdType builtinType;
+    /** */ alias superOrThis = builtinType;
     /** */ Symbol symbol;
     /** */ TypeofExpression typeofExpression;
     /** */ IdentifierOrTemplateChain identifierOrTemplateChain;

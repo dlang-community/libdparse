@@ -5852,6 +5852,8 @@ class Parser
      * $(GRAMMAR $(RULEDEF type2):
      *       $(RULE builtinType)
      *     | $(RULE symbol)
+     *     | $(LITERAL 'super') $(LITERAL '.') $(RULE identifierOrTemplateChain)
+     *     | $(LITERAL 'this') $(LITERAL '.') $(RULE identifierOrTemplateChain)
      *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE identifierOrTemplateChain))?
      *     | $(RULE typeConstructor) $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)')
      *     | $(RULE vector)
@@ -5870,12 +5872,16 @@ class Parser
         {
         case tok!"identifier":
         case tok!".":
-            if ((node.symbol = parseSymbol()) is null)
-                return null;
+            mixin (nullCheck!`node.symbol = parseSymbol()`);
             break;
         mixin (BUILTIN_TYPE_CASES);
-            if ((node.builtinType = parseBuiltinType()) == tok!"")
-                return null;
+            node.builtinType = parseBuiltinType();
+            break;
+        case tok!"super":
+        case tok!"this":
+            node.superOrThis = advance().type;
+            mixin(nullCheck!`expect(tok!".")`);
+            mixin (nullCheck!`node.identifierOrTemplateChain = parseIdentifierOrTemplateChain()`);
             break;
         case tok!"typeof":
             if ((node.typeofExpression = parseTypeofExpression()) is null)
@@ -5884,8 +5890,6 @@ class Parser
             {
                 advance();
                 mixin (nullCheck!`node.identifierOrTemplateChain = parseIdentifierOrTemplateChain()`);
-                if (node.identifierOrTemplateChain is null)
-                    return null;
             }
             break;
         case tok!"const":
