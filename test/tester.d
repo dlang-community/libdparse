@@ -10,7 +10,7 @@ int errorCount = 0;
 int warningCount = 0;
 
 void messageFunction(string fileName, size_t line, size_t column,
-    string message, bool isError)
+    string message, bool isError, void* userp)
 {
     if (isError)
     {
