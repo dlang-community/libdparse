@@ -987,7 +987,7 @@ class Parser
      *     | $(RULE atAttribute)
      *     | $(RULE linkageAttribute)
      *     | $(LITERAL 'export')
-     *     | $(LITERAL 'package')
+     *     | $(LITERAL 'package') ($(LITERAL "(") $(RULE identifierChain) $(LITERAL ")"))?
      *     | $(LITERAL 'private')
      *     | $(LITERAL 'protected')
      *     | $(LITERAL 'public')
@@ -1027,14 +1027,6 @@ class Parser
         case tok!"@":
             mixin (nullCheck!`node.atAttribute = parseAtAttribute()`);
             break;
-        case tok!"extern":
-            if (peekIs(tok!"("))
-            {
-                mixin (nullCheck!`node.linkageAttribute = parseLinkageAttribute()`);
-                break;
-            }
-            else
-                goto case;
         case tok!"package":
             node.attribute = advance();
             if (currentIs(tok!"("))
@@ -1044,6 +1036,14 @@ class Parser
                 expect(tok!")");
             }
             break;
+        case tok!"extern":
+            if (peekIs(tok!"("))
+            {
+                mixin (nullCheck!`node.linkageAttribute = parseLinkageAttribute()`);
+                break;
+            }
+            else
+                goto case;
         case tok!"private":
         case tok!"protected":
         case tok!"public":
@@ -1871,10 +1871,11 @@ class Parser
         if (current.comment !is null)
             comment = current.comment;
         size_t autoStorageClassStart = size_t.max;
-        immutable DecType isAuto = isAutoDeclaration(autoStorageClassStart);
+        DecType isAuto;
         Attribute[] attributes;
         do
         {
+            isAuto = isAutoDeclaration(autoStorageClassStart);
             if (isAuto != DecType.other && index == autoStorageClassStart)
                 break;
             if (!isAttribute())
