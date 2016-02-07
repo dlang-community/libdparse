@@ -66,3 +66,7 @@ version(StdDdoc)
         }
     }
 }
+idouble a = 4Li;
+idouble a = 4i;
+ifloat a = 4fi;
+ifloat a = 4Fi;
