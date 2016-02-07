@@ -1572,7 +1572,7 @@ class Parser
      *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+ $(LITERAL 'else') $(LITERAL ':') $(RULE declaration)*
      *     ;)
      */
-    ConditionalDeclaration parseConditionalDeclaration()
+    ConditionalDeclaration parseConditionalDeclaration(bool strict)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!ConditionalDeclaration;
@@ -1585,7 +1585,7 @@ class Parser
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 auto b = setBookmark();
-                auto d = parseDeclaration();
+                auto d = parseDeclaration(strict);
                 if (d !is null)
                 {
                     abandonBookmark(b);
@@ -1603,7 +1603,7 @@ class Parser
         }
         else
         {
-            auto dec = parseDeclaration();
+            auto dec = parseDeclaration(strict);
             mixin (nullCheck!`dec`);
             trueDeclarations ~= dec;
         }
@@ -1626,7 +1626,7 @@ class Parser
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
             {
-                auto d = parseDeclaration();
+                auto d = parseDeclaration(strict);
                 mixin(nullCheck!`d`);
                 falseDeclarations ~= d;
             }
@@ -2100,7 +2100,7 @@ class Parser
             else if (peekIs(tok!"~"))
                 mixin (nullCheck!`node.staticDestructor = parseStaticDestructor()`);
             else if (peekIs(tok!"if"))
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration()`);
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
             else if (peekIs(tok!"assert"))
                 mixin (nullCheck!`node.staticAssertDeclaration = parseStaticAssertDeclaration()`);
             else
@@ -2131,20 +2131,20 @@ class Parser
         case tok!"__vector":
         mixin (BUILTIN_TYPE_CASES);
         type:
-            Type type = parseType();
-            if (type is null || !currentIs(tok!"identifier"))
+            Type t = parseType();
+            if (t is null || !currentIs(tok!"identifier"))
             {
                 deallocate(node);
                 return null;
             }
             if (peekIs(tok!"("))
-                mixin (nullCheck!`node.functionDeclaration = parseFunctionDeclaration(type, false)`);
+                mixin (nullCheck!`node.functionDeclaration = parseFunctionDeclaration(t, false)`);
             else
-                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(type, false)`);
+                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(t, false)`);
             break;
         case tok!"version":
             if (peekIs(tok!"("))
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration()`);
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
             else if (peekIs(tok!"="))
                 mixin (nullCheck!`node.versionSpecification = parseVersionSpecification()`);
             else
@@ -2158,7 +2158,7 @@ class Parser
             if (peekIs(tok!"="))
                 mixin (nullCheck!`node.debugSpecification = parseDebugSpecification()`);
             else
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration()`);
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
             break;
         default:
             error("Declaration expected");
@@ -2895,14 +2895,8 @@ class Parser
             return node;
         }
         else if (currentIs(tok!"{"))
-        {
-            if ((node.blockStatement = parseBlockStatement()) is null)
-            {
-                deallocate(node);
-                return null;
-            }
-        }
-        else
+            mixin (nullCheck!`node.blockStatement = parseBlockStatement()`);
+        else if (currentIsOneOf(tok!"in", tok!"out", tok!"body"))
         {
             if (currentIs(tok!"in"))
             {
@@ -2920,6 +2914,12 @@ class Parser
             // valid inside of interfaces.
             if (currentIs(tok!"body"))
                 mixin (nullCheck!`node.bodyStatement = parseBodyStatement()`);
+        }
+        else
+        {
+            error("'in', 'out', 'body', or block statement expected");
+            deallocate(node);
+            return null;
         }
         return node;
     }
@@ -5516,7 +5516,6 @@ class Parser
         mixin(nullCheck!`expect(tok!"(")`);
         if (!currentIs(tok!")"))
             mixin (nullCheck!`node.templateParameterList = parseTemplateParameterList()`);
-
         mixin(nullCheck!`expect(tok!")")`);
         return node;
     }
@@ -7245,11 +7244,6 @@ protected:
     Token advance() pure nothrow @nogc @safe
     {
         return tokens[index++];
-    }
-
-    void retreat() pure nothrow @nogc @safe
-    {
-        index--;
     }
 
     /**
