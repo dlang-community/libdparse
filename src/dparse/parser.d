@@ -1585,7 +1585,7 @@ class Parser
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 auto b = setBookmark();
-                auto d = parseDeclaration(strict);
+                auto d = parseDeclaration(strict, true);
                 if (d !is null)
                 {
                     abandonBookmark(b);
@@ -1603,7 +1603,7 @@ class Parser
         }
         else
         {
-            auto dec = parseDeclaration(strict);
+            auto dec = parseDeclaration(strict, true);
             mixin (nullCheck!`dec`);
             trueDeclarations ~= dec;
         }
@@ -1626,7 +1626,7 @@ class Parser
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
             {
-                auto d = parseDeclaration(strict);
+                auto d = parseDeclaration(strict, true);
                 mixin(nullCheck!`d`);
                 falseDeclarations ~= d;
             }
@@ -1635,7 +1635,7 @@ class Parser
         }
         else
         {
-            auto dec = parseDeclaration(suppressMessages > 0);
+            auto dec = parseDeclaration(strict, true);
             mixin(nullCheck!`dec`);
             falseDeclarations ~= dec;
         }
@@ -1710,7 +1710,6 @@ class Parser
             mixin (nullCheck!`node.templateParameters = parseTemplateParameters()`);
         }
         mixin (nullCheck!`node.parameters = parseParameters()`);
-        mixin (nullCheck!`node.parameters`);
 
         MemberFunctionAttribute[] memberFunctionAttributes;
         while (moreTokens() && currentIsMemberFunctionAttribute())
@@ -1858,7 +1857,7 @@ class Parser
      *     | $(RULE versionSpecification)
      *     ;)
      */
-    Declaration parseDeclaration(bool strict = false)
+    Declaration parseDeclaration(bool strict = false, bool mustBeDeclaration = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocate!Declaration;
@@ -1973,10 +1972,9 @@ class Parser
             mixin (nullCheck!`node.classDeclaration = parseClassDeclaration()`);
             break;
         case tok!"this":
-            if (strict && peekIs(tok!"("))
+            if (!mustBeDeclaration && peekIs(tok!"("))
             {
-                // If we are in strict mode, do not parse as a declaration.
-                // Instead this should be parsed as a function call.
+                // Do not parse as a declaration if we could parse as a function call.
                 ++index;
                 const past = peekPastParens();
                 --index;
@@ -1987,19 +1985,12 @@ class Parser
                 }
             }
             if (startsWith(tok!"this", tok!"(", tok!"this", tok!")"))
-            {
                 mixin (nullCheck!`node.postblit = parsePostblit()`);
-                mixin (nullCheck!`node.postblit`);
-            }
             else
-            {
                 mixin (nullCheck!`node.constructor = parseConstructor()`);
-                mixin (nullCheck!`node.constructor`);
-            }
             break;
         case tok!"~":
             mixin (nullCheck!`node.destructor = parseDestructor()`);
-            mixin (nullCheck!`node.destructor`);
             break;
         case tok!"enum":
             auto b = setBookmark();
@@ -2225,7 +2216,7 @@ class Parser
         // "Any ambiguities in the grammar between Statements and
         // Declarations are resolved by the declarations taking precedence."
         auto b = setBookmark();
-        auto d = parseDeclaration(true);
+        auto d = parseDeclaration(true, false);
         if (d is null)
         {
             goToBookmark(b);
@@ -2238,7 +2229,7 @@ class Parser
             // printed. Maybe store messages to then be abandoned or written later?
             deallocate(d);
             goToBookmark(b);
-            node.declaration = parseDeclaration();
+            node.declaration = parseDeclaration(true, true);
         }
         return node;
     }
@@ -3905,7 +3896,7 @@ class Parser
         Declaration[] declarations;
         while (moreTokens())
         {
-            auto declaration = parseDeclaration();
+            auto declaration = parseDeclaration(true, true);
             if (declaration !is null)
                 declarations ~= declaration;
         }
@@ -5067,7 +5058,7 @@ class Parser
         Declaration[] declarations;
         while (!currentIs(tok!"}") && moreTokens())
         {
-            auto dec = parseDeclaration();
+            auto dec = parseDeclaration(true, true);
             if (dec !is null)
                 declarations ~= dec;
         }
@@ -5401,7 +5392,7 @@ class Parser
         Declaration[] declarations;
         while (moreTokens() && !currentIs(tok!"}"))
         {
-            auto decl = parseDeclaration();
+            auto decl = parseDeclaration(true, true);
             if (decl !is null)
                 declarations ~= decl;
         }
@@ -6794,7 +6785,7 @@ protected:
             {
                 auto b = setBookmark();
                 scope (exit) goToBookmark(b);
-                auto dec = parseDeclaration(true);
+                auto dec = parseDeclaration(true, true);
                 if (dec is null)
                     return false;
                 else
@@ -6869,7 +6860,7 @@ protected:
             return false;
         default:
             auto b = setBookmark();
-            auto p = parseDeclaration();
+            auto p = parseDeclaration(true, true);
             if (p is null)
             {
                 goToBookmark(b);
