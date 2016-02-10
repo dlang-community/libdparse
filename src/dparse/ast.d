@@ -2514,8 +2514,9 @@ final class SharedStaticConstructor : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(functionBody));
+        mixin (visitIfNotNull!(memberFunctionAttributes, functionBody));
     }
+    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
     /** */ FunctionBody functionBody;
     /** */ size_t location;
     /** */ string comment;
@@ -2528,8 +2529,9 @@ final class SharedStaticDestructor : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(functionBody));
+        mixin (visitIfNotNull!(memberFunctionAttributes, functionBody));
     }
+    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
     /** */ FunctionBody functionBody;
     /** */ size_t location;
     /** */ string comment;
@@ -2608,8 +2610,9 @@ final class StaticConstructor : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(functionBody));
+        mixin (visitIfNotNull!(memberFunctionAttributes, functionBody));
     }
+    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
     /** */ FunctionBody functionBody;
     /** */ size_t location;
     /** */ size_t line;
@@ -2624,8 +2627,9 @@ final class StaticDestructor : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(functionBody));
+        mixin (visitIfNotNull!(memberFunctionAttributes, functionBody));
     }
+    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
     /** */ FunctionBody functionBody;
     /** */ size_t location;
     /** */ size_t line;

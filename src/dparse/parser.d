@@ -4663,29 +4663,63 @@ class Parser
      * Parses a SharedStaticConstructor
      *
      * $(GRAMMAR $(RULEDEF sharedStaticConstructor):
-     *     $(LITERAL 'shared') $(LITERAL 'static') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE functionBody)
+     *     $(LITERAL 'shared') $(LITERAL 'static') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE MemberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ";"))
      *     ;)
      */
     SharedStaticConstructor parseSharedStaticConstructor()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        mixin(simpleParse!(SharedStaticConstructor, tok!"shared", tok!"static",
-                tok!"this", tok!"(", tok!")", "functionBody|parseFunctionBody"));
+        auto node = allocate!SharedStaticConstructor;
+        mixin(nullCheck!`expect(tok!"shared")`);
+        mixin(nullCheck!`expect(tok!"static")`);
+        mixin(nullCheck!`expect(tok!"this")`);
+        mixin(nullCheck!`expect(tok!"(")`);
+        mixin(nullCheck!`expect(tok!")")`);
+        MemberFunctionAttribute[] attributes;
+        while (moreTokens() && !currentIsOneOf(tok!"{", tok!"in", tok!"out", tok!"body", tok!";"))
+        {
+            auto attribute = parseMemberFunctionAttribute();
+            mixin(nullCheck!`attribute`);
+            attributes ~= attribute;
+        }
+        node.memberFunctionAttributes = ownArray(attributes);
+        if (currentIs(tok!";"))
+            advance();
+        else
+            mixin(nullCheck!`node.functionBody = parseFunctionBody()`);
+        return node;
     }
 
     /**
      * Parses a SharedStaticDestructor
      *
      * $(GRAMMAR $(RULEDEF sharedStaticDestructor):
-     *     $(LITERAL 'shared') $(LITERAL 'static') $(LITERAL '~') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE functionBody)
+     *     $(LITERAL 'shared') $(LITERAL 'static') $(LITERAL '~') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE MemberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ";"))
      *     ;)
      */
     SharedStaticDestructor parseSharedStaticDestructor()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        mixin(simpleParse!(SharedStaticDestructor, tok!"shared", tok!"static",
-            tok!"~", tok!"this", tok!"(", tok!")",
-            "functionBody|parseFunctionBody"));
+        auto node = allocate!SharedStaticDestructor;
+        mixin(nullCheck!`expect(tok!"shared")`);
+        mixin(nullCheck!`expect(tok!"static")`);
+        mixin(nullCheck!`expect(tok!"~")`);
+        mixin(nullCheck!`expect(tok!"this")`);
+        mixin(nullCheck!`expect(tok!"(")`);
+        mixin(nullCheck!`expect(tok!")")`);
+        MemberFunctionAttribute[] attributes;
+        while (moreTokens() && !currentIsOneOf(tok!"{", tok!"in", tok!"out", tok!"body", tok!";"))
+        {
+            auto attribute = parseMemberFunctionAttribute();
+            mixin(nullCheck!`attribute`);
+            attributes ~= attribute;
+        }
+        node.memberFunctionAttributes = ownArray(attributes);
+        if (currentIs(tok!";"))
+            advance();
+        else
+            mixin(nullCheck!`node.functionBody = parseFunctionBody()`);
+        return node;
     }
 
     /**
@@ -4942,28 +4976,61 @@ class Parser
      * Parses a StaticConstructor
      *
      * $(GRAMMAR $(RULEDEF staticConstructor):
-     *     $(LITERAL 'static') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE functionBody)
+     *     $(LITERAL 'static') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE memberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ";"))
      *     ;)
      */
     StaticConstructor parseStaticConstructor()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        mixin(simpleParse!(StaticConstructor, tok!"static", tok!"this",
-            tok!"(", tok!")", "functionBody|parseFunctionBody"));
+        auto node = allocate!StaticConstructor;
+        mixin(nullCheck!`expect(tok!"static")`);
+        mixin(nullCheck!`expect(tok!"this")`);
+        mixin(nullCheck!`expect(tok!"(")`);
+        mixin(nullCheck!`expect(tok!")")`);
+        MemberFunctionAttribute[] attributes;
+        while (moreTokens() && !currentIsOneOf(tok!"{", tok!"in", tok!"out", tok!"body", tok!";"))
+        {
+            auto attribute = parseMemberFunctionAttribute();
+            mixin(nullCheck!`attribute`);
+            attributes ~= attribute;
+        }
+        node.memberFunctionAttributes = ownArray(attributes);
+        if (currentIs(tok!";"))
+            advance();
+        else
+            mixin(nullCheck!`node.functionBody = parseFunctionBody()`);
+        return node;
     }
 
     /**
      * Parses a StaticDestructor
      *
      * $(GRAMMAR $(RULEDEF staticDestructor):
-     *     $(LITERAL 'static') $(LITERAL '~') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE functionBody)
+     *     $(LITERAL 'static') $(LITERAL '~') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE memberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ";"))
      *     ;)
      */
     StaticDestructor parseStaticDestructor()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        mixin(simpleParse!(StaticDestructor, tok!"static", tok!"~", tok!"this",
-            tok!"(", tok!")", "functionBody|parseFunctionBody"));
+        auto node = allocate!StaticDestructor;
+        mixin(nullCheck!`expect(tok!"static")`);
+        mixin(nullCheck!`expect(tok!"~")`);
+        mixin(nullCheck!`expect(tok!"this")`);
+        mixin(nullCheck!`expect(tok!"(")`);
+        mixin(nullCheck!`expect(tok!")")`);
+        MemberFunctionAttribute[] attributes;
+        while (moreTokens() && !currentIsOneOf(tok!"{", tok!"in", tok!"out", tok!"body", tok!";"))
+        {
+            auto attribute = parseMemberFunctionAttribute();
+            mixin(nullCheck!`attribute`);
+            attributes ~= attribute;
+        }
+        node.memberFunctionAttributes = ownArray(attributes);
+        if (currentIs(tok!";"))
+            advance();
+        else
+            mixin(nullCheck!`node.functionBody = parseFunctionBody()`);
+        return node;
     }
 
     /**
