@@ -53,3 +53,20 @@ int a = typeid(10).alignof;
 int a = (int).sizeof;
 enum string STRING_CONSTANT = "abc";
 Size[][] minSizes = new Size[][](cols, rows);
+version(StdDdoc)
+{
+    struct DirEntry
+    {
+        version (Windows)
+        {
+        }
+        else version (Posix)
+        {
+            private this(string path);
+        }
+    }
+}
+idouble a = 4Li;
+idouble a = 4i;
+ifloat a = 4fi;
+ifloat a = 4Fi;

@@ -1276,9 +1276,9 @@ public:
     private import std.typetuple:TypeTuple;
 
     alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasThisDeclaration,
-        AnonymousEnumDeclaration, Attribute[], AttributeDeclaration,
+        AnonymousEnumDeclaration, AttributeDeclaration,
         ClassDeclaration, ConditionalDeclaration, Constructor, DebugSpecification,
-        /+Declaration[],+/ Destructor, EnumDeclaration, EponymousTemplateDeclaration,
+        Destructor, EnumDeclaration, EponymousTemplateDeclaration,
         FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, Invariant,
         MixinDeclaration, MixinTemplateDeclaration, Postblit, PragmaDeclaration,
         SharedStaticConstructor, SharedStaticDestructor, StaticAssertDeclaration,
@@ -1305,7 +1305,6 @@ public:
     mixin(generateProperty("ConditionalDeclaration", "conditionalDeclaration"));
     mixin(generateProperty("Constructor", "constructor"));
     mixin(generateProperty("DebugSpecification", "debugSpecification"));
-    /+mixin(generateProperty("Declaration[]", "declarations"));+/
     mixin(generateProperty("Destructor", "destructor"));
     mixin(generateProperty("EnumDeclaration", "enumDeclaration"));
     mixin(generateProperty("EponymousTemplateDeclaration", "eponymousTemplateDeclaration"));
@@ -3095,6 +3094,7 @@ public:
     }
 
     /** */ IdType builtinType;
+    /** */ alias superOrThis = builtinType;
     /** */ Symbol symbol;
     /** */ TypeofExpression typeofExpression;
     /** */ IdentifierOrTemplateChain identifierOrTemplateChain;

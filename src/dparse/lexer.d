@@ -963,7 +963,7 @@ private pure nothrow @safe:
             index);
     }
 
-    void lexIntSuffix(ref IdType type)
+    void lexIntSuffix(ref IdType type) pure nothrow @safe
     {
         bool secondPass;
         if (range.bytes[range.index] == 'u' || range.bytes[range.index] == 'U')
@@ -976,9 +976,10 @@ private pure nothrow @safe:
             range.popFront();
             if (secondPass)
                 return;
-            if (range.bytes[range.index] == 'L' || range.bytes[range.index] == 'l')
+            if (range.index < range.bytes.length
+                    && (range.bytes[range.index] == 'L' || range.bytes[range.index] == 'l'))
                 goto L;
-            return;
+            goto I;
         }
         if (range.bytes[range.index] == 'L' || range.bytes[range.index] == 'l')
         {
@@ -988,12 +989,23 @@ private pure nothrow @safe:
             else
                 type = tok!"longLiteral";
             range.popFront();
-            if (range.bytes[range.index] == 'U' || range.bytes[range.index] == 'u')
+            if (range.index < range.bytes.length
+                    && (range.bytes[range.index] == 'U' || range.bytes[range.index] == 'u'))
             {
                 secondPass = true;
                 goto U;
             }
-            return;
+            goto I;
+        }
+    I:
+        if (range.index < range.bytes.length && range.bytes[range.index] == 'i')
+        {
+            warning("Complex number literals are deprecated");
+            range.popFront();
+            if (type == tok!"longLiteral" || type == tok!"ulongLiteral")
+                type = tok!"idoubleLiteral";
+            else
+                type = tok!"ifloatLiteral";
         }
     }
 
@@ -1013,7 +1025,7 @@ private pure nothrow @safe:
         default:
             break;
         }
-        if (!(range.index >= range.bytes.length) && range.bytes[range.index] == 'i')
+        if (range.index < range.bytes.length && range.bytes[range.index] == 'i')
         {
             warning("Complex number literals are deprecated");
             range.popFront();
@@ -1029,7 +1041,7 @@ private pure nothrow @safe:
         range.popFront();
         bool foundSign = false;
         bool foundDigit = false;
-        while (!(range.index >= range.bytes.length))
+        while (range.index < range.bytes.length)
         {
             switch (range.bytes[range.index])
             {

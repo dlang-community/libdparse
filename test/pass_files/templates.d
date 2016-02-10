@@ -31,3 +31,4 @@ template a(b) if (is (a : shared)) {}
 enum A(T) = A;
 template A(T) if (is (T u : v, W)) {}
 mixin template A(T) { T t; }
+size_t replicateBits(size_t , )() {}
