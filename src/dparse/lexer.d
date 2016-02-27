@@ -1654,10 +1654,7 @@ private pure nothrow @safe:
         mixin (tokenStart);
         range.popFront();
         if (range.bytes[range.index] == '\\')
-        {
             lexEscapeSequence();
-            goto close;
-        }
         else if (range.bytes[range.index] == '\'')
         {
             range.popFront();
@@ -1667,18 +1664,12 @@ private pure nothrow @safe:
         else if (range.bytes[range.index] & 0x80)
         {
             while (range.bytes[range.index] & 0x80)
-            {
                 range.popFront();
-            }
-            goto close;
         }
         else
-        {
             popFrontWhitespaceAware();
-            goto close;
-        }
-    close:
-        if (range.bytes[range.index] == '\'')
+
+        if (range.index < range.bytes.length && range.bytes[range.index] == '\'')
         {
             range.popFront();
             token = Token(tok!"characterLiteral", cache.intern(range.slice(mark)),
@@ -2298,7 +2289,7 @@ unittest
     auto toks = (string s) => byToken(cast(ubyte[])s);
 
     // valid
-    enum hex = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','A','B','C','D','E','F'];
+    immutable hex = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','A','B','C','D','E','F'];
     auto source = "";
     foreach (h1; hex)
         foreach (h2; hex)
