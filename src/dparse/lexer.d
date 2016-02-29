@@ -176,41 +176,39 @@ public struct LexerConfig
 }
 
 /**
+ * Basic type token types.
+ */
+public alias BasicTypes = AliasSeq!(tok!"int", tok!"bool", tok!"byte",
+		tok!"cdouble", tok!"cent", tok!"cfloat", tok!"char", tok!"creal",
+		tok!"dchar", tok!"double", tok!"float", tok!"idouble",
+		tok!"ifloat", tok!"ireal", tok!"long", tok!"real", tok!"short",
+		tok!"ubyte", tok!"ucent", tok!"uint", tok!"ulong", tok!"ushort",
+		tok!"void", tok!"wchar");
+
+/**
  * Returns: true if the given ID is for a basic type.
  */
 public bool isBasicType(IdType type) nothrow pure @safe @nogc
 {
     switch (type)
     {
-    case tok!"int":
-    case tok!"uint":
-    case tok!"double":
-    case tok!"idouble":
-    case tok!"float":
-    case tok!"ifloat":
-    case tok!"short":
-    case tok!"ushort":
-    case tok!"long":
-    case tok!"ulong":
-    case tok!"char":
-    case tok!"wchar":
-    case tok!"dchar":
-    case tok!"bool":
-    case tok!"void":
-    case tok!"cent":
-    case tok!"ucent":
-    case tok!"real":
-    case tok!"ireal":
-    case tok!"byte":
-    case tok!"ubyte":
-    case tok!"cdouble":
-    case tok!"cfloat":
-    case tok!"creal":
+    foreach (T; BasicTypes)
+    {
+    case T:
         return true;
+    }
     default:
         return false;
     }
 }
+
+/**
+ * Number literal token types.
+ */
+public alias NumberLiterals = AliasSeq!(tok!"doubleLiteral",
+        tok!"floatLiteral", tok!"idoubleLiteral", tok!"ifloatLiteral",
+        tok!"intLiteral", tok!"longLiteral", tok!"realLiteral",
+        tok!"irealLiteral", tok!"uintLiteral", tok!"ulongLiteral");
 
 /**
  * Returns: true if the given ID type is for a number literal.
@@ -219,21 +217,30 @@ public bool isNumberLiteral(IdType type) nothrow pure @safe @nogc
 {
     switch (type)
     {
-    case tok!"doubleLiteral":
-    case tok!"floatLiteral":
-    case tok!"idoubleLiteral":
-    case tok!"ifloatLiteral":
-    case tok!"intLiteral":
-    case tok!"longLiteral":
-    case tok!"realLiteral":
-    case tok!"irealLiteral":
-    case tok!"uintLiteral":
-    case tok!"ulongLiteral":
+    foreach (T; NumberLiterals)
+    {
+    case T:
         return true;
+    }
     default:
         return false;
     }
 }
+
+/**
+ * Operator token types.
+ */
+public alias Operators = AliasSeq!(tok!",", tok!".", tok!"..", tok!"...",
+        tok!"/", tok!"/=", tok!"!", tok!"!<", tok!"!<=", tok!"!<>",
+        tok!"!<>=", tok!"!=", tok!"!>", tok!"!>=", tok!"$", tok!"%",
+        tok!"%=", tok!"&", tok!"&&", tok!"&=", tok!"(", tok!")",
+        tok!"*", tok!"*=", tok!"+", tok!"++", tok!"+=", tok!"-",
+        tok!"--", tok!"-=", tok!":", tok!";", tok!"<", tok!"<<",
+        tok!"<<=", tok!"<=", tok!"<>", tok!"<>=", tok!"=", tok!"==",
+        tok!"=>", tok!">", tok!">=", tok!">>", tok!">>=", tok!">>>",
+        tok!">>>=", tok!"?", tok!"@", tok!"[", tok!"]", tok!"^",
+        tok!"^=", tok!"^^", tok!"^^=", tok!"{", tok!"|", tok!"|=",
+        tok!"||", tok!"}", tok!"~", tok!"~=");
 
 /**
  * Returns: true if the given ID type is for an operator.
@@ -242,73 +249,40 @@ public bool isOperator(IdType type) nothrow pure @safe @nogc
 {
     switch (type)
     {
-    case tok!",":
-    case tok!".":
-    case tok!"..":
-    case tok!"...":
-    case tok!"/":
-    case tok!"/=":
-    case tok!"!":
-    case tok!"!<":
-    case tok!"!<=":
-    case tok!"!<>":
-    case tok!"!<>=":
-    case tok!"!=":
-    case tok!"!>":
-    case tok!"!>=":
-    case tok!"$":
-    case tok!"%":
-    case tok!"%=":
-    case tok!"&":
-    case tok!"&&":
-    case tok!"&=":
-    case tok!"(":
-    case tok!")":
-    case tok!"*":
-    case tok!"*=":
-    case tok!"+":
-    case tok!"++":
-    case tok!"+=":
-    case tok!"-":
-    case tok!"--":
-    case tok!"-=":
-    case tok!":":
-    case tok!";":
-    case tok!"<":
-    case tok!"<<":
-    case tok!"<<=":
-    case tok!"<=":
-    case tok!"<>":
-    case tok!"<>=":
-    case tok!"=":
-    case tok!"==":
-    case tok!"=>":
-    case tok!">":
-    case tok!">=":
-    case tok!">>":
-    case tok!">>=":
-    case tok!">>>":
-    case tok!">>>=":
-    case tok!"?":
-    case tok!"@":
-    case tok!"[":
-    case tok!"]":
-    case tok!"^":
-    case tok!"^=":
-    case tok!"^^":
-    case tok!"^^=":
-    case tok!"{":
-    case tok!"|":
-    case tok!"|=":
-    case tok!"||":
-    case tok!"}":
-    case tok!"~":
-    case tok!"~=":
+    foreach (T; Operators)
+    {
+    case T:
         return true;
+    }
     default:
         return false;
     }
 }
+
+/**
+ * Keyword token types.
+ */
+public alias Keywords = AliasSeq!(tok!"abstract", tok!"alias", tok!"align",
+        tok!"asm", tok!"assert", tok!"auto", tok!"body", tok!"break",
+        tok!"case", tok!"cast", tok!"catch", tok!"class", tok!"const",
+        tok!"continue", tok!"debug", tok!"default", tok!"delegate",
+        tok!"delete", tok!"deprecated", tok!"do", tok!"else", tok!"enum",
+        tok!"export", tok!"extern", tok!"false", tok!"final", tok!"finally",
+        tok!"for", tok!"foreach", tok!"foreach_reverse", tok!"function",
+        tok!"goto", tok!"if", tok!"immutable", tok!"import", tok!"in",
+        tok!"inout", tok!"interface", tok!"invariant", tok!"is",
+        tok!"lazy", tok!"macro", tok!"mixin", tok!"module", tok!"new",
+        tok!"nothrow", tok!"null", tok!"out", tok!"override", tok!"package",
+        tok!"pragma", tok!"private", tok!"protected", tok!"public",
+        tok!"pure", tok!"ref", tok!"return", tok!"scope", tok!"shared",
+        tok!"static", tok!"struct", tok!"super", tok!"switch", tok!"synchronized",
+        tok!"template", tok!"this", tok!"throw", tok!"true", tok!"try",
+        tok!"typedef", tok!"typeid", tok!"typeof", tok!"union", tok!"unittest",
+        tok!"version", tok!"volatile", tok!"while", tok!"with", tok!"__DATE__",
+        tok!"__EOF__", tok!"__FILE__", tok!"__FUNCTION__", tok!"__gshared",
+        tok!"__LINE__", tok!"__MODULE__", tok!"__parameters", tok!"__PRETTY_FUNCTION__",
+        tok!"__TIME__", tok!"__TIMESTAMP__", tok!"__traits", tok!"__vector",
+        tok!"__VENDOR__", tok!"__VERSION__");
 
 /**
  * Returns: true if the given ID type is for a keyword.
@@ -317,104 +291,21 @@ public bool isKeyword(IdType type) pure nothrow @safe @nogc
 {
     switch (type)
     {
-    case tok!"abstract":
-    case tok!"alias":
-    case tok!"align":
-    case tok!"asm":
-    case tok!"assert":
-    case tok!"auto":
-    case tok!"body":
-    case tok!"break":
-    case tok!"case":
-    case tok!"cast":
-    case tok!"catch":
-    case tok!"class":
-    case tok!"const":
-    case tok!"continue":
-    case tok!"debug":
-    case tok!"default":
-    case tok!"delegate":
-    case tok!"delete":
-    case tok!"deprecated":
-    case tok!"do":
-    case tok!"else":
-    case tok!"enum":
-    case tok!"export":
-    case tok!"extern":
-    case tok!"false":
-    case tok!"final":
-    case tok!"finally":
-    case tok!"for":
-    case tok!"foreach":
-    case tok!"foreach_reverse":
-    case tok!"function":
-    case tok!"goto":
-    case tok!"if":
-    case tok!"immutable":
-    case tok!"import":
-    case tok!"in":
-    case tok!"inout":
-    case tok!"interface":
-    case tok!"invariant":
-    case tok!"is":
-    case tok!"lazy":
-    case tok!"macro":
-    case tok!"mixin":
-    case tok!"module":
-    case tok!"new":
-    case tok!"nothrow":
-    case tok!"null":
-    case tok!"out":
-    case tok!"override":
-    case tok!"package":
-    case tok!"pragma":
-    case tok!"private":
-    case tok!"protected":
-    case tok!"public":
-    case tok!"pure":
-    case tok!"ref":
-    case tok!"return":
-    case tok!"scope":
-    case tok!"shared":
-    case tok!"static":
-    case tok!"struct":
-    case tok!"super":
-    case tok!"switch":
-    case tok!"synchronized":
-    case tok!"template":
-    case tok!"this":
-    case tok!"throw":
-    case tok!"true":
-    case tok!"try":
-    case tok!"typedef":
-    case tok!"typeid":
-    case tok!"typeof":
-    case tok!"union":
-    case tok!"unittest":
-    case tok!"version":
-    case tok!"volatile":
-    case tok!"while":
-    case tok!"with":
-    case tok!"__DATE__":
-    case tok!"__EOF__":
-    case tok!"__FILE__":
-    case tok!"__FUNCTION__":
-    case tok!"__gshared":
-    case tok!"__LINE__":
-    case tok!"__MODULE__":
-    case tok!"__parameters":
-    case tok!"__PRETTY_FUNCTION__":
-    case tok!"__TIME__":
-    case tok!"__TIMESTAMP__":
-    case tok!"__traits":
-    case tok!"__vector":
-    case tok!"__VENDOR__":
-    case tok!"__VERSION__":
+    foreach (T; Keywords)
+    {
+    case T:
         return true;
+    }
     default:
         return false;
     }
 }
+
+/**
+ * String literal token types
+ */
+public alias StringLiterals = AliasSeq!(tok!"dstringLiteral",
+        tok!"stringLiteral", tok!"wstringLiteral");
 
 /**
  * Returns: true if the given ID type is for a string literal.
@@ -423,14 +314,21 @@ public bool isStringLiteral(IdType type) pure nothrow @safe @nogc
 {
     switch (type)
     {
-    case tok!"dstringLiteral":
-    case tok!"stringLiteral":
-    case tok!"wstringLiteral":
+    foreach (T; StringLiterals)
+    {
+    case T:
         return true;
+    }
     default:
         return false;
     }
 }
+
+/**
+ * Protection token types.
+ */
+public alias Protections = AliasSeq!(tok!"export", tok!"package",
+        tok!"private", tok!"public", tok!"protected");
 
 /**
  * Returns: true if the given ID type is for a protection attribute.
@@ -439,12 +337,46 @@ public bool isProtection(IdType type) pure nothrow @safe @nogc
 {
     switch (type)
     {
-    case tok!"export":
-    case tok!"package":
-    case tok!"private":
-    case tok!"public":
-    case tok!"protected":
+    foreach (T; Protections)
+    {
+    case T:
         return true;
+    }
+    default:
+        return false;
+    }
+}
+
+public alias SpecialTokens = AliasSeq!(tok!"__DATE__", tok!"__TIME__", tok!"__TIMESTAMP__",
+        tok!"__VENDOR__", tok!"__VERSION__", tok!"__FILE__", tok!"__LINE__",
+        tok!"__MODULE__", tok!"__FUNCTION__", tok!"__PRETTY_FUNCTION__");
+
+public bool isSpecialToken(IdType type) pure nothrow @safe @nogc
+{
+    switch (type)
+    {
+    foreach (T; SpecialTokens)
+    {
+    case T:
+        return true;
+    }
+    default:
+        return false;
+    }
+}
+
+public alias Literals = AliasSeq!(StringLiterals, NumberLiterals, tok!"characterLiteral",
+        SpecialTokens, tok!"true", tok!"false", tok!"null", tok!"$");
+
+public bool isLiteral(IdType type) pure nothrow @safe @nogc
+{
+    switch (type)
+    {
+    foreach (T; Literals)
+    {
+    case T:
+        return true;
+    }
     default:
         return false;
     }
