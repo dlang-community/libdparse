@@ -156,9 +156,15 @@ template TokenIdType(alias staticTokens, alias dynamicTokens,
  * See_also: $(LREF TokenId)
  */
 string tokenStringRepresentation(IdType, alias staticTokens, alias dynamicTokens,
-    alias possibleDefaultTokens)(IdType type) @property
+    alias possibleDefaultTokens)(IdType type) pure nothrow @property @nogc @safe
 {
-    enum tokens = staticTokens ~ dynamicTokens ~ possibleDefaultTokens;
+    // hax
+    static auto f() pure nothrow @trusted
+    {
+        return cast(immutable) staticTokens ~ dynamicTokens ~ possibleDefaultTokens;
+    }
+
+    static immutable tokens = f();
 
     if (type == 0)
         return "!ERROR!";
