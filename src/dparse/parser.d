@@ -15,9 +15,7 @@ import std.string : format;
 
 // Uncomment this if you want ALL THE OUTPUT
 // Caution: generates 180 megabytes of logging for std.datetime
-version = dparse_verbose;
-
-alias ParseAllocator = CAllocatorImpl!(Mallocator);
+//version = dparse_verbose;
 
 /**
  * Params:
@@ -340,7 +338,7 @@ class Parser
         switch (current.type)
         {
         case tok!"[":
-            auto b = setBookmark();
+            immutable b = setBookmark();
             skipBrackets();
             if (currentIs(tok!":"))
             {
@@ -1947,7 +1945,7 @@ class Parser
             mixin(parseNodeQ!(`node.destructor`, `Destructor`));
             break;
         case tok!"enum":
-            auto b = setBookmark();
+            immutable b = setBookmark();
             advance(); // enum
             if (currentIsOneOf(tok!":", tok!"{"))
             {
@@ -2004,7 +2002,7 @@ class Parser
                 mixin(parseNodeQ!(`node.mixinTemplateDeclaration`, `MixinTemplateDeclaration`));
             else
             {
-                auto b = setBookmark();
+                immutable b = setBookmark();
                 advance();
                 if (currentIs(tok!"("))
                 {
@@ -2126,7 +2124,7 @@ class Parser
                 break;
             if (currentIs(tok!"while"))
             {
-                auto b = setBookmark();
+                immutable b = setBookmark();
                 scope (exit) goToBookmark(b);
                 advance();
                 if (currentIs(tok!"("))
@@ -2162,10 +2160,12 @@ class Parser
         auto node = allocator.make!DeclarationOrStatement;
         // "Any ambiguities in the grammar between Statements and
         // Declarations are resolved by the declarations taking precedence."
-        auto b = setBookmark();
+        immutable b = setBookmark();
+        immutable c = allocator.setCheckpoint();
         auto d = parseDeclaration(true, false);
         if (d is null)
         {
+            allocator.rollback(c);
             goToBookmark(b);
             mixin(parseNodeQ!(`node.statement`, `Statement`));
         }
@@ -2174,6 +2174,7 @@ class Parser
             // TODO: Make this more efficient. Right now we parse the declaration
             // twice, once with errors and warnings ignored, and once with them
             // printed. Maybe store messages to then be abandoned or written later?
+            allocator.rollback(c);
             goToBookmark(b);
             node.declaration = parseDeclaration(true, true);
         }
@@ -3823,7 +3824,7 @@ class Parser
         bool isDeprecatedModule;
         if (currentIs(tok!"deprecated"))
         {
-            auto b = setBookmark();
+            immutable b = setBookmark();
             advance();
             if (currentIs(tok!"("))
                 skipParens();
@@ -4424,7 +4425,7 @@ class Parser
                 mixin(parseNodeQ!(`node.arrayLiteral`, `ArrayLiteral`));
             break;
         case tok!"(":
-            auto b = setBookmark();
+            immutable b = setBookmark();
             skipParens();
             while (isAttribute())
                 parseAttribute();
@@ -4993,7 +4994,7 @@ class Parser
         while (!currentIs(tok!"}") && moreTokens())
         {
             immutable c = allocator.setCheckpoint();
-            if (declarations.put(parseDeclaration(true, true)))
+            if (!declarations.put(parseDeclaration(true, true)))
                 allocator.rollback(c);
         }
         ownArray(node.declarations, declarations);
@@ -5240,7 +5241,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         if (suppressedErrorCount > MAX_ERRORS) return null;
         auto node = allocator.make!TemplateArgument;
-        auto b = setBookmark();
+        immutable b = setBookmark();
         auto t = parseType();
         if (t !is null && currentIsOneOf(tok!",", tok!")"))
         {
@@ -6004,7 +6005,7 @@ class Parser
         auto node = allocator.make!TypeidExpression;
         expect(tok!"typeid");
         expect(tok!"(");
-        auto b = setBookmark();
+        immutable b = setBookmark();
         auto t = parseType();
         if (t is null || !currentIs(tok!")"))
         {
@@ -6080,7 +6081,7 @@ class Parser
         case tok!"immutable":
         case tok!"inout":
         case tok!"shared":
-            auto b = setBookmark();
+            immutable b = setBookmark();
             if (peekIs(tok!"("))
             {
                 advance();
@@ -6123,13 +6124,13 @@ class Parser
             break;
         case tok!"(":
             // handle (type).identifier
-            auto b = setBookmark();
+            immutable b = setBookmark();
             skipParens();
             if (startsWith(tok!".", tok!"identifier"))
             {
                 // go back to the (
                 goToBookmark(b);
-                b = setBookmark();
+                immutable b2 = setBookmark();
                 advance();
                 auto t = parseType();
                 if (t is null || !currentIs(tok!")"))
@@ -6137,7 +6138,7 @@ class Parser
                     goToBookmark(b);
                     goto default;
                 }
-                abandonBookmark(b);
+                abandonBookmark(b2);
                 node.type = t;
                 advance(); // )
                 advance(); // .
@@ -6400,11 +6401,11 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!WhileStatement;
-        expect(tok!"while");
+		mixin(tokenCheck!"while");
         node.startIndex = current().index;
-        expect(tok!"(");
+		mixin(tokenCheck!"(");
         mixin(parseNodeQ!(`node.expression`, `Expression`));
-        expect(tok!")");
+        mixin(tokenCheck!")");
         if (currentIs(tok!"}"))
         {
             error("Statement expected", false);
@@ -6492,20 +6493,11 @@ protected:
 
     void ownArray(T)(ref T[] arr, ref StackBuffer sb)
     {
-        if (allocator is null)
-        {
-            arr = new T[](sb.length / T.sizeof);
-            arr[] = cast(T[]) sb[];
-            return;
-        }
         if (sb.length == 0)
             return;
-
-        auto a = cast(ubyte[]) allocator.allocate(sb.length);
+        ubyte[] a = cast(ubyte[]) allocator.allocate(sb.length);
         a[] = sb[];
         arr = cast(T[]) a;
-        assert(arr.length == sb.length / T.sizeof,
-                format("from.length = %d, arr.length = %d, %s", sb.length / T.sizeof, arr.length, T.stringof));
     }
 
     bool isCastQualifier() const
@@ -6536,7 +6528,7 @@ protected:
         if (auto p = current.index in cached)
             return *p;
         size_t currentIndex = current.index;
-        auto b = setBookmark();
+        immutable b = setBookmark();
         scope(exit) goToBookmark(b);
         advance();
         immutable bool result = !currentIs(tok!"]") && parseExpression() !is null && currentIs(tok!":");
@@ -6684,6 +6676,7 @@ protected:
                 return true;
             if (peekIs(tok!"("))
                 goto default;
+            return false;
         case tok!"synchronized":
             if (peekIs(tok!"("))
                 return false;
@@ -6743,7 +6736,7 @@ protected:
         case tok!"assert":
             return false;
         default:
-            auto b = setBookmark();
+            immutable b = setBookmark();
             scope(exit) goToBookmark(b);
             auto c = allocator.setCheckpoint();
             scope(exit) allocator.rollback(c);
@@ -6755,7 +6748,7 @@ protected:
     bool isType()
     {
         if (!moreTokens()) return false;
-        auto b = setBookmark();
+        immutable b = setBookmark();
         scope (exit) goToBookmark(b);
         auto c = allocator.setCheckpoint();
         scope (exit) allocator.rollback(c);
@@ -6812,7 +6805,7 @@ protected:
                 || startsWith(tok!"shared", tok!"static", tok!"~")
                 || peekIs(tok!"("));
         case tok!"pragma":
-            auto b = setBookmark();
+            immutable b = setBookmark();
             scope(exit) goToBookmark(b);
             advance();
             const past = peekPastParens();

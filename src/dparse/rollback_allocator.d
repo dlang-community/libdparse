@@ -1,5 +1,7 @@
 module dparse.rollback_allocator;
 
+//version = debug_rollback_allocator;
+
 /**
  * Pointer-bump allocator with rollback functionality.
  */
@@ -19,6 +21,11 @@ public:
      * Allocates `size` bytes of memory.
      */
     void[] allocate(size_t size)
+    out (arr)
+    {
+        assert(arr.length == size);
+    }
+    body
     {
         bool newNode = first is null;
         if (newNode)
@@ -29,11 +36,12 @@ public:
         {
             immutable end = fu + size;
             void[] m = first.mem[fu .. end];
-            // Align to 8 bytes
-            //if (end & 0b111)
-                //first.used = (end & ~0b111) + 0b1000;
-            //else
+            //Align to 8 bytes
+            if (end & 0b111)
+                first.used = (end & ~0b111L) + 0b1000L;
+            else
                 first.used = end;
+            assert(first.used > fu);
             return m;
         }
         if (newNode)
@@ -56,7 +64,8 @@ public:
         if (first !is null)
         {
             immutable begin = point - cast(size_t) first.mem.ptr;
-            (cast(ubyte[]) first.mem)[begin .. $] = 0;
+            version (debug_rollback_allocator)
+                (cast(ubyte[]) first.mem)[begin .. $] = 0;
             first.used = begin;
         }
     }
@@ -89,42 +98,43 @@ public:
 
 private:
 
-    enum ALLOC_SIZE = 1024 * 1024 * 4;
+    enum ALLOC_SIZE = 1024 * 4;
 
     static struct Node
     {
         Node* next;
         size_t used;
-        void[] mem;
+        ubyte[] mem;
 
         bool contains(size_t p) pure nothrow @nogc @safe
         {
-            return p > cast(size_t) mem.ptr && p < cast(size_t) mem.ptr + mem.length;
+            return p >= cast(size_t) mem.ptr && p < cast(size_t) mem.ptr + mem.length;
         }
     }
 
     void allocateNode()
     {
         import std.experimental.allocator.mallocator : Mallocator;
+        import std.conv : emplace;
 
-        void[] m = Mallocator.instance.allocate(ALLOC_SIZE);
-        Node* n = cast(Node*) m.ptr;
+        ubyte[] m = cast(ubyte[]) Mallocator.instance.allocate(ALLOC_SIZE);
+        version (debug_rollback_allocator)
+            m[] = 0;
+        Node* n = emplace!Node(cast(Node*) m.ptr);
         n.next = first;
         n.used = 0;
-        pragma(msg, Node.sizeof);
         n.mem = m[Node.sizeof .. $];
-
+        assert((cast(size_t) n.mem.ptr) % 8 == 0, "The memoriez!");
         first = n;
     }
 
     void deallocateNode()
     {
         import std.experimental.allocator.mallocator : Mallocator;
-        import std.experimental.allocator : dispose;
-
         Node* next = first.next;
-        void[] mem = (cast(void*) first)[0 .. ALLOC_SIZE];
-        (cast(ubyte[]) mem)[] = 0;
+        ubyte[] mem = (cast(ubyte*) first)[0 .. ALLOC_SIZE];
+        version (debug_rollback_allocator)
+            mem[] = 0;
         Mallocator.instance.deallocate(mem);
         first = next;
     }
