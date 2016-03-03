@@ -94,5 +94,4 @@ unittest
 
     S s;
     sb.put(s);
-    writeln(sb.length);
 }

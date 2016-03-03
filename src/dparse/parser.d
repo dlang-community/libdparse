@@ -2273,12 +2273,8 @@ class Parser
         if (currentIs(tok!"("))
         {
             advance();
-            immutable i = index;
-            while (currentIs(tok!"stringLiteral"))
-                advance();
-            node.stringLiterals = cast(Token[]) allocator.allocate(Token.sizeof * (index - i));
-            node.stringLiterals[] = tokens[i .. index];
-            mixin(tokenCheck!")");
+            mixin (parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+            mixin (tokenCheck!")");
         }
         return node;
     }
