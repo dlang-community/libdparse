@@ -106,7 +106,6 @@ class Parser
                 if (!storageClasses.put(parseStorageClass()))
                     return null;
             ownArray(node.storageClasses, storageClasses);
-            node.oldStyle = true;
             mixin (parseNodeQ!(`node.type`, `Type`));
             mixin (parseNodeQ!(`node.identifierList`, `IdentifierList`));
         }
