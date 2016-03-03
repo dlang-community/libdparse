@@ -446,7 +446,6 @@ public:
     /** */ IdentifierList identifierList;
     /** */ AliasInitializer[] initializers;
     /** */ string comment;
-    /** */ bool oldStyle;
 }
 
 ///
