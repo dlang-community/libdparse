@@ -106,8 +106,6 @@ class Parser
             while (moreTokens() && isStorageClass())
                 storageClasses ~= parseStorageClass();
             node.storageClasses = ownArray(storageClasses);
-            warn("Prefer the new \"'alias' identifier '=' type ';'\" syntax"
-                ~ " to the  old \"'alias' type identifier ';'\" syntax");
             mixin (nullCheck!`node.type = parseType()`);
             mixin (nullCheck!`node.identifierList = parseIdentifierList()`);
         }
