@@ -278,6 +278,8 @@ void testTokenChecks()
 
 int main(string[] args)
 {
+    import dparse.rollback_allocator : RollbackAllocator;
+
     version (D_Coverage) testTokenChecks();
     enforce(args.length > 1, "Must specifiy at least one D file");
     foreach (arg; args[1 .. $])
@@ -291,7 +293,8 @@ int main(string[] args)
         config.stringBehavior = StringBehavior.source;
         config.fileName = arg;
         const(Token)[] tokens = getTokensForParser(fileBytes, config, &cache);
-        parseModule(tokens, arg, null, &messageFunction);
+        RollbackAllocator rba;
+        parseModule(tokens, arg, &rba, &messageFunction);
     }
     writefln("Finished parsing with %d errors and %d warnings.",
             errorCount, warningCount);

@@ -1261,7 +1261,7 @@ public:
         foreach (Type; DeclarationTypes)
         {
             const(Type)* value = storage.peek!Type;
-            if (value)
+            if (value !is null)
             {
                 static if (isArray!Type)
                     foreach (item; *(cast(Type*) value))
