@@ -1036,17 +1036,11 @@ class Formatter(Sink)
         debug (verbose)
             writeln("Deprecated");
         put("deprecated");
-        if (deprecated_.stringLiterals.length > 0)
+        if (deprecated_.assignExpression !is null)
         {
             put("(");
-            foreach (i, literal; deprecated_.stringLiterals)
-            {
-                if (i > 0)
-                    put(" ");
-                put(literal.text);
-            }
+            format(deprecated_.assignExpression);
             put(")");
-            newlineIndent();
         }
     }
 

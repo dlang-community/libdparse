@@ -1427,9 +1427,9 @@ final class Deprecated : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(stringLiterals));
+        mixin (visitIfNotNull!(assignExpression));
     }
-    /** */ Token[] stringLiterals;
+    /** */ ExpressionNode assignExpression;
     mixin OpEquals;
 }
 

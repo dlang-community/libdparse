@@ -2319,7 +2319,7 @@ class Parser
      * Parses a Deprecated attribute
      *
      * $(GRAMMAR $(RULEDEF deprecated):
-     *     $(LITERAL 'deprecated') ($(LITERAL '$(LPAREN)') $(LITERAL StringLiteral)+ $(LITERAL '$(RPAREN)'))?
+     *     $(LITERAL 'deprecated') ($(LITERAL '$(LPAREN)') $(RULE assignExpression) $(LITERAL '$(RPAREN)'))?
      *     ;)
      */
     Deprecated parseDeprecated()
@@ -2330,10 +2330,7 @@ class Parser
         if (currentIs(tok!"("))
         {
             advance();
-            Token[] tokens;
-            while (currentIs(tok!"stringLiteral"))
-                tokens ~= advance();
-            node.stringLiterals = ownArray(tokens);
+            mixin (nullCheck!`node.assignExpression = parseAssignExpression()`);
             mixin (nullCheck!`expect(tok!")")`);
         }
         return node;
