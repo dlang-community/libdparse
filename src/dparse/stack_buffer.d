@@ -86,7 +86,7 @@ private:
 unittest
 {
     StackBuffer sb;
-    void[80] u;
+    ubyte[80] u;
     sb.put(u);
     assert(sb.length == 80);
     static struct S
