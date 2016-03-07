@@ -2,13 +2,13 @@ module dparse.stack_buffer;
 
 import std.traits;
 
-// version = debug_stack_allocator)
+//version = debug_stack_allocator;
 
 struct StackBuffer
 {
     bool put(T)(T t)
     {
-        import core.stdc.stdlib : malloc, realloc;
+        import std.experimental.allocator.mallocator : Mallocator;
 
         static if (is(T == class) || isPointer!T)
             if (t is null)
@@ -24,38 +24,40 @@ struct StackBuffer
         {
             if (_length + T.sizeof > arr.length)
             {
-                size_t nl = arr.length << 1;
-                while (_length + T.sizeof > nl)
-                    nl <<= 1;
-                arr = (cast(ubyte*) realloc(arr.ptr, nl))[0 .. nl];
+                size_t newLength = arr.length << 1;
+                while (_length + T.sizeof > newLength)
+                    newLength <<= 1;
+                Mallocator.instance.reallocate(arr, newLength);
                 version (debug_stack_allocator)
-                    arr[_length .. $] = 0;
+                    (cast(ubyte[]) arr)[_length .. $] = 0;
             }
         }
         else if (_length + T.sizeof > stackSpace.length)
         {
-            size_t nl = stackSpace.length << 1;
-            while (_length + T.sizeof > nl)
-                nl <<= 1;
-            arr = (cast(ubyte*) malloc(nl))[0 .. nl];
+            size_t newLength = stackSpace.length << 1;
+            while (_length + T.sizeof > newLength)
+                newLength <<= 1;
+            arr = Mallocator.instance.allocate(newLength);
             version (debug_stack_allocator)
-                arr[] = 0;
+                (cast(ubyte[]) arr)[] = 0;
             arr[0 .. stackSpace.length] = stackSpace[];
         }
-        arr[_length .. _length + T.sizeof] = (cast(ubyte*) &t)[0 .. T.sizeof];
+        arr[_length .. _length + T.sizeof] = (cast(void*) &t)[0 .. T.sizeof];
         _length += T.sizeof;
         return true;
     }
 
     ~this()
     {
-        import core.stdc.stdlib : free;
+        import std.experimental.allocator.mallocator:Mallocator;
 
+        version (debug_stack_allocator)
+            (cast(ubyte[]) arr)[] = 0;
         if (arr.ptr !is stackSpace.ptr)
-            free(arr.ptr);
+            Mallocator.instance.deallocate(arr);
     }
 
-    ubyte[] opSlice()
+    void[] opSlice()
     {
         return arr[0 .. _length];
     }
@@ -76,20 +78,20 @@ struct StackBuffer
 
 private:
 
-    ubyte[8 * 16] stackSpace;
-    ubyte[] arr;
+    void[8 * 16] stackSpace;
+    void[] arr;
     uint _length;
 }
 
 unittest
 {
     StackBuffer sb;
-    ubyte[80] u;
+    void[80] u;
     sb.put(u);
     assert(sb.length == 80);
     static struct S
     {
-        ubyte[100] u;
+        void[100] u;
     }
 
     S s;

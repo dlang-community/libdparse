@@ -3827,11 +3827,11 @@ class Parser
             goToBookmark(b);
         }
         if (currentIs(tok!"module") || isDeprecatedModule)
-            m.moduleDeclaration = parseModuleDeclaration();
+            mixin(parseNodeQ!(`m.moduleDeclaration`, `ModuleDeclaration`));
         StackBuffer declarations;
         while (moreTokens())
         {
-            auto c = allocator.setCheckpoint();
+            immutable c = allocator.setCheckpoint();
             if (!declarations.put(parseDeclaration(true, true)))
                 allocator.rollback(c);
         }
@@ -6490,7 +6490,7 @@ protected:
     {
         if (sb.length == 0)
             return;
-        ubyte[] a = cast(ubyte[]) allocator.allocate(sb.length);
+        void[] a = allocator.allocate(sb.length);
         a[] = sb[];
         arr = cast(T[]) a;
     }
