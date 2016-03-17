@@ -929,6 +929,7 @@ class Parser
      *     | $(LITERAL '@') $(LITERAL Identifier) $(LITERAL '$(LPAREN)') $(RULE argumentList)? $(LITERAL '$(RPAREN)')
      *     | $(LITERAL '@') $(LITERAL '$(LPAREN)') $(RULE argumentList) $(LITERAL '$(RPAREN)')
      *     | $(LITERAL '@') $(RULE TemplateInstance)
+     *     | $(LITERAL '@') $(RULE TemplateInstance) $(LITERAL '$(LPAREN)') $(RULE argumentList)? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     AtAttribute parseAtAttribute()
@@ -950,15 +951,13 @@ class Parser
             if (peekIs(tok!"!"))
                 mixin(nullCheck!`node.templateInstance = parseTemplateInstance()`);
             else
-            {
                 node.identifier = advance();
-                if (currentIs(tok!"("))
-                {
-                    advance(); // (
-                    if (!currentIs(tok!")"))
-                        mixin (nullCheck!`node.argumentList = parseArgumentList()`);
-                    expect(tok!")");
-                }
+            if (currentIs(tok!"("))
+            {
+                advance(); // (
+                if (!currentIs(tok!")"))
+                    mixin (nullCheck!`node.argumentList = parseArgumentList()`);
+                expect(tok!")");
             }
             break;
         case tok!"(":
