@@ -6454,6 +6454,11 @@ class Parser
     string fileName;
 
     /**
+     * Tokens to parse
+     */
+    const(Token)[] tokens;
+
+    /**
      * Allocator used for creating AST nodes
      */
     RollbackAllocator* allocator;
@@ -7354,7 +7359,6 @@ protected:
         return node;
     }
 
-    const(Token)[] tokens;
     int suppressMessages;
     size_t index;
     int _traceDepth;
