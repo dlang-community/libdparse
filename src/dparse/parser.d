@@ -7290,12 +7290,12 @@ protected:
 
     N parseStaticCtorDtorCommon(N)(N node)
     {
+        node.line = current.line;
+        node.column = current.column;
         mixin(tokenCheck!"this");
         mixin(tokenCheck!"(");
         mixin(tokenCheck!")");
         StackBuffer attributes;
-        node.line = current.line;
-        node.column = current.column;
         while (moreTokens() && !currentIsOneOf(tok!"{", tok!"in", tok!"out", tok!"body", tok!";"))
             if (!attributes.put(parseMemberFunctionAttribute()))
                 return null;
