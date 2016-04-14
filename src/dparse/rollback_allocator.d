@@ -20,18 +20,33 @@ public:
     /**
      * Allocates `size` bytes of memory.
      */
-    void[] allocate(size_t size)
+    void[] allocate(const size_t size)
     out (arr)
     {
         assert(arr.length == size);
     }
     body
     {
-        if (first is null || first.used + size > first.mem.length)
+        if (first is null)
             allocateNode(size);
-        immutable fu = first.used;
-        immutable end = fu + size;
-        void[] m = first.mem[fu .. end];
+
+        // Move size up to the next multiple of 8 for memory alignment purposes
+        immutable size_t s = size & ~7UL;
+        immutable size_t s2 = s == size ? size : s + 8;
+
+        size_t fu = first.used;
+        size_t end = fu + s2;
+        //assert(end >= fu + size);
+        //assert(end % 8 == 0);
+        if (end > first.mem.length)
+        {
+            allocateNode(size);
+            fu = first.used;
+            end = fu + s2;
+        }
+        //assert((cast(size_t) first.mem.ptr) % 8 == 0);
+        //assert(((cast(size_t) first.mem.ptr) + end) % 8 == 0);
+        void[] m = first.mem[fu .. fu + size];
         first.used = end;
         return m;
     }
