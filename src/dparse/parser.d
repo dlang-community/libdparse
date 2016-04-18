@@ -2354,20 +2354,7 @@ class Parser
         EnumMember last;
         while (moreTokens())
         {
-            if (currentIs(tok!","))
-            {
-                if (last !is null && last.comment is null)
-                    last.comment = current.trailingComment;
-                advance();
-                continue;
-            }
-            else if (currentIs(tok!"}"))
-            {
-                if (last !is null && last.comment is null)
-                    last.comment = tokens[index - 1].trailingComment;
-                break;
-            }
-            else
+            if (currentIs(tok!"identifier"))
             {
                 auto c = allocator.setCheckpoint();
                 auto e = parseEnumMember();
@@ -2375,7 +2362,28 @@ class Parser
                     allocator.rollback(c);
                 else
                     last = e;
+                if (currentIs(tok!","))
+                {
+                    if (last !is null && last.comment is null)
+                        last.comment = current.trailingComment;
+                    advance();
+                    continue;
+                }
+                else if (currentIs(tok!"}"))
+                {
+                    if (last !is null && last.comment is null)
+                        last.comment = tokens[index - 1].trailingComment;
+                    break;
+                }
+                else
+                {
+                    error("',' or '}' expected");
+                    if (currentIs(tok!"}"))
+                        break;
+                }
             }
+            else
+                error("Enum member expected");
         }
         ownArray(node.enumMembers, enumMembers);
         const close = expect (tok!"}");
