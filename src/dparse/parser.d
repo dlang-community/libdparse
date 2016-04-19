@@ -2367,9 +2367,10 @@ class Parser
                     if (last !is null && last.comment is null)
                         last.comment = current.trailingComment;
                     advance();
-                    continue;
+                    if (!currentIs(tok!"}"))
+                        continue;
                 }
-                else if (currentIs(tok!"}"))
+                if (currentIs(tok!"}"))
                 {
                     if (last !is null && last.comment is null)
                         last.comment = tokens[index - 1].trailingComment;
