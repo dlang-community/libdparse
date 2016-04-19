@@ -794,7 +794,7 @@ public nothrow pure @safe @nogc:
      */
     bool startsWith(const(ubyte[]) needle) const
     {
-        if (needle.length + index >= bytes.length)
+        if (needle.length + index > bytes.length)
             return false;
         foreach (i; 0 .. needle.length)
             if (needle[i] != bytes[index + i])
