@@ -3223,6 +3223,9 @@ public:
     }
     /** */ BlockStatement blockStatement;
     /** */ string comment;
+    /** */ size_t location;
+    /** */ size_t line;
+    /** */ size_t column;
     mixin OpEquals;
 }
 
