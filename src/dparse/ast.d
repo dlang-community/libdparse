@@ -1743,6 +1743,8 @@ public:
     /** */ Parameters parameters;
     /** */ Token identifier;
     /** */ Type returnType;
+    /** */ size_t line;
+    /** */ size_t column;
     mixin OpEquals;
 }
 

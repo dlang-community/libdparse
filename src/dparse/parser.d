@@ -3001,6 +3001,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!FunctionLiteralExpression;
+        node.line = current.line;
+        node.column = current.column;
         if (currentIsOneOf(tok!"function", tok!"delegate"))
         {
             node.functionOrDelegate = advance().type;
