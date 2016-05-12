@@ -6533,15 +6533,14 @@ protected:
     bool isAssociativeArrayLiteral()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        static bool[typeof(current.index)] cached;
-        if (auto p = current.index in cached)
+        if (auto p = current.index in cachedAAChecks)
             return *p;
         size_t currentIndex = current.index;
         immutable b = setBookmark();
         scope(exit) goToBookmark(b);
         advance();
         immutable bool result = !currentIs(tok!"]") && parseExpression() !is null && currentIs(tok!":");
-        cached[currentIndex] = result;
+        cachedAAChecks[currentIndex] = result;
         return result;
     }
 
@@ -7376,4 +7375,5 @@ protected:
     size_t index;
     int _traceDepth;
     string comment;
+    bool[typeof(Token.index)] cachedAAChecks;
 }
