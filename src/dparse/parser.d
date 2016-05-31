@@ -4597,6 +4597,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!SharedStaticConstructor;
+        node.location = current().index;
         mixin(tokenCheck!"shared");
         mixin(tokenCheck!"static");
         return parseStaticCtorDtorCommon(node);
@@ -4613,6 +4614,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!SharedStaticDestructor;
+        node.location = current().index;
         mixin(tokenCheck!"shared");
         mixin(tokenCheck!"static");
         mixin(tokenCheck!"~");
@@ -4877,6 +4879,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!StaticConstructor;
+        node.location = current().index;
         mixin(tokenCheck!"static");
         return parseStaticCtorDtorCommon(node);
     }
@@ -4892,6 +4895,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!StaticDestructor;
+        node.location = current().index;
         mixin(tokenCheck!"static");
         mixin(tokenCheck!"~");
         return parseStaticCtorDtorCommon(node);
