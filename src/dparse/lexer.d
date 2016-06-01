@@ -1585,6 +1585,8 @@ private pure nothrow @safe:
     {
         mixin (tokenStart);
         range.popFront();
+        if (range.empty)
+            goto err;
         if (range.bytes[range.index] == '\\')
             lexEscapeSequence();
         else if (range.bytes[range.index] == '\'')
@@ -1609,6 +1611,7 @@ private pure nothrow @safe:
         }
         else
         {
+	err:
             error("Error: Expected ' to end character literal");
             token = Token(tok!"");
         }
