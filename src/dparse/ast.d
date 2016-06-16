@@ -1286,7 +1286,7 @@ public:
         TemplateDeclaration, UnionDeclaration, Unittest, VariableDeclaration,
         VersionSpecification);
 
-    private Algebraic!(DeclarationTypes) storage;
+    package Algebraic!(DeclarationTypes) storage;
 
     private static string generateProperty(string type, string name)
     {
