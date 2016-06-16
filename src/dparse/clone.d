@@ -10,13 +10,10 @@ R clone(T: const R, R)(ref T src)
 		 // these have to have a specialized cast to clone()
 		 )
 {
-	pragma(msg,"cloning ",R," ",T);
 
 	static if(is(T == class) || is(T == struct)) {
-		pragma(msg,"structured");
 		R dest;
 		static if(is(T == class)) {
-			pragma(msg,"class");
 			dest = new R;
 		}
 		static if(__traits(compiles,dest = src)) {
@@ -33,13 +30,11 @@ R clone(T: const R, R)(ref T src)
 		return dest;
 		}
 	} else {
-		pragma(msg,"huh?");
 		return cast(R)src;
 	}
 }
 
 R[] clone(T: const R, R)(T[] src) {
-	pragma(msg,"cloning array ",T);
 	R[] dest;
 	dest.length = src.length;
 	foreach(i,e; src) {
@@ -54,22 +49,23 @@ auto derive_then_clone(Base,Types...)(Base src) {
 import dparse.types: NodeTypes;
 import dparse.ast: ExpressionNode;
 
-ExpressionNode clone()(const ExpressionNode src) {
+ExpressionNode clone(T)(const T src) if(is(T == ExpressionNode)) {
+	if(src is null)
+		return null;
+	
 	foreach(Type;NodeTypes) {
 		Type dest = cast(Type)src;
 		if(dest !is null)
 			return cast(ExpressionNode) clone(dest);
-	}
-	pragma(msg,"no type derived?");
-	assert(0);
+	}	
+	assert(0,"couldn't clone");
 
 }
 
 unittest {
 	import dparse.ast;
-
 	auto a = new AddExpression;
 	auto b = cast(const)a;
 	auto c = b.clone();
-	pragma(msg,typeof(c));
+	static assert(is(typeof(a) == typeof(c)));
 }
