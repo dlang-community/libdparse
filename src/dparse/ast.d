@@ -1290,8 +1290,19 @@ public:
 
     private static string generateProperty(string type, string name)
     {
-        return "const(" ~ type ~ ") " ~ name ~ "() const @property { auto p = storage.peek!" ~ type ~ "; return p is null? null : *p;}\n"
-            ~ "const(" ~ type ~ ") " ~ name ~ "(" ~ type ~ " node) @property { storage = node; return node; }";
+      import std.string: replace;
+        return q{
+          inout($type) $name() inout @property {
+            auto p = storage.peek!$type;
+            return p is null? null : *p;
+          }
+          $type $name($type node) @property {
+            storage = node;
+            return node;
+          }
+        }
+        .replace("$name",name)
+           .replace("$type",type);
     }
 
     /** */ Attribute[] attributes;
