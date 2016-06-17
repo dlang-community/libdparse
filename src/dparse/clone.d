@@ -47,7 +47,7 @@ R[] clone(T: const R, R)(T[] src) {
 auto derive_then_clone(Base,Types...)(Base src) {
 }
 
-import dparse.types: NodeTypes;
+import dparse.types: NodeTypes, DeclarationTypes;
 import dparse.ast: ExpressionNode;
 
 ExpressionNode clone(T)(const T src) if(is(T == ExpressionNode)) {
@@ -58,6 +58,19 @@ ExpressionNode clone(T)(const T src) if(is(T == ExpressionNode)) {
 		Type dest = cast(Type)src;
 		if(dest !is null)
 			return cast(ExpressionNode) clone(dest);
+	}	
+	assert(0,"couldn't clone");
+
+}
+
+Declaration clone(T)(const T src) if(is(T == Declaration)) {
+	if(src is null)
+		return null;
+	
+	foreach(Type;DeclarationTypes) {
+		Type dest = cast(Type)src;
+		if(dest !is null)
+			return cast(Declaration) clone(dest);
 	}	
 	assert(0,"couldn't clone");
 
