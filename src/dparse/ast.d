@@ -1258,7 +1258,7 @@ public:
 }
 
 ///
-class Declaration : ASTNode
+abstract class Declaration : ASTNode
 {
 public:
 
@@ -1267,99 +1267,16 @@ public:
 
         foreach (attr; attributes)
             visitor.visit(attr);
-        foreach (dec; declarations)
-            visitor.visit(dec);
-        foreach (Type; DeclarationTypes)
-        {
-            const(Type)* value = storage.peek!Type;
-            if (value !is null)
-            {
-                static if (isArray!Type)
-                    foreach (item; *(cast(Type*) value))
-                        visitor.visit(item);
-                else if (*value !is null)
-                    visitor.visit(*(cast(Type*) value));
-            }
-        }
     }
 
-    private import std.variant:Algebraic;
-    private import std.typetuple:TypeTuple;
-
-    alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasThisDeclaration,
-        AnonymousEnumDeclaration, AttributeDeclaration,
-        ClassDeclaration, ConditionalDeclaration, Constructor, DebugSpecification,
-        Destructor, EnumDeclaration, EponymousTemplateDeclaration,
-        FunctionDeclaration, ImportDeclaration, InterfaceDeclaration, Invariant,
-        MixinDeclaration, MixinTemplateDeclaration, Postblit, PragmaDeclaration,
-        SharedStaticConstructor, SharedStaticDestructor, StaticAssertDeclaration,
-        StaticConstructor, StaticDestructor, StructDeclaration,
-        TemplateDeclaration, UnionDeclaration, Unittest, VariableDeclaration,
-        VersionSpecification);
-
-    package Algebraic!(DeclarationTypes) storage;
-
-    private static string generateProperty(string type, string name)
-    {
-      import std.string: replace;
-        return q{
-          const($type) $name() const @property {
-            auto p = storage.peek!$type;
-            return p is null? null : *p;
-          }
-          $type $name($type node) @property {
-            storage = node;
-            return node;
-          }
-        }
-        .replace("$name",name)
-           .replace("$type",type);
-    }
-
+	// reimplementing non-final classes on our own is a bad idea
     /** */ Attribute[] attributes;
-    /** */ Declaration[] declarations;
+}
 
-    mixin(generateProperty("AliasDeclaration", "aliasDeclaration"));
-    mixin(generateProperty("AliasThisDeclaration", "aliasThisDeclaration"));
-    mixin(generateProperty("AnonymousEnumDeclaration", "anonymousEnumDeclaration"));
-    mixin(generateProperty("AttributeDeclaration", "attributeDeclaration"));
-    mixin(generateProperty("ClassDeclaration", "classDeclaration"));
-    mixin(generateProperty("ConditionalDeclaration", "conditionalDeclaration"));
-    mixin(generateProperty("Constructor", "constructor"));
-    mixin(generateProperty("DebugSpecification", "debugSpecification"));
-    mixin(generateProperty("Destructor", "destructor"));
-    mixin(generateProperty("EnumDeclaration", "enumDeclaration"));
-    mixin(generateProperty("EponymousTemplateDeclaration", "eponymousTemplateDeclaration"));
-    mixin(generateProperty("FunctionDeclaration", "functionDeclaration"));
-    mixin(generateProperty("ImportDeclaration", "importDeclaration"));
-    mixin(generateProperty("InterfaceDeclaration", "interfaceDeclaration"));
-    mixin(generateProperty("Invariant", "invariant_"));
-    mixin(generateProperty("MixinDeclaration", "mixinDeclaration"));
-    mixin(generateProperty("MixinTemplateDeclaration", "mixinTemplateDeclaration"));
-    mixin(generateProperty("Postblit", "postblit"));
-    mixin(generateProperty("PragmaDeclaration", "pragmaDeclaration"));
-    mixin(generateProperty("SharedStaticConstructor", "sharedStaticConstructor"));
-    mixin(generateProperty("SharedStaticDestructor", "sharedStaticDestructor"));
-    mixin(generateProperty("StaticAssertDeclaration", "staticAssertDeclaration"));
-    mixin(generateProperty("StaticConstructor", "staticConstructor"));
-    mixin(generateProperty("StaticDestructor", "staticDestructor"));
-    mixin(generateProperty("StructDeclaration", "structDeclaration"));
-    mixin(generateProperty("TemplateDeclaration", "templateDeclaration"));
-    mixin(generateProperty("UnionDeclaration", "unionDeclaration"));
-    mixin(generateProperty("Unittest", "unittest_"));
-    mixin(generateProperty("VariableDeclaration", "variableDeclaration"));
-    mixin(generateProperty("VersionSpecification", "versionSpecification"));
-
-	alias opEquals = Object.opEquals;
-    bool opEquals(const Object other) const
-    {
-        auto otherDeclaration = cast(Declaration) other;
-        if (otherDeclaration is null)
-            return false;
-        return attributes == otherDeclaration.attributes
-            && declarations == otherDeclaration.declarations
-            && storage == otherDeclaration.storage;
-    }
+/// a list of declarations
+final class Declarations : Declaration
+{
+  Declaration[] declarations;
 }
 
 ///

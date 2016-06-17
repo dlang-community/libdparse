@@ -1926,8 +1926,10 @@ class Parser
                 }
             }
             mixin(tokenCheck!"}");
-			
-			return allocator.make!(Declarations,declarations);
+
+			auto l = allocator.make!Declarations;
+			ownArray(l.declarations, declarations);
+			return l;
         case tok!"alias":
             if (startsWith(tok!"alias", tok!"identifier", tok!"this"))
                 mixin(parseNodeQ!(`node`, `AliasThisDeclaration`));
