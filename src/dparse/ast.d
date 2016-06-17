@@ -1276,7 +1276,11 @@ public:
 /// a list of declarations
 final class Declarations : Declaration
 {
-  Declaration[] declarations;
+	override void accept(ASTVisitor visitor) const
+	{
+		mixin (visitIfNotNull!(declarations));
+	}
+  /** */ Declaration[] declarations;
 }
 
 ///
