@@ -375,7 +375,7 @@ mixin template OpEquals(bool print = false)
 
 mixin template OpEquals(Base, bool print = false)
 {
-	alias opEquals = Base.opEquals;
+    alias opEquals = Base.opEquals;
     override bool opEquals(Object other) const
     {
         static if (print)
@@ -1035,7 +1035,7 @@ public:
     /** */ ExpressionNode low;
     /** */ ExpressionNode high;
     /** */ DeclarationsAndStatements declarationsAndStatements;
-	/** */ size_t colonLocation;
+    /** */ size_t colonLocation;
 //    mixin OpEquals;
 }
 
@@ -1049,7 +1049,7 @@ public:
     }
     /** */ ArgumentList argumentList;
     /** */ DeclarationsAndStatements declarationsAndStatements;
-	/** */ size_t colonLocation;
+    /** */ size_t colonLocation;
 //    mixin OpEquals;
 }
 
@@ -1269,17 +1269,17 @@ public:
             visitor.visit(attr);
     }
 
-	// reimplementing non-final classes on our own is a bad idea
+    // reimplementing non-final classes on our own is a bad idea
     /** */ Attribute[] attributes;
 }
 
 /// a list of declarations
 final class Declarations : Declaration
 {
-	override void accept(ASTVisitor visitor) const
-	{
-		mixin (visitIfNotNull!(declarations));
-	}
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(declarations));
+    }
   /** */ Declaration[] declarations;
 }
 
@@ -1334,7 +1334,7 @@ public:
         mixin (visitIfNotNull!(declarationsAndStatements));
     }
     /** */ DeclarationsAndStatements declarationsAndStatements;
-	/** */ size_t colonLocation;
+    /** */ size_t colonLocation;
 //    mixin OpEquals;
 }
 
