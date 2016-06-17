@@ -1813,19 +1813,19 @@ class Parser
      *     | $(RULE versionSpecification)
      *     ;)
      */
+	import std.typecons: Nullable;
 	Declaration parseDeclaration(bool strict = false, bool mustBeDeclaration = false) {
-		Nullable!Stackbuffer attributes;
-		auto node = parseDeclarationUnsafe(strict, mustBeDeclaration,
-										   attributes);
+		StackBuffer attributes;
+		auto node = parseDeclaration(strict, mustBeDeclaration,
+									 attributes);
 		if(node is null) return null;
-		if(!attributes.isNull)
+		if(attributes.length > 0)
 			ownArray(node.attributes, attributes);
 		return node;
 	}
-    Declaration parseDeclaration
+	Declaration parseDeclaration
 	(bool strict, bool mustBeDeclaration,
-	 ref Nullable!StackBuffer attributes)
-    {
+	 ref StackBuffer attributes) {
         mixin(traceEnterAndExit!(__FUNCTION__));
         if (!moreTokens)
         {
@@ -1837,7 +1837,6 @@ class Parser
         size_t autoStorageClassStart = size_t.max;
         DecType isAuto;
 
-		attributes = StackBuffer();
         do
         {
             isAuto = isAutoDeclaration(autoStorageClassStart);
@@ -1908,7 +1907,7 @@ class Parser
             advance();
             break;
         case tok!"{":
-            if (attributes.empty)
+            if (attributes.length == 0)
             {
                 error("declaration expected instead of '{'");
                 return null;
@@ -1976,7 +1975,7 @@ class Parser
                     {
                         goToBookmark(b);
                         mixin(parseNodeQ!(`node`,`FunctionDeclaration`,
-										  q{(null, true, attributes)}));
+										  q{(null, true, null)}));
                     }
                     else
                     {
