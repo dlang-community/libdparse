@@ -7246,7 +7246,7 @@ protected:
 
     template parseNodeQ(string VarName, string NodeName)
     {
-        enum parseNodeQ = `{ if ((` ~ VarName ~ ` = parse` ~ NodeName ~ `()) is null) return null; }`;
+        enum parseNodeQ = nullCheck!(VarName ~ ` = parse` ~ NodeName ~ `()`);
     }
 
     template nullCheck(string exp)

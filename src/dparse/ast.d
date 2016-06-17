@@ -373,6 +373,17 @@ mixin template OpEquals(bool print = false)
     }
 }
 
+mixin template OpEquals(Base, bool print = false)
+{
+	alias opEquals = Base.opEquals;
+    override bool opEquals(Object other) const
+    {
+        static if (print)
+            pragma(msg, generateOpEquals!(typeof(this)));
+        mixin (generateOpEquals!(typeof(this)));
+    }
+}
+
 template generateOpEquals(T)
 {
     template opEqualsPart(p ...)
@@ -433,14 +444,14 @@ public:
 }
 
 ///
-final class AliasDeclaration : ASTNode
+final class AliasDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(storageClasses, type, identifierList, initializers));
     }
-    mixin OpEquals;
+    mixin OpEquals!Declaration;
     /** */ StorageClass[] storageClasses;
     /** */ Type type;
     /** */ IdentifierList identifierList;
@@ -1247,7 +1258,7 @@ public:
 }
 
 ///
-final class Declaration : ASTNode
+class Declaration : ASTNode
 {
 public:
 
@@ -1292,7 +1303,7 @@ public:
     {
       import std.string: replace;
         return q{
-          inout($type) $name() inout @property {
+          const($type) $name() const @property {
             auto p = storage.peek!$type;
             return p is null? null : *p;
           }
@@ -1339,7 +1350,7 @@ public:
     mixin(generateProperty("VariableDeclaration", "variableDeclaration"));
     mixin(generateProperty("VersionSpecification", "versionSpecification"));
 
-
+	alias opEquals = Object.opEquals;
     bool opEquals(const Object other) const
     {
         auto otherDeclaration = cast(Declaration) other;

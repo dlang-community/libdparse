@@ -22,6 +22,7 @@ R clone(T: const R, R)(ref T src)
 		} else {
 		alias names = FieldNameTuple!T;
 		foreach(name; names) {
+			pragma(msg,name);
 			if(!is(typeof(__traits(getMember,src,name)) == immutable))
 				__traits(getMember,dest,name) =
 					cast(typeof(__traits(getMember,dest,name)))
