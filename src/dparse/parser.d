@@ -246,8 +246,9 @@ class Parser
             return null;
         }
         size_t startLocation = current().index;
-        auto node = parseCommaSeparatedRule!(ArgumentList, AssignExpression)(true);
-        mixin (nullCheck!`node`);
+		ArgumentList node;
+        mixin(parseNodeQ!(`node`,`CommaSeparatedRule`,
+						  `!(ArgumentList, AssignExpression)(true)`));
         node.startLocation = startLocation;
         if (moreTokens) node.endLocation = current().index;
         return node;
@@ -1876,10 +1877,8 @@ class Parser
         }
         else if (isAuto == DecType.autoFun)
         {
-            mixin(nullCheck!q{
-					node.functionDeclaration =
-						parseFunctionDeclaration(null, true)
-						});
+            mixin(parseNodeQ!(`node`,`FunctionDeclaration`,
+							  q{(null, true)}));
             return node;
         }
 
@@ -1976,9 +1975,8 @@ class Parser
                     if (!currentIs(tok!"="))
                     {
                         goToBookmark(b);
-                        node = parseFunctionDeclaration
-							(null, true, attributes);
-                        mixin (nullCheck!`node`);
+                        mixin(parseNodeQ!(`node`,`FunctionDeclaration`,
+										  q{(null, true, attributes)}));
                     }
                     else
                     {
@@ -1996,8 +1994,8 @@ class Parser
                 {
                     immutable bool eq = currentIs(tok!"=");
                     goToBookmark(b);
-                    mixin (parseNodeQ!`node`,`VariableDeclaration`,
-						   `(null, eq)`);
+                    mixin(parseNodeQ!(`node`,`VariableDeclaration`,
+									   q{(null, eq)}));
                 }
             }
             else
@@ -2060,7 +2058,8 @@ class Parser
             else if (peekIs(tok!"~"))
                 mixin(parseNodeQ!(`node`, `StaticDestructor`));
             else if (peekIs(tok!"if"))
-                mixin (nullCheck!`node = parseConditionalDeclaration(strict)`);
+                mixin (parseNodeQ!(`node`,`ConditionalDeclaration`,
+								   q{(strict)}));
             else if (peekIs(tok!"assert"))
                 mixin(parseNodeQ!(`node`, `StaticAssertDeclaration`));
             else
@@ -2095,15 +2094,18 @@ class Parser
             if (t is null || !currentIs(tok!"identifier"))
                 return null;
             if (peekIs(tok!"("))
-                mixin (nullCheck!`node.functionDeclaration = parseFunctionDeclaration(t, false)`);
+                mixin (parseNodeQ!(`node`,`FunctionDeclaration`,
+								   q{(t, false)}));
             else
-                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(t, false)`);
+                mixin (parseNodeQ!(`node`,`VariableDeclaration`,
+								   q{(t, false)}));
             break;
         case tok!"version":
             if (peekIs(tok!"("))
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
+                mixin (parseNodeQ!(`node`,`ConditionalDeclaration`,
+								   q{(strict)}));
             else if (peekIs(tok!"="))
-                mixin(parseNodeQ!(`node.versionSpecification`, `VersionSpecification`));
+                mixin(parseNodeQ!(`node`, `VersionSpecification`));
             else
             {
                 error(`"=" or "(" expected following "version"`);
@@ -2112,9 +2114,10 @@ class Parser
             break;
         case tok!"debug":
             if (peekIs(tok!"="))
-                mixin(parseNodeQ!(`node.debugSpecification`, `DebugSpecification`));
+                mixin(parseNodeQ!(`node`, `DebugSpecification`));
             else
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
+                mixin (parseNodeQ!(`node`,`ConditionalDeclaration`,
+								   q{(strict)}));
             break;
         default:
             error("Declaration expected");

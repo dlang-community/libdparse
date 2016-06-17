@@ -477,7 +477,7 @@ public:
 }
 
 ///
-final class AliasThisDeclaration : ASTNode
+final class AliasThisDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -526,7 +526,7 @@ public:
 }
 
 ///
-final class AnonymousEnumDeclaration : ASTNode
+final class AnonymousEnumDeclaration : Declaration
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -922,7 +922,7 @@ public:
 }
 
 ///
-final class AttributeDeclaration : ASTNode
+final class AttributeDeclaration : Declaration
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1108,7 +1108,7 @@ public:
 }
 
 ///
-final class ClassDeclaration: ASTNode
+final class ClassDeclaration: Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1200,7 +1200,7 @@ public:
 }
 
 ///
-final class Constructor : ASTNode
+final class Constructor : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1246,7 +1246,7 @@ public:
 }
 
 ///
-final class DebugSpecification : ASTNode
+final class DebugSpecification : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1373,7 +1373,7 @@ public:
 }
 
 ///
-final class Destructor : ASTNode
+final class Destructor : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1425,7 +1425,7 @@ public:
 }
 
 ///
-final class EnumDeclaration : ASTNode
+final class EnumDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1455,7 +1455,7 @@ public:
 }
 
 ///
-final class EponymousTemplateDeclaration : ASTNode
+final class EponymousTemplateDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1641,7 +1641,7 @@ public:
 }
 
 ///
-final class FunctionDeclaration : ASTNode
+final class FunctionDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1811,7 +1811,7 @@ public:
 }
 
 ///
-final class ImportDeclaration : ASTNode
+final class ImportDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1912,7 +1912,7 @@ public:
 }
 
 ///
-final class InterfaceDeclaration : ASTNode
+final class InterfaceDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -1930,7 +1930,7 @@ public:
 }
 
 ///
-final class Invariant : ASTNode
+final class Invariant :  Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2041,7 +2041,7 @@ public:
 }
 
 ///
-final class MixinDeclaration : ASTNode
+final class MixinDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2312,7 +2312,7 @@ public:
 }
 
 ///
-final class Postblit : ASTNode
+final class Postblit : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2337,7 +2337,7 @@ public:
 }
 
 ///
-final class PragmaDeclaration : ASTNode
+final class PragmaDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2449,7 +2449,7 @@ public:
 }
 
 ///
-final class SharedStaticConstructor : ASTNode
+final class SharedStaticConstructor : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2525,7 +2525,7 @@ public:
 }
 
 ///
-final class StaticAssertDeclaration : ASTNode
+final class StaticAssertDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2549,7 +2549,7 @@ public:
 }
 
 ///
-final class StaticConstructor : ASTNode
+final class StaticConstructor : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2566,7 +2566,7 @@ public:
 }
 
 ///
-final class StaticDestructor : ASTNode
+final class StaticDestructor : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2634,7 +2634,7 @@ public:
 }
 
 ///
-final class StructDeclaration : ASTNode
+final class StructDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -2785,7 +2785,7 @@ public:
 }
 
 ///
-final class TemplateDeclaration : ASTNode
+final class TemplateDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -3138,7 +3138,7 @@ public:
 }
 
 ///
-final class UnionDeclaration : ASTNode
+final class UnionDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -3155,7 +3155,7 @@ public:
 }
 
 ///
-final class Unittest : ASTNode
+final class Unittest : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -3171,7 +3171,7 @@ public:
 }
 
 ///
-final class VariableDeclaration : ASTNode
+final class VariableDeclaration : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
@@ -3212,7 +3212,7 @@ public:
 }
 
 ///
-final class VersionSpecification : ASTNode
+final class VersionSpecification : Declaration
 {
 public:
     override void accept(ASTVisitor visitor) const
