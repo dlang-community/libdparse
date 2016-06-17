@@ -44,36 +44,62 @@ R[] clone(T: const R, R)(T[] src) {
 	return dest;
 }
 
-auto derive_then_clone(Base,Types...)(Base src) {
-}
-
 import dparse.types: NodeTypes, DeclarationTypes;
-import dparse.ast: ExpressionNode;
+import dparse.ast: ExpressionNode, Declaration;
 
-ExpressionNode clone(T)(const T src) if(is(T == ExpressionNode)) {
-	if(src is null)
-		return null;
+/* Every class type has a special field in it that determines whether
+	 it can be derived to one class or another.
+
+	 Of course we aren't allowed to access that field, because reasons,
+	 so instead of switching on it, we have to just try each one of
+	 all the types, until the cast returns not null.
+*/
+
+version(D_DOES_NOT_SUCK) {
+	/*	This doesn't work because... reasons? */
+	mixin template clone_types(Base, Types ...) {
+		Base clone(T)(const T src) if(is(T == Base)) {
+			if(src is null)
+				return null;
+		
+			foreach(Type;Types) {
+				Type dest = cast(Type)src;
+				if(dest !is null)
+					return cast(Base) clone(dest);
+			}	
+			assert(0,"couldn't clone");
+		}
+	}
+
+	mixin clone_types!(ExpressionNode, NodeTypes);
+	mixin clone_types!(Declaration, DeclarationTypes);
+
+} else {
+
+	ExpressionNode clone(T)(const T src) if(is(T == ExpressionNode)) {
+		if(src is null)
+			return null;
 	
-	foreach(Type;NodeTypes) {
-		Type dest = cast(Type)src;
-		if(dest !is null)
-			return cast(ExpressionNode) clone(dest);
-	}	
-	assert(0,"couldn't clone");
+		foreach(Type;NodeTypes) {
+			Type dest = cast(Type)src;
+			if(dest !is null)
+				return cast(ExpressionNode) clone(dest);
+		}	
+		assert(0,"couldn't clone expression");
 
-}
+	}
 
-Declaration clone(T)(const T src) if(is(T == Declaration)) {
-	if(src is null)
-		return null;
+	Declaration clone(T)(const T src) if(is(T == Declaration)) {
+		if(src is null)
+			return null;
 	
-	foreach(Type;DeclarationTypes) {
-		Type dest = cast(Type)src;
-		if(dest !is null)
-			return cast(Declaration) clone(dest);
-	}	
-	assert(0,"couldn't clone");
-
+		foreach(Type;DeclarationTypes) {
+			Type dest = cast(Type)src;
+			if(dest !is null)
+				return cast(Declaration) clone(dest);
+		}	
+		assert(0,"couldn't clone declaration");
+	}
 }
 
 unittest {
