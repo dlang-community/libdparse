@@ -3668,15 +3668,17 @@ class Parser
      * Parses a LinkageAttribute
      *
      * $(GRAMMAR $(RULEDEF linkageAttribute):
-     *     $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) ($(LITERAL '++') ($(LITERAL ',') $(RULE identifierChain))?)? $(LITERAL '$(RPAREN)')
+     *       $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)')
+     *       $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '-') $(LITERAL Identifier) $(LITERAL '$(RPAREN)')
+     *     | $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '++') ($(LITERAL ',') $(RULE identifierChain) | $(LITERAL 'struct') | $(LITERAL 'class'))? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     LinkageAttribute parseLinkageAttribute()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!LinkageAttribute;
-        expect(tok!"extern");
-        expect(tok!"(");
+        mixin (tokenCheck!"extern");
+        mixin (tokenCheck!"(");
         const ident = expect(tok!"identifier");
         mixin (nullCheck!`ident`);
         node.identifier = *ident;
@@ -3687,8 +3689,16 @@ class Parser
             if (currentIs(tok!","))
             {
                 advance();
-                mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
+                if (currentIsOneOf(tok!"struct", tok!"class"))
+                    node.classOrStruct = advance().type;
+                else
+                    mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
             }
+        }
+        else if (currentIs(tok!"-"))
+        {
+            advance();
+            mixin(tokenCheck!"identifier");
         }
         expect(tok!")");
         return node;

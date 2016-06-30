@@ -1951,6 +1951,8 @@ class Formatter(Sink)
 
         put("extern (");
         format(linkageAttribute.identifier);
+        if (linkageAttribute.identifier.text == "Objective")
+            put("-C");
         if (linkageAttribute.hasPlusPlus)
         {
             put("++");
@@ -1959,6 +1961,10 @@ class Formatter(Sink)
                 put(", ");
                 format(linkageAttribute.identifierChain);
             }
+            else if (linkageAttribute.classOrStruct == tok!"class")
+                put(", class");
+            else if (linkageAttribute.classOrStruct == tok!"struct")
+                put(", struct");
         }
         put(")");
     }

@@ -898,7 +898,7 @@ public:
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(pragmaExpression, deprecated_, atAttribute,
-            alignAttribute, identifierChain));
+            alignAttribute, identifierChain, linkageAttribute));
     }
     /** */ PragmaExpression pragmaExpression;
     /** */ Deprecated deprecated_;
@@ -2055,7 +2055,7 @@ public:
     {
         mixin (visitIfNotNull!(identifier, declarationOrStatement));
     }
-    Token identifier;
+    /** */ Token identifier;
     /** */ DeclarationOrStatement declarationOrStatement;
     mixin OpEquals;
 }
@@ -2085,6 +2085,7 @@ public:
     /** */ Token identifier;
     /** */ bool hasPlusPlus;
     /** */ IdentifierChain identifierChain;
+    /** */ IdType classOrStruct;
     mixin OpEquals;
 }
 
