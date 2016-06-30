@@ -167,10 +167,10 @@ class Formatter(Sink)
         **/
 
         put("align");
-        if (alignAttribute.intLiteral.text)
+        if (alignAttribute.assignExpression !is null)
         {
             put("(");
-            format(alignAttribute.intLiteral);
+            format(alignAttribute.assignExpression);
             put(")");
         }
     }

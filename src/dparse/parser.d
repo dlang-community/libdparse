@@ -183,7 +183,7 @@ class Parser
      * Parses an AlignAttribute.
      *
      * $(GRAMMAR $(RULEDEF alignAttribute):
-     *     $(LITERAL 'align') ($(LITERAL '$(LPAREN)') $(LITERAL IntegerLiteral) $(LITERAL '$(RPAREN)'))?
+     *     $(LITERAL 'align') ($(LITERAL '$(LPAREN)') $(RULE AssignExpression) $(LITERAL '$(RPAREN)'))?
      *     ;)
      */
     AlignAttribute parseAlignAttribute()
@@ -194,7 +194,7 @@ class Parser
         if (currentIs(tok!"("))
         {
             mixin(tokenCheck!"(");
-            mixin(tokenCheck!(`node.intLiteral`, "intLiteral"));
+            mixin(parseNodeQ!("node.assignExpression", "AssignExpression"));
             mixin(tokenCheck!")");
         }
         return node;
@@ -7239,19 +7239,6 @@ protected:
     else
     {
         void trace(lazy string) {}
-    }
-
-    template parseNode(string NodeName, string VarName)
-    {
-        enum parseNode = `{
-            auto c = allocator.setCheckpoint();
-            ` ~ VarName ~ ` = parse` ~ NodeName ~ `();
-            if (` ~ VarName ~ ` is null)
-            {
-                allocator.rollback(c);
-                return null;
-            }
-        }`;
     }
 
     template parseNodeQ(string VarName, string NodeName)

@@ -484,10 +484,10 @@ final class AlignAttribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(intLiteral));
+        mixin (visitIfNotNull!(assignExpression));
     }
     mixin OpEquals;
-    /** */ Token intLiteral;
+    /** */ ExpressionNode assignExpression;
 }
 
 ///

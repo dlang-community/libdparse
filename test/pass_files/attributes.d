@@ -1,6 +1,3 @@
-extern(C++) int a;
-extern(C++, a) int b;
-extern(C++, a.b.c) int c;
 extern int d;
 @uda int e;
 @("uda") int f;
@@ -19,6 +16,10 @@ public:
 int q;
 deprecated double r;
 deprecated("NEVAR USE THIS") double s;
+deprecated("NEVAR USE THIS" ~ " IT AM BAD") double s;
 @templateName!int(123) int t;
 @templateName(123) int u;
 extern(System) int v;
+align int a;
+align(8) int b;
+align(8 + c) int c;
