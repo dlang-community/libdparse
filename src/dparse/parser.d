@@ -2408,7 +2408,7 @@ class Parser
         if (currentIs(tok!"identifier") && peekIsOneOf(tok!",", tok!"=", tok!"}"))
         {
             node.comment = current.comment;
-            mixin (tokenCheck!(`node.name`, `identifier`));
+            mixin(tokenCheck!(`node.name`, `identifier`));
             if (currentIs(tok!"="))
             {
                 advance(); // =
@@ -2419,7 +2419,7 @@ class Parser
         {
             node.comment = current.comment;
             mixin(parseNodeQ!(`node.type`, `Type`));
-            mixin (tokenCheck!(`node.name`, `identifier`));
+            mixin(tokenCheck!(`node.name`, `identifier`));
             mixin(tokenCheck!"=");
     assign:
             mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
@@ -2873,8 +2873,8 @@ class Parser
      * Parses a FunctionCallExpression
      *
      * $(GRAMMAR $(RULEDEF functionCallExpression):
-     *      $(RULE symbol) $(RULE arguments)
-     *      $(RULE unaryExpression) $(RULE arguments)
+     *       $(RULE symbol) $(RULE arguments)
+     *     | $(RULE unaryExpression) $(RULE arguments)
      *     | $(RULE type) $(RULE arguments)
      *     ;)
      */
@@ -5800,7 +5800,7 @@ class Parser
         case tok!".":
             mixin(parseNodeQ!(`node.symbol`, `Symbol`));
             break;
-		foreach (B; BasicTypes) { case B: }
+        foreach (B; BasicTypes) { case B: }
             node.builtinType = parseBuiltinType();
             break;
         case tok!"super":
