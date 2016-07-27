@@ -3830,6 +3830,11 @@ class Parser
      *     ;)
      */
     Module parseModule()
+    out (retVal)
+    {
+        assert(retVal !is null);
+    }
+    body
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         Module m = allocator.make!Module;
@@ -3846,7 +3851,12 @@ class Parser
             goToBookmark(b);
         }
         if (currentIs(tok!"module") || isDeprecatedModule)
-            mixin(parseNodeQ!(`m.moduleDeclaration`, `ModuleDeclaration`));
+        {
+            immutable c = allocator.setCheckpoint();
+            m.moduleDeclaration = parseModuleDeclaration();
+            if (m.moduleDeclaration is null)
+                allocator.rollback(c);
+        }
         StackBuffer declarations;
         while (moreTokens())
         {
@@ -7251,10 +7261,10 @@ protected:
         enum nullCheck = "{if ((" ~ exp ~ ") is null) { return null; }}";
     }
 
-	template tokenCheck(string Tok)
-	{
-		enum tokenCheck = `{ if (expect(tok!"` ~ Tok ~ `") is null) { return null; } }`;
-	}
+    template tokenCheck(string Tok)
+    {
+        enum tokenCheck = `{ if (expect(tok!"` ~ Tok ~ `") is null) { return null; } }`;
+    }
 
     template tokenCheck(string Exp, string Tok)
     {
