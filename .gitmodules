@@ -1,3 +1,0 @@
-[submodule "experimental_allocator"]
-	path = experimental_allocator
-	url = https://github.com/Hackerpilot/experimental_allocator.git
