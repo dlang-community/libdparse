@@ -38,9 +38,9 @@ private enum keywords = [
     "throw", "true", "try", "typedef", "typeid", "typeof", "ubyte", "ucent",
     "uint", "ulong", "union", "unittest", "ushort", "version", "void",
     "volatile", "wchar", "while", "with", "__DATE__", "__EOF__", "__FILE__",
-    "__FUNCTION__", "__gshared", "__LINE__", "__MODULE__", "__parameters",
-    "__PRETTY_FUNCTION__", "__TIME__", "__TIMESTAMP__", "__traits", "__vector",
-    "__VENDOR__", "__VERSION__"
+    "__FILE_FULL_PATH__", "__FUNCTION__", "__gshared", "__LINE__", "__MODULE__",
+    "__parameters", "__PRETTY_FUNCTION__", "__TIME__", "__TIMESTAMP__", "__traits",
+    "__vector", "__VENDOR__", "__VERSION__"
 ];
 
 /// Other tokens
@@ -279,10 +279,10 @@ public alias Keywords = AliasSeq!(tok!"abstract", tok!"alias", tok!"align",
         tok!"template", tok!"this", tok!"throw", tok!"true", tok!"try",
         tok!"typedef", tok!"typeid", tok!"typeof", tok!"union", tok!"unittest",
         tok!"version", tok!"volatile", tok!"while", tok!"with", tok!"__DATE__",
-        tok!"__EOF__", tok!"__FILE__", tok!"__FUNCTION__", tok!"__gshared",
-        tok!"__LINE__", tok!"__MODULE__", tok!"__parameters", tok!"__PRETTY_FUNCTION__",
-        tok!"__TIME__", tok!"__TIMESTAMP__", tok!"__traits", tok!"__vector",
-        tok!"__VENDOR__", tok!"__VERSION__");
+        tok!"__EOF__", tok!"__FILE__", tok!"__FILE_FULL_PATH__", tok!"__FUNCTION__",
+        tok!"__gshared", tok!"__LINE__", tok!"__MODULE__", tok!"__parameters",
+        tok!"__PRETTY_FUNCTION__", tok!"__TIME__", tok!"__TIMESTAMP__",
+        tok!"__traits", tok!"__vector", tok!"__VENDOR__", tok!"__VERSION__");
 
 /**
  * Returns: true if the given ID type is for a keyword.
