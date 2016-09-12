@@ -179,11 +179,11 @@ public struct LexerConfig
  * Basic type token types.
  */
 public alias BasicTypes = AliasSeq!(tok!"int", tok!"bool", tok!"byte",
-		tok!"cdouble", tok!"cent", tok!"cfloat", tok!"char", tok!"creal",
-		tok!"dchar", tok!"double", tok!"float", tok!"idouble",
-		tok!"ifloat", tok!"ireal", tok!"long", tok!"real", tok!"short",
-		tok!"ubyte", tok!"ucent", tok!"uint", tok!"ulong", tok!"ushort",
-		tok!"void", tok!"wchar");
+        tok!"cdouble", tok!"cent", tok!"cfloat", tok!"char", tok!"creal",
+        tok!"dchar", tok!"double", tok!"float", tok!"idouble",
+        tok!"ifloat", tok!"ireal", tok!"long", tok!"real", tok!"short",
+        tok!"ubyte", tok!"ucent", tok!"uint", tok!"ulong", tok!"ushort",
+        tok!"void", tok!"wchar");
 
 /**
  * Returns: true if the given ID is for a basic type.
@@ -460,11 +460,14 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
         Token t = lexer.front;
         lexer.popFront();
         tokenCount++;
-        if (!trailingCommentAppender.data.empty)
-            (cast() output.data[$ - 1].trailingComment) = cache.intern(cast(string) trailingCommentAppender.data);
+        if (!output.data.empty && !trailingCommentAppender.data.empty)
+        {
+            (cast() output.data[$ - 1].trailingComment) =
+                cache.intern(cast(string) trailingCommentAppender.data);
+            hadDdoc = false;
+        }
         t.comment = leadingCommentAppender.data.length > 0
             ? cache.intern(cast(string) leadingCommentAppender.data) : (hadDdoc ? empty : null);
-
         leadingCommentAppender.clear();
         trailingCommentAppender.clear();
         hadDdoc = false;
@@ -1611,7 +1614,7 @@ private pure nothrow @safe:
         }
         else
         {
-	err:
+    err:
             error("Error: Expected ' to end character literal");
             token = Token(tok!"");
         }
