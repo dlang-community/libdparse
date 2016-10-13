@@ -178,6 +178,7 @@ public:
     /** */ void visit(const Attribute attribute) { attribute.accept(this); }
     /** */ void visit(const AttributeDeclaration attributeDeclaration) { attributeDeclaration.accept(this); }
     /** */ void visit(const AutoDeclaration autoDeclaration) { autoDeclaration.accept(this); }
+    /** */ void visit(const AutoDeclarationPart autoDeclarationPart) { autoDeclarationPart.accept(this); }
     /** */ void visit(const BlockStatement blockStatement) { blockStatement.accept(this); }
     /** */ void visit(const BodyStatement bodyStatement) { bodyStatement.accept(this); }
     /** */ void visit(const BreakStatement breakStatement) { breakStatement.accept(this); }
@@ -930,16 +931,27 @@ public:
     {
         foreach (sc; storageClasses)
             visitor.visit(sc);
-        foreach (i; 0 .. initializers.length)
-        {
-            visitor.visit(initializers[i]);
-        }
+        foreach (part; parts)
+            visitor.visit(part);
     }
-    /** */ Token[] identifiers;
-    /** */ Initializer[] initializers;
+    /** */ AutoDeclarationPart[] parts;
     /** */ StorageClass[] storageClasses;
     /** */ string comment;
     mixin OpEquals;
+}
+
+final class AutoDeclarationPart : ASTNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        if (templateParameters !is null)
+            visitor.visit(templateParameters);
+        visitor.visit(initializer);
+    }
+
+    /** */ Token identifier;
+    /** */ Initializer initializer;
+    /** */ TemplateParameters templateParameters;
 }
 
 ///

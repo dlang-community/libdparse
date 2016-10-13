@@ -489,13 +489,14 @@ class Formatter(Sink)
         **/
 
         // zip doesn't work here, dmd 2.064.2
-        assert(decl.identifiers.length == decl.initializers.length);
-        foreach(i; 0..decl.identifiers.length)
+        foreach(i, part; decl.parts)
         {
-            if (i) put(", ");
-            format(decl.identifiers[i]);
+            if (i > 0) put(", ");
+            format(part.identifier);
+            if (part.templateParameters)
+                format(part.templateParameters);
             put(" = ");
-            format(decl.initializers[i]);
+            format(part.initializer);
         }
     }
 

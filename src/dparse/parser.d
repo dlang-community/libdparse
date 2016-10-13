@@ -1076,7 +1076,7 @@ class Parser
      * Parses an AutoDeclaration
      *
      * $(GRAMMAR $(RULEDEF autoDeclaration):
-     *     $(RULE storageClass)+ $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer) ($(LITERAL ',') $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer))* $(LITERAL ';')
+     *     $(RULE storageClass)+  $(RULE autoDeclarationPart) ($(LITERAL ',') $(RULE autoDeclarationPart))* $(LITERAL ';')
      *     ;)
      */
     AutoDeclaration parseAutoDeclaration()
@@ -1090,25 +1090,40 @@ class Parser
             if (!storageClasses.put(parseStorageClass()))
                 return null;
         ownArray(node.storageClasses, storageClasses);
-        StackBuffer identifiers;
-        StackBuffer initializers;
+        StackBuffer parts;
         do
         {
-            auto i = expect(tok!"identifier");
-            if (i is null)
-                return null;
-            identifiers.put(*i);
-            mixin(tokenCheck!"=");
-            if (!initializers.put(parseInitializer()))
+            if (!parts.put(parseAutoDeclarationPart()))
                 return null;
             if (currentIs(tok!","))
                 advance();
             else
                 break;
         } while (moreTokens());
-        ownArray(node.identifiers, identifiers);
-        ownArray(node.initializers, initializers);
+        ownArray(node.parts, parts);
         return attachCommentFromSemicolon(node);
+    }
+
+    /**
+     * Parses an AutoDeclarationPart
+     *
+     * $(GRAMMAR $(RULEDEF autoDeclarationPart):
+     *     $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE initializer)
+     *     ;)
+     */
+    AutoDeclarationPart parseAutoDeclarationPart()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto part = allocator.make!AutoDeclarationPart;
+        auto i = expect(tok!"identifier");
+        if (i is null)
+            return null;
+        part.identifier = *i;
+        if (currentIs(tok!"("))
+            mixin(parseNodeQ!("part.templateParameters", "TemplateParameters"));
+        mixin(tokenCheck!"=");
+        mixin(parseNodeQ!("part.initializer", "Initializer"));
+        return part;
     }
 
     /**
@@ -6686,7 +6701,12 @@ protected:
         {
             advance();
             auto past = peekPastParens();
-            return (past !is null && past.type == tok!"=") ? DecType.other : DecType.autoFun;
+            if (past is null)
+                return DecType.other;
+            else if (past.type == tok!"=")
+                return DecType.autoVar;
+            else
+                return DecType.autoFun;
         }
         return DecType.other;
     }
