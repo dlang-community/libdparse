@@ -850,7 +850,7 @@ class Parser
      * Parses an AssignExpression
      *
      * $(GRAMMAR $(RULEDEF assignExpression):
-     *     $(RULE ternaryExpression) ($(RULE assignOperator) $(RULE expression))?
+     *     $(RULE ternaryExpression) ($(RULE assignOperator) $(RULE assignExpression))?
      *     ;
      *$(RULEDEF assignOperator):
      *       $(LITERAL '=')
@@ -892,7 +892,7 @@ class Parser
             node.column = current().column;
             node.ternaryExpression = ternary;
             node.operator = advance().type;
-            mixin(parseNodeQ!(`node.expression`, `Expression`));
+            mixin(parseNodeQ!(`node.expression`, `AssignExpression`));
             return node;
         }
         return ternary;
