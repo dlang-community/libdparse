@@ -749,6 +749,7 @@ public:
     /** */ ExpressionNode asmExp;
     /** */ IdentifierChain identifierChain;
     /** */ Register register;
+    /** */ ExpressionNode segmentOverrideSuffix;
     /** */ Token token;
     mixin OpEquals;
 }

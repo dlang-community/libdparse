@@ -30,6 +30,9 @@ void doStuff()
 		mov RAX, -a;
 		mov RAX, +a;
 		mov RAX, offsetof a;
+		mov EAX, FS:4;
+		mov EAX, FS:CL;
+		push dword ptr FS:[0];
 		jge short L_largepositive;
 		lea EDX,[ECX][ECX*8];
 		in AL,6;
