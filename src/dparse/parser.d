@@ -584,6 +584,7 @@ class Parser
      *     | $(LITERAL FloatLiteral)
      *     | $(LITERAL StringLiteral)
      *     | $(RULE register)
+     *     | $(RULE register : AsmExp)
      *     | $(RULE identifierChain)
      *     | $(LITERAL '$')
      *     ;)
@@ -608,6 +609,11 @@ class Parser
             {
                 trace("Found register");
                 mixin (nullCheck!`(node.register = parseRegister())`);
+                if (current.type == tok!":")
+                {
+                    advance();
+                    mixin(parseNodeQ!(`node.segmentOverrideSuffix`, `AsmExp`));
+                }
             }
             else
                 mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
