@@ -4293,10 +4293,7 @@ class Parser
         node.line = current.line;
         node.column = current.column;
         node.location = current.index;
-        expect(tok!"this");
-        expect(tok!"(");
-        expect(tok!"this");
-        expect(tok!")");
+        index += 4;
         StackBuffer memberFunctionAttributes;
         while (currentIsMemberFunctionAttribute())
             if (!memberFunctionAttributes.put(parseMemberFunctionAttribute()))
