@@ -4290,6 +4290,9 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!Postblit;
+        node.line = current.line;
+        node.column = current.column;
+        node.location = current.index;
         expect(tok!"this");
         expect(tok!"(");
         expect(tok!"this");
