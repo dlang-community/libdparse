@@ -1894,6 +1894,8 @@ public:
     }
     /** */ SingleImport[] singleImports;
     /** */ ImportBindings importBindings;
+    /** */ size_t startIndex;
+    /** */ size_t endIndex;
     mixin OpEquals;
 }
 
