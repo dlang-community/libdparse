@@ -2396,6 +2396,9 @@ public:
     }
     /** */ FunctionBody functionBody;
     /** */ MemberFunctionAttribute[] memberFunctionAttributes;
+    /** */ size_t location;
+    /** */ size_t line;
+    /** */ size_t column;
     mixin OpEquals;
 }
 

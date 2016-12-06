@@ -4290,10 +4290,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!Postblit;
-        expect(tok!"this");
-        expect(tok!"(");
-        expect(tok!"this");
-        expect(tok!")");
+        node.line = current.line;
+        node.column = current.column;
+        node.location = current.index;
+        index += 4;
         StackBuffer memberFunctionAttributes;
         while (currentIsMemberFunctionAttribute())
             if (!memberFunctionAttributes.put(parseMemberFunctionAttribute()))
