@@ -3361,6 +3361,7 @@ class Parser
     ImportDeclaration parseImportDeclaration()
     {
         auto node = allocator.make!ImportDeclaration;
+        node.startIndex = current().index;
         mixin(tokenCheck!"import");
         SingleImport si = parseSingleImport();
         if (si is null)
@@ -3395,6 +3396,7 @@ class Parser
             }
             ownArray(node.singleImports, singleImports);
         }
+        node.endIndex = current().index + 1;
         mixin(tokenCheck!";");
         return node;
     }
