@@ -347,9 +347,10 @@ public bool isProtection(IdType type) pure nothrow @safe @nogc
     }
 }
 
-public alias SpecialTokens = AliasSeq!(tok!"__DATE__", tok!"__TIME__", tok!"__TIMESTAMP__",
-        tok!"__VENDOR__", tok!"__VERSION__", tok!"__FILE__", tok!"__LINE__",
-        tok!"__MODULE__", tok!"__FUNCTION__", tok!"__PRETTY_FUNCTION__");
+public alias SpecialTokens = AliasSeq!(tok!"__DATE__", tok!"__TIME__",
+    tok!"__TIMESTAMP__", tok!"__VENDOR__", tok!"__VERSION__", tok!"__FILE__",
+    tok!"__FILE_FULL_PATH__", tok!"__LINE__", tok!"__MODULE__",
+    tok!"__FUNCTION__", tok!"__PRETTY_FUNCTION__");
 
 public bool isSpecialToken(IdType type) pure nothrow @safe @nogc
 {
