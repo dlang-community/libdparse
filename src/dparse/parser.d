@@ -3234,6 +3234,7 @@ class Parser
      *     $(LITERAL 'if') $(LITERAL '$(LPAREN)') $(RULE ifCondition) $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement) ($(LITERAL 'else') $(RULE declarationOrStatement))?
      *$(RULEDEF ifCondition):
      *       $(LITERAL 'auto') $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
+     *     | $(RULE typeConstructors) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE type) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE expression)
      *     ;)
@@ -3251,6 +3252,21 @@ class Parser
         if (currentIs(tok!"auto"))
         {
             advance();
+            const i = expect(tok!"identifier");
+            if (i !is null)
+                node.identifier = *i;
+            expect(tok!"=");
+            mixin(parseNodeQ!(`node.expression`, `Expression`));
+        }
+        else if (isTypeCtor(current.type))
+        {
+            while (isTypeCtor(current.type))
+            {
+                const prev = current.type;
+                advance();
+                if (current.type == prev)
+                    warn("redundant type constructor");
+            }
             const i = expect(tok!"identifier");
             if (i !is null)
                 node.identifier = *i;
@@ -6908,6 +6924,20 @@ protected:
         case tok!"pure":
         case tok!"nothrow":
         case tok!"return":
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    static bool isTypeCtor(IdType t) pure nothrow @nogc @safe
+    {
+        switch (t)
+        {
+        case tok!"const":
+        case tok!"immutable":
+        case tok!"inout":
+        case tok!"shared":
             return true;
         default:
             return false;
