@@ -96,4 +96,20 @@ unittest
 
     S s;
     sb.put(s);
+
+    class B
+    {
+        int b;
+    }
+
+    class D : B
+    {
+        double d;
+    }
+
+    B b = new B;
+    sb.put(b);
+
+    B d = new D;
+    sb.put(d);
 }
