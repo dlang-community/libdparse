@@ -744,7 +744,8 @@ final class AsmPrimaryExp : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(token, register, asmExp, identifierChain));
+        mixin (visitIfNotNull!(token, register, asmExp, identifierChain,
+            segmentOverrideSuffix));
     }
     /** */ ExpressionNode asmExp;
     /** */ IdentifierChain identifierChain;
