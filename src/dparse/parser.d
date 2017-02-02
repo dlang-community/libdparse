@@ -3753,6 +3753,7 @@ class Parser
      *     | $(LITERAL 'shared')
      *     | $(LITERAL 'const')
      *     | $(LITERAL 'return')
+     *     | $(LITERAL 'scope')
      *     ;)
      */
     MemberFunctionAttribute parseMemberFunctionAttribute()
@@ -3771,6 +3772,7 @@ class Parser
         case tok!"pure":
         case tok!"nothrow":
         case tok!"return":
+        case tok!"scope":
             node.tokenType = advance().type;
             break;
         default:
@@ -6924,6 +6926,7 @@ protected:
         case tok!"pure":
         case tok!"nothrow":
         case tok!"return":
+        case tok!"scope":
             return true;
         default:
             return false;
