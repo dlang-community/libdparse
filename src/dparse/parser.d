@@ -3261,16 +3261,19 @@ class Parser
         else
         {
             // consume for TypeCtors = identifier
-            while (isTypeCtor(current.type))
+            if (isTypeCtor(current.type))
             {
-                const prev = current.type;
-                advance();
-                if (current.type == prev)
-                    warn("redundant type constructor");
+                while (isTypeCtor(current.type))
+                {
+                    const prev = current.type;
+                    advance();
+                    if (current.type == prev)
+                        warn("redundant type constructor");
+                }
+                // goes back for TypeCtor(Type) = identifier
+                if (currentIs(tok!"("))
+                    index--;
             }
-            // goes back for TypeCtor(Type) = identifier
-            if (currentIs(tok!"("))
-                index--;
 
             immutable b = setBookmark();
             immutable c = allocator.setCheckpoint();

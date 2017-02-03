@@ -6,3 +6,10 @@ void foo()
     if (auto a = call()){}
     if (immutable shared(Type) a = call()){}
 }
+
+void main()
+{
+    if ((a && b) || c)
+    {
+    }
+}
