@@ -3258,8 +3258,9 @@ class Parser
             expect(tok!"=");
             mixin(parseNodeQ!(`node.expression`, `Expression`));
         }
-        else if (isTypeCtor(current.type))
+        else
         {
+            // consume for TypeCtors = identifier
             while (isTypeCtor(current.type))
             {
                 const prev = current.type;
@@ -3267,14 +3268,10 @@ class Parser
                 if (current.type == prev)
                     warn("redundant type constructor");
             }
-            const i = expect(tok!"identifier");
-            if (i !is null)
-                node.identifier = *i;
-            expect(tok!"=");
-            mixin(parseNodeQ!(`node.expression`, `Expression`));
-        }
-        else
-        {
+            // goes back for TypeCtor(Type) = identifier
+            if (currentIs(tok!"("))
+                index--;
+
             immutable b = setBookmark();
             immutable c = allocator.setCheckpoint();
             auto type = parseType();
