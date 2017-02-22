@@ -2341,12 +2341,14 @@ class Formatter(Sink)
         AssocArrayLiteral assocArrayLiteral;
         Expression expression;
         IsExpression isExpression;
-        LambdaExpression lambdaExpression;
         FunctionLiteralExpression functionLiteralExpression;
         TraitsExpression traitsExpression;
         MixinExpression mixinExpression;
         ImportExpression importExpression;
         Vector vector;
+        Type type;
+        Token typeConstructor;
+        Arguments arguments;
         **/
 
         with(primaryExpression)
@@ -2379,6 +2381,8 @@ class Formatter(Sink)
             else if (mixinExpression) format(mixinExpression);
             else if (importExpression) format(importExpression);
             else if (vector) format(vector);
+            else if (type) format(type);
+            else if (arguments) format(arguments);
         }
     }
 
