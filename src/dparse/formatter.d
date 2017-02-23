@@ -1489,12 +1489,24 @@ class Formatter(Sink)
     void format(const FunctionLiteralExpression functionLiteralExpression)
     {
         debug(verbose) writeln("FunctionLiteralExpression");
+        /**
+        ExpressionNode assignExpression;
+        FunctionAttribute[] functionAttributes;
+        FunctionBody functionBody;
+        IdType functionOrDelegate;
+        MemberFunctionAttribute[] memberFunctionAttributes;
+        Parameters parameters;
+        Token identifier;
+        Type returnType;
+        **/
 
         with(functionLiteralExpression)
         {
             put(tokenRep(functionOrDelegate));
 
-            space();
+            if (returnType || parameters)
+                space();
+
             if (returnType) format(returnType);
             if (parameters) format(parameters);
 
@@ -1509,6 +1521,7 @@ class Formatter(Sink)
                 format(functionBody);
             else
             {
+                format(identifier);
                 put(" => ");
                 format(assignExpression);
             }
