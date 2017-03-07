@@ -3412,7 +3412,7 @@ class Parser
             }
             ownArray(node.singleImports, singleImports);
         }
-        node.endIndex = current().index + 1;
+        node.endIndex = (moreTokens() ? current() : previous()).index + 1;
         mixin(tokenCheck!";");
         return node;
     }
@@ -7176,6 +7176,14 @@ protected:
     Token current() const pure nothrow @safe @nogc @property
     {
         return tokens[index];
+    }
+
+    /**
+     * Returns: the _previous token
+     */
+    Token previous() const pure nothrow @safe @nogc @property
+    {
+        return tokens[index - 1];
     }
 
     /**
