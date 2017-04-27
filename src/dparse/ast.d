@@ -1342,8 +1342,7 @@ public:
     mixin(generateProperty("VariableDeclaration", "variableDeclaration"));
     mixin(generateProperty("VersionSpecification", "versionSpecification"));
 
-
-    bool opEquals(const Object other) const
+    override bool opEquals(Object other) const
     {
         auto otherDeclaration = cast(Declaration) other;
         if (otherDeclaration is null)
