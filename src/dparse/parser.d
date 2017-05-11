@@ -3167,7 +3167,10 @@ class Parser
             if (!identifiersOrTemplateInstances.put(parseIdentifierOrTemplateInstance()))
             {
                 allocator.rollback(c);
-                break;
+                if (identifiersOrTemplateInstances.length == 0)
+                    return null;
+                else
+                    break;
             }
             if (!currentIs(tok!"."))
                 break;
