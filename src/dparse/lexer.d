@@ -1774,7 +1774,7 @@ private pure nothrow @safe:
         bool isError;
     }
 
-    Message[] messages;
+    public Message[] messages;
     StringCache* cache;
     LexerConfig config;
     bool haveSSE42;
