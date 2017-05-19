@@ -359,6 +359,8 @@ template visitIfNotNull(fields ...)
         }
         else static if (__traits(hasMember, typeof(fields[0]), "classinfo"))
             immutable visitIfNotNull = "if (" ~ fields[0].stringof ~ " !is null) visitor.visit(" ~ fields[0].stringof ~ ");\n";
+        else static if (is(Unqual!(typeof(fields[0])) == Token))
+            immutable visitIfNotNull = "if (" ~ fields[0].stringof ~ ` != tok!""` ~ ") visitor.visit(" ~ fields[0].stringof ~ ");\n";
         else
             immutable visitIfNotNull = "visitor.visit(" ~ fields[0].stringof ~ ");\n";
     }
@@ -3343,3 +3345,21 @@ public:
     mixin BinaryExpressionBody;
     mixin OpEquals;
 }
+
+unittest // issue #133
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+    ubyte[] src = cast(ubyte[])q{module test133; void main(){}};
+    final class TkTest : ASTVisitor
+    {
+        alias visit = ASTVisitor.visit;
+        override void visit(const Token t){assert(t.text.length);}
+    }
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+    Module m = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
+    TkTest t = new TkTest;
+    t.visit(m);
+}
+
