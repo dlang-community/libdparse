@@ -359,6 +359,8 @@ template visitIfNotNull(fields ...)
         }
         else static if (__traits(hasMember, typeof(fields[0]), "classinfo"))
             immutable visitIfNotNull = "if (" ~ fields[0].stringof ~ " !is null) visitor.visit(" ~ fields[0].stringof ~ ");\n";
+        else static if (is(Unqual!(typeof(fields[0])) == Token))
+            immutable visitIfNotNull = "if (" ~ fields[0].stringof ~ ` != tok!""` ~ ") visitor.visit(" ~ fields[0].stringof ~ ");\n";
         else
             immutable visitIfNotNull = "visitor.visit(" ~ fields[0].stringof ~ ");\n";
     }
