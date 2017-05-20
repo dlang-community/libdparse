@@ -1,4 +1,10 @@
 language: d
+d:
+  - dmd-nightly
+  - dmd-beta
+  - dmd
+  - ldc-beta
+  - ldc
 sudo: false
 script:
   - cd test && ./run_tests.sh
