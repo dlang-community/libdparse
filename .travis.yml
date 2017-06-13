@@ -7,4 +7,7 @@ d:
   - ldc
 sudo: false
 script:
-  - cd test && ./run_tests.sh
+  - cd test && ./run_tests.sh && cd ..
+  - find test/coverage -type f -exec mv {} . \;
+after_success:
+ - bash <(curl -s https://codecov.io/bash)
