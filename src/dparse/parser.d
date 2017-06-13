@@ -6296,6 +6296,7 @@ class Parser
         if (currentIs(tok!"identifier"))
         {
             node.name = advance();
+            node.comment = comment;
             if (currentIs(tok!"("))
             {
                 mixin(parseNodeQ!(`node.templateParameters`, `TemplateParameters`));
