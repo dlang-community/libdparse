@@ -6291,12 +6291,13 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!UnionDeclaration;
+        node.comment = comment;
+        comment = null;
         // grab line number even if it's anonymous
         const t = expect(tok!"union");
         if (currentIs(tok!"identifier"))
         {
             node.name = advance();
-            node.comment = comment;
             if (currentIs(tok!"("))
             {
                 mixin(parseNodeQ!(`node.templateParameters`, `TemplateParameters`));
@@ -6311,7 +6312,6 @@ class Parser
         {
             node.name.line = t.line;
             node.name.column = t.column;
-            node.comment = comment;
     semiOrStructBody:
             if (currentIs(tok!";"))
                 advance();
