@@ -6311,6 +6311,7 @@ class Parser
         {
             node.name.line = t.line;
             node.name.column = t.column;
+            node.comment = comment;
     semiOrStructBody:
             if (currentIs(tok!";"))
                 advance();
