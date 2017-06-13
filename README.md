@@ -1,6 +1,6 @@
 libdparse
 =========
-Library for lexing and parsing D source code
+Library for lexing and parsing D source code.
 
 # Documentation
 Online documentation is available [here](https://dlang-community.github.io/libdparse)
