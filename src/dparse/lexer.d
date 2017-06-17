@@ -1786,8 +1786,11 @@ private pure nothrow @safe:
  */
 public auto byToken(ubyte[] range)
 {
+    import std.math : nextPow2;
+    uint bc = cast(uint)((range.length > 2^^31UL) ? 2^^31
+        : nextPow2(1 + range.length / 32));
     LexerConfig config;
-    StringCache* cache = new StringCache(StringCache.defaultBucketCount);
+    StringCache* cache = new StringCache(bc);
     return DLexer(range, config, cache);
 }
 
