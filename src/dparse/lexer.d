@@ -171,7 +171,7 @@ public struct LexerConfig
 {
     string fileName;
     StringBehavior stringBehavior;
-    WhitespaceBehavior whitespaceBehavior;
+    WhitespaceBehavior whitespaceBehavior = WhitespaceBehavior.skip;
     CommentBehavior commentBehavior = CommentBehavior.intern;
 }
 
@@ -409,7 +409,6 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
         return CommentType.notDoc;
     }
 
-    config.whitespaceBehavior = WhitespaceBehavior.skip;
     config.commentBehavior = CommentBehavior.noIntern;
 
     auto leadingCommentAppender = appender!(char[])();
@@ -425,6 +424,9 @@ const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
     {
     case tok!"specialTokenSequence":
     case tok!"whitespace":
+        if (config.whitespaceBehavior == WhitespaceBehavior.include)
+            output.put(lexer.front);
+
         lexer.popFront();
         break;
     case tok!"comment":
