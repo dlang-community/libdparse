@@ -11,3 +11,4 @@ test/tokens-newlines.txt
 test/tokens.txt
 test/unittests
 dub.selections.json
+*.lst
