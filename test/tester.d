@@ -223,6 +223,7 @@ void testTokenChecks()
         case tok!"__DATE__":
         case tok!"__EOF__":
         case tok!"__FILE__":
+        case tok!"__FILE_FULL_PATH__":
         case tok!"__FUNCTION__":
         case tok!"__gshared":
         case tok!"__LINE__":
