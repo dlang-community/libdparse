@@ -441,7 +441,8 @@ final class AliasDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(storageClasses, type, identifierList, initializers));
+        mixin (visitIfNotNull!(storageClasses, type, identifierList, initializers,
+                               parameters, memberFunctionAttributes));
     }
     mixin OpEquals;
     /** */ StorageClass[] storageClasses;
@@ -449,6 +450,8 @@ public:
     /** */ IdentifierList identifierList;
     /** */ AliasInitializer[] initializers;
     /** */ string comment;
+    /** */ Parameters parameters;
+    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
 }
 
 ///

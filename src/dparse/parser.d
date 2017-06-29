@@ -74,6 +74,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF aliasDeclaration):
      *       $(LITERAL 'alias') $(RULE aliasInitializer) $(LPAREN)$(LITERAL ',') $(RULE aliasInitializer)$(RPAREN)* $(LITERAL ';')
      *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(RULE identifierList) $(LITERAL ';')
+     *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(RULE identifier) $(LITERAL '(') $(RULE parameters) $(LITERAL ')') $(memberFunctionAttribute)* $(LITERAL ';')
      *     ;)
      */
     AliasDeclaration parseAliasDeclaration()
@@ -108,6 +109,15 @@ class Parser
             ownArray(node.storageClasses, storageClasses);
             mixin (parseNodeQ!(`node.type`, `Type`));
             mixin (parseNodeQ!(`node.identifierList`, `IdentifierList`));
+            if (currentIs(tok!"("))
+            {
+                mixin(parseNodeQ!(`node.parameters`, `Parameters`));
+                StackBuffer memberFunctionAttributes;
+                while (moreTokens() && currentIsMemberFunctionAttribute())
+                    if (!memberFunctionAttributes.put(parseMemberFunctionAttribute()))
+                        return null;
+                ownArray(node.memberFunctionAttributes, memberFunctionAttributes);
+            }
         }
         return attachCommentFromSemicolon(node);
     }
