@@ -384,9 +384,10 @@ public bool isLiteral(IdType type) pure nothrow @safe @nogc
 }
 
 /**
- * Returns: an array of tokens lexed from the given source code to the output range. All
- * whitespace tokens are skipped and comments are attached to the token nearest
- * to them.
+ * Returns: an array of tokens lexed from the given source code to the output range.
+ * Whitespace token are skipped by default, except `WhitespaceBehavior.include`
+ * has been set explicitly.
+ * comments are attached to the token nearest to them.
  */
 const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
     StringCache* cache)
