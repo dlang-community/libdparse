@@ -4393,6 +4393,34 @@ class Parser
     }
 
     /**
+     * Parses a PragmaStatement
+     *
+     * $(GRAMMAR $(RULEDEF pragmaStatement):
+     *        $(RULE pragmaExpression) $(RULE statement)
+     *      | $(RULE pragmaExpression) $(RULE blockStatement)
+     *      | $(RULE pragmaExpression) $(LITERAL ';')
+     */
+    PragmaStatement parsePragmaStatement()
+    {
+        mixin (traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!PragmaStatement;
+        mixin(parseNodeQ!(`node.pragmaExpression`, `PragmaExpression`));
+        if (current == tok!"{")
+        {
+            mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
+        }
+        else if (current == tok!";")
+        {
+            advance();
+        }
+        else
+        {
+            mixin(parseNodeQ!(`node.statement`, `Statement`));
+        }
+        return node;
+    }
+
+    /**
      * Parses a PrimaryExpression
      *
      * $(GRAMMAR $(RULEDEF primaryExpression):
@@ -4795,6 +4823,7 @@ class Parser
      *     | $(RULE tryStatement)
      *     | $(RULE throwStatement)
      *     | $(RULE scopeGuardStatement)
+     *     | $(RULE pragmaStatement)
      *     | $(RULE asmStatement)
      *     | $(RULE conditionalStatement)
      *     | $(RULE staticAssertStatement)
@@ -4861,6 +4890,9 @@ class Parser
             break;
         case tok!"asm":
             mixin(parseNodeQ!(`node.asmStatement`, `AsmStatement`));
+            break;
+        case tok!"pragma":
+            mixin(parseNodeQ!(`node.pragmaStatement`, `PragmaStatement`));
             break;
         case tok!"final":
             if (peekIs(tok!"switch"))
