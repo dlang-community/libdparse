@@ -272,6 +272,7 @@ public:
     /** */ void visit(const Postblit postblit) { postblit.accept(this); }
     /** */ void visit(const PowExpression powExpression) { powExpression.accept(this); }
     /** */ void visit(const PragmaDeclaration pragmaDeclaration) { pragmaDeclaration.accept(this); }
+    /** */ void visit(const PragmaStatement pragmaStatement) { pragmaStatement.accept(this); }
     /** */ void visit(const PragmaExpression pragmaExpression) { pragmaExpression.accept(this); }
     /** */ void visit(const PrimaryExpression primaryExpression) { primaryExpression.accept(this); }
     /** */ void visit(const Register register) { register.accept(this); }
@@ -2261,9 +2262,9 @@ public:
             switchStatement, finalSwitchStatement, continueStatement,
             breakStatement, returnStatement, gotoStatement, withStatement,
             synchronizedStatement, tryStatement, throwStatement,
-            scopeGuardStatement, asmStatement, conditionalStatement,
-            staticAssertStatement, versionSpecification, debugSpecification,
-            expressionStatement));
+            scopeGuardStatement, asmStatement, pragmaStatement,
+            conditionalStatement, staticAssertStatement, versionSpecification,
+            debugSpecification, expressionStatement));
     }
     /** */ LabeledStatement labeledStatement;
     /** */ BlockStatement blockStatement;
@@ -2284,6 +2285,7 @@ public:
     /** */ ThrowStatement throwStatement;
     /** */ ScopeGuardStatement scopeGuardStatement;
     /** */ AsmStatement asmStatement;
+    /** */ PragmaStatement pragmaStatement;
     /** */ ConditionalStatement conditionalStatement;
     /** */ StaticAssertStatement staticAssertStatement;
     /** */ VersionSpecification versionSpecification;
@@ -2443,6 +2445,20 @@ public:
     }
     /** */ Token identifier;
     /** */ ArgumentList argumentList;
+    mixin OpEquals;
+}
+
+///
+final class PragmaStatement : ASTNode
+{
+public:
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(pragmaExpression, statement, blockStatement));
+    }
+    /** */ PragmaExpression pragmaExpression;
+    /** */ Statement statement;
+    /** */ BlockStatement blockStatement;
     mixin OpEquals;
 }
 
