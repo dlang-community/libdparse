@@ -4486,15 +4486,17 @@ class Parser
         case tok!"const":
         case tok!"inout":
         case tok!"shared":
-            advance();
-            expect(tok!"(");
-            mixin(parseNodeQ!(`node.type`, `Type`));
-            expect(tok!")");
-            expect(tok!".");
-            const ident = expect(tok!"identifier");
-            if (ident !is null)
-                node.primary = *ident;
-            break;
+            {
+                advance();
+                expect(tok!"(");
+                mixin(parseNodeQ!(`node.type`, `Type`));
+                expect(tok!")");
+                expect(tok!".");
+                const ident = expect(tok!"identifier");
+                if (ident !is null)
+                    node.primary = *ident;
+                break;
+            }
 		foreach (B; BasicTypes) { case B: }
             node.basicType = advance();
             if (currentIs(tok!"."))
