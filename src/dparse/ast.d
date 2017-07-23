@@ -322,6 +322,7 @@ public:
     /** */ void visit(const TraitsExpression traitsExpression) { traitsExpression.accept(this); }
     /** */ void visit(const TryStatement tryStatement) { tryStatement.accept(this); }
     /** */ void visit(const Type type) { type.accept(this); }
+    /** */ void visit(const TypeIdentifierList typeIdentList) { typeIdentList.accept(this); }
     /** */ void visit(const Type2 type2) { type2.accept(this); }
     /** */ void visit(const TypeSpecialization typeSpecialization) { typeSpecialization.accept(this); }
     /** */ void visit(const TypeSuffix typeSuffix) { typeSuffix.accept(this); }
@@ -3131,20 +3132,35 @@ public:
 }
 
 ///
+final class TypeIdentifierList : ASTNode
+{
+public:
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(identifierOrTemplateInstance,
+            typeIdentifierList, indexer));
+    }
+    /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
+    /** */ TypeIdentifierList typeIdentifierList ;
+    /** */ ExpressionNode indexer;
+    mixin OpEquals;
+}
+
+///
 final class Type2 : ASTNode
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(symbol, typeofExpression,
-            identifierOrTemplateChain, type, vector));
+            typeIdentifierList, type, vector));
     }
 
     /** */ IdType builtinType;
     /** */ alias superOrThis = builtinType;
     /** */ Symbol symbol;
     /** */ TypeofExpression typeofExpression;
-    /** */ IdentifierOrTemplateChain identifierOrTemplateChain;
+    /** */ TypeIdentifierList typeIdentifierList;
     /** */ IdType typeConstructor;
     /** */ Type type;
     /** */ Vector vector;

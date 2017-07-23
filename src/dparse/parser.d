@@ -3161,11 +3161,50 @@ class Parser
     }
 
     /**
+     * Parses an TypeIdentifierList.
+     *
+     * $(GRAMMAR $(RULEDEF typeIdentifierList):
+     *      $(RULE identifierOrTemplateInstance)
+     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '.') $(RULE typeIdentifierList)
+     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '[') $(RULE assignExpression) $(LITERAL ']') $(LITERAL '.') $(RULE typeIdentifierList)
+     *      ;)
+     */
+    TypeIdentifierList parseTypeIdentifierList()
+    {
+        TypeIdentifierList node = allocator.make!TypeIdentifierList;
+        mixin(parseNodeQ!(`node.identifierOrTemplateInstance`, `IdentifierOrTemplateInstance`));
+        if (currentIs(tok!"["))
+        {
+            const b = setBookmark();
+            advance();
+            if (!currentIs(tok!"]"))
+            {
+                mixin(parseNodeQ!(`node.indexer`, `AssignExpression`));
+            }
+            expect(tok!"]");
+            if (!currentIs(tok!"."))
+            {
+                goToBookmark(b);
+                return null;
+            }
+            else
+            {
+                abandonBookmark(b);
+            }
+        }
+        if (currentIs(tok!"."))
+        {
+            advance();
+            mixin(parseNodeQ!(`node.typeIdentifierList`, `TypeIdentifierList`));
+        }
+        return node;
+    }
+
+    /**
      * Parses an IdentifierOrTemplateChain
      *
      * $(GRAMMAR $(RULEDEF identifierOrTemplateChain):
      *     $(RULE identifierOrTemplateInstance) ($(LITERAL '.') $(RULE identifierOrTemplateInstance))*
-     *     $(RULE identifierOrTemplateInstance) ($(LITERAL '[') $(RULE assignExpression) ($(LITERAL ']') ($(LITERAL '.') $(RULE parseIdentifierOrTemplateChain)
      *     ;)
      */
     IdentifierOrTemplateChain parseIdentifierOrTemplateChain()
@@ -3182,30 +3221,6 @@ class Parser
                     return null;
                 else
                     break;
-            }
-            if (currentIs(tok!"["))
-            {
-                auto b = setBookmark();
-                advance();
-                if (!currentIs(tok!"]"))
-                {
-                    mixin(parseNodeQ!(`node.indexer`, `AssignExpression`));
-                }
-                expect(tok!"]");
-                if (node.indexer is null)
-                {
-                    // [] is a TypeSuffix
-                    goToBookmark(b);
-                    return node;
-                }
-                if (!currentIs(tok!"."))
-                {
-                    goToBookmark(b);
-                }
-                else
-                {
-                    abandonBookmark(b);
-                }
             }
             if (!currentIs(tok!"."))
                 break;
@@ -5928,7 +5943,7 @@ class Parser
         case tok!"this":
             node.superOrThis = advance().type;
             mixin(tokenCheck!".");
-            mixin(parseNodeQ!(`node.identifierOrTemplateChain`, `IdentifierOrTemplateChain`));
+            mixin(parseNodeQ!(`node.typeIdentifierList`, `TypeIdentifierList`));
             break;
         case tok!"typeof":
             if ((node.typeofExpression = parseTypeofExpression()) is null)
@@ -5936,7 +5951,7 @@ class Parser
             if (currentIs(tok!"."))
             {
                 advance();
-                mixin(parseNodeQ!(`node.identifierOrTemplateChain`, `IdentifierOrTemplateChain`));
+                mixin(parseNodeQ!(`node.typeIdentifierList`, `TypeIdentifierList`));
             }
             break;
         case tok!"const":
