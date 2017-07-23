@@ -1811,11 +1811,10 @@ final class IdentifierOrTemplateChain : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifiersOrTemplateInstances, indexer));
+        mixin (visitIfNotNull!(identifiersOrTemplateInstances));
     }
 
     /** */ IdentifierOrTemplateInstance[] identifiersOrTemplateInstances;
-    /** */ ExpressionNode indexer;
     mixin OpEquals;
 }
 
