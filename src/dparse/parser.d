@@ -28,7 +28,26 @@ import std.string : format;
  * Returns: the parsed module
  */
 Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
-    void function(string, size_t, size_t, string, bool) messageFunction = null,
+    void delegate(string, size_t, size_t, string, bool) messageFunction = null,
+    uint* errorCount = null, uint* warningCount = null)
+{
+    auto parser = new Parser();
+    parser.fileName = fileName;
+    parser.tokens = tokens;
+    parser.messageDg = messageFunction;
+    parser.allocator = allocator;
+    auto mod = parser.parseModule();
+    if (warningCount !is null)
+        *warningCount = parser.warningCount;
+    if (errorCount !is null)
+        *errorCount = parser.errorCount;
+    return mod;
+}
+
+/// Ditto
+deprecated("Use the overload accepting a delegate instead of a function")
+Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
+    void function(string, size_t, size_t, string, bool) messageFunction,
     uint* errorCount = null, uint* warningCount = null)
 {
     auto parser = new Parser();
@@ -6593,7 +6612,14 @@ class Parser
      * The parameters are the file name, line number, column number,
      * and the error or warning message.
      */
-    void function(string, size_t, size_t, string, bool) messageFunction;
+    deprecated("Use 'messageDg' instead")
+    public alias messageFunction = messageFunction_;
+
+    /// Ditto
+    public void delegate(string, size_t, size_t, string, bool) messageDg;
+
+    /// Ditto
+    private void function(string, size_t, size_t, string, bool) messageFunction_;
 
     void setTokens(const(Token)[] tokens)
     {
@@ -7061,10 +7087,12 @@ protected:
         ++warningCount;
         auto column = index < tokens.length ? tokens[index].column : 0;
         auto line = index < tokens.length ? tokens[index].line : 0;
-        if (messageFunction is null)
-            stderr.writefln("%s(%d:%d)[warn]: %s", fileName, line, column, message);
+        if (messageDg !is null)
+            messageDg(fileName, line, column, message, false);
+        else if (messageFunction_ !is null)
+            messageFunction_(fileName, line, column, message, false);
         else
-            messageFunction(fileName, line, column, message, false);
+            stderr.writefln("%s(%d:%d)[warn]: %s", fileName, line, column, message);
     }
 
     void error(string message, bool shouldAdvance = true)
@@ -7075,10 +7103,12 @@ protected:
             ++errorCount;
             auto column = index < tokens.length ? tokens[index].column : tokens[$ - 1].column;
             auto line = index < tokens.length ? tokens[index].line : tokens[$ - 1].line;
-            if (messageFunction is null)
-                stderr.writefln("%s(%d:%d)[error]: %s", fileName, line, column, message);
+            if (messageDg !is null)
+                messageDg(fileName, line, column, message, true);
+            else if (messageFunction_ !is null)
+                messageFunction_(fileName, line, column, message, true);
             else
-                messageFunction(fileName, line, column, message, true);
+                stderr.writefln("%s(%d:%d)[error]: %s", fileName, line, column, message);
         }
         else
             ++suppressedErrorCount;
