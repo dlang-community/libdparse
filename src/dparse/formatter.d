@@ -7,6 +7,13 @@ import std.typetuple:TypeTuple;
 
 import dparse.ast;
 import dparse.lexer;
+version (unittest)
+{
+    import dparse.parser;
+    import dparse.rollback_allocator;
+    import std.array : Appender;
+    import std.algorithm : canFind;
+}
 
 //debug = verbose;
 
@@ -121,7 +128,10 @@ class Formatter(Sink)
                     format(type);
                     space();
                 }
-                format(identifierList);
+                if (declaratorIdentifierList)
+                {
+                    format(declaratorIdentifierList);
+                }
             }
             put(";");
         }
@@ -1551,13 +1561,40 @@ class Formatter(Sink)
         }
     }
 
-    void format(const IdentifierList identifierList)
+    void format(const DeclaratorIdentifierList declaratorIdentifierList)
     {
-        debug(verbose) writeln("IdentifierList");
-        foreach(count, ident; identifierList.identifiers)
+        debug(verbose) writeln("DeclaratorIdentifierList");
+
+        foreach(count, ident; declaratorIdentifierList.identifiers)
         {
-            if (count) put(", ");
+            if (count)
+                put(", ");
             put(ident.text);
+        }
+    }
+
+    void format(const TypeIdentifierChain typeIdentifierChain)
+    {
+        debug(verbose) writeln("TypeIdentifierChain");
+
+        if (typeIdentifierChain.dot)
+        {
+            put(".");
+        }
+        if (typeIdentifierChain.identifierOrTemplateInstance)
+        {
+            format(typeIdentifierChain.identifierOrTemplateInstance);
+        }
+        if (typeIdentifierChain.indexer)
+        {
+            put("[");
+            format(typeIdentifierChain.indexer);
+            put("]");
+        }
+        if (typeIdentifierChain.typeIdentifierChain)
+        {
+            put(".");
+            format(typeIdentifierChain.typeIdentifierChain);
         }
     }
 
@@ -1970,10 +2007,10 @@ class Formatter(Sink)
         if (linkageAttribute.hasPlusPlus)
         {
             put("++");
-            if (linkageAttribute.identifierChain && linkageAttribute.identifierChain.identifiers.length > 0)
+            if (linkageAttribute.typeIdentifierChain)
             {
                 put(", ");
-                format(linkageAttribute.identifierChain);
+                format(linkageAttribute.typeIdentifierChain);
             }
             else if (linkageAttribute.classOrStruct == tok!"class")
                 put(", class");
@@ -3187,24 +3224,23 @@ class Formatter(Sink)
 
         /**
         IdType builtinType;
-        Symbol symbol;
         TypeofExpression typeofExpression;
-        IdentifierOrTemplateChain identifierOrTemplateChain;
+        IdentifierList identifierList;
         IdType typeConstructor;
         Type type;
         **/
 
-        if (type2.symbol !is null)
+        if (type2.typeIdentifierChain !is null)
         {
-            format(type2.symbol);
+            format(type2.typeIdentifierChain);
         }
         else if (type2.typeofExpression !is null)
         {
             format(type2.typeofExpression);
-            if (type2.identifierOrTemplateChain)
+            if (type2.typeIdentifierChain)
             {
                 put(".");
-                format(type2.identifierOrTemplateChain);
+                format(type2.typeIdentifierChain);
             }
             return;
         }
@@ -3218,10 +3254,10 @@ class Formatter(Sink)
         else
         {
             put(tokenRep(type2.builtinType));
-            if (type2.identifierOrTemplateChain !is null)
+            if (type2.typeIdentifierChain)
             {
                 put(".");
-                format(type2.identifierOrTemplateChain);
+                format(type2.typeIdentifierChain);
             }
         }
     }
@@ -3866,4 +3902,35 @@ protected:
         "invariant_",
         "postblit"
     ];
+}
+
+version (unittest)
+void testFormatNode(Node)(string sourceCode)
+{
+    Appender!string fmt;
+    ubyte[] code = cast(ubyte[]) sourceCode;
+
+    class CatchInterestingStuff : ASTVisitor
+    {
+        alias visit = ASTVisitor.visit;
+        override void visit(const(Node) stuff)
+        {
+            stuff.accept(this);
+            format(&fmt, stuff);
+            assert(fmt.data.canFind(code), fmt.data);
+        }
+    }
+
+    LexerConfig config;
+    StringCache cache = StringCache(32);
+    RollbackAllocator rba;
+    auto toks = getTokensForParser(code, config, &cache);
+    Module mod = parseModule(toks, "stdin", &rba);
+    (new CatchInterestingStuff).visit(mod);
+}
+
+unittest
+{
+    testFormatNode!(VariableDeclaration)("T[0].Y y;");
+    testFormatNode!(VariableDeclaration)(`.T!"oof" toof;`);
 }
