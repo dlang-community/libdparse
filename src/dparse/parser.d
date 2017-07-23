@@ -6091,7 +6091,6 @@ class Parser
             advance();
             if (currentIs(tok!"]"))
             {
-                warn("no conflict with arrays");
                 advance();
                 return node;
             }
