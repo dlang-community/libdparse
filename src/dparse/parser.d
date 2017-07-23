@@ -3165,6 +3165,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF identifierOrTemplateChain):
      *     $(RULE identifierOrTemplateInstance) ($(LITERAL '.') $(RULE identifierOrTemplateInstance))*
+     *     $(RULE identifierOrTemplateInstance) ($(LITERAL '[') $(RULE assignExpression) ($(LITERAL ']') ($(LITERAL '.') $(RULE parseIdentifierOrTemplateChain)
      *     ;)
      */
     IdentifierOrTemplateChain parseIdentifierOrTemplateChain()
@@ -3181,6 +3182,30 @@ class Parser
                     return null;
                 else
                     break;
+            }
+            if (currentIs(tok!"["))
+            {
+                auto b = setBookmark();
+                advance();
+                if (!currentIs(tok!"]"))
+                {
+                    mixin(parseNodeQ!(`node.indexer`, `AssignExpression`));
+                }
+                expect(tok!"]");
+                if (node.indexer is null)
+                {
+                    // [] is a TypeSuffix
+                    goToBookmark(b);
+                    return node;
+                }
+                if (!currentIs(tok!"."))
+                {
+                    goToBookmark(b);
+                }
+                else
+                {
+                    abandonBookmark(b);
+                }
             }
             if (!currentIs(tok!"."))
                 break;
@@ -6066,6 +6091,7 @@ class Parser
             advance();
             if (currentIs(tok!"]"))
             {
+                warn("no conflict with arrays");
                 advance();
                 return node;
             }
