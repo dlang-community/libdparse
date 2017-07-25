@@ -3151,13 +3151,11 @@ final class Type2 : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(symbol, typeofExpression, identifierList, type,
-            vector));
+        mixin (visitIfNotNull!(typeofExpression, identifierList, type, vector));
     }
 
     /** */ IdType builtinType;
     /** */ alias superOrThis = builtinType;
-    /** */ Symbol symbol;
     /** */ TypeofExpression typeofExpression;
     /** */ IdentifierList identifierList;
     /** */ IdType typeConstructor;

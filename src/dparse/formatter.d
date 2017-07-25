@@ -7,6 +7,13 @@ import std.typetuple:TypeTuple;
 
 import dparse.ast;
 import dparse.lexer;
+version (unittest)
+{
+    import dparse.parser;
+    import dparse.rollback_allocator;
+    import std.array : Appender;
+    import std.algorithm : canFind;
+}
 
 //debug = verbose;
 
@@ -1570,12 +1577,14 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("IdentifierList");
 
-        if (identifierOrTemplateInstance)
-            format(identifierOrTemplateInstance);
-        if (indexer)
+        if (identifierList.identifierOrTemplateInstance)
+        {
+            format(identifierList.identifierOrTemplateInstance);
+        }
+        if (identifierList.indexer)
         {
             put("[");
-            format(indexer);
+            format(identifierList.indexer);
             put("]");
         }
         if (identifierList.identifierList)
@@ -1994,10 +2003,10 @@ class Formatter(Sink)
         if (linkageAttribute.hasPlusPlus)
         {
             put("++");
-            if (linkageAttribute.identifierChain && linkageAttribute.identifierChain.identifiers.length > 0)
+            if (linkageAttribute.identifierList)
             {
                 put(", ");
-                format(linkageAttribute.identifierChain);
+                format(linkageAttribute.identifierList);
             }
             else if (linkageAttribute.classOrStruct == tok!"class")
                 put(", class");
@@ -3211,16 +3220,15 @@ class Formatter(Sink)
 
         /**
         IdType builtinType;
-        Symbol symbol;
         TypeofExpression typeofExpression;
-        IdentifierOrTemplateChain identifierOrTemplateChain;
+        IdentifierList identifierList;
         IdType typeConstructor;
         Type type;
         **/
 
-        if (type2.symbol !is null)
+        if (type2.identifierList !is null)
         {
-            format(type2.symbol);
+            format(type2.identifierList);
         }
         else if (type2.typeofExpression !is null)
         {
@@ -3890,4 +3898,35 @@ protected:
         "invariant_",
         "postblit"
     ];
+}
+
+version (unittest)
+void testFormatNode(Node)(string sourceCode)
+{
+    Appender!string fmt;
+    ubyte[] code = cast(ubyte[]) sourceCode;
+
+    class CatchInterestingStuff : ASTVisitor
+    {
+        alias visit = ASTVisitor.visit;
+        override void visit(const(Node) stuff)
+        {
+            stuff.accept(this);
+            format(&fmt, stuff);
+            assert(fmt.data.canFind(code), fmt.data);
+            writeln(fmt.data);
+        }
+    }
+
+    LexerConfig config;
+    StringCache cache = StringCache(32);
+    RollbackAllocator rba;
+    auto toks = getTokensForParser(code, config, &cache);
+    Module mod = parseModule(toks, "stdin", &rba);
+    (new CatchInterestingStuff).visit(mod);
+}
+
+unittest
+{
+    testFormatNode!(VariableDeclaration)("T[0].Y y;");
 }

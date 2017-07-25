@@ -5934,7 +5934,7 @@ class Parser
         {
         case tok!"identifier":
         case tok!".":
-            mixin(parseNodeQ!(`node.symbol`, `Symbol`));
+            mixin(parseNodeQ!(`node.identifierList`, `IdentifierList`));
             break;
         foreach (B; BasicTypes) { case B: }
             node.builtinType = parseBuiltinType();
