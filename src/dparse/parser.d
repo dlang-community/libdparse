@@ -3185,7 +3185,6 @@ class Parser
             if (!currentIs(tok!"."))
             {
                 goToBookmark(b);
-                return null;
             }
             else
             {
@@ -5913,7 +5912,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF type2):
      *       $(RULE builtinType)
-     *     | $(RULE symbol)
+     *     | $(RULE identifierList)
      *     | $(LITERAL 'super') $(LITERAL '.') $(RULE identifierList)
      *     | $(LITERAL 'this') $(LITERAL '.') $(RULE identifierList)
      *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE identifierList))?
