@@ -121,7 +121,10 @@ class Formatter(Sink)
                     format(type);
                     space();
                 }
-                format(identifierList);
+                if (declaratorIdentifierList)
+                {
+                    format(declaratorIdentifierList);
+                }
             }
             put(";");
         }
@@ -1551,13 +1554,34 @@ class Formatter(Sink)
         }
     }
 
+    void format(const DeclaratorIdentifierList declaratorIdentifierList)
+    {
+        debug(verbose) writeln("DeclaratorIdentifierList");
+
+        foreach(count, ident; declaratorIdentifierList.identifiers)
+        {
+            if (count)
+                put(", ");
+            put(ident.text);
+        }
+    }
+
     void format(const IdentifierList identifierList)
     {
         debug(verbose) writeln("IdentifierList");
-        foreach(count, ident; identifierList.identifiers)
+
+        if (identifierOrTemplateInstance)
+            format(identifierOrTemplateInstance);
+        if (indexer)
         {
-            if (count) put(", ");
-            put(ident.text);
+            put("[");
+            format(indexer);
+            put("]");
+        }
+        if (identifierList.identifierList)
+        {
+            put(".");
+            format(identifierList.identifierList);
         }
     }
 
@@ -3201,10 +3225,10 @@ class Formatter(Sink)
         else if (type2.typeofExpression !is null)
         {
             format(type2.typeofExpression);
-            if (type2.identifierOrTemplateChain)
+            if (type2.identifierList)
             {
                 put(".");
-                format(type2.identifierOrTemplateChain);
+                format(type2.identifierList);
             }
             return;
         }
@@ -3218,10 +3242,10 @@ class Formatter(Sink)
         else
         {
             put(tokenRep(type2.builtinType));
-            if (type2.identifierOrTemplateChain !is null)
+            if (type2.identifierList)
             {
                 put(".");
-                format(type2.identifierOrTemplateChain);
+                format(type2.identifierList);
             }
         }
     }
