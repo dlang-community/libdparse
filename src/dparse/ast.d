@@ -230,7 +230,7 @@ public:
     /** */ void visit(const FunctionLiteralExpression functionLiteralExpression) { functionLiteralExpression.accept(this); }
     /** */ void visit(const GotoStatement gotoStatement) { gotoStatement.accept(this); }
     /** */ void visit(const IdentifierChain identifierChain) { identifierChain.accept(this); }
-    /** */ void visit(const IdentifierList identifierList) { identifierList.accept(this); }
+    /** */ void visit(const DeclaratorIdentifierList identifierList) { identifierList.accept(this); }
     /** */ void visit(const IdentifierOrTemplateChain identifierOrTemplateChain) { identifierOrTemplateChain.accept(this); }
     /** */ void visit(const IdentifierOrTemplateInstance identifierOrTemplateInstance) { identifierOrTemplateInstance.accept(this); }
     /** */ void visit(const IdentityExpression identityExpression) { identityExpression.accept(this); }
@@ -322,7 +322,7 @@ public:
     /** */ void visit(const TraitsExpression traitsExpression) { traitsExpression.accept(this); }
     /** */ void visit(const TryStatement tryStatement) { tryStatement.accept(this); }
     /** */ void visit(const Type type) { type.accept(this); }
-    /** */ void visit(const TypeIdentifierList typeIdentList) { typeIdentList.accept(this); }
+    /** */ void visit(const IdentifierList typeIdentList) { typeIdentList.accept(this); }
     /** */ void visit(const Type2 type2) { type2.accept(this); }
     /** */ void visit(const TypeSpecialization typeSpecialization) { typeSpecialization.accept(this); }
     /** */ void visit(const TypeSuffix typeSuffix) { typeSuffix.accept(this); }
@@ -443,13 +443,13 @@ final class AliasDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(storageClasses, type, identifierList, initializers,
-                               parameters, memberFunctionAttributes));
+        mixin (visitIfNotNull!(storageClasses, type, declaratorIdentifierList,
+            initializers, parameters, memberFunctionAttributes));
     }
     mixin OpEquals;
     /** */ StorageClass[] storageClasses;
     /** */ Type type;
-    /** */ IdentifierList identifierList;
+    /** */ DeclaratorIdentifierList declaratorIdentifierList;
     /** */ AliasInitializer[] initializers;
     /** */ string comment;
     /** */ Parameters parameters;
@@ -1403,6 +1403,18 @@ public:
 }
 
 ///
+final class DeclaratorIdentifierList : ASTNode
+{
+public:
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(identifiers));
+    }
+    /** */ Token[] identifiers;
+    mixin OpEquals;
+}
+
+///
 final class DefaultStatement : ASTNode
 {
 public:
@@ -1799,9 +1811,12 @@ final class IdentifierList : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifiers));
+        mixin (visitIfNotNull!(identifierOrTemplateInstance, identifierList,
+            indexer));
     }
-    /** */ Token[] identifiers;
+    /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
+    /** */ IdentifierList identifierList ;
+    /** */ ExpressionNode indexer;
     mixin OpEquals;
 }
 
@@ -2102,11 +2117,11 @@ final class LinkageAttribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, identifierChain));
+        mixin (visitIfNotNull!(identifier, identifierList));
     }
     /** */ Token identifier;
     /** */ bool hasPlusPlus;
-    /** */ IdentifierChain identifierChain;
+    /** */ IdentifierList identifierList;
     /** */ IdType classOrStruct;
     mixin OpEquals;
 }
@@ -3131,35 +3146,20 @@ public:
 }
 
 ///
-final class TypeIdentifierList : ASTNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(identifierOrTemplateInstance,
-            typeIdentifierList, indexer));
-    }
-    /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
-    /** */ TypeIdentifierList typeIdentifierList ;
-    /** */ ExpressionNode indexer;
-    mixin OpEquals;
-}
-
-///
 final class Type2 : ASTNode
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(symbol, typeofExpression,
-            typeIdentifierList, type, vector));
+        mixin (visitIfNotNull!(symbol, typeofExpression, identifierList, type,
+            vector));
     }
 
     /** */ IdType builtinType;
     /** */ alias superOrThis = builtinType;
     /** */ Symbol symbol;
     /** */ TypeofExpression typeofExpression;
-    /** */ TypeIdentifierList typeIdentifierList;
+    /** */ IdentifierList identifierList;
     /** */ IdType typeConstructor;
     /** */ Type type;
     /** */ Vector vector;
