@@ -1814,6 +1814,7 @@ public:
         mixin (visitIfNotNull!(identifierOrTemplateInstance, identifierList,
             indexer));
     }
+    /** */ bool dot;
     /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
     /** */ IdentifierList identifierList ;
     /** */ ExpressionNode indexer;

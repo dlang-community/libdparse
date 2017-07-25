@@ -3172,6 +3172,11 @@ class Parser
     IdentifierList parseIdentifierList()
     {
         IdentifierList node = allocator.make!IdentifierList;
+        if (currentIs(tok!"."))
+        {
+            node.dot = true;
+            advance();
+        }
         mixin(parseNodeQ!(`node.identifierOrTemplateInstance`, `IdentifierOrTemplateInstance`));
         if (currentIs(tok!"["))
         {

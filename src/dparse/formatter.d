@@ -1577,6 +1577,10 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("IdentifierList");
 
+        if (identifierList.dot)
+        {
+            put(".");
+        }
         if (identifierList.identifierOrTemplateInstance)
         {
             format(identifierList.identifierOrTemplateInstance);
@@ -3929,4 +3933,5 @@ void testFormatNode(Node)(string sourceCode)
 unittest
 {
     testFormatNode!(VariableDeclaration)("T[0].Y y;");
+    testFormatNode!(VariableDeclaration)(`.T!"oof" toof;`);
 }
