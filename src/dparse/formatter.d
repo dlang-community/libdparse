@@ -1573,28 +1573,28 @@ class Formatter(Sink)
         }
     }
 
-    void format(const IdentifierList identifierList)
+    void format(const TypeIdentifierChain typeIdentifierChain)
     {
-        debug(verbose) writeln("IdentifierList");
+        debug(verbose) writeln("TypeIdentifierChain");
 
-        if (identifierList.dot)
+        if (typeIdentifierChain.dot)
         {
             put(".");
         }
-        if (identifierList.identifierOrTemplateInstance)
+        if (typeIdentifierChain.identifierOrTemplateInstance)
         {
-            format(identifierList.identifierOrTemplateInstance);
+            format(typeIdentifierChain.identifierOrTemplateInstance);
         }
-        if (identifierList.indexer)
+        if (typeIdentifierChain.indexer)
         {
             put("[");
-            format(identifierList.indexer);
+            format(typeIdentifierChain.indexer);
             put("]");
         }
-        if (identifierList.identifierList)
+        if (typeIdentifierChain.typeIdentifierChain)
         {
             put(".");
-            format(identifierList.identifierList);
+            format(typeIdentifierChain.typeIdentifierChain);
         }
     }
 
@@ -2007,10 +2007,10 @@ class Formatter(Sink)
         if (linkageAttribute.hasPlusPlus)
         {
             put("++");
-            if (linkageAttribute.identifierList)
+            if (linkageAttribute.typeIdentifierChain)
             {
                 put(", ");
-                format(linkageAttribute.identifierList);
+                format(linkageAttribute.typeIdentifierChain);
             }
             else if (linkageAttribute.classOrStruct == tok!"class")
                 put(", class");
@@ -3230,17 +3230,17 @@ class Formatter(Sink)
         Type type;
         **/
 
-        if (type2.identifierList !is null)
+        if (type2.typeIdentifierChain !is null)
         {
-            format(type2.identifierList);
+            format(type2.typeIdentifierChain);
         }
         else if (type2.typeofExpression !is null)
         {
             format(type2.typeofExpression);
-            if (type2.identifierList)
+            if (type2.typeIdentifierChain)
             {
                 put(".");
-                format(type2.identifierList);
+                format(type2.typeIdentifierChain);
             }
             return;
         }
@@ -3254,10 +3254,10 @@ class Formatter(Sink)
         else
         {
             put(tokenRep(type2.builtinType));
-            if (type2.identifierList)
+            if (type2.typeIdentifierChain)
             {
                 put(".");
-                format(type2.identifierList);
+                format(type2.typeIdentifierChain);
             }
         }
     }

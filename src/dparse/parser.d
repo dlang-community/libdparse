@@ -3161,17 +3161,17 @@ class Parser
     }
 
     /**
-     * Parses an IdentifierList.
+     * Parses a TypeIdentifierChain.
      *
-     * $(GRAMMAR $(RULEDEF identifierList):
+     * $(GRAMMAR $(RULEDEF typeIdentifierChain):
      *      $(RULE identifierOrTemplateInstance)
-     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '.') $(RULE identifierList)
-     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '[') $(RULE assignExpression) $(LITERAL ']') $(LITERAL '.') $(RULE identifierList)
+     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '.') $(RULE typeIdentifierChain)
+     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '[') $(RULE assignExpression) $(LITERAL ']') $(LITERAL '.') $(RULE typeIdentifierChain)
      *      ;)
      */
-    IdentifierList parseIdentifierList()
+    TypeIdentifierChain parseTypeIdentifierChain()
     {
-        IdentifierList node = allocator.make!IdentifierList;
+        TypeIdentifierChain node = allocator.make!TypeIdentifierChain;
         if (currentIs(tok!"."))
         {
             node.dot = true;
@@ -3199,7 +3199,7 @@ class Parser
         if (currentIs(tok!"."))
         {
             advance();
-            mixin(parseNodeQ!(`node.identifierList`, `IdentifierList`));
+            mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
         }
         return node;
     }
@@ -3766,7 +3766,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF linkageAttribute):
      *       $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)')
      *       $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '-') $(LITERAL Identifier) $(LITERAL '$(RPAREN)')
-     *     | $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '++') ($(LITERAL ',') $(RULE identifierList) | $(LITERAL 'struct') | $(LITERAL 'class'))? $(LITERAL '$(RPAREN)')
+     *     | $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '++') ($(LITERAL ',') $(RULE typeIdentifierChain) | $(LITERAL 'struct') | $(LITERAL 'class'))? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     LinkageAttribute parseLinkageAttribute()
@@ -3788,7 +3788,7 @@ class Parser
                 if (currentIsOneOf(tok!"struct", tok!"class"))
                     node.classOrStruct = advance().type;
                 else
-                    mixin(parseNodeQ!(`node.identifierList`, `IdentifierList`));
+                    mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
             }
         }
         else if (currentIs(tok!"-"))
@@ -5917,10 +5917,10 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF type2):
      *       $(RULE builtinType)
-     *     | $(RULE identifierList)
-     *     | $(LITERAL 'super') $(LITERAL '.') $(RULE identifierList)
-     *     | $(LITERAL 'this') $(LITERAL '.') $(RULE identifierList)
-     *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE identifierList))?
+     *     | $(RULE typeIdentifierChain)
+     *     | $(LITERAL 'super') $(LITERAL '.') $(RULE typeIdentifierChain)
+     *     | $(LITERAL 'this') $(LITERAL '.') $(RULE typeIdentifierChain)
+     *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE typeIdentifierChain))?
      *     | $(RULE typeConstructor) $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)')
      *     | $(RULE vector)
      *     ;)
@@ -5938,7 +5938,7 @@ class Parser
         {
         case tok!"identifier":
         case tok!".":
-            mixin(parseNodeQ!(`node.identifierList`, `IdentifierList`));
+            mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
             break;
         foreach (B; BasicTypes) { case B: }
             node.builtinType = parseBuiltinType();
@@ -5947,7 +5947,7 @@ class Parser
         case tok!"this":
             node.superOrThis = advance().type;
             mixin(tokenCheck!".");
-            mixin(parseNodeQ!(`node.identifierList`, `IdentifierList`));
+            mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
             break;
         case tok!"typeof":
             if ((node.typeofExpression = parseTypeofExpression()) is null)
@@ -5955,7 +5955,7 @@ class Parser
             if (currentIs(tok!"."))
             {
                 advance();
-                mixin(parseNodeQ!(`node.identifierList`, `IdentifierList`));
+                mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
             }
             break;
         case tok!"const":

@@ -322,7 +322,7 @@ public:
     /** */ void visit(const TraitsExpression traitsExpression) { traitsExpression.accept(this); }
     /** */ void visit(const TryStatement tryStatement) { tryStatement.accept(this); }
     /** */ void visit(const Type type) { type.accept(this); }
-    /** */ void visit(const IdentifierList typeIdentList) { typeIdentList.accept(this); }
+    /** */ void visit(const TypeIdentifierChain typeIdentChain) { typeIdentChain.accept(this); }
     /** */ void visit(const Type2 type2) { type2.accept(this); }
     /** */ void visit(const TypeSpecialization typeSpecialization) { typeSpecialization.accept(this); }
     /** */ void visit(const TypeSuffix typeSuffix) { typeSuffix.accept(this); }
@@ -1806,17 +1806,17 @@ public:
 }
 
 ///
-final class IdentifierList : ASTNode
+final class TypeIdentifierChain : ASTNode
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifierOrTemplateInstance, identifierList,
+        mixin (visitIfNotNull!(identifierOrTemplateInstance, typeIdentifierChain,
             indexer));
     }
     /** */ bool dot;
     /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
-    /** */ IdentifierList identifierList ;
+    /** */ TypeIdentifierChain typeIdentifierChain ;
     /** */ ExpressionNode indexer;
     mixin OpEquals;
 }
@@ -2118,11 +2118,11 @@ final class LinkageAttribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, identifierList));
+        mixin (visitIfNotNull!(identifier, typeIdentifierChain));
     }
     /** */ Token identifier;
     /** */ bool hasPlusPlus;
-    /** */ IdentifierList identifierList;
+    /** */ TypeIdentifierChain typeIdentifierChain;
     /** */ IdType classOrStruct;
     mixin OpEquals;
 }
@@ -3152,13 +3152,13 @@ final class Type2 : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(typeofExpression, identifierList, type, vector));
+        mixin (visitIfNotNull!(typeofExpression, typeIdentifierChain, type, vector));
     }
 
     /** */ IdType builtinType;
     /** */ alias superOrThis = builtinType;
     /** */ TypeofExpression typeofExpression;
-    /** */ IdentifierList identifierList;
+    /** */ TypeIdentifierChain typeIdentifierChain;
     /** */ IdType typeConstructor;
     /** */ Type type;
     /** */ Vector vector;
