@@ -3918,7 +3918,6 @@ void testFormatNode(Node)(string sourceCode)
             stuff.accept(this);
             format(&fmt, stuff);
             assert(fmt.data.canFind(code), fmt.data);
-            writeln(fmt.data);
         }
     }
 
