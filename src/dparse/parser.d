@@ -92,7 +92,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF aliasDeclaration):
      *       $(LITERAL 'alias') $(RULE aliasInitializer) $(LPAREN)$(LITERAL ',') $(RULE aliasInitializer)$(RPAREN)* $(LITERAL ';')
-     *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(RULE identifierList) $(LITERAL ';')
+     *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(RULE declaratorIdentifierList) $(LITERAL ';')
      *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(RULE identifier) $(LITERAL '(') $(RULE parameters) $(LITERAL ')') $(memberFunctionAttribute)* $(LITERAL ';')
      *     ;)
      */
@@ -127,7 +127,7 @@ class Parser
                     return null;
             ownArray(node.storageClasses, storageClasses);
             mixin (parseNodeQ!(`node.type`, `Type`));
-            mixin (parseNodeQ!(`node.identifierList`, `IdentifierList`));
+            mixin (parseNodeQ!(`node.declaratorIdentifierList`, `DeclaratorIdentifierList`));
             if (currentIs(tok!"("))
             {
                 mixin(parseNodeQ!(`node.parameters`, `Parameters`));
@@ -2268,6 +2268,34 @@ class Parser
     }
 
     /**
+     * Parses a DeclaratorIdentifierList
+     *
+     * $(GRAMMAR $(RULEDEF declaratorIdentifierList):
+     *     $(LITERAL Identifier) ($(LITERAL ',') $(LITERAL Identifier))*
+     *     ;)
+     */
+    DeclaratorIdentifierList parseDeclaratorIdentifierList()
+    {
+        auto node = allocator.make!DeclaratorIdentifierList;
+        StackBuffer identifiers;
+        while (moreTokens())
+        {
+            const ident = expect(tok!"identifier");
+            mixin(nullCheck!`ident`);
+            identifiers.put(*ident);
+            if (currentIs(tok!","))
+            {
+                advance();
+                continue;
+            }
+            else
+                break;
+        }
+        ownArray(node.identifiers, identifiers);
+        return node;
+    }
+
+    /**
      * Parses a DefaultStatement
      *
      * $(GRAMMAR $(RULEDEF defaultStatement):
@@ -3152,30 +3180,46 @@ class Parser
     }
 
     /**
-     * Parses an IdentifierList
+     * Parses a TypeIdentifierChain.
      *
-     * $(GRAMMAR $(RULEDEF identifierList):
-     *     $(LITERAL Identifier) ($(LITERAL ',') $(LITERAL Identifier))*
-     *     ;)
+     * $(GRAMMAR $(RULEDEF typeIdentifierChain):
+     *      $(RULE identifierOrTemplateInstance)
+     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '.') $(RULE typeIdentifierChain)
+     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '[') $(RULE assignExpression) $(LITERAL ']') $(LITERAL '.') $(RULE typeIdentifierChain)
+     *      ;)
      */
-    IdentifierList parseIdentifierList()
+    TypeIdentifierChain parseTypeIdentifierChain()
     {
-        auto node = allocator.make!IdentifierList;
-        StackBuffer identifiers;
-        while (moreTokens())
+        TypeIdentifierChain node = allocator.make!TypeIdentifierChain;
+        if (currentIs(tok!"."))
         {
-            const ident = expect(tok!"identifier");
-            mixin(nullCheck!`ident`);
-            identifiers.put(*ident);
-            if (currentIs(tok!","))
+            node.dot = true;
+            advance();
+        }
+        mixin(parseNodeQ!(`node.identifierOrTemplateInstance`, `IdentifierOrTemplateInstance`));
+        if (currentIs(tok!"["))
+        {
+            const b = setBookmark();
+            advance();
+            if (!currentIs(tok!"]"))
             {
-                advance();
-                continue;
+                mixin(parseNodeQ!(`node.indexer`, `AssignExpression`));
+            }
+            expect(tok!"]");
+            if (!currentIs(tok!"."))
+            {
+                goToBookmark(b);
             }
             else
-                break;
+            {
+                abandonBookmark(b);
+            }
         }
-        ownArray(node.identifiers, identifiers);
+        if (currentIs(tok!"."))
+        {
+            advance();
+            mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
+        }
         return node;
     }
 
@@ -3741,7 +3785,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF linkageAttribute):
      *       $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)')
      *       $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '-') $(LITERAL Identifier) $(LITERAL '$(RPAREN)')
-     *     | $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '++') ($(LITERAL ',') $(RULE identifierChain) | $(LITERAL 'struct') | $(LITERAL 'class'))? $(LITERAL '$(RPAREN)')
+     *     | $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '++') ($(LITERAL ',') $(RULE typeIdentifierChain) | $(LITERAL 'struct') | $(LITERAL 'class'))? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     LinkageAttribute parseLinkageAttribute()
@@ -3763,7 +3807,7 @@ class Parser
                 if (currentIsOneOf(tok!"struct", tok!"class"))
                     node.classOrStruct = advance().type;
                 else
-                    mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
+                    mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
             }
         }
         else if (currentIs(tok!"-"))
@@ -5894,10 +5938,10 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF type2):
      *       $(RULE builtinType)
-     *     | $(RULE symbol)
-     *     | $(LITERAL 'super') $(LITERAL '.') $(RULE identifierOrTemplateChain)
-     *     | $(LITERAL 'this') $(LITERAL '.') $(RULE identifierOrTemplateChain)
-     *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE identifierOrTemplateChain))?
+     *     | $(RULE typeIdentifierChain)
+     *     | $(LITERAL 'super') $(LITERAL '.') $(RULE typeIdentifierChain)
+     *     | $(LITERAL 'this') $(LITERAL '.') $(RULE typeIdentifierChain)
+     *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE typeIdentifierChain))?
      *     | $(RULE typeConstructor) $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)')
      *     | $(RULE vector)
      *     ;)
@@ -5915,7 +5959,7 @@ class Parser
         {
         case tok!"identifier":
         case tok!".":
-            mixin(parseNodeQ!(`node.symbol`, `Symbol`));
+            mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
             break;
         foreach (B; BasicTypes) { case B: }
             node.builtinType = parseBuiltinType();
@@ -5924,7 +5968,7 @@ class Parser
         case tok!"this":
             node.superOrThis = advance().type;
             mixin(tokenCheck!".");
-            mixin(parseNodeQ!(`node.identifierOrTemplateChain`, `IdentifierOrTemplateChain`));
+            mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
             break;
         case tok!"typeof":
             if ((node.typeofExpression = parseTypeofExpression()) is null)
@@ -5932,7 +5976,7 @@ class Parser
             if (currentIs(tok!"."))
             {
                 advance();
-                mixin(parseNodeQ!(`node.identifierOrTemplateChain`, `IdentifierOrTemplateChain`));
+                mixin(parseNodeQ!(`node.typeIdentifierChain`, `TypeIdentifierChain`));
             }
             break;
         case tok!"const":
