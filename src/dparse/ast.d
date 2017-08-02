@@ -230,7 +230,7 @@ public:
     /** */ void visit(const FunctionLiteralExpression functionLiteralExpression) { functionLiteralExpression.accept(this); }
     /** */ void visit(const GotoStatement gotoStatement) { gotoStatement.accept(this); }
     /** */ void visit(const IdentifierChain identifierChain) { identifierChain.accept(this); }
-    /** */ void visit(const DeclaratorIdentifierList identifierList) { identifierList.accept(this); }
+    /** */ void visit(const IdentifierList identifierList) { identifierList.accept(this); }
     /** */ void visit(const IdentifierOrTemplateChain identifierOrTemplateChain) { identifierOrTemplateChain.accept(this); }
     /** */ void visit(const IdentifierOrTemplateInstance identifierOrTemplateInstance) { identifierOrTemplateInstance.accept(this); }
     /** */ void visit(const IdentityExpression identityExpression) { identityExpression.accept(this); }
@@ -322,7 +322,6 @@ public:
     /** */ void visit(const TraitsExpression traitsExpression) { traitsExpression.accept(this); }
     /** */ void visit(const TryStatement tryStatement) { tryStatement.accept(this); }
     /** */ void visit(const Type type) { type.accept(this); }
-    /** */ void visit(const TypeIdentifierChain typeIdentChain) { typeIdentChain.accept(this); }
     /** */ void visit(const Type2 type2) { type2.accept(this); }
     /** */ void visit(const TypeSpecialization typeSpecialization) { typeSpecialization.accept(this); }
     /** */ void visit(const TypeSuffix typeSuffix) { typeSuffix.accept(this); }
@@ -443,13 +442,13 @@ final class AliasDeclaration : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(storageClasses, type, declaratorIdentifierList,
-            initializers, parameters, memberFunctionAttributes));
+        mixin (visitIfNotNull!(storageClasses, type, identifierList, initializers,
+                               parameters, memberFunctionAttributes));
     }
     mixin OpEquals;
     /** */ StorageClass[] storageClasses;
     /** */ Type type;
-    /** */ DeclaratorIdentifierList declaratorIdentifierList;
+    /** */ IdentifierList identifierList;
     /** */ AliasInitializer[] initializers;
     /** */ string comment;
     /** */ Parameters parameters;
@@ -1403,18 +1402,6 @@ public:
 }
 
 ///
-final class DeclaratorIdentifierList : ASTNode
-{
-public:
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(identifiers));
-    }
-    /** */ Token[] identifiers;
-    mixin OpEquals;
-}
-
-///
 final class DefaultStatement : ASTNode
 {
 public:
@@ -1806,18 +1793,14 @@ public:
 }
 
 ///
-final class TypeIdentifierChain : ASTNode
+final class IdentifierList : ASTNode
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifierOrTemplateInstance, typeIdentifierChain,
-            indexer));
+        mixin (visitIfNotNull!(identifiers));
     }
-    /** */ bool dot;
-    /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
-    /** */ TypeIdentifierChain typeIdentifierChain ;
-    /** */ ExpressionNode indexer;
+    /** */ Token[] identifiers;
     mixin OpEquals;
 }
 
@@ -2118,11 +2101,11 @@ final class LinkageAttribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, typeIdentifierChain));
+        mixin (visitIfNotNull!(identifier, identifierChain));
     }
     /** */ Token identifier;
     /** */ bool hasPlusPlus;
-    /** */ TypeIdentifierChain typeIdentifierChain;
+    /** */ IdentifierChain identifierChain;
     /** */ IdType classOrStruct;
     mixin OpEquals;
 }
@@ -3152,13 +3135,15 @@ final class Type2 : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(typeofExpression, typeIdentifierChain, type, vector));
+        mixin (visitIfNotNull!(symbol, typeofExpression,
+            identifierOrTemplateChain, type, vector));
     }
 
     /** */ IdType builtinType;
     /** */ alias superOrThis = builtinType;
+    /** */ Symbol symbol;
     /** */ TypeofExpression typeofExpression;
-    /** */ TypeIdentifierChain typeIdentifierChain;
+    /** */ IdentifierOrTemplateChain identifierOrTemplateChain;
     /** */ IdType typeConstructor;
     /** */ Type type;
     /** */ Vector vector;
