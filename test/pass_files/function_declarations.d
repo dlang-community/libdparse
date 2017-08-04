@@ -47,3 +47,5 @@ void bar()
 void cVarArg(int, ...);
 enum bool isInputRange = is(typeof((inout int = 0){}));
 auto a = b => b * 2;
+
+int typesafeVarArg(int a = 1, int[] rest = [] ...) { return 1; }
