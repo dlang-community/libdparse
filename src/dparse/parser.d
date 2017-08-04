@@ -4214,6 +4214,12 @@ class Parser
             {
                 advance();
                 mixin(parseNodeQ!(`node.default_`, `AssignExpression`));
+
+                if (currentIs(tok!"..."))
+                {
+                    advance();
+                    node.vararg = true;
+                }
             }
             else if (currentIs(tok!"["))
             {
