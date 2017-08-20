@@ -3382,3 +3382,22 @@ unittest // issue #133
     t.visit(m);
 }
 
+unittest // issue #165
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+    ubyte[] src = cast(ubyte[])q{module test165; enum foo(T) = bar!T;};
+    final class EpoTest : ASTVisitor
+    {
+        bool visited;
+        alias visit = ASTVisitor.visit;
+        override void visit(const EponymousTemplateDeclaration){visited = true;}
+    }
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+    Module m = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
+    EpoTest et = new EpoTest;
+    et.visit(m);
+    assert(et.visited);
+}
+

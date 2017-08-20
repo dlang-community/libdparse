@@ -1908,15 +1908,18 @@ class Parser
             return null;
         }
 
-        if (isAuto == DecType.autoVar)
+        if (!currentIs(tok!"enum")) // #165: handle enums separatly b/c of EponymousTemplateDeclaration
         {
-            mixin(nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, true)`);
-            return node;
-        }
-        else if (isAuto == DecType.autoFun)
-        {
-            mixin(nullCheck!`node.functionDeclaration = parseFunctionDeclaration(null, true)`);
-            return node;
+            if (isAuto == DecType.autoVar)
+            {
+                mixin(nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, true)`);
+                return node;
+            }
+            else if (isAuto == DecType.autoFun)
+            {
+                mixin(nullCheck!`node.functionDeclaration = parseFunctionDeclaration(null, true)`);
+                return node;
+            }
         }
 
         switch (current.type)
