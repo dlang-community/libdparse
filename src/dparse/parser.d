@@ -370,6 +370,7 @@ class Parser
             skipBrackets();
             if (currentIs(tok!":"))
             {
+                goToBookmark(b);
                 mixin (parseNodeQ!(`node.assignExpression`, `AssignExpression`));
                 advance(); // :
                 mixin (parseNodeQ!(`node.nonVoidInitializer`, `NonVoidInitializer`));
@@ -4080,8 +4081,22 @@ class Parser
         }
         else if (currentIs(tok!"["))
         {
+            // issue 156:
+            // the expression that gives an array element is usually a primary
+            // so look if there are two open brackets + colon when they are closed
+            bool isAA;
+            const bk = setBookmark();
+            advance();
+            if (currentIs(tok!"["))
+            {
+                advance();
+                const c = peekPastBrackets();
+                isAA = c !is null && c.type == tok!":";
+            }
+            goToBookmark(bk);
+
             const b = peekPastBrackets();
-            if (b !is null && (b.type == tok!","
+            if (!isAA && b !is null && (b.type == tok!","
                 || b.type == tok!")"
                 || b.type == tok!"]"
                 || b.type == tok!"}"
@@ -4089,8 +4104,7 @@ class Parser
             {
                 mixin(parseNodeQ!(`node.arrayInitializer`, `ArrayInitializer`));
             }
-            else
-                mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+            else mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
         }
         else
             mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));

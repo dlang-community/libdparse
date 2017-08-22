@@ -3399,5 +3399,61 @@ unittest // issue #165
     EpoTest et = new EpoTest;
     et.visit(m);
     assert(et.visited);
+
+unittest // issue #156
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+    final class Test : ASTVisitor
+    {
+        bool arrIndex, arrValue, arrValueOnly, aaLiteral;
+        alias visit = ASTVisitor.visit;
+        override void visit(const ArrayInitializer ai)
+        {
+            if (ai.arrayMemberInitializations.length == 1)
+            {
+                arrIndex = ai.arrayMemberInitializations[0].assignExpression !is null;
+                arrValue = ai.arrayMemberInitializations[0].nonVoidInitializer !is null;
+                arrValueOnly = arrValue && !arrIndex;
+            }
+        }
+        override void visit(const AssocArrayLiteral aal)
+        {
+            aaLiteral = true;
+        }
+    }
+
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+
+    {
+        // no colon so array.
+        ubyte[] src1 = cast(ubyte[])q{void main(){const arr = [[0]];}};
+        Module m = parseModule(getTokensForParser(src1, cf, &ca), "", &ra);
+        Test t = new Test;
+        t.visit(m);
+        assert(t.arrValueOnly);
+    }
+    {
+        // simple primary before colon, assume array.
+        ubyte[] src2 = cast(ubyte[])q{void main(){const arr = [0:0];}};
+        Module m = parseModule(getTokensForParser(src2, cf, &ca), "", &ra);
+        Test t = new Test;
+        t.visit(m);
+        assert(t.arrIndex);
+        assert(t.arrValue);
+        assert(!t.aaLiteral);
+    }
+    {
+        // more complex exp before colon, assume AA.
+        ubyte[] src3 = cast(ubyte[])q{void main(){const arr = [[0]:0];}};
+        Module m = parseModule(getTokensForParser(src3, cf, &ca), "", &ra);
+        Test t = new Test;
+        t.visit(m);
+        assert(!t.arrIndex);
+        assert(!t.arrValue);
+        assert(t.aaLiteral);
+    }
 }
 
