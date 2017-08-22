@@ -3399,6 +3399,7 @@ unittest // issue #165
     EpoTest et = new EpoTest;
     et.visit(m);
     assert(et.visited);
+}
 
 unittest // issue #156
 {
