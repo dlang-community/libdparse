@@ -70,3 +70,13 @@ idouble a = 4Li;
 idouble a = 4i;
 ifloat a = 4fi;
 ifloat a = 4Fi;
+
+static foreach (n; ['a', 'b', 'c'])
+{
+    mixin("char " ~ n ~ ";");
+}
+
+static foreach_reverse (i; '0' .. '5')
+{
+    mixin("int _" ~ i ~ ";");
+}
