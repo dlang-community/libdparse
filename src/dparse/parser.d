@@ -2097,6 +2097,8 @@ class Parser
                 mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
             else if (peekIs(tok!"assert"))
                 mixin(parseNodeQ!(`node.staticAssertDeclaration`, `StaticAssertDeclaration`));
+            else if (peekIs(tok!"foreach") || peekIs(tok!"foreach_reverse"))
+                mixin(parseNodeQ!(`node.staticForeachDeclaration`, `StaticForeachDeclaration`));
             else
                 goto type;
             break;
@@ -2742,6 +2744,37 @@ class Parser
     }
 
     /**
+     * Parses a StaticForeachDeclaration
+     *
+     * $(GRAMMAR $(RULEDEF staticForeachDeclaration):
+     *       $(LITERAL 'static') ($(LITERAL 'foreach') | $(LITERAL 'foreach_reverse')) $(LITERAL '$(LPAREN)') $(RULE foreachTypeList) $(LITERAL ';') $(RULE expression) $(LITERAL '$(RPAREN)')
+     *          ($(RULE declaration) | $(LITERAL '{') $(RULE declaration)* $(LITERAL '}'))
+     *     | $(LITERAL 'static') ($(LITERAL 'foreach') | $(LITERAL 'foreach_reverse')) $(LITERAL '$(LPAREN)') $(RULE foreachType) $(LITERAL ';') $(RULE expression) $(LITERAL '..') $(RULE expression) $(LITERAL '$(RPAREN)')
+     *          ($(RULE declaration) | $(LITERAL '{') $(RULE declaration)* $(LITERAL '}'))
+     *     ;)
+     */
+    StaticForeachDeclaration parseStaticForeachDeclaration()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        mixin(tokenCheck!"static");
+        return parseForeach!true();
+    }
+
+    /**
+     * Parses a StaticForeachStatement
+     *
+     * $(GRAMMAR $(RULEDEF staticForeachStatement):
+     *       $(LITERAL 'static') $(RULE foreachStatement)
+     *     ;)
+     */
+    StaticForeachStatement parseStaticForeachStatement()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        mixin(simpleParse!(StaticForeachStatement,
+            tok!"static", "foreachStatement|parseForeachStatement"));
+    }
+
+    /**
      * Parses a ForeachStatement
      *
      * $(GRAMMAR $(RULEDEF foreachStatement):
@@ -2752,7 +2785,13 @@ class Parser
     ForeachStatement parseForeachStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        ForeachStatement node = allocator.make!ForeachStatement;
+        return parseForeach!false();
+    }
+
+    Foreach!declOnly parseForeach(bool declOnly = false)()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        Foreach!declOnly node = allocator.make!(Foreach!declOnly);
         if (currentIsOneOf(tok!"foreach", tok!"foreach_reverse"))
             node.type = advance().type;
         else
@@ -2791,7 +2830,33 @@ class Parser
             error("Statement expected", false);
             return node; // this line makes DCD better
         }
-        mixin(parseNodeQ!(`node.declarationOrStatement`, `DeclarationOrStatement`));
+        static if (declOnly)
+        {
+            StackBuffer declarations;
+            if (currentIs(tok!"{"))
+            {
+                advance();
+                while (moreTokens() && !currentIs(tok!"}"))
+                {
+                    immutable b = setBookmark();
+                    immutable c = allocator.setCheckpoint();
+                    if (declarations.put(parseDeclaration(true, true)))
+                        abandonBookmark(b);
+                    else
+                    {
+                        goToBookmark(b);
+                        allocator.rollback(c);
+                        return null;
+                    }
+                }
+                mixin(tokenCheck!"}");
+            }
+            else if (!declarations.put(parseDeclaration(true, true)))
+                return null;
+            ownArray(node.declarations, declarations);
+        }
+        else
+            mixin(parseNodeQ!(`node.declarationOrStatement`, `DeclarationOrStatement`));
         return node;
     }
 
@@ -4966,9 +5031,11 @@ class Parser
                 mixin(parseNodeQ!(`node.conditionalStatement`, `ConditionalStatement`));
             else if (peekIs(tok!"assert"))
                 mixin(parseNodeQ!(`node.staticAssertStatement`, `StaticAssertStatement`));
+            else if (peekIs(tok!"foreach") || peekIs(tok!"foreach_reverse"))
+                mixin(parseNodeQ!(`node.staticForeachStatement`, `StaticForeachStatement`));
             else
             {
-                error("'if' or 'assert' expected.");
+                error("'if' or 'assert' or 'foreach' or 'foreach_reverse' expected.");
                 return null;
             }
             break;
@@ -6861,6 +6928,8 @@ protected:
         case tok!"static":
             if (peekIs(tok!"if"))
                 return false;
+            else if (peekIs(tok!"foreach") || peekIs(tok!"foreach_reverse"))
+                goto default;
             goto case;
         case tok!"scope":
             if (peekIs(tok!"("))
@@ -6975,7 +7044,7 @@ protected:
         case tok!"scope":
             return !peekIs(tok!"(");
         case tok!"static":
-            return !peekIsOneOf(tok!"assert", tok!"this", tok!"if", tok!"~");
+            return !peekIsOneOf(tok!"assert", tok!"this", tok!"if", tok!"~", tok!"foreach", tok!"foreach_reverse");
         case tok!"shared":
             return !(startsWith(tok!"shared", tok!"static", tok!"this")
                 || startsWith(tok!"shared", tok!"static", tok!"~")

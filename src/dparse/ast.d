@@ -221,6 +221,8 @@ public:
     /** */ void visit(const Finally finally_) { finally_.accept(this); }
     /** */ void visit(const ForStatement forStatement) { forStatement.accept(this); }
     /** */ void visit(const ForeachStatement foreachStatement) { foreachStatement.accept(this); }
+    /** */ void visit(const StaticForeachDeclaration staticForeachDeclaration) { staticForeachDeclaration.accept(this); }
+    /** */ void visit(const StaticForeachStatement staticForeachStatement) { staticForeachStatement.accept(this); }
     /** */ void visit(const ForeachType foreachType) { foreachType.accept(this); }
     /** */ void visit(const ForeachTypeList foreachTypeList) { foreachTypeList.accept(this); }
     /** */ void visit(const FunctionAttribute functionAttribute) { functionAttribute.accept(this); }
@@ -1304,7 +1306,7 @@ public:
         SharedStaticConstructor, SharedStaticDestructor, StaticAssertDeclaration,
         StaticConstructor, StaticDestructor, StructDeclaration,
         TemplateDeclaration, UnionDeclaration, Unittest, VariableDeclaration,
-        VersionSpecification);
+        VersionSpecification, StaticForeachDeclaration);
 
     private Algebraic!(DeclarationTypes) storage;
 
@@ -1347,6 +1349,7 @@ public:
     mixin(generateProperty("Unittest", "unittest_"));
     mixin(generateProperty("VariableDeclaration", "variableDeclaration"));
     mixin(generateProperty("VersionSpecification", "versionSpecification"));
+    mixin(generateProperty("StaticForeachDeclaration", "staticForeachDeclaration"));
 
     override bool opEquals(Object other) const
     {
@@ -1629,22 +1632,47 @@ public:
     mixin OpEquals;
 }
 
+
 ///
-final class ForeachStatement : ASTNode
+final class Foreach(bool declOnly) : ASTNode
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(foreachType, foreachTypeList, low, high,
-            declarationOrStatement));
+        mixin (visitIfNotNull!(foreachType, foreachTypeList, low, high));
+        static if (declOnly)
+            mixin (visitIfNotNull!(declarations));
+        else
+            mixin (visitIfNotNull!(declarationOrStatement));
     }
     /** */ IdType type;
     /** */ ForeachTypeList foreachTypeList;
     /** */ ForeachType foreachType;
     /** */ Expression low;
     /** */ Expression high;
-    /** */ DeclarationOrStatement declarationOrStatement;
     /** */ size_t startIndex;
+    static if (declOnly)
+        /** */ Declaration[] declarations;
+    else
+        /** */ DeclarationOrStatement declarationOrStatement;
+    mixin OpEquals;
+}
+
+///
+alias StaticForeachDeclaration = Foreach!true;
+
+///
+alias ForeachStatement = Foreach!false;
+
+///
+final class StaticForeachStatement : ASTNode
+{
+public:
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(foreachStatement));
+    }
+    /** */ ForeachStatement foreachStatement;
     mixin OpEquals;
 }
 
@@ -2264,7 +2292,7 @@ public:
             synchronizedStatement, tryStatement, throwStatement,
             scopeGuardStatement, asmStatement, pragmaStatement,
             conditionalStatement, staticAssertStatement, versionSpecification,
-            debugSpecification, expressionStatement));
+            debugSpecification, expressionStatement, staticForeachStatement));
     }
     /** */ LabeledStatement labeledStatement;
     /** */ BlockStatement blockStatement;
@@ -2273,6 +2301,7 @@ public:
     /** */ DoStatement doStatement;
     /** */ ForStatement forStatement;
     /** */ ForeachStatement foreachStatement;
+    /** */ StaticForeachStatement staticForeachStatement;
     /** */ SwitchStatement switchStatement;
     /** */ FinalSwitchStatement finalSwitchStatement;
     /** */ ContinueStatement continueStatement;
