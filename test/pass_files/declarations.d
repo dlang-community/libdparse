@@ -80,3 +80,8 @@ static foreach_reverse (i; '0' .. '5')
 {
     mixin("int _" ~ i ~ ";");
 }
+
+static foreach (enum i, alias T; AliasSeq!(int, bool))
+{
+    T a = i;
+}
