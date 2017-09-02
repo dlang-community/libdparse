@@ -2864,29 +2864,32 @@ class Parser
      * Parses a ForeachType
      *
      * $(GRAMMAR $(RULEDEF foreachType):
-     *       $(LITERAL 'ref')? $(RULE typeConstructors)? $(RULE type)? $(LITERAL Identifier)
-     *     | $(RULE typeConstructors)? $(LITERAL 'ref')? $(RULE type)? $(LITERAL Identifier)
+     *       ($(LITERAL 'ref') | $(LITERAL 'alias') | $(LITERAL 'enum') | $(RULE typeConstructor))* $(RULE type)? $(LITERAL Identifier)
      *     ;)
      */
     ForeachType parseForeachType()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!ForeachType;
-        if (currentIs(tok!"ref"))
+        while (moreTokens())
         {
-            node.isRef = true;
-            advance();
-        }
-        if (currentIsOneOf(tok!"const", tok!"immutable",
-            tok!"inout", tok!"shared") && !peekIs(tok!"("))
-        {
-            trace("\033[01;36mType constructor");
-            mixin(parseNodeQ!(`node.typeConstructors`, `TypeConstructors`));
-        }
-        if (currentIs(tok!"ref"))
-        {
-            node.isRef = true;
-            advance();
+            IdType typeConstructor;
+            if (currentIs(tok!"ref"))
+            {
+                node.isRef = true;
+                advance();
+            }
+            else if (currentIs(tok!"alias"))
+                advance(); // TODO: where should I put this
+            else if (currentIs(tok!"enum"))
+                advance(); // TODO: where should I put this
+            else if (tok!"" != (typeConstructor = parseTypeConstructor(false)))
+            {
+                trace("\033[01;36mType constructor");
+                node.typeConstructors ~= typeConstructor;
+            }
+            else
+                break;
         }
         if (currentIs(tok!"identifier") && peekIsOneOf(tok!",", tok!";"))
         {
