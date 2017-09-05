@@ -60,4 +60,15 @@ deprecated void foo()
 		i++;
 	}
 label:
+
+
+	static foreach (n; ['a', 'b', 'c'])
+	{{
+		mixin(n ~ "++;");
+	}}
+
+	static foreach_reverse (i; 1 .. 10)
+	{
+		assert(i-- > 0);
+	}
 }
