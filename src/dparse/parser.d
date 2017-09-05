@@ -2880,9 +2880,15 @@ class Parser
                 advance();
             }
             else if (currentIs(tok!"alias"))
-                advance(); // TODO: where should I put this
+            {
+                node.isAlias = true;
+                advance();
+            }
             else if (currentIs(tok!"enum"))
-                advance(); // TODO: where should I put this
+            {
+                node.isEnum = true;
+                advance();
+            }
             else if (tok!"" != (typeConstructor = parseTypeConstructor(false)))
             {
                 trace("\033[01;36mType constructor");

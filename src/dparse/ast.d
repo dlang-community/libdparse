@@ -1684,6 +1684,8 @@ public:
     {
         mixin (visitIfNotNull!(type, identifier));
     }
+    /** */ bool isAlias;
+    /** */ bool isEnum;
     /** */ bool isRef;
     /** */ IdType[] typeConstructors;
     /** */ Type type;
