@@ -2129,7 +2129,11 @@ class Parser
         type:
             Type t = parseType();
             if (t is null || !currentIs(tok!"identifier"))
+            {
+                if (t)
+                    error("no identifier for declarator");
                 return null;
+            }
             if (peekIs(tok!"("))
                 mixin (nullCheck!`node.functionDeclaration = parseFunctionDeclaration(t, false)`);
             else
