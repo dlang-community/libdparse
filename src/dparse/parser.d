@@ -4139,21 +4139,41 @@ class Parser
         {
             const b = peekPastBraces();
             if (b !is null && (b.type == tok!"("))
+            {
                 mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+            }
             else
             {
-                assert (currentIs(tok!"{"));
-                auto m = setBookmark();
-                auto initializer = parseStructInitializer();
-                if (initializer !is null)
+                const g = setBookmark();
+                advance();
+                ExpressionNode e;
+                // issue 170: try to find a valid ExpressionStatement / EmptyStatement
+                if (current.type != tok!";" && current.type != tok!"}")
                 {
-                    node.structInitializer = initializer;
-                    abandonBookmark(m);
+                    e = parseAssignExpression();
                 }
+                if ((current.type == tok!";" && e) || (!e && current.type == tok!";"))
+                {
+                    goToBookmark(g);
+                    mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+                }
+                // No ExpressionStatement in the braces : StructInit
                 else
                 {
-                    goToBookmark(m);
-                    mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+                    goToBookmark(g);
+                    assert (currentIs(tok!"{"));
+                    const m = setBookmark();
+                    auto initializer = parseStructInitializer();
+                    if (initializer !is null)
+                    {
+                        node.structInitializer = initializer;
+                        abandonBookmark(m);
+                    }
+                    else
+                    {
+                        goToBookmark(m);
+                        mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+                    }
                 }
             }
         }

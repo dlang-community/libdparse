@@ -3489,3 +3489,38 @@ unittest // issue #156
     }
 }
 
+unittest // issue #170
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+    final class Test170_F : ASTVisitor
+    {
+        static ubyte[] src = cast(ubyte[])q{void function() a = {call();};};
+        bool visited;
+        alias visit = ASTVisitor.visit;
+        override void visit(const FunctionLiteralExpression){visited = true;}
+    }
+
+    final class Test170_S : ASTVisitor
+    {
+        static ubyte[] src = cast(ubyte[])q{A a = {member : call()};};
+        bool visited;
+        alias visit = ASTVisitor.visit;
+        override void visit(const StructInitializer){visited = true;}
+    }
+
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+
+    Module m = parseModule(getTokensForParser(Test170_F.src, cf, &ca), "", &ra);
+    Test170_F t170_f = new Test170_F;
+    t170_f.visit(m);
+    assert(t170_f.visited);
+
+    m = parseModule(getTokensForParser(Test170_S.src, cf, &ca), "", &ra);
+    Test170_S t170_s = new Test170_S;
+    t170_s.visit(m);
+    assert(t170_s.visited);
+}
+
