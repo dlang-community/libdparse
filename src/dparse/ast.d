@@ -1549,6 +1549,7 @@ public:
     /** */ TemplateParameters templateParameters;
     /** */ ExpressionNode assignExpression;
     /** */ Type type;
+    /** */ string comment;
     mixin OpEquals;
 }
 

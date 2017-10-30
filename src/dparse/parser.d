@@ -2604,6 +2604,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!EponymousTemplateDeclaration;
+        node.comment = current.comment;
         advance(); // enum
         const ident = expect(tok!"identifier");
         mixin (nullCheck!`ident`);
