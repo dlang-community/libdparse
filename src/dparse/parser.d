@@ -532,9 +532,20 @@ class Parser
             advance(); // align
             node.hasAlign = true;
             if (currentIsOneOf(tok!"intLiteral", tok!"identifier"))
+            {
                 node.identifierOrIntegerOrOpcode = advance();
+                if (!currentIs(tok!";"))
+                {
+                    error("';' expected.");
+                    advance();
+                    return null;
+                }
+            }
             else
+            {
                 error("Identifier or integer literal expected.");
+                return null;
+            }
         }
         else if (currentIsOneOf(tok!"identifier", tok!"in", tok!"out", tok!"int"))
         {

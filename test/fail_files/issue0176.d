@@ -1,0 +1,1 @@
+void foo(){ asm{ align 8); }}
