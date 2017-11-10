@@ -523,7 +523,6 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         import std.conv : text;
         string[] sortedTokens = array(sort!"a.length > b.length"(tokens));
 
-
         if (tokens.length == 1 && tokens[0].length == 1)
         {
             if (pseudoTokens.countUntil(tokens[0]) >= 0)
@@ -534,8 +533,8 @@ mixin template Lexer(Token, alias defaultTokenFunction,
             else if (staticTokens.countUntil(tokens[0]) >= 0)
             {
                 return indent ~ "range.index++; range.column++;\n"
-                    ~ indent ~ "token= Token(_tok!\"" ~ escape(tokens[0]) ~ "\", null, line, column, index);\n"
-                    ~ indent ~ "return;";
+                    ~ indent ~ "token = Token(_tok!\"" ~ escape(tokens[0]) ~ "\", null, line, column, index);\n"
+                    ~ indent ~ "return;\n";
             }
             else if (pseudoTokens.countUntil(tokens[0]) >= 0)
             {
@@ -561,10 +560,12 @@ mixin template Lexer(Token, alias defaultTokenFunction,
             {
                 if (token.length <= 8)
                 {
-                    code ~= indent ~ "    "
+                    if (token.length == 1)
+                        insertTrailingGoto = false;
+                    code ~= (token.length == 1 ? indent : indent ~ "    ")
                         ~ tokenHandlers[tokenHandlers.countUntil(token) + 1]
                         ~ "(token);\n";
-                    code ~= indent ~ "return;\n";
+                    code ~= (token.length == 1 ? indent : indent ~ "    ") ~ "return;\n";
                 }
                 else
                 {
@@ -572,14 +573,15 @@ mixin template Lexer(Token, alias defaultTokenFunction,
                     code ~= indent ~ "        "
                         ~ tokenHandlers[tokenHandlers.countUntil(token) + 1]
                         ~ "();\n";
-                    code ~= indent ~ "return;\n";
+                    code ~= indent ~ "    return;\n";
                 }
             }
             else if (staticTokens.countUntil(token) >= 0)
             {
                 if (token.length <= 8)
                 {
-                    insertTrailingGoto = false;
+                    if (token.length == 1)
+                        insertTrailingGoto = false;
                     code ~= indent ~ (token.length != 1 ? "    " : "") ~ "range.index += " ~ text(token.length) ~ "; range.column += " ~ text(token.length) ~ ";\n";
                     code ~= indent ~ (token.length != 1 ? "    " : "") ~ "token = Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
                     code ~= indent ~ (token.length != 1 ? "    " : "") ~ "return;\n";
@@ -608,7 +610,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
                     code ~= indent ~ "    if (range.startsWith(cast (ubyte[]) \"" ~ escape(token) ~"\") && isSeparating(" ~ text(token.length) ~ "))\n";
                     code ~= indent ~ "    {\n";
                     code ~= indent ~ "        range.index += " ~ text(token.length) ~ "; range.column += " ~ text(token.length) ~ ";\n";
-                    code ~= indent ~ "        token =  Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
+                    code ~= indent ~ "        token = Token(_tok!\"" ~ escape(token) ~ "\", null, line, column, index);\n";
                     code ~= indent ~ "        return;\n";
                     code ~= indent ~ "    }\n";
                     code ~= indent ~ "    else\n";
