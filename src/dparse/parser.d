@@ -1207,14 +1207,18 @@ class Parser
      * Parses a BodyStatement
      *
      * $(GRAMMAR $(RULEDEF bodyStatement):
-     *     $(LITERAL 'body') $(RULE blockStatement)
+     *     ($(LITERAL 'body') | $(LITERAL 'do')) $(RULE blockStatement)
      *     ;)
      */
     BodyStatement parseBodyStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        mixin (simpleParse!(BodyStatement, tok!"body",
-            "blockStatement|parseBlockStatement"));
+        auto node = allocator.make!BodyStatement;
+        if (!currentIsOneOf(tok!"body", tok!"do"))
+            return null;
+        advance();
+        mixin(simpleParseItem!("blockStatement|parseBlockStatement"));
+        return node;
     }
 
     /**
@@ -2986,7 +2990,7 @@ class Parser
         }
         else if (currentIs(tok!"{"))
             mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
-        else if (currentIsOneOf(tok!"in", tok!"out", tok!"body"))
+        else if (currentIsOneOf(tok!"in", tok!"out", tok!"body", tok!"do"))
         {
             if (currentIs(tok!"in"))
             {
@@ -3002,7 +3006,7 @@ class Parser
             }
             // Allow function bodies without body statements because this is
             // valid inside of interfaces.
-            if (currentIs(tok!"body"))
+            if (currentIsOneOf(tok!"body", tok!"do"))
                 mixin(parseNodeQ!(`node.bodyStatement`, `BodyStatement`));
         }
         else
@@ -3150,7 +3154,7 @@ class Parser
         if (currentIsOneOf(tok!"function", tok!"delegate"))
         {
             node.functionOrDelegate = advance().type;
-            if (!currentIsOneOf(tok!"(", tok!"in", tok!"body",
+            if (!currentIsOneOf(tok!"(", tok!"in", tok!"body", tok!"do",
                     tok!"out", tok!"{", tok!"=>"))
                 mixin(parseNodeQ!(`node.returnType`, `Type`));
         }
@@ -4667,6 +4671,7 @@ class Parser
         case tok!"in":
         case tok!"out":
         case tok!"body":
+        case tok!"do":
             mixin(parseNodeQ!(`node.functionLiteralExpression`, `FunctionLiteralExpression`));
             break;
         case tok!"typeof":
@@ -7602,7 +7607,7 @@ protected:
         mixin(tokenCheck!"(");
         mixin(tokenCheck!")");
         StackBuffer attributes;
-        while (moreTokens() && !currentIsOneOf(tok!"{", tok!"in", tok!"out", tok!"body", tok!";"))
+        while (moreTokens() && !currentIsOneOf(tok!"{", tok!"in", tok!"out", tok!"body", tok!"do", tok!";"))
             if (!attributes.put(parseMemberFunctionAttribute()))
                 return null;
         ownArray(node.memberFunctionAttributes, attributes);
