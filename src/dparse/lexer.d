@@ -1780,13 +1780,20 @@ private pure nothrow @safe:
     bool haveSSE42;
 }
 
+/// copy from phobos b/c we need to build on older versions of dmd
+/// Returns : the next power of two from a given value
+private static size_t nextPow2(size_t value)
+{
+    import core.bitop : bsr;
+    return 1 << bsr(value) + 1;
+}
+
 /**
  * Creates a token range from the given source code. Creates a default lexer
  * configuration and a GC-managed string cache.
  */
 public auto byToken(ubyte[] range)
 {
-    import std.math : nextPow2;
     uint bc = cast(uint)((range.length > 2^^31UL) ? 2^^31
         : nextPow2(1 + range.length / 32));
     LexerConfig config;
