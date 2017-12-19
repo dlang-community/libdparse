@@ -3202,6 +3202,8 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!GotoStatement;
         mixin(tokenCheck!"goto");
+        if (!moreTokens)
+            return null;
         switch (current.type)
         {
         case tok!"identifier":
