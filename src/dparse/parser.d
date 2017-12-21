@@ -536,7 +536,7 @@ class Parser
                 node.identifierOrIntegerOrOpcode = advance();
                 if (!currentIs(tok!";"))
                 {
-                    error("';' expected.");
+                    error("`;` expected.");
                     advance();
                     return null;
                 }
@@ -660,7 +660,7 @@ class Parser
                 mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
             break;
         default:
-            error("Float literal, integer literal, $, or identifier expected.");
+            error("Float literal, integer literal, `$`, or identifier expected.");
             return null;
         }
         return node;
@@ -713,7 +713,7 @@ class Parser
         {
             if (!functionAttributes.put(parseFunctionAttribute()))
             {
-                error("Function attribute or '{' expected");
+                error("Function attribute or `{` expected");
                 return null;
             }
         }
@@ -780,7 +780,7 @@ class Parser
                 node.right = advance();
             return node;
         default:
-            error("Expected an identifier, 'byte', 'short', 'int', 'float', 'double', or 'real'");
+            error("Expected an identifier, `byte`, `short`, `int`, `float`, `double`, or `real`");
             return null;
         }
     }
@@ -977,7 +977,7 @@ class Parser
         mixin (nullCheck!`start`);
         if (!moreTokens)
         {
-            error(`"(", or identifier expected`);
+            error("`(`, or identifier expected");
             return null;
         }
         node.startLocation = start.index;
@@ -1002,7 +1002,7 @@ class Parser
             expect(tok!")");
             break;
         default:
-            error(`"(", or identifier expected`);
+            error("`(`, or identifier expected");
             return null;
         }
         if (moreTokens) node.endLocation = current().index;
@@ -1243,7 +1243,7 @@ class Parser
             advance();
             break;
         default:
-            error("Identifier or semicolon expected following \"break\"");
+            error("Identifier or semicolon expected following `break`");
             return null;
         }
         return node;
@@ -1424,7 +1424,7 @@ class Parser
             node.first = advance();
             break;
         default:
-            error("const, immutable, inout, or shared expected");
+            error("`const`, `immutable`, `inout`, or `shared` expected");
             return null;
         }
         return node;
@@ -1588,7 +1588,7 @@ class Parser
             mixin(parseNodeQ!(`node.staticIfCondition`, `StaticIfCondition`));
             break;
         default:
-            error(`"version", "debug", or "static" expected`);
+            error("`version`, `debug`, or `static` expected");
             return null;
         }
         return node;
@@ -1776,7 +1776,7 @@ class Parser
             advance();
             break;
         default:
-            error(`Identifier or semicolon expected following "continue"`);
+            error("Identifier or semicolon expected following `continue`");
             return null;
         }
         return node;
@@ -1966,7 +1966,7 @@ class Parser
         case tok!"{":
             if (node.attributes.empty)
             {
-                error("declaration expected instead of '{'");
+                error("declaration expected instead of `{`");
                 return null;
             }
             advance();
@@ -2161,7 +2161,7 @@ class Parser
                 mixin(parseNodeQ!(`node.versionSpecification`, `VersionSpecification`));
             else
             {
-                error(`"=" or "(" expected following "version"`);
+                error("`=` or `(` expected following `version`");
                 return null;
             }
             break;
@@ -2367,7 +2367,7 @@ class Parser
         mixin(tokenCheck!"~");
         if (!moreTokens)
         {
-            error("'this' expected");
+            error("`this` expected");
             return null;
         }
         node.index = current.index;
@@ -2453,7 +2453,7 @@ class Parser
                 }
                 else
                 {
-                    error("',' or '}' expected");
+                    error("`,` or `}` expected");
                     if (currentIs(tok!"}"))
                         break;
                 }
@@ -2816,7 +2816,7 @@ class Parser
             node.type = advance().type;
         else
         {
-            error(`"foreach" or "foreach_reverse" expected`);
+            error("`foreach` or `foreach_reverse` expected");
             return null;
         }
         node.startIndex = current().index;
@@ -2965,7 +2965,7 @@ class Parser
             break;
         default:
             if (validate)
-                error(`@attribute, "pure", or "nothrow" expected`);
+                error("`@`attribute, `pure`, or `nothrow` expected");
             return null;
         }
         return node;
@@ -3011,7 +3011,7 @@ class Parser
         }
         else
         {
-            error("'in', 'out', 'body', or block statement expected");
+            error("`in`, `out`, `body`, or block statement expected");
             return null;
         }
         return node;
@@ -3105,7 +3105,7 @@ class Parser
         mixin(tokenCheck!(`node.name`, "identifier"));
         if (!currentIs(tok!"("))
         {
-            error("'(' expected");
+            error("`(` expected");
             return null;
         }
         const p = peekPastParens();
@@ -3216,7 +3216,7 @@ class Parser
                 mixin(parseNodeQ!(`node.expression`, `Expression`));
             break;
         default:
-            error(`Identifier, "default", or "case" expected`);
+            error("Identifier, `default`, or `case` expected");
             return null;
         }
         mixin(tokenCheck!";");
@@ -3931,7 +3931,7 @@ class Parser
             mixin(parseNodeQ!(`node.mixinExpression`, `MixinExpression`));
         else
         {
-            error(`"(" or identifier expected`);
+            error("`(` or identifier expected");
             return null;
         }
         expect(tok!";");
@@ -5063,7 +5063,7 @@ class Parser
             }
             else
             {
-                error(`"switch" expected`);
+                error("`switch` expected");
                 return null;
             }
         case tok!"debug":
@@ -5087,7 +5087,7 @@ class Parser
                 mixin(parseNodeQ!(`node.staticForeachStatement`, `StaticForeachStatement`));
             else
             {
-                error("'if' or 'assert' or 'foreach' or 'foreach_reverse' expected.");
+                error("`if`, `assert`, `foreach` or `foreach_reverse` expected.");
                 return null;
             }
             break;
@@ -6121,7 +6121,7 @@ class Parser
             goto default;
         default:
             if (validate)
-                error(`"const", "immutable", "inout", or "shared" expected`);
+                error("`const`, `immutable`, `inout`, or `shared` expected");
             return tok!"";
         }
     }
@@ -6264,7 +6264,7 @@ class Parser
             ownArray(node.memberFunctionAttributes, memberFunctionAttributes);
             return node;
         default:
-            error(`"*", "[", "delegate", or "function" expected.`);
+            error("`*`, `[`, `delegate`, or `function` expected.");
             return null;
         }
     }
@@ -6639,7 +6639,7 @@ class Parser
 			node.token = advance();
 		else
 		{
-			error(`Expected an integer literal, an identifier, "assert", or "unittest"`);
+			error("Expected an integer literal, an identifier, `assert`, or `unittest`");
 			return null;
 		}
 		expect(tok!")");
@@ -7387,7 +7387,7 @@ protected:
             auto token = (index < tokens.length
                 ? (tokens[index].text is null ? str(tokens[index].type) : tokens[index].text)
                 : "EOF");
-            error("Expected " ~  tokenString ~ " instead of " ~ token,
+            error("Expected `" ~  tokenString ~ "` instead of `" ~ token ~ "`",
                 !shouldNotAdvance);
             return null;
         }
@@ -7646,7 +7646,7 @@ protected:
                     goto emptyBody;
                 else
                 {
-                    error("Struct body or ';' expected");
+                    error("Struct body or `;` expected");
                     return null;
                 }
             }
