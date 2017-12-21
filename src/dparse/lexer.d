@@ -1317,7 +1317,7 @@ private pure nothrow @safe:
                     }
                     else
                     {
-                        error("Error: \" expected to end delimited string literal");
+                        error("Error: `\"` expected to end delimited string literal");
                         token = Token(tok!"");
                         return;
                     }
@@ -1365,7 +1365,7 @@ private pure nothrow @safe:
             range.popFront();
         }
         else
-            error(`" expected`);
+            error("`\"` expected");
         IdType type = tok!"stringLiteral";
         lexStringSuffix(type);
         token = Token(type, cache.intern(range.slice(mark)), line, column, index);
@@ -1616,7 +1616,7 @@ private pure nothrow @safe:
         else
         {
     err:
-            error("Error: Expected ' to end character literal");
+            error("Error: Expected `'` to end character literal");
             token = Token(tok!"");
         }
     }
