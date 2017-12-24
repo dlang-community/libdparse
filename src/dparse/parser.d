@@ -753,36 +753,21 @@ class Parser
     AsmTypePrefix parseAsmTypePrefix()
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
-        switch (current().type)
+        assert(currentIsOneOf(tok!"identifier", tok!"byte", tok!"short",
+            tok!"int", tok!"float", tok!"double", tok!"real"));
+
+        AsmTypePrefix node = allocator.make!AsmTypePrefix();
+        node.left = advance();
+
+        version(assert) if (node.left.type == tok!"identifier")
         {
-        case tok!"identifier":
-        case tok!"byte":
-        case tok!"short":
-        case tok!"int":
-        case tok!"float":
-        case tok!"double":
-        case tok!"real":
-            AsmTypePrefix node = allocator.make!AsmTypePrefix();
-            node.left = advance();
-            if (node.left.type == tok!"identifier") switch (node.left.text)
-            {
-            case "near":
-            case "far":
-            case "word":
-            case "dword":
-            case "qword":
-                break;
-            default:
-                error("ASM type node expected");
-                return null;
-            }
-            if (currentIs(tok!"identifier") && current().text == "ptr")
-                node.right = advance();
-            return node;
-        default:
-            error("Expected an identifier, `byte`, `short`, `int`, `float`, `double`, or `real`");
-            return null;
+            import std.algorithm: among;
+            assert(node.left.text.among("near", "far", "word", "dword", "qword"));
         }
+
+        if (currentIs(tok!"identifier") && current().text == "ptr")
+            node.right = advance();
+        return node;
     }
 
     /**
@@ -1213,9 +1198,8 @@ class Parser
     BodyStatement parseBodyStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        assert(currentIsOneOf(tok!"body", tok!"do"));
         auto node = allocator.make!BodyStatement;
-        if (!currentIsOneOf(tok!"body", tok!"do"))
-            return null;
         advance();
         mixin(simpleParseItem!("blockStatement|parseBlockStatement"));
         return node;
@@ -1323,7 +1307,7 @@ class Parser
      * Parses a CaseRangeStatement
      *
      * $(GRAMMAR $(RULEDEF caseRangeStatement):
-     *     $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(LITERAL '...') $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(RULE declarationsAndStatements)
+     *     $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(LITERAL '..') $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(RULE declarationsAndStatements)
      *     ;)
      */
     CaseRangeStatement parseCaseRangeStatement(ExpressionNode low)
@@ -1406,8 +1390,9 @@ class Parser
     CastQualifier parseCastQualifier()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        assert(isCastQualifier());
         auto node = allocator.make!CastQualifier;
-        switch (current.type)
+        final switch (current.type)
         {
         case tok!"inout":
         case tok!"const":
@@ -1423,9 +1408,6 @@ class Parser
         case tok!"immutable":
             node.first = advance();
             break;
-        default:
-            error("`const`, `immutable`, `inout`, or `shared` expected");
-            return null;
         }
         return node;
     }
