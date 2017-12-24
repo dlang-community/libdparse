@@ -3105,10 +3105,7 @@ class Parser
         if (isTemplate && currentIs(tok!"if"))
             mixin(parseNodeQ!(`node.constraint`, `Constraint`));
 
-        if (currentIs(tok!";"))
-            advance();
-        else
-            mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
+        mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
         ownArray(node.memberFunctionAttributes, memberFunctionAttributes);
         return node;
     }
@@ -3410,11 +3407,7 @@ class Parser
         }
 
         mixin(tokenCheck!")");
-        if (currentIs(tok!"}"))
-        {
-            error("Statement expected", false);
-            return node; // this line makes DCD better
-        }
+
         mixin(parseNodeQ!(`node.thenStatement`, `DeclarationOrStatement`));
         if (currentIs(tok!"else"))
         {
