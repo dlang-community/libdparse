@@ -4,4 +4,5 @@
 	"targetType": "library",
 	"description": "Library for lexing and parsing D source code",
 	"license": "BSL-1.0",
+	"buildRequirements": ["disallowDeprecations"],
 }
