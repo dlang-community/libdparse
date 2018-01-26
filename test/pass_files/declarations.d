@@ -1,6 +1,7 @@
 deprecated("this code is older than the dinosaurs") module declarations;
 int a;
 int[] a;
+int a[];
 int[string] a;
 int a, b;
 int a = .b.c;
