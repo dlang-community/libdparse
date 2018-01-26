@@ -324,7 +324,7 @@ public:
     /** */ void visit(const TraitsExpression traitsExpression) { traitsExpression.accept(this); }
     /** */ void visit(const TryStatement tryStatement) { tryStatement.accept(this); }
     /** */ void visit(const Type type) { type.accept(this); }
-    /** */ void visit(const TypeIdentifierChain typeIdentChain) { typeIdentChain.accept(this); }
+    /** */ void visit(const TypeIdentifierPart typeIdentChain) { typeIdentChain.accept(this); }
     /** */ void visit(const Type2 type2) { type2.accept(this); }
     /** */ void visit(const TypeSpecialization typeSpecialization) { typeSpecialization.accept(this); }
     /** */ void visit(const TypeSuffix typeSuffix) { typeSuffix.accept(this); }
@@ -1837,17 +1837,17 @@ public:
 }
 
 ///
-final class TypeIdentifierChain : ASTNode
+final class TypeIdentifierPart : ASTNode
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifierOrTemplateInstance, typeIdentifierChain,
+        mixin (visitIfNotNull!(identifierOrTemplateInstance, typeIdentifierPart,
             indexer));
     }
     /** */ bool dot;
     /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
-    /** */ TypeIdentifierChain typeIdentifierChain ;
+    /** */ TypeIdentifierPart typeIdentifierPart ;
     /** */ ExpressionNode indexer;
     mixin OpEquals;
 }
@@ -2149,11 +2149,11 @@ final class LinkageAttribute : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, typeIdentifierChain));
+        mixin (visitIfNotNull!(identifier, typeIdentifierPart));
     }
     /** */ Token identifier;
     /** */ bool hasPlusPlus;
-    /** */ TypeIdentifierChain typeIdentifierChain;
+    /** */ TypeIdentifierPart typeIdentifierPart;
     /** */ IdType classOrStruct;
     mixin OpEquals;
 }
@@ -3184,13 +3184,13 @@ final class Type2 : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(typeofExpression, typeIdentifierChain, type, vector));
+        mixin (visitIfNotNull!(typeofExpression, typeIdentifierPart, type, vector));
     }
 
     /** */ IdType builtinType;
     /** */ alias superOrThis = builtinType;
     /** */ TypeofExpression typeofExpression;
-    /** */ TypeIdentifierChain typeIdentifierChain;
+    /** */ TypeIdentifierPart typeIdentifierPart;
     /** */ IdType typeConstructor;
     /** */ Type type;
     /** */ Vector vector;

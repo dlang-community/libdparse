@@ -1573,28 +1573,28 @@ class Formatter(Sink)
         }
     }
 
-    void format(const TypeIdentifierChain typeIdentifierChain)
+    void format(const TypeIdentifierPart typeIdentifierPart)
     {
-        debug(verbose) writeln("TypeIdentifierChain");
+        debug(verbose) writeln("TypeIdentifierPart");
 
-        if (typeIdentifierChain.dot)
+        if (typeIdentifierPart.dot)
         {
             put(".");
         }
-        if (typeIdentifierChain.identifierOrTemplateInstance)
+        if (typeIdentifierPart.identifierOrTemplateInstance)
         {
-            format(typeIdentifierChain.identifierOrTemplateInstance);
+            format(typeIdentifierPart.identifierOrTemplateInstance);
         }
-        if (typeIdentifierChain.indexer)
+        if (typeIdentifierPart.indexer)
         {
             put("[");
-            format(typeIdentifierChain.indexer);
+            format(typeIdentifierPart.indexer);
             put("]");
         }
-        if (typeIdentifierChain.typeIdentifierChain)
+        if (typeIdentifierPart.typeIdentifierPart)
         {
             put(".");
-            format(typeIdentifierChain.typeIdentifierChain);
+            format(typeIdentifierPart.typeIdentifierPart);
         }
     }
 
@@ -2007,10 +2007,10 @@ class Formatter(Sink)
         if (linkageAttribute.hasPlusPlus)
         {
             put("++");
-            if (linkageAttribute.typeIdentifierChain)
+            if (linkageAttribute.typeIdentifierPart)
             {
                 put(", ");
-                format(linkageAttribute.typeIdentifierChain);
+                format(linkageAttribute.typeIdentifierPart);
             }
             else if (linkageAttribute.classOrStruct == tok!"class")
                 put(", class");
@@ -3230,17 +3230,17 @@ class Formatter(Sink)
         Type type;
         **/
 
-        if (type2.typeIdentifierChain !is null)
+        if (type2.typeIdentifierPart !is null)
         {
-            format(type2.typeIdentifierChain);
+            format(type2.typeIdentifierPart);
         }
         else if (type2.typeofExpression !is null)
         {
             format(type2.typeofExpression);
-            if (type2.typeIdentifierChain)
+            if (type2.typeIdentifierPart)
             {
                 put(".");
-                format(type2.typeIdentifierChain);
+                format(type2.typeIdentifierPart);
             }
             return;
         }
@@ -3254,10 +3254,10 @@ class Formatter(Sink)
         else
         {
             put(tokenRep(type2.builtinType));
-            if (type2.typeIdentifierChain)
+            if (type2.typeIdentifierPart)
             {
                 put(".");
-                format(type2.typeIdentifierChain);
+                format(type2.typeIdentifierPart);
             }
         }
     }
