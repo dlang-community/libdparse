@@ -3931,6 +3931,15 @@ void testFormatNode(Node)(string sourceCode)
 
 unittest
 {
+    testFormatNode!(VariableDeclaration)("T.T y;");
+    testFormatNode!(VariableDeclaration)("T[] y;");
+    testFormatNode!(VariableDeclaration)("T* y;");
     testFormatNode!(VariableDeclaration)("T[0].Y y;");
-    testFormatNode!(VariableDeclaration)(`.T!"oof" toof;`);
+    testFormatNode!(VariableDeclaration)("T.T[] y;");
+    testFormatNode!(VariableDeclaration)("T.T[8] y;");
+    testFormatNode!(VariableDeclaration)("T.T[8].T y;");
+    testFormatNode!(VariableDeclaration)(`.T!"af" taf;`);
+    testFormatNode!(VariableDeclaration)(`.T!0[] t;`);
+    testFormatNode!(VariableDeclaration)(`T!(0)[] t;`);
+    testFormatNode!(VariableDeclaration)(`T!(0)[dim] t;`);
 }

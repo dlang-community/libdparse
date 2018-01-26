@@ -3308,6 +3308,7 @@ class Parser
             expect(tok!"]");
             if (!currentIs(tok!"."))
             {
+                node.indexer = null;
                 goToBookmark(b);
             }
             else
