@@ -3299,16 +3299,22 @@ class Parser
         mixin(parseNodeQ!(`node.identifierOrTemplateInstance`, `IdentifierOrTemplateInstance`));
         if (currentIs(tok!"["))
         {
+            size_t c;
             const b = setBookmark();
             advance();
             if (!currentIs(tok!"]"))
             {
+                c = allocator.setCheckpoint;
                 mixin(parseNodeQ!(`node.indexer`, `AssignExpression`));
             }
             expect(tok!"]");
             if (!currentIs(tok!"."))
             {
-                node.indexer = null;
+                if (node.indexer !is null)
+                {
+                    allocator.rollback(c);
+                    node.indexer = null;
+                }
                 goToBookmark(b);
             }
             else
