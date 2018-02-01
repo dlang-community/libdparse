@@ -3569,7 +3569,7 @@ unittest // issue #193
                     .identifier.text == "Type1");
                 assert(type.typeSuffixes.length == 1);
             }
-            else if (tc == 3) // immutable
+            else if (tc == 3) // immutable(
             {
                 assert(type.type2.typeConstructor == tok!"immutable");
                 assert(type.type2.typeIdentifierPart is null);
