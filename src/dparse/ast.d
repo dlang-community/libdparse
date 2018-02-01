@@ -3540,3 +3540,57 @@ unittest // issue #170
     assert(t170_s.visited);
 }
 
+unittest // issue #193
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+    final class Test193 : ASTVisitor
+    {
+        static ubyte[] src = cast(ubyte[])q{const(Type1[immutable(Type2)]) qualAarray;};
+        size_t tc;
+        alias visit = ASTVisitor.visit;
+        override void visit(const TypeIdentifierPart tip)
+        {
+            tip.accept(this);
+            assert(tip.indexer is null);
+        }
+        override void visit(const Type type)
+        {
+            tc++;
+            if (tc == 1) //const(
+            {
+                assert(type.type2.typeConstructor == tok!"const");
+                assert(type.type2.typeIdentifierPart is null);
+            }
+            else if (tc == 2) //const(Type1
+            {
+                assert(type.typeConstructors.length == 0);
+                assert(type.type2.typeIdentifierPart.identifierOrTemplateInstance
+                    .identifier.text == "Type1");
+                assert(type.typeSuffixes.length == 1);
+            }
+            else if (tc == 3) // immutable
+            {
+                assert(type.type2.typeConstructor == tok!"immutable");
+                assert(type.type2.typeIdentifierPart is null);
+            }
+            else if (tc == 4) // immutable(Type2
+            {
+                assert(type.typeConstructors.length == 0);
+                assert(type.type2.typeIdentifierPart.identifierOrTemplateInstance
+                    .identifier.text == "Type2");
+                assert(type.typeSuffixes.length == 0);
+            }
+            type.accept(this);
+        }
+    }
+
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+
+    Module m = parseModule(getTokensForParser(Test193.src, cf, &ca), "", &ra);
+    Test193 t193 = new Test193;
+    t193.visit(m);
+}
+

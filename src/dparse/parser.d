@@ -3304,8 +3304,13 @@ class Parser
             advance();
             if (!currentIs(tok!"]"))
             {
+                node.indexer = parseAssignExpression();
+                if (node.indexer is null)
+                {
+                    goToBookmark(b);
+                    return node;
+                }
                 c = allocator.setCheckpoint;
-                mixin(parseNodeQ!(`node.indexer`, `AssignExpression`));
             }
             expect(tok!"]");
             if (!currentIs(tok!"."))
