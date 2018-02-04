@@ -3,7 +3,10 @@ libdparse
 Library for lexing and parsing D source code.
 
 # Documentation
-Online documentation is available [here](https://dlang-community.github.io/libdparse)
+
+Online documentation is available [here](http://libdparse.dlang.io).
+
+A HTML version of libdparse's grammar is also [automatically generated](http://libdparse.dlang.io/libdparse/grammar.html).
 
 # Testing
 [![CI Status](https://travis-ci.org/dlang-community/libdparse.svg)](https://travis-ci.org/dlang-community/libdparse)
