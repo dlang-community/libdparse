@@ -1,30 +1,26 @@
+sudo: false
 language: d
 d:
-  #- dmd-nightly
-  #- dmd-beta
   - dmd
   - dmd-2.071.0
-  - ldc-beta
   - ldc
 matrix:
   include:
     d: dmd-2.078.1
     env: [DEPLOY=1]
-sudo: false
-# ddox dependencies (can be removed after 0.8.3 has been released)
-addons:
-  apt:
-    packages:
-      - libevent-dev
-      # needed for xmllint
-      - libxml2-utils
+    # ddox dependencies (can be removed after 0.8.3 has been released)
+    addons:
+      apt:
+        packages:
+          - libevent-dev
 script:
   - cd test && ./run_tests.sh && cd ..
   - find test/coverage -type f -exec mv {} . \;
   # build docs and grammar
-  - dub build -b ddox
-  - ./DGrammar/generate_html_from_libdparse.sh
-  - cp ./DGrammar/grammar.html docs/grammar.html
+  - if [ "$DEPLOY" -eq 1 ] ; then dub build -b ddox ; fi
+  - if [ "$DEPLOY" -eq 1 ] ; then ./DGrammar/generate_html_from_libdparse.sh ; fi
+  - if [ "$DEPLOY" -eq 1 ] ; then cp ./DGrammar/grammar.html docs/grammar.html ; fi
+  - if [ "$DEPLOY" -eq 1 ] ; then echo "libdparse.dlang.io" > docs/CNAME ; fi
 # Deploy using travis builtin GitHub Pages support
 deploy:
   provider: pages
@@ -32,7 +28,7 @@ deploy:
   local_dir: docs
   github_token: $GH_REPO_TOKEN
   on:
-    #branch: master
+    branch: master
     condition: "$DEPLOY = 1"
 after_success:
  - bash <(curl -s https://codecov.io/bash)
