@@ -1,7 +1,7 @@
 language: d
 d:
-  - dmd-nightly
-  - dmd-beta
+  #- dmd-nightly
+  #- dmd-beta
   - dmd
   - dmd-2.071.0
   - ldc-beta
