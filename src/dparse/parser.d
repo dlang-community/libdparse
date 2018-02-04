@@ -1840,7 +1840,9 @@ class Parser
     /**
      * Parses a Declaration
      *
-     * Params: strict = if true, do not return partial AST nodes on errors.
+     * Params:
+     *   strict = if true, do not return partial AST nodes on errors.
+     *   mustBeDeclaration = do not parse as a declaration if it could be parsed as a function call
      *
      * $(GRAMMAR $(RULEDEF declaration):
      *       $(RULE attribute)* $(RULE declaration2)
@@ -4613,6 +4615,7 @@ class Parser
      *        $(RULE pragmaExpression) $(RULE statement)
      *      | $(RULE pragmaExpression) $(RULE blockStatement)
      *      | $(RULE pragmaExpression) $(LITERAL ';')
+     *     ;)
      */
     PragmaStatement parsePragmaStatement()
     {

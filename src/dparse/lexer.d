@@ -495,6 +495,7 @@ public struct DLexer
      *     config = the lexer configuration to use.
      *     cache = the string interning cache for de-duplicating identifiers and
      *         other token text.
+     *     haveSSE42 = Parse streaming SIMD Extensions 4.2 in inline assembly
      */
     this(ubyte[] range, const LexerConfig config, StringCache* cache,
         bool haveSSE42 = sse42()) pure nothrow @safe

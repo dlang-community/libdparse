@@ -1,14 +1,33 @@
 language: d
 d:
-  - dmd-nightly
-  - dmd-beta
+  #- dmd-nightly
+  #- dmd-beta
   - dmd
   - dmd-2.071.0
   - ldc-beta
   - ldc
 sudo: false
+# ddox dependencies (can be removed after 0.8.3 has been released)
+addons:
+  apt:
+    packages:
+      - libevent-dev
+      # needed for xmllint
+      - libxml2-utils
 script:
   - cd test && ./run_tests.sh && cd ..
   - find test/coverage -type f -exec mv {} . \;
+  # build docs and grammar
+  - dub build -b ddox
+  - ./DGrammar/generate_html_from_libdparse.sh
+  - cp ./DGrammar/grammar.html docs/grammar.html
+# Deploy using travis builtin GitHub Pages support
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: $TRAVIS_BUILD_DIR/docs
+  github_token: $GH_REPO_TOKEN
+  on:
+    branch: master
 after_success:
  - bash <(curl -s https://codecov.io/bash)
