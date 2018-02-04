@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <title>D Grammar</title>
+    <style type="text/css">
+		body {background-color: #fdf6e3; color: #586e75; }
+		.ruleDef { font-weight: bold; }
+		.ruleRef { font-weight: bold; }
+		.literal { font-weight: normal; font-style: italic; color: #cb4b16; }
+		a {color: #586e75; }
+		</style>
+  </head>
+  <body>
