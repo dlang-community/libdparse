@@ -25,6 +25,7 @@ script:
   - dub build -b ddox
   - ./DGrammar/generate_html_from_libdparse.sh
   - cp ./DGrammar/grammar.html docs/grammar.html
+  - echo "libdparse.dlang.io" > docs/CNAME
 # Deploy using travis builtin GitHub Pages support
 deploy:
   provider: pages
