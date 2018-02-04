@@ -6,6 +6,10 @@ d:
   - dmd-2.071.0
   - ldc-beta
   - ldc
+matrix:
+  include:
+    d: dmd-2.078.1
+    env: [DEPLOY=1]
 sudo: false
 # ddox dependencies (can be removed after 0.8.3 has been released)
 addons:
@@ -29,6 +33,6 @@ deploy:
   github_token: $GH_REPO_TOKEN
   on:
     branch: master
-    d: dmd
+    condition: "$DEPLOY = 1"
 after_success:
  - bash <(curl -s https://codecov.io/bash)
