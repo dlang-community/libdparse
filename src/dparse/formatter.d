@@ -69,7 +69,7 @@ class Formatter(Sink)
      *     sink = the output range that the formatted source code is placed in
      *     useTabs = if true, tabs are used for indent levels instead of spaces
      *     style = the brace style
-     *     indenteWidth = the number of spaces used for indentation if useTabs is false
+     *     indentWidth = the number of spaces used for indentation if useTabs is false
      */
     this(Sink sink, bool useTabs = false, IndentStyle style = IndentStyle.allman, uint indentWidth = 4)
     {
