@@ -212,7 +212,7 @@ class Parser
      * Parses an AlignAttribute.
      *
      * $(GRAMMAR $(RULEDEF alignAttribute):
-     *     $(LITERAL 'align') ($(LITERAL '$(LPAREN)') $(RULE AssignExpression) $(LITERAL '$(RPAREN)'))?
+     *     $(LITERAL 'align') ($(LITERAL '$(LPAREN)') $(RULE assignExpression) $(LITERAL '$(RPAREN)'))?
      *     ;)
      */
     AlignAttribute parseAlignAttribute()
@@ -966,7 +966,7 @@ class Parser
      *       $(LITERAL '@') $(LITERAL Identifier)
      *     | $(LITERAL '@') $(LITERAL Identifier) $(LITERAL '$(LPAREN)') $(RULE argumentList)? $(LITERAL '$(RPAREN)')
      *     | $(LITERAL '@') $(LITERAL '$(LPAREN)') $(RULE argumentList) $(LITERAL '$(RPAREN)')
-     *     | $(LITERAL '@') $(RULE TemplateInstance)
+     *     | $(LITERAL '@') $(RULE templateInstance)
      *     ;)
      */
     AtAttribute parseAtAttribute()
@@ -4921,7 +4921,7 @@ class Parser
      * Parses a SharedStaticConstructor
      *
      * $(GRAMMAR $(RULEDEF sharedStaticConstructor):
-     *     $(LITERAL 'shared') $(LITERAL 'static') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE MemberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ";"))
+     *     $(LITERAL 'shared') $(LITERAL 'static') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE memberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ";"))
      *     ;)
      */
     SharedStaticConstructor parseSharedStaticConstructor()
@@ -4938,7 +4938,7 @@ class Parser
      * Parses a SharedStaticDestructor
      *
      * $(GRAMMAR $(RULEDEF sharedStaticDestructor):
-     *     $(LITERAL 'shared') $(LITERAL 'static') $(LITERAL '~') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE MemberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ";"))
+     *     $(LITERAL 'shared') $(LITERAL 'static') $(LITERAL '~') $(LITERAL 'this') $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)') $(RULE memberFunctionAttribute)* ($(RULE functionBody) | $(LITERAL ";"))
      *     ;)
      */
     SharedStaticDestructor parseSharedStaticDestructor()
@@ -6000,7 +6000,7 @@ class Parser
      * Parses an TraitsExpression
      *
      * $(GRAMMAR $(RULEDEF traitsExpression):
-     *     $(LITERAL '___traits') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL ',') $(RULE TemplateArgumentList) $(LITERAL '$(RPAREN)')
+     *     $(LITERAL '___traits') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL ',') $(RULE templateArgumentList) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     TraitsExpression parseTraitsExpression()
