@@ -1232,6 +1232,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         expect(tok!"break");
+        if (!moreTokens)
+            return null;
         auto node = allocator.make!BreakStatement;
         switch (current.type)
         {
@@ -1764,8 +1766,10 @@ class Parser
     ContinueStatement parseContinueStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!ContinueStatement;
         mixin(tokenCheck!"continue");
+        if (!moreTokens)
+            return null;
+        auto node = allocator.make!ContinueStatement;
         switch (current.type)
         {
         case tok!"identifier":
@@ -2430,8 +2434,10 @@ class Parser
     DoStatement parseDoStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!DoStatement;
         mixin(tokenCheck!"do");
+        if (!moreTokens)
+            return null;
+        auto node = allocator.make!DoStatement;
         mixin(parseNodeQ!(`node.statementNoCaseNoDefault`, `StatementNoCaseNoDefault`));
         mixin(tokenCheck!"while");
         mixin(tokenCheck!"(");
@@ -2760,7 +2766,8 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!ForStatement;
         mixin(tokenCheck!"for");
-        if (!moreTokens) node.startIndex = current().index;
+        if (moreTokens)
+            node.startIndex = current().index;
         mixin(tokenCheck!"(");
 
         if (currentIs(tok!";"))
@@ -2849,7 +2856,8 @@ class Parser
             error("`foreach` or `foreach_reverse` expected");
             return null;
         }
-        node.startIndex = current().index;
+        if (moreTokens)
+            node.startIndex = current().index;
         mixin(tokenCheck!"(");
         ForeachTypeList feType = parseForeachTypeList();
         mixin (nullCheck!`feType`);
@@ -3436,7 +3444,8 @@ class Parser
         node.line = current().line;
         node.column = current().column;
         mixin(tokenCheck!"if");
-        node.startIndex = current().index;
+        if (moreTokens)
+            node.startIndex = current().index;
         mixin(tokenCheck!"(");
 
         if (currentIs(tok!"auto"))
@@ -5054,7 +5063,7 @@ class Parser
      */
     StatementNoCaseNoDefault parseStatementNoCaseNoDefault()
     {
-    mixin(traceEnterAndExit!(__FUNCTION__));
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!StatementNoCaseNoDefault;
         node.startLocation = current().index;
         switch (current.type)
@@ -5505,8 +5514,10 @@ class Parser
     SynchronizedStatement parseSynchronizedStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!SynchronizedStatement;
         expect(tok!"synchronized");
+        if (!moreTokens)
+            return null;
+        auto node = allocator.make!SynchronizedStatement;
         if (currentIs(tok!"("))
         {
             expect(tok!"(");
@@ -6740,7 +6751,8 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!WhileStatement;
 		mixin(tokenCheck!"while");
-        node.startIndex = current().index;
+        if (moreTokens)
+            node.startIndex = current().index;
 		mixin(tokenCheck!"(");
         mixin(parseNodeQ!(`node.expression`, `Expression`));
         mixin(tokenCheck!")");
