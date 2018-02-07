@@ -20,3 +20,50 @@ script. Running the tests on Windows is not currently supported.
 # Unsupported Syntax
 * [Class allocators](http://dlang.org/class.html#allocators). These are deprecated in D2.
 * [Class deallocators](http://dlang.org/class.html#deallocators). These are deprecated in D2.
+
+# Example
+
+```d
+/+dub.sdl:
+dependency "libdparse" version="~>0.7"
++/
+import dparse.ast;
+import std.stdio, std.range;
+
+class TestVisitor : ASTVisitor
+{
+    alias visit = ASTVisitor.visit;
+    int indentLevel;
+
+    override void visit(const FunctionDeclaration decl)
+    {
+        writeln(' '.repeat(indentLevel * 4), decl.name.text);
+        indentLevel++;
+        scope (exit) indentLevel--;
+        decl.accept(this);
+    }
+}
+
+void main()
+{
+    import dparse.lexer;
+    import dparse.parser : parseModule;
+    import dparse.rollback_allocator : RollbackAllocator;
+    import std.string : representation;
+
+    auto sourceCode = q{
+        void foo() @safe {
+            void bar();
+        }
+    }.dup;
+    LexerConfig config;
+    auto cache = StringCache(StringCache.defaultBucketCount);
+    auto tokens = getTokensForParser(sourceCode.representation, config, &cache);
+
+    RollbackAllocator rba;
+    auto m = parseModule(tokens, "test.d", &rba);
+    auto visitor = new TestVisitor();
+    visitor.visit(m);
+}
+```
+[![Open on run.dlang.io](https://img.shields.io/badge/run.dlang.io-open-blue.svg)](https://run.dlang.io/is/qZsGDD)
