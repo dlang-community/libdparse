@@ -1013,7 +1013,7 @@ class Parser
      * Parses an Attribute
      *
      * $(GRAMMAR $(RULEDEF attribute):
-     *     | $(RULE pragmaExpression)
+     *       $(RULE pragmaExpression)
      *     | $(RULE alignAttribute)
      *     | $(RULE deprecated)
      *     | $(RULE atAttribute)
@@ -1107,7 +1107,7 @@ class Parser
      * Parses an AttributeDeclaration
      *
      * $(GRAMMAR $(RULEDEF attributeDeclaration):
-     *     $(RULE attribute) $(LITERAL ':')
+     *     $(RULE _attribute) $(LITERAL ':')
      *     ;)
      */
     AttributeDeclaration parseAttributeDeclaration(Attribute attribute = null)
@@ -1291,29 +1291,29 @@ class Parser
      * Parses an BuiltinType
      *
      * $(GRAMMAR $(RULEDEF builtinType):
-     *      $(LITERAL 'bool')
-     *    | $(LITERAL 'byte')
-     *    | $(LITERAL 'ubyte')
-     *    | $(LITERAL 'short')
-     *    | $(LITERAL 'ushort')
-     *    | $(LITERAL 'int')
-     *    | $(LITERAL 'uint')
-     *    | $(LITERAL 'long')
-     *    | $(LITERAL 'ulong')
-     *    | $(LITERAL 'char')
-     *    | $(LITERAL 'wchar')
-     *    | $(LITERAL 'dchar')
-     *    | $(LITERAL 'float')
-     *    | $(LITERAL 'double')
-     *    | $(LITERAL 'real')
-     *    | $(LITERAL 'ifloat')
-     *    | $(LITERAL 'idouble')
-     *    | $(LITERAL 'ireal')
-     *    | $(LITERAL 'cfloat')
-     *    | $(LITERAL 'cdouble')
-     *    | $(LITERAL 'creal')
-     *    | $(LITERAL 'void')
-     *    ;)
+     *       $(LITERAL 'bool')
+     *     | $(LITERAL 'byte')
+     *     | $(LITERAL 'ubyte')
+     *     | $(LITERAL 'short')
+     *     | $(LITERAL 'ushort')
+     *     | $(LITERAL 'int')
+     *     | $(LITERAL 'uint')
+     *     | $(LITERAL 'long')
+     *     | $(LITERAL 'ulong')
+     *     | $(LITERAL 'char')
+     *     | $(LITERAL 'wchar')
+     *     | $(LITERAL 'dchar')
+     *     | $(LITERAL 'float')
+     *     | $(LITERAL 'double')
+     *     | $(LITERAL 'real')
+     *     | $(LITERAL 'ifloat')
+     *     | $(LITERAL 'idouble')
+     *     | $(LITERAL 'ireal')
+     *     | $(LITERAL 'cfloat')
+     *     | $(LITERAL 'cdouble')
+     *     | $(LITERAL 'creal')
+     *     | $(LITERAL 'void')
+     *     ;)
      */
     IdType parseBuiltinType()
     {
@@ -1350,7 +1350,7 @@ class Parser
      * Parses an CaseStatement
      *
      * $(GRAMMAR $(RULEDEF caseStatement):
-     *     $(LITERAL 'case') $(RULE argumentList) $(LITERAL ':') $(RULE declarationsAndStatements)
+     *     $(LITERAL 'case') $(RULE _argumentList) $(LITERAL ':') $(RULE declarationsAndStatements)
      *     ;)
      */
     CaseStatement parseCaseStatement(ArgumentList argumentList = null)
@@ -1395,15 +1395,15 @@ class Parser
      * Parses a CastQualifier
      *
      * $(GRAMMAR $(RULEDEF castQualifier):
-     *      $(LITERAL 'const')
-     *    | $(LITERAL 'const') $(LITERAL 'shared')
-     *    | $(LITERAL 'immutable')
-     *    | $(LITERAL 'inout')
-     *    | $(LITERAL 'inout') $(LITERAL 'shared')
-     *    | $(LITERAL 'shared')
-     *    | $(LITERAL 'shared') $(LITERAL 'const')
-     *    | $(LITERAL 'shared') $(LITERAL 'inout')
-     *    ;)
+     *       $(LITERAL 'const')
+     *     | $(LITERAL 'const') $(LITERAL 'shared')
+     *     | $(LITERAL 'immutable')
+     *     | $(LITERAL 'inout')
+     *     | $(LITERAL 'inout') $(LITERAL 'shared')
+     *     | $(LITERAL 'shared')
+     *     | $(LITERAL 'shared') $(LITERAL 'const')
+     *     | $(LITERAL 'shared') $(LITERAL 'inout')
+     *     ;)
      */
     CastQualifier parseCastQualifier()
     {
@@ -1718,7 +1718,7 @@ class Parser
      * Parses a Constructor
      *
      * $(GRAMMAR $(RULEDEF constructor):
-     *       $(LITERAL 'this') $(RULE templateParameters)? $(RULE parameters) $(RULE memberFunctionAttribute)* $(RULE constraint)? ($(RULE functionBody) | $(LITERAL ';'))
+     *     $(LITERAL 'this') $(RULE templateParameters)? $(RULE parameters) $(RULE memberFunctionAttribute)* $(RULE constraint)? ($(RULE functionBody) | $(LITERAL ';'))
      *     ;)
      */
     Constructor parseConstructor()
@@ -2712,7 +2712,7 @@ class Parser
      * Parses an ExpressionStatement
      *
      * $(GRAMMAR $(RULEDEF expressionStatement):
-     *     $(RULE expression) $(LITERAL ';')
+     *     $(RULE _expression) $(LITERAL ';')
      *     ;)
      */
     ExpressionStatement parseExpressionStatement(Expression expression = null)
@@ -2804,10 +2804,8 @@ class Parser
      * Parses a StaticForeachDeclaration
      *
      * $(GRAMMAR $(RULEDEF staticForeachDeclaration):
-     *       $(LITERAL 'static') ($(LITERAL 'foreach') | $(LITERAL 'foreach_reverse')) $(LITERAL '$(LPAREN)') $(RULE foreachTypeList) $(LITERAL ';') $(RULE expression) $(LITERAL '$(RPAREN)')
-     *          ($(RULE declaration) | $(LITERAL '{') $(RULE declaration)* $(LITERAL '}'))
-     *     | $(LITERAL 'static') ($(LITERAL 'foreach') | $(LITERAL 'foreach_reverse')) $(LITERAL '$(LPAREN)') $(RULE foreachType) $(LITERAL ';') $(RULE expression) $(LITERAL '..') $(RULE expression) $(LITERAL '$(RPAREN)')
-     *          ($(RULE declaration) | $(LITERAL '{') $(RULE declaration)* $(LITERAL '}'))
+     *       $(LITERAL 'static') ($(LITERAL 'foreach') | $(LITERAL 'foreach_reverse')) $(LITERAL '$(LPAREN)') $(RULE foreachTypeList) $(LITERAL ';') $(RULE expression) $(LITERAL '$(RPAREN)') ($(RULE declaration) | $(LITERAL '{') $(RULE declaration)* $(LITERAL '}'))
+     *     | $(LITERAL 'static') ($(LITERAL 'foreach') | $(LITERAL 'foreach_reverse')) $(LITERAL '$(LPAREN)') $(RULE foreachType) $(LITERAL ';') $(RULE expression) $(LITERAL '..') $(RULE expression) $(LITERAL '$(RPAREN)') ($(RULE declaration) | $(LITERAL '{') $(RULE declaration)* $(LITERAL '}'))
      *     ;)
      */
     StaticForeachDeclaration parseStaticForeachDeclaration()
@@ -2821,7 +2819,7 @@ class Parser
      * Parses a StaticForeachStatement
      *
      * $(GRAMMAR $(RULEDEF staticForeachStatement):
-     *       $(LITERAL 'static') $(RULE foreachStatement)
+     *     $(LITERAL 'static') $(RULE foreachStatement)
      *     ;)
      */
     StaticForeachStatement parseStaticForeachStatement()
@@ -3293,10 +3291,10 @@ class Parser
      * Parses a TypeIdentifierPart.
      *
      * $(GRAMMAR $(RULEDEF typeIdentifierPart):
-     *      $(RULE identifierOrTemplateInstance)
-     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '.') $(RULE typeIdentifierPart)
-     *    | $(RULE identifierOrTemplateInstance) $(LITERAL '[') $(RULE assignExpression) $(LITERAL ']') $(LITERAL '.') $(RULE typeIdentifierPart)
-     *      ;)
+     *       $(RULE identifierOrTemplateInstance)
+     *     | $(RULE identifierOrTemplateInstance) $(LITERAL '.') $(RULE typeIdentifierPart)
+     *     | $(RULE identifierOrTemplateInstance) $(LITERAL '[') $(RULE assignExpression) $(LITERAL ']') $(LITERAL '.') $(RULE typeIdentifierPart)
+     *     ;)
      */
     TypeIdentifierPart parseTypeIdentifierPart()
     {
@@ -3536,7 +3534,7 @@ class Parser
      * Parses ImportBindings
      *
      * $(GRAMMAR $(RULEDEF importBindings):
-     *     $(RULE singleImport) $(LITERAL ':') $(RULE importBind) ($(LITERAL ',') $(RULE importBind))*
+     *     $(RULE _singleImport) $(LITERAL ':') $(RULE importBind) ($(LITERAL ',') $(RULE importBind))*
      *     ;)
      */
     ImportBindings parseImportBindings(SingleImport singleImport)
@@ -3655,8 +3653,8 @@ class Parser
      * Parses an IndexExpression
      *
      * $(GRAMMAR $(RULEDEF indexExpression):
-     *       $(RULE unaryExpression) $(LITERAL '[') $(LITERAL ']')
-     *     | $(RULE unaryExpression) $(LITERAL '[') $(RULE index) ($(LITERAL ',') $(RULE index))* $(LITERAL ']')
+     *       $(RULE _unaryExpression) $(LITERAL '[') $(LITERAL ']')
+     *     | $(RULE _unaryExpression) $(LITERAL '[') $(RULE index) ($(LITERAL ',') $(RULE index))* $(LITERAL ']')
      *     ;
      * )
      */
@@ -4382,9 +4380,9 @@ class Parser
      * Parses a Parameter
      *
      * $(GRAMMAR $(RULEDEF parameter):
-     *     $(RULE parameterAttribute)* $(RULE type)
-     *     $(RULE parameterAttribute)* $(RULE type) $(LITERAL Identifier)? $(LITERAL '...')
-     *     $(RULE parameterAttribute)* $(RULE type) $(LITERAL Identifier)? ($(LITERAL '=') $(RULE assignExpression))?
+     *       $(RULE parameterAttribute)* $(RULE type)
+     *     | $(RULE parameterAttribute)* $(RULE type) $(LITERAL Identifier)? $(LITERAL '...')
+     *     | $(RULE parameterAttribute)* $(RULE type) $(LITERAL Identifier)? ($(LITERAL '=') $(RULE assignExpression))?
      *     ;)
      */
     Parameter parseParameter()
@@ -4621,9 +4619,9 @@ class Parser
      * Parses a PragmaStatement
      *
      * $(GRAMMAR $(RULEDEF pragmaStatement):
-     *        $(RULE pragmaExpression) $(RULE statement)
-     *      | $(RULE pragmaExpression) $(RULE blockStatement)
-     *      | $(RULE pragmaExpression) $(LITERAL ';')
+     *       $(RULE pragmaExpression) $(RULE statement)
+     *     | $(RULE pragmaExpression) $(RULE blockStatement)
+     *     | $(RULE pragmaExpression) $(LITERAL ';')
      *     ;)
      */
     PragmaStatement parsePragmaStatement()
@@ -6613,8 +6611,8 @@ class Parser
      * Parses a VariableDeclaration
      *
      * $(GRAMMAR $(RULEDEF variableDeclaration):
-     *       $(RULE storageClass)* $(RULE type) $(RULE declarator) ($(LITERAL ',') $(RULE declarator))* $(LITERAL ';')
-     *     | $(RULE storageClass)* $(RULE type) $(LITERAL identifier) $(LITERAL '=') $(RULE functionBody) $(LITERAL ';')
+     *       $(RULE storageClass)* $(RULE _type) $(RULE declarator) ($(LITERAL ',') $(RULE declarator))* $(LITERAL ';')
+     *     | $(RULE storageClass)* $(RULE _type) $(LITERAL identifier) $(LITERAL '=') $(RULE functionBody) $(LITERAL ';')
      *     | $(RULE autoDeclaration)
      *     ;)
      */
