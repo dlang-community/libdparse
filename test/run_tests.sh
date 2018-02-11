@@ -9,16 +9,19 @@ GREEN="\033[32m"
 RED="\033[31m"
 CYAN="\033[36m"
 DMD=${DMD:=dmd}
+SOURCE_FILES="../src/std/experimental/*.d ../src/dparse/*.d "
+SOURCE_FILES+=$(find ../stdx-allocator/source -name "*.d" )
+IMPORT_PATHS="-I../src/ -I../stdx-allocator/source"
 
 echo -en "Compiling unit tests..."
-${DMD} -ofunittests -unittest -main ../src/std/experimental/*.d ../src/dparse/*.d -g -I../src/ || exit 1
+${DMD} -ofunittests -unittest -main $SOURCE_FILES -g $IMPORT_PATHS || exit 1
 echo -e "${GREEN}DONE${NORMAL}"
 echo "Running unit tests..."
 ./unittests || exit 1
 echo -e "${GREEN}DONE${NORMAL}"
 
 echo -en "Compiling tester... "
-${DMD} tester.d ../src/std/experimental/*.d ../src/dparse/*.d -g -I../src/ || exit 1
+${DMD} tester.d $SOURCE_FILES -g $IMPORT_PATHS || exit 1
 echo -e "${GREEN}DONE${NORMAL}"
 
 for i in $PASS_FILES; do
@@ -56,7 +59,7 @@ fi
 
 find . -name "*.lst" | xargs rm -f
 echo -en "Generating coverage reports... "
-${DMD} tester.d -cov ../src/std/experimental/*.d ../src/dparse/*.d  -I../src/ || exit 1
+${DMD} tester.d -cov $SOURCE_FILES $IMPORT_PATHS || exit 1
 ./tester $PASS_FILES $FAIL_FILES 2>/dev/null 1>/dev/null
 rm -rf coverage/
 mkdir coverage/
