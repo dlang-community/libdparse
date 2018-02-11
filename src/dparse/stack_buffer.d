@@ -8,7 +8,7 @@ struct StackBuffer
 {
     bool put(T)(T t)
     {
-        import std.experimental.allocator.mallocator : Mallocator;
+        import stdx.allocator.mallocator : Mallocator;
 
         static if (is(T == class) || isPointer!T)
             if (t is null)
@@ -49,7 +49,7 @@ struct StackBuffer
 
     ~this()
     {
-        import std.experimental.allocator.mallocator:Mallocator;
+        import stdx.allocator.mallocator:Mallocator;
 
         version (debug_stack_allocator)
             (cast(ubyte[]) arr)[] = 0;

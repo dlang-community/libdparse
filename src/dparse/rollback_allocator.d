@@ -91,7 +91,7 @@ public:
     auto make(T, Args...)(auto ref Args args)
     {
         import std.algorithm.comparison : max;
-        import std.experimental.allocator : stateSize;
+        import stdx.allocator : stateSize;
         import std.conv : emplace;
 
         void[] mem = allocate(max(stateSize!T, 1));
@@ -129,7 +129,7 @@ private:
     void allocateNode(size_t size)
     {
         import std.algorithm : max;
-        import std.experimental.allocator.mallocator : Mallocator;
+        import stdx.allocator.mallocator : Mallocator;
         import std.conv : emplace;
 
         enum ALLOC_SIZE = 1024 * 8;
@@ -145,7 +145,7 @@ private:
     void deallocateNode()
     {
         assert(first !is null);
-        import std.experimental.allocator.mallocator : Mallocator;
+        import stdx.allocator.mallocator : Mallocator;
 
         Node* next = first.next;
         ubyte[] mem = (cast(ubyte*) first)[0 .. Node.sizeof + first.mem.length];
