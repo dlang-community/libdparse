@@ -2,11 +2,11 @@ sudo: false
 language: d
 d:
   - dmd
-  - dmd-2.071.0
+  - dmd-2.072.0
   - ldc
 matrix:
   include:
-    d: dmd-2.078.1
+    d: dmd-2.078.2
     env: [DEPLOY=1]
     # ddox dependencies (can be removed after 0.8.3 has been released)
     addons:
