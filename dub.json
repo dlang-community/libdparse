@@ -8,5 +8,8 @@
 		"--unittest-examples",
 		"--min-protection=Protected"
 	],
+	"dependencies": {
+            "stdx-allocator": "2.77.0"
+	},
 	"-ddoxTool": "scod"
 }
