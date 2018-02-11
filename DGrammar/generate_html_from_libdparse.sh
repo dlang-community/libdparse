@@ -8,6 +8,7 @@ cd $DIR
 
 dmd -D ${LIBDPARSE_PATH}/src/dparse/parser.d\
 	-I${LIBDPARSE_PATH}/src\
+	-I${LIBDPARSE_PATH}/stdx-allocator/source\
 	${LIBDPARSE_PATH}/macros.ddoc -c -o-
 
 # install pup (if not existent)
