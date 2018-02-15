@@ -3415,7 +3415,7 @@ public:
 unittest // issue #133
 {
     import dparse.lexer, dparse.parser, dparse.rollback_allocator;
-    ubyte[] src = cast(ubyte[])q{module test133; void main(){}};
+    string src = q{module test133; void main(){}};
     final class TkTest : ASTVisitor
     {
         alias visit = ASTVisitor.visit;
@@ -3432,7 +3432,7 @@ unittest // issue #133
 unittest // issue #165
 {
     import dparse.lexer, dparse.parser, dparse.rollback_allocator;
-    ubyte[] src = cast(ubyte[])q{module test165; enum foo(T) = bar!T;};
+    string src = q{module test165; enum foo(T) = bar!T;};
     final class EpoTest : ASTVisitor
     {
         bool visited;
@@ -3477,7 +3477,7 @@ unittest // issue #156
 
     {
         // no colon so array.
-        ubyte[] src1 = cast(ubyte[])q{void main(){const arr = [[0]];}};
+        string src1 = q{void main(){const arr = [[0]];}};
         Module m = parseModule(getTokensForParser(src1, cf, &ca), "", &ra);
         Test t = new Test;
         t.visit(m);
@@ -3485,7 +3485,7 @@ unittest // issue #156
     }
     {
         // simple primary before colon, assume array.
-        ubyte[] src2 = cast(ubyte[])q{void main(){const arr = [0:0];}};
+        string src2 = q{void main(){const arr = [0:0];}};
         Module m = parseModule(getTokensForParser(src2, cf, &ca), "", &ra);
         Test t = new Test;
         t.visit(m);
@@ -3495,7 +3495,7 @@ unittest // issue #156
     }
     {
         // more complex exp before colon, assume AA.
-        ubyte[] src3 = cast(ubyte[])q{void main(){const arr = [[0]:0];}};
+        string src3 = q{void main(){const arr = [[0]:0];}};
         Module m = parseModule(getTokensForParser(src3, cf, &ca), "", &ra);
         Test t = new Test;
         t.visit(m);
@@ -3511,7 +3511,7 @@ unittest // issue #170
 
     final class Test170_F : ASTVisitor
     {
-        static ubyte[] src = cast(ubyte[])q{void function() a = {call();};};
+        static string src = q{void function() a = {call();};};
         bool visited;
         alias visit = ASTVisitor.visit;
         override void visit(const FunctionLiteralExpression){visited = true;}
@@ -3519,7 +3519,7 @@ unittest // issue #170
 
     final class Test170_S : ASTVisitor
     {
-        static ubyte[] src = cast(ubyte[])q{A a = {member : call()};};
+        static string src = q{A a = {member : call()};};
         bool visited;
         alias visit = ASTVisitor.visit;
         override void visit(const StructInitializer){visited = true;}
@@ -3546,7 +3546,7 @@ unittest // issue #193
 
     final class Test193 : ASTVisitor
     {
-        static ubyte[] src = cast(ubyte[])q{const(Type1[immutable(Type2)]) qualAarray;};
+        static string src = q{const(Type1[immutable(Type2)]) qualAarray;};
         size_t tc;
         alias visit = ASTVisitor.visit;
         override void visit(const TypeIdentifierPart tip)

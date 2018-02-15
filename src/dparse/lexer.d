@@ -6,6 +6,7 @@ import std.array;
 import std.algorithm;
 import std.range;
 import std.experimental.lexer;
+import std.traits;
 import core.cpuid : sse42;
 version (D_InlineAsm_X86_64)
 {
@@ -388,8 +389,8 @@ public bool isLiteral(IdType type) pure nothrow @safe @nogc
  * whitespace tokens are skipped and comments are attached to the token nearest
  * to them.
  */
-const(Token)[] getTokensForParser(ubyte[] sourceCode, LexerConfig config,
-    StringCache* cache)
+const(Token)[] getTokensForParser(R)(R sourceCode, LexerConfig config, StringCache* cache)
+if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
 {
     enum CommentType : ubyte
     {
@@ -497,13 +498,14 @@ public struct DLexer
      *         other token text.
      *     haveSSE42 = Parse streaming SIMD Extensions 4.2 in inline assembly
      */
-    this(ubyte[] range, const LexerConfig config, StringCache* cache,
+    this(R)(R range, const LexerConfig config, StringCache* cache,
         bool haveSSE42 = sse42()) pure nothrow @safe
+    if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
     {
         this.haveSSE42 = haveSSE42;
         auto r = (range.length >= 3 && range[0] == 0xef && range[1] == 0xbb && range[2] == 0xbf)
             ? range[3 .. $] : range;
-        this.range = LexerRange(r);
+        this.range = LexerRange(cast(const(ubyte)[]) r);
         this.config = config;
         this.cache = cache;
         popFront();
@@ -1793,7 +1795,8 @@ private static size_t nextPow2(size_t value)
  * Creates a token range from the given source code. Creates a default lexer
  * configuration and a GC-managed string cache.
  */
-public auto byToken(ubyte[] range)
+public auto byToken(R)(R range)
+if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
 {
     uint bc = cast(uint)((range.length > 2^^31UL) ? 2^^31
         : nextPow2(1 + range.length / 32));
@@ -1806,7 +1809,8 @@ public auto byToken(ubyte[] range)
  * Creates a token range from the given source code. Uses the given string
  * cache.
  */
-public auto byToken(ubyte[] range, StringCache* cache)
+public auto byToken(R)(R range, StringCache* cache)
+if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
 {
     LexerConfig config;
     return DLexer(range, config, cache);
@@ -1816,7 +1820,8 @@ public auto byToken(ubyte[] range, StringCache* cache)
  * Creates a token range from the given source code. Uses the provided lexer
  * configuration and string cache.
  */
-public auto byToken(ubyte[] range, const LexerConfig config, StringCache* cache)
+public auto byToken(R)(R range, const LexerConfig config, StringCache* cache)
+if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
 {
     return DLexer(range, config, cache);
 }
