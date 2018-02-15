@@ -49,16 +49,15 @@ void main()
     import dparse.lexer;
     import dparse.parser : parseModule;
     import dparse.rollback_allocator : RollbackAllocator;
-    import std.string : representation;
 
     auto sourceCode = q{
         void foo() @safe {
             void bar();
         }
-    }.dup;
+    };
     LexerConfig config;
     auto cache = StringCache(StringCache.defaultBucketCount);
-    auto tokens = getTokensForParser(sourceCode.representation, config, &cache);
+    auto tokens = getTokensForParser(sourceCode, config, &cache);
 
     RollbackAllocator rba;
     auto m = parseModule(tokens, "test.d", &rba);
