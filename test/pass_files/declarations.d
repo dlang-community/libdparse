@@ -85,3 +85,8 @@ static foreach (enum i, alias T; AliasSeq!(int, bool))
 {
     T a = i;
 }
+
+struct Foo(T);
+union Foo(T);
+class Foo(T);
+interface Foo(T);

@@ -5373,9 +5373,8 @@ class Parser
             mixin(parseNodeQ!(`node.templateParameters`, `TemplateParameters`));
             if (currentIs(tok!"if"))
                 mixin(parseNodeQ!(`node.constraint`, `Constraint`));
-            mixin(parseNodeQ!(`node.structBody`, `StructBody`));
         }
-        else if (currentIs(tok!"{"))
+        if (currentIs(tok!"{"))
         {
             mixin(parseNodeQ!(`node.structBody`, `StructBody`));
         }
@@ -6576,10 +6575,8 @@ class Parser
                 mixin(parseNodeQ!(`node.templateParameters`, `TemplateParameters`));
                 if (currentIs(tok!"if"))
                     mixin(parseNodeQ!(`node.constraint`, `Constraint`));
-                mixin(parseNodeQ!(`node.structBody`, `StructBody`));
             }
-            else
-                goto semiOrStructBody;
+            goto semiOrStructBody;
         }
         else
         {
