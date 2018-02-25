@@ -4676,6 +4676,7 @@ class Parser
      *     | $(LITERAL '___VENDOR__')
      *     | $(LITERAL '___VERSION__')
      *     | $(LITERAL '___FILE__')
+     *     | $(LITERAL '___FILE_FULL_PATH__')
      *     | $(LITERAL '___LINE__')
      *     | $(LITERAL '___MODULE__')
      *     | $(LITERAL '___FUNCTION__')
@@ -5350,7 +5351,8 @@ class Parser
      * Parses a StructDeclaration
      *
      * $(GRAMMAR $(RULEDEF structDeclaration):
-     *     $(LITERAL 'struct') $(LITERAL Identifier)? ($(RULE templateParameters) $(RULE constraint)? $(RULE structBody) | ($(RULE structBody) | $(LITERAL ';')))
+     *       $(LITERAL 'struct') $(LITERAL Identifier) ($(RULE templateParameters) $(RULE constraint)?)? ($(RULE structBody) | $(LITERAL ';'))
+     *     | $(LITERAL 'struct') $(RULE structBody)
      *     ;)
      */
     StructDeclaration parseStructDeclaration()
@@ -5804,6 +5806,7 @@ class Parser
      *     | $(LITERAL '___VENDOR__')
      *     | $(LITERAL '___VERSION__')
      *     | $(LITERAL '___FILE__')
+     *     | $(LITERAL '___FILE_FULL_PATH__')
      *     | $(LITERAL '___LINE__')
      *     | $(LITERAL '___MODULE__')
      *     | $(LITERAL '___FUNCTION__')
@@ -5923,7 +5926,13 @@ class Parser
      * Parses a TemplateValueParameterDefault
      *
      * $(GRAMMAR $(RULEDEF templateValueParameterDefault):
-     *     $(LITERAL '=') ($(LITERAL '___FILE__') | $(LITERAL '___MODULE__') | $(LITERAL '___LINE__') | $(LITERAL '___FUNCTION__') | $(LITERAL '___PRETTY_FUNCTION__') | $(RULE assignExpression))
+     *       $(LITERAL '=') $(LITERAL '___FILE__')
+     *     | $(LITERAL '=') $(LITERAL '___FILE_FULL_PATH__')
+     *     | $(LITERAL '=') $(LITERAL '___MODULE__')
+     *     | $(LITERAL '=') $(LITERAL '___LINE__')
+     *     | $(LITERAL '=') $(LITERAL '___FUNCTION__')
+     *     | $(LITERAL '=') $(LITERAL '___PRETTY_FUNCTION__')
+     *     | $(LITERAL '=') $(RULE assignExpression)
      *     ;)
      */
     TemplateValueParameterDefault parseTemplateValueParameterDefault()
@@ -5934,6 +5943,7 @@ class Parser
         switch (current.type)
         {
         case tok!"__FILE__":
+        case tok!"__FILE_FULL_PATH__":
         case tok!"__MODULE__":
         case tok!"__LINE__":
         case tok!"__FUNCTION__":
@@ -6554,8 +6564,7 @@ class Parser
      * Parses an UnionDeclaration
      *
      * $(GRAMMAR $(RULEDEF unionDeclaration):
-     *       $(LITERAL 'union') $(LITERAL Identifier) $(RULE templateParameters) $(RULE constraint)? $(RULE structBody)
-     *     | $(LITERAL 'union') $(LITERAL Identifier) ($(RULE structBody) | $(LITERAL ';'))
+     *       $(LITERAL 'union') $(LITERAL Identifier) ($(RULE templateParameters) $(RULE constraint)?)? ($(RULE structBody) | $(LITERAL ';'))
      *     | $(LITERAL 'union') $(RULE structBody)
      *     ;)
      */
