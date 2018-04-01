@@ -5477,9 +5477,19 @@ class Parser
         auto node = allocator.make!SwitchStatement;
         expect(tok!"switch");
         expect(tok!"(");
-        mixin(parseNodeQ!(`node.expression`, `Expression`));
-        expect(tok!")");
-        mixin(parseNodeQ!(`node.statement`, `Statement`));
+        // DCD #453
+        // with just `switch(stuff` returns a non null node,
+        // which allows DCD to gives completion on `stuff`.
+        if (auto e = parseExpression())
+        {
+            node.expression = e;
+            if (currentIs(tok!")"))
+            {
+                advance();
+                // returns null only from here.
+                mixin(parseNodeQ!(`node.statement`, `Statement`));
+            }
+        }
         return node;
     }
 
