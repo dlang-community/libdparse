@@ -2146,7 +2146,7 @@ class Parser
         case tok!"scope":
         case tok!"typeof":
         case tok!"__vector":
-		foreach (B; BasicTypes) { case B: }
+        foreach (B; BasicTypes) { case B: }
         type:
             Type t = parseType();
             if (t is null || !currentIs(tok!"identifier"))
@@ -4671,16 +4671,16 @@ class Parser
      *     | $(LITERAL '_true')
      *     | $(LITERAL '_false')
      *     | $(LITERAL '___DATE__')
+     *     | $(LITERAL '___FILE__')
+     *     | $(LITERAL '___FILE_FULL_PATH__')
+     *     | $(LITERAL '___FUNCTION__')
+     *     | $(LITERAL '___LINE__')
+     *     | $(LITERAL '___MODULE__')
+     *     | $(LITERAL '___PRETTY_FUNCTION__')
      *     | $(LITERAL '___TIME__')
      *     | $(LITERAL '___TIMESTAMP__')
      *     | $(LITERAL '___VENDOR__')
      *     | $(LITERAL '___VERSION__')
-     *     | $(LITERAL '___FILE__')
-     *     | $(LITERAL '___FILE_FULL_PATH__')
-     *     | $(LITERAL '___LINE__')
-     *     | $(LITERAL '___MODULE__')
-     *     | $(LITERAL '___FUNCTION__')
-     *     | $(LITERAL '___PRETTY_FUNCTION__')
      *     | $(LITERAL IntegerLiteral)
      *     | $(LITERAL FloatLiteral)
      *     | $(LITERAL StringLiteral)+
@@ -4722,7 +4722,7 @@ class Parser
                     node.primary = *ident;
                 break;
             }
-		foreach (B; BasicTypes) { case B: }
+        foreach (B; BasicTypes) { case B: }
             node.basicType = advance();
             if (currentIs(tok!"."))
             {
@@ -4790,7 +4790,7 @@ class Parser
             break;
         case tok!"this":
         case tok!"super":
-		foreach (L; Literals) { case L: }
+        foreach (L; Literals) { case L: }
             if (currentIsOneOf(tok!"stringLiteral", tok!"wstringLiteral", tok!"dstringLiteral"))
             {
                 node.primary = advance();
@@ -5811,16 +5811,16 @@ class Parser
      *     | $(LITERAL '_null')
      *     | $(LITERAL 'this')
      *     | $(LITERAL '___DATE__')
+     *     | $(LITERAL '___FILE__')
+     *     | $(LITERAL '___FILE_FULL_PATH__')
+     *     | $(LITERAL '___FUNCTION__')
+     *     | $(LITERAL '___LINE__')
+     *     | $(LITERAL '___MODULE__')
+     *     | $(LITERAL '___PRETTY_FUNCTION__')
      *     | $(LITERAL '___TIME__')
      *     | $(LITERAL '___TIMESTAMP__')
      *     | $(LITERAL '___VENDOR__')
      *     | $(LITERAL '___VERSION__')
-     *     | $(LITERAL '___FILE__')
-     *     | $(LITERAL '___FILE_FULL_PATH__')
-     *     | $(LITERAL '___LINE__')
-     *     | $(LITERAL '___MODULE__')
-     *     | $(LITERAL '___FUNCTION__')
-     *     | $(LITERAL '___PRETTY_FUNCTION__')
      *     ;)
      */
     TemplateSingleArgument parseTemplateSingleArgument()
@@ -5836,8 +5836,8 @@ class Parser
         {
         case tok!"this":
         case tok!"identifier":
-		foreach (B; Literals) { case B: }
-		foreach (C; BasicTypes) { case C: }
+        foreach (B; Literals) { case B: }
+        foreach (C; BasicTypes) { case C: }
             node.token = advance();
             break;
         default:
@@ -5936,12 +5936,17 @@ class Parser
      * Parses a TemplateValueParameterDefault
      *
      * $(GRAMMAR $(RULEDEF templateValueParameterDefault):
-     *       $(LITERAL '=') $(LITERAL '___FILE__')
+     *       $(LITERAL '=') $(LITERAL '___DATE__')
+     *     | $(LITERAL '=') $(LITERAL '___FILE__')
      *     | $(LITERAL '=') $(LITERAL '___FILE_FULL_PATH__')
-     *     | $(LITERAL '=') $(LITERAL '___MODULE__')
-     *     | $(LITERAL '=') $(LITERAL '___LINE__')
      *     | $(LITERAL '=') $(LITERAL '___FUNCTION__')
+     *     | $(LITERAL '=') $(LITERAL '___LINE__')
+     *     | $(LITERAL '=') $(LITERAL '___MODULE__')
      *     | $(LITERAL '=') $(LITERAL '___PRETTY_FUNCTION__')
+     *     | $(LITERAL '=') $(LITERAL '___TIME__')
+     *     | $(LITERAL '=') $(LITERAL '___TIMESTAMP__')
+     *     | $(LITERAL '=') $(LITERAL '___VENDOR__')
+     *     | $(LITERAL '=') $(LITERAL '___VERSION__')
      *     | $(LITERAL '=') $(RULE assignExpression)
      *     ;)
      */
@@ -6711,24 +6716,24 @@ class Parser
      *     $(LITERAL 'version') $(LITERAL '$(LPAREN)') ($(LITERAL IntegerLiteral) | $(LITERAL Identifier) | $(LITERAL 'unittest') | $(LITERAL 'assert')) $(LITERAL '$(RPAREN)')
      *     ;)
      */
-	VersionCondition parseVersionCondition()
-	{
-		mixin(traceEnterAndExit!(__FUNCTION__));
-		auto node = allocator.make!VersionCondition;
-		const v = expect(tok!"version");
-		mixin(nullCheck!`v`);
-		node.versionIndex = v.index;
-		mixin(tokenCheck!"(");
-		if (currentIsOneOf(tok!"intLiteral", tok!"identifier", tok!"unittest", tok!"assert"))
-			node.token = advance();
-		else
-		{
-			error("Expected an integer literal, an identifier, `assert`, or `unittest`");
-			return null;
-		}
-		expect(tok!")");
-		return node;
-	}
+    VersionCondition parseVersionCondition()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!VersionCondition;
+        const v = expect(tok!"version");
+        mixin(nullCheck!`v`);
+        node.versionIndex = v.index;
+        mixin(tokenCheck!"(");
+        if (currentIsOneOf(tok!"intLiteral", tok!"identifier", tok!"unittest", tok!"assert"))
+            node.token = advance();
+        else
+        {
+            error("Expected an integer literal, an identifier, `assert`, or `unittest`");
+            return null;
+        }
+        expect(tok!")");
+        return node;
+    }
 
     /**
      * Parses a VersionSpecification
@@ -6741,8 +6746,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!VersionSpecification;
-		mixin(tokenCheck!"version");
-		mixin(tokenCheck!"=");
+        mixin(tokenCheck!"version");
+        mixin(tokenCheck!"=");
         if (!currentIsOneOf(tok!"identifier", tok!"intLiteral"))
         {
             error("Identifier or integer literal expected");
@@ -6764,10 +6769,10 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!WhileStatement;
-		mixin(tokenCheck!"while");
+        mixin(tokenCheck!"while");
         if (moreTokens)
             node.startIndex = current().index;
-		mixin(tokenCheck!"(");
+        mixin(tokenCheck!"(");
         mixin(parseNodeQ!(`node.expression`, `Expression`));
         mixin(tokenCheck!")");
         if (currentIs(tok!"}"))
@@ -7096,7 +7101,7 @@ protected:
         case tok!"union":
         case tok!"unittest":
             return true;
-		foreach (B; BasicTypes) { case B: }
+        foreach (B; BasicTypes) { case B: }
             return !peekIsOneOf(tok!".", tok!"(");
         case tok!"asm":
         case tok!"break":

@@ -1047,7 +1047,7 @@ public:
     /** */ ExpressionNode low;
     /** */ ExpressionNode high;
     /** */ DeclarationsAndStatements declarationsAndStatements;
-	/** */ size_t colonLocation;
+    /** */ size_t colonLocation;
     mixin OpEquals;
 }
 
@@ -1061,7 +1061,7 @@ public:
     }
     /** */ ArgumentList argumentList;
     /** */ DeclarationsAndStatements declarationsAndStatements;
-	/** */ size_t colonLocation;
+    /** */ size_t colonLocation;
     mixin OpEquals;
 }
 
@@ -1426,7 +1426,7 @@ public:
         mixin (visitIfNotNull!(declarationsAndStatements));
     }
     /** */ DeclarationsAndStatements declarationsAndStatements;
-	/** */ size_t colonLocation;
+    /** */ size_t colonLocation;
     mixin OpEquals;
 }
 
