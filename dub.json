@@ -9,7 +9,7 @@
 		"--min-protection=Protected"
 	],
 	"dependencies": {
-            "stdx-allocator": "2.77.0"
+            "stdx-allocator": "2.77.1"
 	},
 	"-ddoxTool": "scod"
 }
