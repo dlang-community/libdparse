@@ -384,29 +384,31 @@ template generateOpEquals(T)
 {
     template opEqualsPart(p ...)
     {
-        import std.traits;
-        static if (p.length == 0)
-            enum opEqualsPart = "";
-        else static if (!isSomeFunction!(__traits(getMember, T, p[0]))
-            && p[0] != "line" && p[0] != "column" && p[0] != "startLocation"
-            && p[0] != "endLocation" && p[0] != "index")
+        import std.traits : isSomeFunction, isDynamicArray;
+        import std.algorithm : among;
+
+        static if (p.length > 1)
         {
-            static if (typeof(__traits(getMember, T, p[0])).stringof[$ - 2 .. $] == "[]")
+            enum opEqualsPart = opEqualsPart!(p[0 .. $/2]) ~ opEqualsPart!(p[$/2 .. $]);
+        }
+        else static if (p.length && !isSomeFunction!(typeof(__traits(getMember, T, p[0])))
+            && !p[0].among("comment", "line", "column", "endLocation", "startLocation", "index"))
+        {
+            static if (isDynamicArray!(typeof(__traits(getMember, T, p[0]))))
             {
-                enum opEqualsPart = "\nif (obj." ~ p[0] ~ ".length != this." ~ p[0] ~ ".length) return false;\n"
-                    ~ "foreach (i; 0 .. this." ~ p[0] ~ ".length)\n"
-                    ~ "\tif (this." ~ p[0] ~ "[i] != obj." ~ p[0] ~ "[i]) return false;" ~ opEqualsPart!(p[1 .. $]);
+                enum opEqualsPart = "\tif (obj." ~ p[0] ~ ".length != " ~ p[0] ~ ".length) return false;\n"
+                    ~ "\tforeach (i; 0 .. " ~ p[0]  ~ ".length)\n"
+                    ~ "\t\tif (" ~ p[0] ~ "[i] != obj." ~ p[0] ~ "[i]) return false;\n";
             }
             else
-                enum opEqualsPart = "\nif (obj." ~ p[0] ~ " != this." ~ p[0] ~ ") return false;" ~ opEqualsPart!(p[1 .. $]);
+                enum opEqualsPart = "\tif (obj." ~ p[0] ~ " != " ~ p[0] ~ ") return false;\n";
         }
         else
-            enum opEqualsPart = opEqualsPart!(p[1 .. $]);
+            enum opEqualsPart = "";
     }
-    enum generateOpEquals = T.stringof ~ " obj = cast(" ~ T.stringof ~ ") other;\n"
-        ~ "if (obj is null) return false;"
-        ~ opEqualsPart!(__traits(derivedMembers, T)) ~ "\n"
-        ~ "return true;";
+    enum generateOpEquals = "if (auto obj = cast(" ~ T.stringof ~ ") other){\n"
+        ~ opEqualsPart!(__traits(derivedMembers, T))
+        ~ "\treturn true;\n}\nreturn false;";
 }
 
 abstract class ExpressionNode : ASTNode
