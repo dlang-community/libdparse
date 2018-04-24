@@ -6544,6 +6544,13 @@ class Parser
                 break loop;
         case tok!"(":
             auto newUnary = allocator.make!UnaryExpression();
+            // Allows DCD to get the call tips
+            // see https://github.com/dlang-community/DCD/issues/405
+            if (peekIs(tok!"}"))
+            {
+                advance();
+                return newUnary;
+            }
             mixin (nullCheck!`newUnary.functionCallExpression = parseFunctionCallExpression(node)`);
             node = newUnary;
             break;
