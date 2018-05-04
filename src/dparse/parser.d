@@ -5490,6 +5490,7 @@ class Parser
                 mixin(parseNodeQ!(`node.statement`, `Statement`));
             }
         }
+        else error("Error, expression expected after `switch(`", false);
         return node;
     }
 
@@ -6548,6 +6549,7 @@ class Parser
             // see https://github.com/dlang-community/DCD/issues/405
             if (peekIs(tok!"}"))
             {
+                error("Error, expected parameters or `)`", false);
                 advance();
                 return newUnary;
             }
