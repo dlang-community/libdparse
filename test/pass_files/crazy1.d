@@ -110,7 +110,7 @@ package class acrylic : cfloat
 		asm
 		{
 			ds word 79944 < ~ + + byte ptr word ptr 67048.8 + 13589.6 & orange.knife.items >= ~real ptr zelda >= angelic ^ 50597.6;
-			ds [remote.drywall ? + SPL : tape];
+			ds [remote.drywall ? + SPL : tape : 0];
 		}
 	}
 }
@@ -151,7 +151,7 @@ unittest
 			default:
 				struct acrylic
 				{
-				abstract ouchMyFinger = 'F', discworld = void;
+				auto ouchMyFinger = 'F',  discworld = void;
 				}
 	while (__VENDOR__);
 }
@@ -160,7 +160,7 @@ debug phone.tape knife = { immutable freedom = void, aaargh = void; };
 unittest
 {
 	foreach_reverse (shared .gosh.eggplant!aaargh.discworld angelic;
-		new real[*__TIME__ !is ~8633][__DATE__, freedom])
+		new real[*__TIME__ !is ~8633][__DATE__])
 	{
 		void plastic = void;
 	}
