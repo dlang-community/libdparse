@@ -1880,6 +1880,11 @@ body
         break;
     case "/++":
     case "/**":
+        if (comment.length == 3)
+        {
+            comment = "";
+            goto default;
+        }
         j = comment.length - 2;
         // Skip beginning and ending stars and plusses
         adjustBeginningAndEnd(comment, i, j);
@@ -2372,4 +2377,19 @@ version (iasm64NotWindows)
         else
             enum ulong ByteCombine = c[0];
     }
+}
+
+unittest
+{
+    import core.exception : RangeError;
+    import std.exception : assertNotThrown;
+
+    static immutable src1 = "/++";
+    static immutable src2 = "/**";
+
+    LexerConfig cf;
+    StringCache ca = StringCache(16);
+
+    assertNotThrown!RangeError(getTokensForParser(src1, cf, &ca));
+    assertNotThrown!RangeError(getTokensForParser(src2, cf, &ca));
 }
