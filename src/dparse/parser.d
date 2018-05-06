@@ -1626,13 +1626,9 @@ class Parser
             immutable bool brace = advance() == tok!"{";
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
-                immutable b = setBookmark();
                 immutable c = allocator.setCheckpoint();
-                if (trueDeclarations.put(parseDeclaration(strict, true)))
-                    abandonBookmark(b);
-                else
+                if (!trueDeclarations.put(parseDeclaration(strict, true)))
                 {
-                    goToBookmark(b);
                     allocator.rollback(c);
                     return null;
                 }
