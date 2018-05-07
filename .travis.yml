@@ -15,7 +15,7 @@ matrix:
           - libevent-dev
 script:
   # note: for dlang project tester, which doesn't clone automatically
-  - if [ ! -d stdx-allocator ]; then git submodule update --init --recursive; fi
+  - git submodule update --init --recursive
   #
   - cd test && ./run_tests.sh && cd ..
   - find test/coverage -type f -exec mv {} . \;
