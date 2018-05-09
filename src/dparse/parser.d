@@ -6565,6 +6565,7 @@ class Parser
             node = n;
             break;
         case tok!".":
+            node.dotLocation = current.index;
             advance();
             auto n = allocator.make!UnaryExpression();
             n.unaryExpression = node;

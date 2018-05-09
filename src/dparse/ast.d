@@ -392,7 +392,7 @@ template generateOpEquals(T)
             enum opEqualsPart = opEqualsPart!(p[0 .. $/2]) ~ opEqualsPart!(p[$/2 .. $]);
         }
         else static if (p.length && !isSomeFunction!(typeof(__traits(getMember, T, p[0])))
-            && !p[0].among("comment", "line", "column", "endLocation", "startLocation", "index"))
+            && !p[0].among("comment", "line", "column", "endLocation", "startLocation", "index", "dotLocation"))
         {
             static if (isDynamicArray!(typeof(__traits(getMember, T, p[0]))))
             {
@@ -3284,6 +3284,7 @@ public:
     /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
     /** */ AssertExpression assertExpression;
     /** */ IndexExpression indexExpression;
+    /** */ size_t dotLocation;
     mixin OpEquals;
 }
 
