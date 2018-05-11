@@ -812,7 +812,7 @@ class Formatter(Sink)
                 format(d);
             endBlock();
         }
-        else if (decl.falseDeclarations.length == 0)
+        else if (decl.falseDeclarations.length == 1)
             maybeIndent(decl.falseDeclarations[0]);
         else
             put("{}");
