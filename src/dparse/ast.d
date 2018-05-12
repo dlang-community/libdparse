@@ -3394,11 +3394,11 @@ final class WithStatement : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(expression, statementNoCaseNoDefault));
+        mixin (visitIfNotNull!(expression, declarationOrStatement));
     }
 
     /** */ Expression expression;
-    /** */ StatementNoCaseNoDefault statementNoCaseNoDefault;
+    /** */ DeclarationOrStatement declarationOrStatement;
     mixin OpEquals;
 }
 
