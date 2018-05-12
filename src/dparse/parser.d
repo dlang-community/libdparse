@@ -6794,15 +6794,24 @@ class Parser
      * Parses a WithStatement
      *
      * $(GRAMMAR $(RULEDEF withStatement):
-     *     $(LITERAL 'with') $(LITERAL '$(LPAREN)') $(RULE expression) $(LITERAL '$(RPAREN)') $(RULE statementNoCaseNoDefault)
+     *     $(LITERAL 'with') $(LITERAL '$(LPAREN)') $(RULE expression) $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement)
      *     ;)
      */
     WithStatement parseWithStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        mixin (simpleParse!(WithStatement, tok!"with", tok!"(",
-            "expression|parseExpression", tok!")",
-            "statementNoCaseNoDefault|parseStatementNoCaseNoDefault"));
+        auto node = allocator.make!WithStatement;
+        mixin(tokenCheck!"with");
+        mixin(tokenCheck!"(");
+        mixin(parseNodeQ!(`node.expression`, `Expression`));
+        mixin(tokenCheck!")");
+        if (currentIs(tok!"}"))
+        {
+            error("Statement expected", false);
+            return node; // this line makes DCD better
+        }
+        mixin(parseNodeQ!(`node.declarationOrStatement`, `DeclarationOrStatement`));
+        return node;
     }
 
     /**

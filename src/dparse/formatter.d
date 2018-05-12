@@ -3572,14 +3572,15 @@ class Formatter(Sink)
 
         /**
         Expression expression;
-        StatementNoCaseNoDefault statementNoCaseNoDefault;
+        DeclarationsOrStatement declarationOrStatement;
         **/
 
         space();
         put("with (");
         format(stmt.expression);
         put(")");
-        format(stmt.statementNoCaseNoDefault);
+        if (stmt.declarationOrStatement)
+            format(stmt.declarationOrStatement);
     }
 
     void format(const XorExpression xorExpression)
