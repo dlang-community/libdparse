@@ -1388,6 +1388,8 @@ public:
 
     /** */ Declaration declaration;
     /** */ Statement statement;
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     mixin OpEquals;
 }
 
