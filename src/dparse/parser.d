@@ -2232,6 +2232,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!DeclarationOrStatement;
+        if (moreTokens)
+            node.startLocation = current.index;
         // "Any ambiguities in the grammar between Statements and
         // Declarations are resolved by the declarations taking precedence."
         immutable b = setBookmark();
@@ -2252,6 +2254,8 @@ class Parser
             goToBookmark(b);
             node.declaration = parseDeclaration(true, true);
         }
+        if (moreTokens)
+            node.endLocation = current.index;
         return node;
     }
 
