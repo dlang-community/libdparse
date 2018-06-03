@@ -6135,7 +6135,10 @@ class Parser
      */
     Type2 parseType2()
     {
-        mixin(traceEnterAndExit!(__FUNCTION__));
+        // deactivated, b/c causes https://github.com/dlang-community/D-Scanner/issues/593
+        // until DMD get fixed
+        //mixin(traceEnterAndExit!(__FUNCTION__));
+        
         auto node = allocator.make!Type2;
         if (!moreTokens)
         {
