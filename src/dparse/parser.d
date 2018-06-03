@@ -6881,7 +6881,7 @@ class Parser
         return index < tokens.length;
     }
 
-protected:
+protected: final:
 
     uint suppressedErrorCount;
 
