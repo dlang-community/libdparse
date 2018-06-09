@@ -56,6 +56,7 @@ void testTokenChecks()
         case tok!"creal":
             assert (isBasicType(i));
             assert (!isNumberLiteral(i));
+            assert (!isIntegerLiteral(i));
             assert (!isOperator(i));
             assert (!isKeyword(i));
             assert (!isStringLiteral(i));
@@ -65,14 +66,23 @@ void testTokenChecks()
         case tok!"floatLiteral":
         case tok!"idoubleLiteral":
         case tok!"ifloatLiteral":
-        case tok!"intLiteral":
-        case tok!"longLiteral":
         case tok!"realLiteral":
         case tok!"irealLiteral":
+            assert (!isBasicType(i));
+            assert (isNumberLiteral(i));
+            assert (!isIntegerLiteral(i));
+            assert (!isOperator(i));
+            assert (!isKeyword(i));
+            assert (!isStringLiteral(i));
+            assert (!isProtection(i));
+            break;
+        case tok!"intLiteral":
+        case tok!"longLiteral":
         case tok!"uintLiteral":
         case tok!"ulongLiteral":
             assert (!isBasicType(i));
             assert (isNumberLiteral(i));
+            assert (isIntegerLiteral(i));
             assert (!isOperator(i));
             assert (!isKeyword(i));
             assert (!isStringLiteral(i));
@@ -142,6 +152,7 @@ void testTokenChecks()
         case tok!"~=":
             assert (!isBasicType(i));
             assert (!isNumberLiteral(i));
+            assert (!isIntegerLiteral(i));
             assert (isOperator(i));
             assert (!isKeyword(i));
             assert (!isStringLiteral(i));
@@ -238,6 +249,7 @@ void testTokenChecks()
         case tok!"__VERSION__":
             assert (!isBasicType(i));
             assert (!isNumberLiteral(i));
+            assert (!isIntegerLiteral(i));
             assert (!isOperator(i));
             assert (isKeyword(i));
             assert (!isStringLiteral(i));
@@ -248,6 +260,7 @@ void testTokenChecks()
         case tok!"wstringLiteral":
             assert (!isBasicType(i));
             assert (!isNumberLiteral(i));
+            assert (!isIntegerLiteral(i));
             assert (!isOperator(i));
             assert (!isKeyword(i));
             assert (isStringLiteral(i));
@@ -260,6 +273,7 @@ void testTokenChecks()
         case tok!"protected":
             assert (!isBasicType(i));
             assert (!isNumberLiteral(i));
+            assert (!isIntegerLiteral(i));
             assert (!isOperator(i));
             assert (isKeyword(i));
             assert (!isStringLiteral(i));
@@ -268,6 +282,7 @@ void testTokenChecks()
         default:
             assert (!isBasicType(i));
             assert (!isNumberLiteral(i));
+            assert (!isIntegerLiteral(i));
             assert (!isOperator(i));
             assert (!isKeyword(i));
             assert (!isStringLiteral(i));
