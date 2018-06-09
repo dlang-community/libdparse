@@ -229,6 +229,29 @@ public bool isNumberLiteral(IdType type) nothrow pure @safe @nogc
 }
 
 /**
+ * Number literal token types.
+ */
+public alias IntegerLiterals = AliasSeq!(tok!"intLiteral", tok!"longLiteral",
+        tok!"uintLiteral", tok!"ulongLiteral");
+
+/**
+ * Returns: true if the given ID type is for a integer literal.
+ */
+public bool isIntegerLiteral(IdType type) nothrow pure @safe @nogc
+{
+    switch (type)
+    {
+    foreach (T; IntegerLiterals)
+    {
+    case T:
+        return true;
+    }
+    default:
+        return false;
+    }
+}
+
+/**
  * Operator token types.
  */
 public alias Operators = AliasSeq!(tok!",", tok!".", tok!"..", tok!"...",
