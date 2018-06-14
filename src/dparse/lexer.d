@@ -25,7 +25,7 @@ private enum operators = [
 
 /// Kewords
 private enum keywords = [
-    "abstract", "alias", "align", "asm", "assert", "auto", "body", "bool",
+    "abstract", "alias", "align", "asm", "assert", "auto", "bool",
     "break", "byte", "case", "cast", "catch", "cdouble", "cent", "cfloat",
     "char", "class", "const", "continue", "creal", "dchar", "debug", "default",
     "delegate", "delete", "deprecated", "do", "double", "else", "enum",
@@ -264,7 +264,7 @@ public bool isOperator(IdType type) nothrow pure @safe @nogc
  * Keyword token types.
  */
 public alias Keywords = AliasSeq!(tok!"abstract", tok!"alias", tok!"align",
-        tok!"asm", tok!"assert", tok!"auto", tok!"body", tok!"break",
+        tok!"asm", tok!"assert", tok!"auto", tok!"break",
         tok!"case", tok!"cast", tok!"catch", tok!"class", tok!"const",
         tok!"continue", tok!"debug", tok!"default", tok!"delegate",
         tok!"delete", tok!"deprecated", tok!"do", tok!"else", tok!"enum",

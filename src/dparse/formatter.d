@@ -532,7 +532,7 @@ class Formatter(Sink)
         debug(verbose) writeln("BodyStatement");
 
         newline();
-        put("body");
+        put("do");
         format(bodyStatement.blockStatement);
     }
 
