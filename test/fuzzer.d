@@ -106,7 +106,6 @@ again:
 	case tok!"asm":
 	case tok!"assert":
 	case tok!"auto":
-	case tok!"body":
 	case tok!"break":
 	case tok!"case":
 	case tok!"cast":
