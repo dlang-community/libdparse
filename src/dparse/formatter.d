@@ -1424,9 +1424,9 @@ class Formatter(Sink)
                 format(blockStatement);
                 return;
             }
-            if (inStatement)
+            foreach(inStatement; inStatements)
                 format(inStatement);
-            if (outStatement)
+            foreach(outStatement; outStatements)
                 format(outStatement);
             if (bodyStatement)
                 format(bodyStatement);

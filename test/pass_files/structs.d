@@ -14,6 +14,8 @@ struct S
 	{
 		assert (x == 10);
 	}
+	invariant(true);
+	invariant(true, "false");
 }
 struct S;
 struct S {}

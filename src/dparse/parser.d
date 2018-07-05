@@ -3012,7 +3012,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF functionBody):
      *       $(RULE blockStatement)
-     *     | ($(RULE inStatement) | $(RULE outStatement) | $(RULE outStatement) $(RULE inStatement) | $(RULE inStatement) $(RULE outStatement))? $(RULE bodyStatement)?
+     *     | ($(RULE inStatement) | $(RULE outStatement))* $(RULE bodyStatement)?
      *     ;)
      */
     FunctionBody parseFunctionBody()
@@ -3024,26 +3024,94 @@ class Parser
             advance();
             return node;
         }
-        else if (currentIs(tok!"{"))
-            mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
-        else if (currentIsOneOf(tok!"in", tok!"out", tok!"do") || current.text == "body")
+
+        StackBuffer inStatements;
+        StackBuffer outStatements;
+        bool requireDo;
+
+        while (currentIsOneOf(tok!"in", tok!"out"))
         {
+            const(Token)* next = peek();
+            if (next is null)
+                return null;
+
             if (currentIs(tok!"in"))
             {
-                mixin(parseNodeQ!(`node.inStatement`, `InStatement`));
-                if (currentIs(tok!"out"))
-                    mixin(parseNodeQ!(`node.outStatement`, `OutStatement`));
+                if (next.type == tok!"{")
+                {
+                    requireDo = true;
+                    if (auto s = parseInStatement())
+                        inStatements.put(s);
+                    else return null;
+                }
+                else if (next.type == tok!"(")
+                {
+                    advance();
+                    advance();
+                    if (InStatement s = parseContractExpression!InStatement())
+                        inStatements.put(s);
+                    else return null;
+                }
+                else return null;
             }
             else if (currentIs(tok!"out"))
             {
-                mixin(parseNodeQ!(`node.outStatement`, `OutStatement`));
-                if (currentIs(tok!"in"))
-                    mixin(parseNodeQ!(`node.inStatement`, `InStatement`));
+                if (next.type == tok!"{" || (index < tokens.length - 3  &&
+                    tokens[index + 2].type == tok!("identifier") &&
+                    tokens[index + 3].type == tok!(")")))
+                {
+                    requireDo = true;
+                    if (auto s = parseOutStatement())
+                        outStatements.put(s);
+                    else return null;
+                }
+                else if (next.type == tok!"(")
+                {
+                    advance();
+                    advance();
+                    if (currentIs(tok!";"))
+                    {
+                        advance();
+                    }
+                    else if (currentIs(tok!"identifier") && peekIs(tok!";"))
+                    {
+                        advance();
+                        advance();
+                    }
+                    else
+                    {
+                        error("`;` or identifier expected");
+                        return null;
+                    }
+                    if (OutStatement s = parseContractExpression!OutStatement())
+                        outStatements.put(s);
+                    else return null;
+                }
+                else return null;
             }
-            // Allow function bodies without body statements because this is
-            // valid inside of interfaces.
-            if (currentIsOneOf(tok!"do") || current.text == "body")
-                mixin(parseNodeQ!(`node.bodyStatement`, `BodyStatement`));
+            else break;
+        }
+
+        ownArray(node.inStatements, inStatements);
+        ownArray(node.outStatements, outStatements);
+
+        if (currentIs(tok!"{") && !requireDo)
+        {
+            mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
+        }
+        else if (currentIs(tok!";"))
+        {
+            advance();
+            return node;
+        }
+        else if (currentIs(tok!"do") || current.text == "body")
+        {
+            mixin(parseNodeQ!(`node.bodyStatement`, `BodyStatement`));
+        }
+        else if (requireDo)
+        {
+            error("`do` exptected after InStatement or OutStatement");
+            return null;
         }
         else
         {
@@ -3711,7 +3779,8 @@ class Parser
      * Parses an InStatement
      *
      * $(GRAMMAR $(RULEDEF inStatement):
-     *     $(LITERAL 'in') $(RULE blockStatement)
+     *       $(LITERAL 'in') $(RULE blockStatement)
+     *     | $(LITERAL 'in') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     InStatement parseInStatement()
@@ -3763,22 +3832,39 @@ class Parser
      * Parses an Invariant
      *
      * $(GRAMMAR $(RULEDEF invariant):
-     *     $(LITERAL 'invariant') ($(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)'))? $(RULE blockStatement)
+     *       $(LITERAL 'invariant') $(RULE blockStatement)
+     *     | $(LITERAL 'invariant') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     Invariant parseInvariant()
     {
-        auto node = allocator.make!Invariant;
-        node.index = current.index;
-        node.line = current.line;
         mixin(tokenCheck!"invariant");
-        if (currentIs(tok!"("))
+        if (currentIs(tok!"(") && peekIs(tok!")"))
         {
             advance();
-            mixin(tokenCheck!")");
+            advance();
         }
-        mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
-        return node;
+        if (currentIs(tok!"{"))
+        {
+            Invariant node = allocator.make!Invariant;
+            node.index = current.index;
+            node.line = current.line;
+            if (currentIs(tok!"("))
+            {
+                advance();
+                mixin(tokenCheck!")");
+            }
+            mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
+            return node;
+        }
+        else if (currentIs(tok!"("))
+        {
+            advance();
+            if (Invariant node = parseContractExpression!Invariant())
+                return node;
+            else return null;
+        }
+        else return null;
     }
 
     /**
@@ -4355,7 +4441,8 @@ class Parser
      * Parses an OutStatement
      *
      * $(GRAMMAR $(RULEDEF outStatement):
-     *     $(LITERAL 'out') ($(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)'))? $(RULE blockStatement)
+     *       $(LITERAL 'out') ($(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)'))? $(RULE blockStatement)
+     *     | $(LITERAL 'out') $(LITERAL '$(LPAREN)') $(LITERAL Identifier)? $(LITERAL ';') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     OutStatement parseOutStatement()
@@ -7783,6 +7870,54 @@ protected: final:
         advance();
         return node;
     }
+
+        AssertExpression parseAssertForContractExp()
+        {
+            auto node = allocator.make!AssertExpression;
+            node.line = current.line;
+            node.column = current.column;
+            mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
+            if (currentIs(tok!","))
+            {
+                advance();
+                if (currentIs(tok!")"))
+                {
+                    advance();
+                    return node;
+                }
+                mixin(parseNodeQ!(`node.message`, `AssignExpression`));
+            }
+            if (currentIs(tok!","))
+                advance();
+            mixin(tokenCheck!")");
+            return node;
+        }
+
+        T parseContractExpression(T)()
+        {
+
+            AssertExpression ae = parseAssertForContractExp();
+            if (!ae)
+                return null;
+            T inOrOut = allocator.make!T();
+            inOrOut.blockStatement = allocator.make!BlockStatement();
+            DeclarationsAndStatements d = allocator.make!DeclarationsAndStatements();
+            inOrOut.blockStatement.declarationsAndStatements = d;
+            StackBuffer dos;
+            dos.put(allocator.make!DeclarationOrStatement());
+            ownArray(d.declarationsAndStatements, dos);
+            Statement s = allocator.make!Statement();
+            d.declarationsAndStatements[0].statement = s;
+            s.statementNoCaseNoDefault = allocator.make!StatementNoCaseNoDefault();
+            s.statementNoCaseNoDefault.expressionStatement = allocator.make!ExpressionStatement();
+            Expression e = allocator.make!Expression();
+            s.statementNoCaseNoDefault.expressionStatement.expression = e;
+            StackBuffer en;
+            en.put(ae);
+            ownArray(e.items, en);
+
+            return inOrOut;
+        }
 
     int suppressMessages;
     size_t index;

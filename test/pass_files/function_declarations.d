@@ -49,3 +49,28 @@ enum bool isInputRange = is(typeof((inout int = 0){}));
 auto a = b => b * 2;
 
 int typesafeVarArg(int a = 1, int[] rest = [] ...) { return 1; }
+
+void foo() in(true) do {}
+void foo() in(true,) do {}
+void foo() in(true,"false") do {}
+void foo() in(true,"false",) do {}
+void foo() in(true) in(true) do {}
+void foo() in(true) {}
+void foo() in(true) in(true) {}
+void foo() in(true) in {} do {}
+void foo() in {} in {} do {}
+
+void foo() out(;true) do {}
+void foo() out(;true, "false") do {}
+void foo() out(;true, "false",) do {}
+void foo() out(;true) out(;true) do {}
+void foo() out(;true,) {}
+void foo() out(;true) out(;true) {}
+void foo() out(;true) out {} do {}
+void foo() out {} out {} do {}
+
+void foo() in(true) out(;true) do {}
+void foo() out(; true) in(true) do {}
+void foo() out(result; true) in(true) do {}
+void foo() in(true) out(result; true) in(true) {}
+void foo() in(true) out(result; true) in(true);
