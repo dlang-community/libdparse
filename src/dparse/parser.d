@@ -3667,22 +3667,22 @@ class Parser
         StackBuffer indexes;
         while (true)
         {
-            if (!moreTokens())
-            {
-                error("Expected unary expression instead of EOF");
-                return null;
-            }
             if (currentIs(tok!"]"))
                 break;
             if (!(indexes.put(parseIndex())))
                 return null;
+            if (!moreTokens())
+            {
+                error("Expected ',' or ']' instead of EOF");
+                return null;
+            }
             if (currentIs(tok!","))
                 advance();
             else
                 break;
         }
         ownArray(node.indexes, indexes);
-        advance(); // ]
+        mixin(tokenCheck!"]");
         return node;
     }
 
