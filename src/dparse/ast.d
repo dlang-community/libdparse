@@ -1742,14 +1742,14 @@ final class FunctionBody : ASTNode
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(inStatement, outStatement, bodyStatement,
+        mixin (visitIfNotNull!(inStatements, outStatements, bodyStatement,
             blockStatement));
     }
 
     /** */ BlockStatement blockStatement;
     /** */ BodyStatement bodyStatement;
-    /** */ OutStatement outStatement;
-    /** */ InStatement inStatement;
+    /** */ OutStatement[] outStatements;
+    /** */ InStatement[] inStatements;
     mixin OpEquals;
 }
 
