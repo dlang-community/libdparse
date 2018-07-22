@@ -263,7 +263,7 @@ public pure nothrow @safe @nogc:
     }
 
     /**
-     * Returs: true if the token has the given type, false otherwise.
+     * Returns: true if the token has the given type, false otherwise.
      */
     bool opEquals(IdType type) const
     {
@@ -756,7 +756,7 @@ public nothrow pure @safe @nogc:
     }
 
     /**
-     * Returs a slice of the input byte array between the given mark and the
+     * Returns a slice of the input byte array between the given mark and the
      * current position.
      * Params m = the beginning index of the slice to return
      */
