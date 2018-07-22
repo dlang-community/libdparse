@@ -25,7 +25,7 @@ public:
     {
         assert(arr.length == size);
     }
-    body
+    do
     {
         if (first is null)
             allocateNode(size);
