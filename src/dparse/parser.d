@@ -4158,7 +4158,7 @@ class Parser
     {
         assert(retVal !is null);
     }
-    body
+    do
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         Module m = allocator.make!Module;

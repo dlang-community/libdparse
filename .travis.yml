@@ -2,7 +2,7 @@ sudo: false
 language: d
 d:
   - dmd
-  - dmd-2.072.0
+  - dmd-2.075.0
   - ldc
 matrix:
   include:
