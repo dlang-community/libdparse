@@ -6245,6 +6245,7 @@ class Parser
             break;
         case tok!"super":
         case tok!"this":
+            warn("Using `this` and `super` as type is deprecated");
             node.superOrThis = advance().type;
             mixin(tokenCheck!".");
             mixin(parseNodeQ!(`node.typeIdentifierPart`, `TypeIdentifierPart`));
