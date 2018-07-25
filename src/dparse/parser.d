@@ -94,7 +94,6 @@ class Parser
      *       $(LITERAL 'alias') $(RULE aliasInitializer) $(LPAREN)$(LITERAL ',') $(RULE aliasInitializer)$(RPAREN)* $(LITERAL ';')
      *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(RULE declaratorIdentifierList) $(LITERAL ';')
      *     | $(LITERAL 'alias') $(RULE storageClass)* $(RULE type) $(RULE identifier) $(LITERAL '(') $(RULE parameters) $(LITERAL ')') $(memberFunctionAttribute)* $(LITERAL ';')
-     *     | $(LITERAL 'alias') $(RULE 'partial')* $(RULE identifier) $(LITERAL ';')
      *     ;)
      */
     AliasDeclaration parseAliasDeclaration()
