@@ -1161,6 +1161,7 @@ class Formatter(Sink)
 
         with(enumMember)
         {
+            enumMemberAttributes.each!(a => format(a));
             newline();
             if (type) format(type);
             format(name);
@@ -1170,6 +1171,14 @@ class Formatter(Sink)
                 format(assignExpression);
             }
         }
+    }
+
+    void format(const EnumMemberAttribute ema)
+    {
+        if (ema.atAttribute)
+            format(ema.atAttribute);
+        else if (ema.deprecated_)
+            format(ema.deprecated_);
     }
 
     void format(const EponymousTemplateDeclaration decl)

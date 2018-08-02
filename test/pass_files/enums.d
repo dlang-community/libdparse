@@ -11,3 +11,10 @@ enum
     b, // doc for b
     c // doc for c
 }
+
+enum E
+{
+    @disable member,
+    @A @B deprecated("meep") member,
+    deprecated("meep") member
+}
