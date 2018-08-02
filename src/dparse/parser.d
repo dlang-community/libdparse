@@ -2465,7 +2465,7 @@ class Parser
         EnumMember last;
         while (moreTokens())
         {
-            if (currentIs(tok!"identifier"))
+            if (currentIsOneOf(tok!"identifier", tok!"@", tok!"deprecated"))
             {
                 auto c = allocator.setCheckpoint();
                 auto e = parseEnumMember();
@@ -2623,18 +2623,51 @@ class Parser
     }
 
     /**
+     * Parses an EnumMemberAttribute
+     *
+     * $(GRAMMAR $(RULEDEF enumMemberAttribute):
+     *       $(RULE atAttribute)
+     *     | $(RULE deprecated)
+     *     ;)
+     */
+    EnumMemberAttribute parseEnumMemberAttribute()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        EnumMemberAttribute node;
+        if (currentIs(tok!"@"))
+        {
+            node = allocator.make!EnumMemberAttribute;
+            mixin(parseNodeQ!(`node.atAttribute`, `AtAttribute`));
+        }
+        else if (currentIs(tok!"deprecated"))
+        {
+            node = allocator.make!EnumMemberAttribute;
+            mixin(parseNodeQ!(`node.deprecated_`, `Deprecated`));
+        }
+        return node;
+    }
+
+    /**
      * Parses an EnumMember
      *
      * $(GRAMMAR $(RULEDEF enumMember):
-     *       $(LITERAL Identifier)
-     *     | $(LITERAL Identifier) $(LITERAL '=') $(RULE assignExpression)
+     *     ($(RULE enumMemberAttribute))* (LITERAL Identifier) ($(LITERAL '=') $(RULE assignExpression))?
      *     ;)
      */
     EnumMember parseEnumMember()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!EnumMember;
+        EnumMember node = allocator.make!EnumMember;
         node.comment = current.comment;
+
+        StackBuffer emas;
+        while (moreTokens())
+        {
+            if (!emas.put(parseEnumMemberAttribute()))
+                break;
+        }
+        ownArray(node.enumMemberAttributes, emas);
+
         mixin (tokenCheck!(`node.name`, `identifier`));
         if (currentIs(tok!"="))
         {

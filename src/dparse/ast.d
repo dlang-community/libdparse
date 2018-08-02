@@ -213,6 +213,7 @@ public:
     /** */ void visit(const EnumBody enumBody) { enumBody.accept(this); }
     /** */ void visit(const EnumDeclaration enumDeclaration) { enumDeclaration.accept(this); }
     /** */ void visit(const EnumMember enumMember) { enumMember.accept(this); }
+    /** */ void visit(const EnumMemberAttribute enumMemberAttribute) { enumMemberAttribute.accept(this); }
     /** */ void visit(const EponymousTemplateDeclaration eponymousTemplateDeclaration) { eponymousTemplateDeclaration.accept(this); }
     /** */ void visit(const EqualExpression equalExpression) { equalExpression.accept(this); }
     /** */ void visit(const Expression expression) { expression.accept(this); }
@@ -1539,14 +1540,27 @@ public:
     mixin OpEquals;
 }
 
+final class EnumMemberAttribute : ASTNode
+{
+public:
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(deprecated_, atAttribute));
+    }
+    /** */ Deprecated deprecated_;
+    /** */ AtAttribute atAttribute;
+    mixin OpEquals;
+}
+
 ///
 final class EnumMember : ASTNode
 {
 public:
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(name, type, assignExpression));
+        mixin (visitIfNotNull!(enumMemberAttributes, name, type, assignExpression));
     }
+    /** */ EnumMemberAttribute[] enumMemberAttributes;
     /** */ Token name;
     /** */ Type type;
     /** */ ExpressionNode assignExpression;
