@@ -2651,7 +2651,7 @@ class Parser
      * Parses an EnumMember
      *
      * $(GRAMMAR $(RULEDEF enumMember):
-     *     ($(RULE enumMemberAttribute))* (LITERAL Identifier) ($(LITERAL '=') $(RULE assignExpression))?
+     *     ($(RULE enumMemberAttribute))* $(LITERAL Identifier) ($(LITERAL '=') $(RULE assignExpression))?
      *     ;)
      */
     EnumMember parseEnumMember()
