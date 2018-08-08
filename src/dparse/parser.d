@@ -6278,9 +6278,13 @@ class Parser
             break;
         case tok!"super":
         case tok!"this":
+            // note: super can be removed but `this` can be an alias to an instance.
             node.superOrThis = advance().type;
-            mixin(tokenCheck!".");
-            mixin(parseNodeQ!(`node.typeIdentifierPart`, `TypeIdentifierPart`));
+            if (currentIs(tok!"."))
+            {
+                advance();
+                mixin(parseNodeQ!(`node.typeIdentifierPart`, `TypeIdentifierPart`));
+            }
             break;
         case tok!"typeof":
             if ((node.typeofExpression = parseTypeofExpression()) is null)
