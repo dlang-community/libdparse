@@ -19,19 +19,5 @@ script:
   #
   - cd test && ./run_tests.sh && cd ..
   - find test/coverage -type f -exec mv {} . \;
-  # build docs and grammar
-  - if [ "$DEPLOY" -eq 1 ] ; then dub build -b ddox ; fi
-  - if [ "$DEPLOY" -eq 1 ] ; then ./DGrammar/generate_html_from_libdparse.sh ; fi
-  - if [ "$DEPLOY" -eq 1 ] ; then cp ./DGrammar/grammar.html docs/grammar.html ; fi
-  - if [ "$DEPLOY" -eq 1 ] ; then echo "libdparse.dlang.io" > docs/CNAME ; fi
-# Deploy using travis builtin GitHub Pages support
-deploy:
-  provider: pages
-  skip_cleanup: true
-  local_dir: docs
-  github_token: $GH_REPO_TOKEN
-  on:
-    branch: master
-    condition: "$DEPLOY = 1"
 after_success:
  - bash <(curl -s https://codecov.io/bash)
