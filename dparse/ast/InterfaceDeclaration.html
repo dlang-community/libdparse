@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Class InterfaceDeclaration</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Class InterfaceDeclaration</h1><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">class</span> <span class="typ">InterfaceDeclaration</span>
+				<br>&nbsp;&nbsp;: <a href="../../dparse/ast/ASTNode.html"><span class="typ">ASTNode</span></a>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Fields</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/InterfaceDeclaration.baseClassList.html" class="public"><code>baseClassList</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/BaseClassList.html"><span class="typ">BaseClassList</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/InterfaceDeclaration.comment.html" class="public"><code>comment</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">string</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/InterfaceDeclaration.constraint.html" class="public"><code>constraint</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/Constraint.html"><span class="typ">Constraint</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/InterfaceDeclaration.name.html" class="public"><code>name</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/InterfaceDeclaration.structBody.html" class="public"><code>structBody</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/StructBody.html"><span class="typ">StructBody</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/InterfaceDeclaration.templateParameters.html" class="public"><code>templateParameters</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/TemplateParameters.html"><span class="typ">TemplateParameters</span></a></code></td><td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/InterfaceDeclaration.accept.html" class="public">
+									<code>accept</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					<p>Brian Schott
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

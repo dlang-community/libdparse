@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Class Parser</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Class Parser</h1><p>D Parser.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">class</span> <span class="typ">Parser</span>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				<section><p>It is sometimes useful to sub-class Parser to skip over things that are not
+ interesting. For example, DCD skips over function bodies when caching symbols
+ from imported files.
+</p>
+</section>
+
+				<section><h2>Fields</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.allocator.html" class="public"><code>allocator</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/rollback_allocator/RollbackAllocator.html"><span class="typ">RollbackAllocator</span></a><span class="pun">*</span></code></td><td>Allocator used for creating AST nodes
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.errorCount.html" class="public"><code>errorCount</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td>Current error count
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.fileName.html" class="public"><code>fileName</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">string</span></code></td><td>Name used when reporting warnings and errors
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.messageDg.html" class="public"><code>messageDg</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span></code></td><td>Function that is called when a warning or error is encountered.
+ The parameters are the file name, line number, column number,
+ and the error or warning message.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.tokens.html" class="public"><code>tokens</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")<span class="pun">)</span><span class="pun">[]</span></code></td><td>Tokens to parse
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.warningCount.html" class="public"><code>warningCount</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td>Current warning count
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.cachedAAChecks.html" class="protected"><code>cachedAAChecks</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span><span class="pun">[</span><span class="typ">ulong</span><span class="pun">]</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.comment.html" class="protected"><code>comment</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">string</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.index.html" class="protected"><code>index</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ulong</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.REGISTER_NAMES.html" class="protected"><code>REGISTER_NAMES</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">immutable</span><span class="pun">(</span><span class="typ">char</span><span class="pun">[]</span><span class="pun">[]</span><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.suppressedErrorCount.html" class="protected"><code>suppressedErrorCount</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.suppressMessages.html" class="protected"><code>suppressMessages</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">int</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser._traceDepth.html" class="protected"><code>_traceDepth</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">int</span></code></td><td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Properties</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.current.html" class="protected property"><code>current</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.previous.html" class="protected property"><code>previous</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.moreTokens.html" class="public">
+									<code>moreTokens</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAddExpression.html" class="public">
+									<code>parseAddExpression</code>
+								</a>
+							</td>
+							<td>Parses an AddExpression.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAliasDeclaration.html" class="public">
+									<code>parseAliasDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an AliasDeclaration.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAliasInitializer.html" class="public">
+									<code>parseAliasInitializer</code>
+								</a>
+							</td>
+							<td>Parses an AliasInitializer.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAliasThisDeclaration.html" class="public">
+									<code>parseAliasThisDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an AliasThisDeclaration.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAlignAttribute.html" class="public">
+									<code>parseAlignAttribute</code>
+								</a>
+							</td>
+							<td>Parses an AlignAttribute.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAndAndExpression.html" class="public">
+									<code>parseAndAndExpression</code>
+								</a>
+							</td>
+							<td>Parses an AndAndExpression.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAndExpression.html" class="public">
+									<code>parseAndExpression</code>
+								</a>
+							</td>
+							<td>Parses an AndExpression.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAnonymousEnumDeclaration.html" class="public">
+									<code>parseAnonymousEnumDeclaration</code>
+								</a>
+							</td>
+							<td>anonymousEnumDeclaration:
+     'enum' (':' type)? '{' anonymousEnumMember+ '}'
+     ;
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAnonymousEnumMember.html" class="public">
+									<code>parseAnonymousEnumMember</code>
+								</a>
+							</td>
+							<td>anonymousEnumMember:
+       type identifier '=' assignExpression
+     | identifier '=' assignExpression
+     | identifier
+     ;
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseArgumentList.html" class="public">
+									<code>parseArgumentList</code>
+								</a>
+							</td>
+							<td>Parses an ArgumentList.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseArguments.html" class="public">
+									<code>parseArguments</code>
+								</a>
+							</td>
+							<td>Parses Arguments.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseArrayInitializer.html" class="public">
+									<code>parseArrayInitializer</code>
+								</a>
+							</td>
+							<td>Parses an ArrayInitializer.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseArrayLiteral.html" class="public">
+									<code>parseArrayLiteral</code>
+								</a>
+							</td>
+							<td>Parses an ArrayLiteral.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseArrayMemberInitialization.html" class="public">
+									<code>parseArrayMemberInitialization</code>
+								</a>
+							</td>
+							<td>Parses an ArrayMemberInitialization.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmAddExp.html" class="public">
+									<code>parseAsmAddExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmAddExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmAndExp.html" class="public">
+									<code>parseAsmAndExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmAndExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmBrExp.html" class="public">
+									<code>parseAsmBrExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmBrExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmEqualExp.html" class="public">
+									<code>parseAsmEqualExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmEqualExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmExp.html" class="public">
+									<code>parseAsmExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmInstruction.html" class="public">
+									<code>parseAsmInstruction</code>
+								</a>
+							</td>
+							<td>Parses an AsmInstruction
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmLogAndExp.html" class="public">
+									<code>parseAsmLogAndExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmLogAndExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmLogOrExp.html" class="public">
+									<code>parseAsmLogOrExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmLogOrExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmMulExp.html" class="public">
+									<code>parseAsmMulExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmMulExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmOrExp.html" class="public">
+									<code>parseAsmOrExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmOrExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmPrimaryExp.html" class="public">
+									<code>parseAsmPrimaryExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmPrimaryExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmRelExp.html" class="public">
+									<code>parseAsmRelExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmRelExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmShiftExp.html" class="public">
+									<code>parseAsmShiftExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmShiftExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmStatement.html" class="public">
+									<code>parseAsmStatement</code>
+								</a>
+							</td>
+							<td>Parses an AsmStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmTypePrefix.html" class="public">
+									<code>parseAsmTypePrefix</code>
+								</a>
+							</td>
+							<td>Parses an AsmTypePrefix
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmUnaExp.html" class="public">
+									<code>parseAsmUnaExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmUnaExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAsmXorExp.html" class="public">
+									<code>parseAsmXorExp</code>
+								</a>
+							</td>
+							<td>Parses an AsmXorExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAssertExpression.html" class="public">
+									<code>parseAssertExpression</code>
+								</a>
+							</td>
+							<td>Parses an AssertExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAssignExpression.html" class="public">
+									<code>parseAssignExpression</code>
+								</a>
+							</td>
+							<td>Parses an AssignExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAssocArrayLiteral.html" class="public">
+									<code>parseAssocArrayLiteral</code>
+								</a>
+							</td>
+							<td>Parses an AssocArrayLiteral
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAtAttribute.html" class="public">
+									<code>parseAtAttribute</code>
+								</a>
+							</td>
+							<td>Parses an AtAttribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAttribute.html" class="public">
+									<code>parseAttribute</code>
+								</a>
+							</td>
+							<td>Parses an Attribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAttributeDeclaration.html" class="public">
+									<code>parseAttributeDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an AttributeDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAutoDeclaration.html" class="public">
+									<code>parseAutoDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an AutoDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAutoDeclarationPart.html" class="public">
+									<code>parseAutoDeclarationPart</code>
+								</a>
+							</td>
+							<td>Parses an AutoDeclarationPart
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseBaseClass.html" class="public">
+									<code>parseBaseClass</code>
+								</a>
+							</td>
+							<td>Parses a BaseClass
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseBaseClassList.html" class="public">
+									<code>parseBaseClassList</code>
+								</a>
+							</td>
+							<td>Parses a BaseClassList
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseBlockStatement.html" class="public">
+									<code>parseBlockStatement</code>
+								</a>
+							</td>
+							<td>Parses a BlockStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseBodyStatement.html" class="public">
+									<code>parseBodyStatement</code>
+								</a>
+							</td>
+							<td>Parses a BodyStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseBreakStatement.html" class="public">
+									<code>parseBreakStatement</code>
+								</a>
+							</td>
+							<td>Parses a BreakStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseBuiltinType.html" class="public">
+									<code>parseBuiltinType</code>
+								</a>
+							</td>
+							<td>Parses an BuiltinType
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCaseRangeStatement.html" class="public">
+									<code>parseCaseRangeStatement</code>
+								</a>
+							</td>
+							<td>Parses a CaseRangeStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCaseStatement.html" class="public">
+									<code>parseCaseStatement</code>
+								</a>
+							</td>
+							<td>Parses an CaseStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCastExpression.html" class="public">
+									<code>parseCastExpression</code>
+								</a>
+							</td>
+							<td>Parses a CastExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCastQualifier.html" class="public">
+									<code>parseCastQualifier</code>
+								</a>
+							</td>
+							<td>Parses a CastQualifier
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCatch.html" class="public">
+									<code>parseCatch</code>
+								</a>
+							</td>
+							<td>Parses a Catch
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCatches.html" class="public">
+									<code>parseCatches</code>
+								</a>
+							</td>
+							<td>Parses a Catches
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseClassDeclaration.html" class="public">
+									<code>parseClassDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a ClassDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCmpExpression.html" class="public">
+									<code>parseCmpExpression</code>
+								</a>
+							</td>
+							<td>Parses a CmpExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCompileCondition.html" class="public">
+									<code>parseCompileCondition</code>
+								</a>
+							</td>
+							<td>Parses a CompileCondition
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseConditionalDeclaration.html" class="public">
+									<code>parseConditionalDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a ConditionalDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseConditionalStatement.html" class="public">
+									<code>parseConditionalStatement</code>
+								</a>
+							</td>
+							<td>Parses a ConditionalStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseConstraint.html" class="public">
+									<code>parseConstraint</code>
+								</a>
+							</td>
+							<td>Parses a Constraint
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseConstructor.html" class="public">
+									<code>parseConstructor</code>
+								</a>
+							</td>
+							<td>Parses a Constructor
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseContinueStatement.html" class="public">
+									<code>parseContinueStatement</code>
+								</a>
+							</td>
+							<td>Parses an ContinueStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDebugCondition.html" class="public">
+									<code>parseDebugCondition</code>
+								</a>
+							</td>
+							<td>Parses a DebugCondition
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDebugSpecification.html" class="public">
+									<code>parseDebugSpecification</code>
+								</a>
+							</td>
+							<td>Parses a DebugSpecification
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDeclaration.html" class="public">
+									<code>parseDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a Declaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDeclarationOrStatement.html" class="public">
+									<code>parseDeclarationOrStatement</code>
+								</a>
+							</td>
+							<td>Parses a DeclarationOrStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDeclarationsAndStatements.html" class="public">
+									<code>parseDeclarationsAndStatements</code>
+								</a>
+							</td>
+							<td>Parses DeclarationsAndStatements
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDeclarator.html" class="public">
+									<code>parseDeclarator</code>
+								</a>
+							</td>
+							<td>Parses a Declarator
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDeclaratorIdentifierList.html" class="public">
+									<code>parseDeclaratorIdentifierList</code>
+								</a>
+							</td>
+							<td>Parses a DeclaratorIdentifierList
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDefaultStatement.html" class="public">
+									<code>parseDefaultStatement</code>
+								</a>
+							</td>
+							<td>Parses a DefaultStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDeleteExpression.html" class="public">
+									<code>parseDeleteExpression</code>
+								</a>
+							</td>
+							<td>Parses a DeleteExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDeprecated.html" class="public">
+									<code>parseDeprecated</code>
+								</a>
+							</td>
+							<td>Parses a Deprecated attribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDestructor.html" class="public">
+									<code>parseDestructor</code>
+								</a>
+							</td>
+							<td>Parses a Destructor
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseDoStatement.html" class="public">
+									<code>parseDoStatement</code>
+								</a>
+							</td>
+							<td>Parses a DoStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseEnumBody.html" class="public">
+									<code>parseEnumBody</code>
+								</a>
+							</td>
+							<td>Parses an EnumBody
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseEnumDeclaration.html" class="public">
+									<code>parseEnumDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an EnumDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseEnumMember.html" class="public">
+									<code>parseEnumMember</code>
+								</a>
+							</td>
+							<td>Parses an EnumMember
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseEnumMemberAttribute.html" class="public">
+									<code>parseEnumMemberAttribute</code>
+								</a>
+							</td>
+							<td>Parses an EnumMemberAttribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseEponymousTemplateDeclaration.html" class="public">
+									<code>parseEponymousTemplateDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an EponymousTemplateDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseEqualExpression.html" class="public">
+									<code>parseEqualExpression</code>
+								</a>
+							</td>
+							<td>Parses an EqualExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseExpression.html" class="public">
+									<code>parseExpression</code>
+								</a>
+							</td>
+							<td>Parses an Expression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseExpressionStatement.html" class="public">
+									<code>parseExpressionStatement</code>
+								</a>
+							</td>
+							<td>Parses an ExpressionStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseFinally.html" class="public">
+									<code>parseFinally</code>
+								</a>
+							</td>
+							<td>Parses a Finally
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseFinalSwitchStatement.html" class="public">
+									<code>parseFinalSwitchStatement</code>
+								</a>
+							</td>
+							<td>Parses a FinalSwitchStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseForeach.html" class="public">
+									<code>parseForeach</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseForeachStatement.html" class="public">
+									<code>parseForeachStatement</code>
+								</a>
+							</td>
+							<td>Parses a ForeachStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseForeachType.html" class="public">
+									<code>parseForeachType</code>
+								</a>
+							</td>
+							<td>Parses a ForeachType
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseForeachTypeList.html" class="public">
+									<code>parseForeachTypeList</code>
+								</a>
+							</td>
+							<td>Parses a ForeachTypeList
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseForStatement.html" class="public">
+									<code>parseForStatement</code>
+								</a>
+							</td>
+							<td>Parses a ForStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseFunctionAttribute.html" class="public">
+									<code>parseFunctionAttribute</code>
+								</a>
+							</td>
+							<td>Parses a FunctionAttribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseFunctionBody.html" class="public">
+									<code>parseFunctionBody</code>
+								</a>
+							</td>
+							<td>Parses a FunctionBody
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseFunctionCallExpression.html" class="public">
+									<code>parseFunctionCallExpression</code>
+								</a>
+							</td>
+							<td>Parses a FunctionCallExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseFunctionDeclaration.html" class="public">
+									<code>parseFunctionDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a FunctionDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseFunctionLiteralExpression.html" class="public">
+									<code>parseFunctionLiteralExpression</code>
+								</a>
+							</td>
+							<td>Parses a FunctionLiteralExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseGotoStatement.html" class="public">
+									<code>parseGotoStatement</code>
+								</a>
+							</td>
+							<td>Parses a GotoStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIdentifierChain.html" class="public">
+									<code>parseIdentifierChain</code>
+								</a>
+							</td>
+							<td>Parses an IdentifierChain
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIdentifierOrTemplateChain.html" class="public">
+									<code>parseIdentifierOrTemplateChain</code>
+								</a>
+							</td>
+							<td>Parses an IdentifierOrTemplateChain
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIdentifierOrTemplateInstance.html" class="public">
+									<code>parseIdentifierOrTemplateInstance</code>
+								</a>
+							</td>
+							<td>Parses an IdentifierOrTemplateInstance
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIdentityExpression.html" class="public">
+									<code>parseIdentityExpression</code>
+								</a>
+							</td>
+							<td>Parses an IdentityExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIfStatement.html" class="public">
+									<code>parseIfStatement</code>
+								</a>
+							</td>
+							<td>Parses an IfStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseImportBind.html" class="public">
+									<code>parseImportBind</code>
+								</a>
+							</td>
+							<td>Parses an ImportBind
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseImportBindings.html" class="public">
+									<code>parseImportBindings</code>
+								</a>
+							</td>
+							<td>Parses ImportBindings
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseImportDeclaration.html" class="public">
+									<code>parseImportDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an ImportDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseImportExpression.html" class="public">
+									<code>parseImportExpression</code>
+								</a>
+							</td>
+							<td>Parses an ImportExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIndex.html" class="public">
+									<code>parseIndex</code>
+								</a>
+							</td>
+							<td>Parses an Index
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIndexExpression.html" class="public">
+									<code>parseIndexExpression</code>
+								</a>
+							</td>
+							<td>Parses an IndexExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInExpression.html" class="public">
+									<code>parseInExpression</code>
+								</a>
+							</td>
+							<td>Parses an InExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInitializer.html" class="public">
+									<code>parseInitializer</code>
+								</a>
+							</td>
+							<td>Parses an Initializer
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInStatement.html" class="public">
+									<code>parseInStatement</code>
+								</a>
+							</td>
+							<td>Parses an InStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInterfaceDeclaration.html" class="public">
+									<code>parseInterfaceDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an InterfaceDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInvariant.html" class="public">
+									<code>parseInvariant</code>
+								</a>
+							</td>
+							<td>Parses an Invariant
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIsExpression.html" class="public">
+									<code>parseIsExpression</code>
+								</a>
+							</td>
+							<td>Parses an IsExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseKeyValuePair.html" class="public">
+									<code>parseKeyValuePair</code>
+								</a>
+							</td>
+							<td>Parses a KeyValuePair
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseKeyValuePairs.html" class="public">
+									<code>parseKeyValuePairs</code>
+								</a>
+							</td>
+							<td>Parses KeyValuePairs
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseLabeledStatement.html" class="public">
+									<code>parseLabeledStatement</code>
+								</a>
+							</td>
+							<td>Parses a LabeledStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseLastCatch.html" class="public">
+									<code>parseLastCatch</code>
+								</a>
+							</td>
+							<td>Parses a LastCatch
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseLinkageAttribute.html" class="public">
+									<code>parseLinkageAttribute</code>
+								</a>
+							</td>
+							<td>Parses a LinkageAttribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseMemberFunctionAttribute.html" class="public">
+									<code>parseMemberFunctionAttribute</code>
+								</a>
+							</td>
+							<td>Parses a MemberFunctionAttribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseMixinDeclaration.html" class="public">
+									<code>parseMixinDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a MixinDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseMixinExpression.html" class="public">
+									<code>parseMixinExpression</code>
+								</a>
+							</td>
+							<td>Parses a MixinExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseMixinTemplateDeclaration.html" class="public">
+									<code>parseMixinTemplateDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a MixinTemplateDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseMixinTemplateName.html" class="public">
+									<code>parseMixinTemplateName</code>
+								</a>
+							</td>
+							<td>Parses a MixinTemplateName
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseModule.html" class="public">
+									<code>parseModule</code>
+								</a>
+							</td>
+							<td>Parses a Module
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseModuleDeclaration.html" class="public">
+									<code>parseModuleDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a ModuleDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseMulExpression.html" class="public">
+									<code>parseMulExpression</code>
+								</a>
+							</td>
+							<td>Parses a MulExpression.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseNewAnonClassExpression.html" class="public">
+									<code>parseNewAnonClassExpression</code>
+								</a>
+							</td>
+							<td>Parses a NewAnonClassExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseNewExpression.html" class="public">
+									<code>parseNewExpression</code>
+								</a>
+							</td>
+							<td>Parses a NewExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseNonVoidInitializer.html" class="public">
+									<code>parseNonVoidInitializer</code>
+								</a>
+							</td>
+							<td>Parses a NonVoidInitializer
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseOperands.html" class="public">
+									<code>parseOperands</code>
+								</a>
+							</td>
+							<td>Parses Operands
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseOrExpression.html" class="public">
+									<code>parseOrExpression</code>
+								</a>
+							</td>
+							<td>Parses an OrExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseOrOrExpression.html" class="public">
+									<code>parseOrOrExpression</code>
+								</a>
+							</td>
+							<td>Parses an OrOrExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseOutStatement.html" class="public">
+									<code>parseOutStatement</code>
+								</a>
+							</td>
+							<td>Parses an OutStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseParameter.html" class="public">
+									<code>parseParameter</code>
+								</a>
+							</td>
+							<td>Parses a Parameter
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseParameterAttribute.html" class="public">
+									<code>parseParameterAttribute</code>
+								</a>
+							</td>
+							<td>Parses a ParameterAttribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseParameters.html" class="public">
+									<code>parseParameters</code>
+								</a>
+							</td>
+							<td>Parses Parameters
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parsePostblit.html" class="public">
+									<code>parsePostblit</code>
+								</a>
+							</td>
+							<td>Parses a Postblit
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parsePowExpression.html" class="public">
+									<code>parsePowExpression</code>
+								</a>
+							</td>
+							<td>Parses a PowExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parsePragmaDeclaration.html" class="public">
+									<code>parsePragmaDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a PragmaDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parsePragmaExpression.html" class="public">
+									<code>parsePragmaExpression</code>
+								</a>
+							</td>
+							<td>Parses a PragmaExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parsePragmaStatement.html" class="public">
+									<code>parsePragmaStatement</code>
+								</a>
+							</td>
+							<td>Parses a PragmaStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parsePrimaryExpression.html" class="public">
+									<code>parsePrimaryExpression</code>
+								</a>
+							</td>
+							<td>Parses a PrimaryExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseRegister.html" class="public">
+									<code>parseRegister</code>
+								</a>
+							</td>
+							<td>Parses a Register
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseRelExpression.html" class="public">
+									<code>parseRelExpression</code>
+								</a>
+							</td>
+							<td>Parses a RelExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseReturnStatement.html" class="public">
+									<code>parseReturnStatement</code>
+								</a>
+							</td>
+							<td>Parses a ReturnStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseScopeGuardStatement.html" class="public">
+									<code>parseScopeGuardStatement</code>
+								</a>
+							</td>
+							<td>Parses a ScopeGuardStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseSharedStaticConstructor.html" class="public">
+									<code>parseSharedStaticConstructor</code>
+								</a>
+							</td>
+							<td>Parses a SharedStaticConstructor
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseSharedStaticDestructor.html" class="public">
+									<code>parseSharedStaticDestructor</code>
+								</a>
+							</td>
+							<td>Parses a SharedStaticDestructor
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseShiftExpression.html" class="public">
+									<code>parseShiftExpression</code>
+								</a>
+							</td>
+							<td>Parses a ShiftExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseSingleImport.html" class="public">
+									<code>parseSingleImport</code>
+								</a>
+							</td>
+							<td>Parses a SingleImport
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStatement.html" class="public">
+									<code>parseStatement</code>
+								</a>
+							</td>
+							<td>Parses a Statement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStatementNoCaseNoDefault.html" class="public">
+									<code>parseStatementNoCaseNoDefault</code>
+								</a>
+							</td>
+							<td>Parses a StatementNoCaseNoDefault
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStaticAssertDeclaration.html" class="public">
+									<code>parseStaticAssertDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a StaticAssertDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStaticAssertStatement.html" class="public">
+									<code>parseStaticAssertStatement</code>
+								</a>
+							</td>
+							<td>Parses a StaticAssertStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStaticConstructor.html" class="public">
+									<code>parseStaticConstructor</code>
+								</a>
+							</td>
+							<td>Parses a StaticConstructor
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStaticDestructor.html" class="public">
+									<code>parseStaticDestructor</code>
+								</a>
+							</td>
+							<td>Parses a StaticDestructor
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStaticForeachDeclaration.html" class="public">
+									<code>parseStaticForeachDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a StaticForeachDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStaticForeachStatement.html" class="public">
+									<code>parseStaticForeachStatement</code>
+								</a>
+							</td>
+							<td>Parses a StaticForeachStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStaticIfCondition.html" class="public">
+									<code>parseStaticIfCondition</code>
+								</a>
+							</td>
+							<td>Parses an StaticIfCondition
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStorageClass.html" class="public">
+									<code>parseStorageClass</code>
+								</a>
+							</td>
+							<td>Parses a StorageClass
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStructBody.html" class="public">
+									<code>parseStructBody</code>
+								</a>
+							</td>
+							<td>Parses a StructBody
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStructDeclaration.html" class="public">
+									<code>parseStructDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a StructDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStructInitializer.html" class="public">
+									<code>parseStructInitializer</code>
+								</a>
+							</td>
+							<td>Parses an StructInitializer
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStructMemberInitializer.html" class="public">
+									<code>parseStructMemberInitializer</code>
+								</a>
+							</td>
+							<td>Parses a StructMemberInitializer
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStructMemberInitializers.html" class="public">
+									<code>parseStructMemberInitializers</code>
+								</a>
+							</td>
+							<td>Parses StructMemberInitializers
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseSwitchStatement.html" class="public">
+									<code>parseSwitchStatement</code>
+								</a>
+							</td>
+							<td>Parses a SwitchStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseSymbol.html" class="public">
+									<code>parseSymbol</code>
+								</a>
+							</td>
+							<td>Parses a Symbol
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseSynchronizedStatement.html" class="public">
+									<code>parseSynchronizedStatement</code>
+								</a>
+							</td>
+							<td>Parses a SynchronizedStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateAliasParameter.html" class="public">
+									<code>parseTemplateAliasParameter</code>
+								</a>
+							</td>
+							<td>Parses a TemplateAliasParameter
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateArgument.html" class="public">
+									<code>parseTemplateArgument</code>
+								</a>
+							</td>
+							<td>Parses a TemplateArgument
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateArgumentList.html" class="public">
+									<code>parseTemplateArgumentList</code>
+								</a>
+							</td>
+							<td>Parses a TemplateArgumentList
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateArguments.html" class="public">
+									<code>parseTemplateArguments</code>
+								</a>
+							</td>
+							<td>Parses TemplateArguments
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateDeclaration.html" class="public">
+									<code>parseTemplateDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a TemplateDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateInstance.html" class="public">
+									<code>parseTemplateInstance</code>
+								</a>
+							</td>
+							<td>Parses a TemplateInstance
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateMixinExpression.html" class="public">
+									<code>parseTemplateMixinExpression</code>
+								</a>
+							</td>
+							<td>Parses a TemplateMixinExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateParameter.html" class="public">
+									<code>parseTemplateParameter</code>
+								</a>
+							</td>
+							<td>Parses a TemplateParameter
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateParameterList.html" class="public">
+									<code>parseTemplateParameterList</code>
+								</a>
+							</td>
+							<td>Parses a TemplateParameterList
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateParameters.html" class="public">
+									<code>parseTemplateParameters</code>
+								</a>
+							</td>
+							<td>Parses TemplateParameters
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateSingleArgument.html" class="public">
+									<code>parseTemplateSingleArgument</code>
+								</a>
+							</td>
+							<td>Parses a TemplateSingleArgument
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateThisParameter.html" class="public">
+									<code>parseTemplateThisParameter</code>
+								</a>
+							</td>
+							<td>Parses a TemplateThisParameter
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateTupleParameter.html" class="public">
+									<code>parseTemplateTupleParameter</code>
+								</a>
+							</td>
+							<td>Parses an TemplateTupleParameter
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateTypeParameter.html" class="public">
+									<code>parseTemplateTypeParameter</code>
+								</a>
+							</td>
+							<td>Parses a TemplateTypeParameter
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateValueParameter.html" class="public">
+									<code>parseTemplateValueParameter</code>
+								</a>
+							</td>
+							<td>Parses a TemplateValueParameter
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTemplateValueParameterDefault.html" class="public">
+									<code>parseTemplateValueParameterDefault</code>
+								</a>
+							</td>
+							<td>Parses a TemplateValueParameterDefault
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTernaryExpression.html" class="public">
+									<code>parseTernaryExpression</code>
+								</a>
+							</td>
+							<td>Parses a TernaryExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseThrowStatement.html" class="public">
+									<code>parseThrowStatement</code>
+								</a>
+							</td>
+							<td>Parses a ThrowStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTraitsExpression.html" class="public">
+									<code>parseTraitsExpression</code>
+								</a>
+							</td>
+							<td>Parses an TraitsExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTryStatement.html" class="public">
+									<code>parseTryStatement</code>
+								</a>
+							</td>
+							<td>Parses a TryStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseType.html" class="public">
+									<code>parseType</code>
+								</a>
+							</td>
+							<td>Parses a Type
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseType2.html" class="public">
+									<code>parseType2</code>
+								</a>
+							</td>
+							<td>Parses a Type2
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTypeConstructor.html" class="public">
+									<code>parseTypeConstructor</code>
+								</a>
+							</td>
+							<td>Parses a TypeConstructor
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTypeConstructors.html" class="public">
+									<code>parseTypeConstructors</code>
+								</a>
+							</td>
+							<td>Parses TypeConstructors
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTypeIdentifierPart.html" class="public">
+									<code>parseTypeIdentifierPart</code>
+								</a>
+							</td>
+							<td>Parses a TypeIdentifierPart.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTypeidExpression.html" class="public">
+									<code>parseTypeidExpression</code>
+								</a>
+							</td>
+							<td>Parses a TypeidExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTypeofExpression.html" class="public">
+									<code>parseTypeofExpression</code>
+								</a>
+							</td>
+							<td>Parses a TypeofExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTypeSpecialization.html" class="public">
+									<code>parseTypeSpecialization</code>
+								</a>
+							</td>
+							<td>Parses a TypeSpecialization
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseTypeSuffix.html" class="public">
+									<code>parseTypeSuffix</code>
+								</a>
+							</td>
+							<td>Parses a TypeSuffix
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseUnaryExpression.html" class="public">
+									<code>parseUnaryExpression</code>
+								</a>
+							</td>
+							<td>Parses a UnaryExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseUnionDeclaration.html" class="public">
+									<code>parseUnionDeclaration</code>
+								</a>
+							</td>
+							<td>Parses an UnionDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseUnittest.html" class="public">
+									<code>parseUnittest</code>
+								</a>
+							</td>
+							<td>Parses a Unittest
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseVariableDeclaration.html" class="public">
+									<code>parseVariableDeclaration</code>
+								</a>
+							</td>
+							<td>Parses a VariableDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseVector.html" class="public">
+									<code>parseVector</code>
+								</a>
+							</td>
+							<td>Parses a Vector
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseVersionCondition.html" class="public">
+									<code>parseVersionCondition</code>
+								</a>
+							</td>
+							<td>Parses a VersionCondition
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseVersionSpecification.html" class="public">
+									<code>parseVersionSpecification</code>
+								</a>
+							</td>
+							<td>Parses a VersionSpecification
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseWhileStatement.html" class="public">
+									<code>parseWhileStatement</code>
+								</a>
+							</td>
+							<td>Parses a WhileStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseWithStatement.html" class="public">
+									<code>parseWithStatement</code>
+								</a>
+							</td>
+							<td>Parses a WithStatement
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseXorExpression.html" class="public">
+									<code>parseXorExpression</code>
+								</a>
+							</td>
+							<td>Parses an XorExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.setTokens.html" class="public">
+									<code>setTokens</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.trace.html" class="public">
+									<code>trace</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.abandonBookmark.html" class="protected">
+									<code>abandonBookmark</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.advance.html" class="protected">
+									<code>advance</code>
+								</a>
+							</td>
+							<td>Advances to the next token and returns the current token
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.attachCommentFromSemicolon.html" class="protected">
+									<code>attachCommentFromSemicolon</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.currentIs.html" class="protected">
+									<code>currentIs</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.currentIsMemberFunctionAttribute.html" class="protected">
+									<code>currentIsMemberFunctionAttribute</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.currentIsOneOf.html" class="protected">
+									<code>currentIsOneOf</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.error.html" class="protected">
+									<code>error</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.expect.html" class="protected">
+									<code>expect</code>
+								</a>
+							</td>
+							<td>Returns a token of the specified type if it was the next token, otherwise
+ calls the error function and returns null. Advances the lexer by one token.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.goToBookmark.html" class="protected">
+									<code>goToBookmark</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.hasMagicDelimiter.html" class="protected">
+									<code>hasMagicDelimiter</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isAssociativeArrayLiteral.html" class="protected">
+									<code>isAssociativeArrayLiteral</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isAttribute.html" class="protected">
+									<code>isAttribute</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isAutoDeclaration.html" class="protected">
+									<code>isAutoDeclaration</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isCastQualifier.html" class="protected">
+									<code>isCastQualifier</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isDeclaration.html" class="protected">
+									<code>isDeclaration</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isMemberFunctionAttribute.html" class="protected">
+									<code>isMemberFunctionAttribute</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isStorageClass.html" class="protected">
+									<code>isStorageClass</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isType.html" class="protected">
+									<code>isType</code>
+								</a>
+							</td>
+							<td>Only use this in template parameter parsing
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.isTypeCtor.html" class="protected">
+									<code>isTypeCtor</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.ownArray.html" class="protected">
+									<code>ownArray</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAssertForContractExp.html" class="protected">
+									<code>parseAssertForContractExp</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseCommaSeparatedRule.html" class="protected">
+									<code>parseCommaSeparatedRule</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseContractExpression.html" class="protected">
+									<code>parseContractExpression</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInterfaceOrClass.html" class="protected">
+									<code>parseInterfaceOrClass</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseLeftAssocBinaryExpression.html" class="protected">
+									<code>parseLeftAssocBinaryExpression</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseStaticCtorDtorCommon.html" class="protected">
+									<code>parseStaticCtorDtorCommon</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peek.html" class="protected">
+									<code>peek</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekIs.html" class="protected">
+									<code>peekIs</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekIsOneOf.html" class="protected">
+									<code>peekIsOneOf</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekPast.html" class="protected">
+									<code>peekPast</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekPastBraces.html" class="protected">
+									<code>peekPastBraces</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekPastBrackets.html" class="protected">
+									<code>peekPastBrackets</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekPastParens.html" class="protected">
+									<code>peekPastParens</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.setBookmark.html" class="protected">
+									<code>setBookmark</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.skip.html" class="protected">
+									<code>skip</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.skipBraces.html" class="protected">
+									<code>skipBraces</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.skipBrackets.html" class="protected">
+									<code>skipBrackets</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.skipParens.html" class="protected">
+									<code>skipParens</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.startsWith.html" class="protected">
+									<code>startsWith</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.trace.html" class="protected">
+									<code>trace</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.warn.html" class="protected">
+									<code>warn</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Enums</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.DecType.html" class="protected">
+									<code>DecType</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Aliases</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.messageFunction.html" class="public">
+									<code>messageFunction</code>
+								</a>
+							</td>
+							<td>Function that is called when a warning or error is encountered.
+ The parameters are the file name, line number, column number,
+ and the error or warning message.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.Bookmark.html" class="protected">
+									<code>Bookmark</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

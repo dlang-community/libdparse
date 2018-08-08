@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Function unDecorateComment</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Function unDecorateComment</h1><p>Removes "decoration" such as leading whitespace, leading + and * characters,
+ and places the result into the given output range
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">unDecorateComment</span>(T)
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">string</span> <span class="pln">comment</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">auto ref </span><span class="pln">T</span> <span class="pln">outputRange</span>
+				<br/>
+				<span class="pun">)</span>
+				<br/>
+				<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isOutputRange</span><span class="pun">!(</span><span class="pln">T</span><span class="pun">, </span><span class="typ">string</span><span class="pun">)</span><span class="pun">);</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Example</h2>
+
+<pre class="code"><code class="lang-d"><span class="kwd">import </span><span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">array</span><span class="pun">:</span><span class="pln">array</span><span class="pun">, </span><span class="pln">appender</span><span class="pun">;
+</span><span class="kwd">import </span><span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">stdio</span><span class="pun">:</span><span class="pln">stderr</span><span class="pun">;
+</span><span class="pln">stderr<wbr/></span><span class="pun">.</span><span class="pln">writeln</span><span class="pun">(</span><span class="str">"Running unittest for unDecorateComment..."</span><span class="pun">);
+
+
+</span><span class="typ">string</span><span class="pun">[] </span><span class="pln">inputs </span><span class="pun">= [
+    </span><span class="str">"/***************\n*******************/"</span><span class="pun">,
+    </span><span class="str">"/***************\n *\n ******************/"</span><span class="pun">,
+    </span><span class="str">"/**\n*/"</span><span class="pun">,
+    </span><span class="str">"/** */"</span><span class="pun">,
+    </span><span class="str">"/***/"</span><span class="pun">,
+    </span><span class="str">"/** abcde */"</span><span class="pun">,
+    </span><span class="str">"/// abcde\n/// abcde"</span><span class="pun">,
+    </span><span class="str">"/**\n * stuff\n */"</span><span class="pun">,
+    </span><span class="str">"/**\n *\n * stuff\n */"</span><span class="pun">,
+    </span><span class="str">"/**\n *\n * stuff\n *\n */"</span><span class="pun">,
+    </span><span class="str">"/**\n *\n * stuff\n *\n*/"</span><span class="pun">,
+    </span><span class="str">"/**\n *  abcde\n *    abcde \n */"</span><span class="pun">,
+    </span><span class="str">"/**\n * abcde\n *\n * abcde\n */"</span><span class="pun">,
+];
+</span><span class="typ">string</span><span class="pun">[] </span><span class="pln">outputs </span><span class="pun">= [
+    </span><span class="str">""</span><span class="pun">,
+    </span><span class="str">""</span><span class="pun">,
+    </span><span class="str">""</span><span class="pun">,
+    </span><span class="str">""</span><span class="pun">,
+    </span><span class="str">""</span><span class="pun">,
+    </span><span class="str">"abcde"</span><span class="pun">,
+    </span><span class="str">"abcde\nabcde"</span><span class="pun">,
+    </span><span class="str">"stuff"</span><span class="pun">,
+    </span><span class="str">"stuff"</span><span class="pun">,
+    </span><span class="str">"stuff"</span><span class="pun">,
+    </span><span class="str">"stuff"</span><span class="pun">,
+    </span><span class="str">"abcde\n  abcde"</span><span class="pun">,
+    </span><span class="str">"abcde\n\nabcde"
+</span><span class="pun">];
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">inputs<wbr/></span><span class="pun">.</span><span class="pln">length </span><span class="pun">== </span><span class="pln">outputs<wbr/></span><span class="pun">.</span><span class="pln">length</span><span class="pun">);
+</span><span class="kwd">foreach </span><span class="pun">(</span><span class="pln">pair</span><span class="pun">; </span><span class="pln">zip</span><span class="pun">(</span><span class="pln">inputs</span><span class="pun">, </span><span class="pln">outputs</span><span class="pun">))
+{
+    </span><span class="kwd">foreach </span><span class="pun">(</span><span class="pln">b</span><span class="pun">; [</span><span class="kwd">true</span><span class="pun">, </span><span class="kwd">false</span><span class="pun">])
+    {
+        </span><span class="kwd">auto </span><span class="pln">app </span><span class="pun">= </span><span class="pln">appender</span><span class="pun">!</span><span class="typ">string</span><span class="pun">();
+        </span><span class="pln">unDecorateComment</span><span class="pun">(</span><span class="pln">b </span><span class="pun">? </span><span class="pln">pair</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] : </span><span class="pln">pair</span><span class="pun">[</span><span class="lit">0</span><span class="pun">]<wbr/>.</span><span class="pln">replace</span><span class="pun">(</span><span class="str">"*"</span><span class="pun">, </span><span class="str">"+"</span><span class="pun">), </span><span class="pln">app</span><span class="pun">);
+        </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">pair</span><span class="pun">[</span><span class="lit">1</span><span class="pun">] == </span><span class="pln">app<wbr/></span><span class="pun">.</span><span class="pln">data</span><span class="pun">, </span><span class="str">"[[" </span><span class="pun">~ </span><span class="pln">pair</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] ~ </span><span class="str">"]] =&gt; [[" </span><span class="pun">~ </span><span class="pln">app<wbr/></span><span class="pun">.</span><span class="pln">data </span><span class="pun">~ </span><span class="str">"]]"</span><span class="pun">);
+    }
+}
+</span><span class="pln">stderr<wbr/></span><span class="pun">.</span><span class="pln">writeln</span><span class="pun">(</span><span class="str">"Unittest for unDecorateComment passed."</span><span class="pun">);
+</span></code></pre>
+</section>
+
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

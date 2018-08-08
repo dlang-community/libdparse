@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Class Formatter</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Class Formatter</h1><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">class</span> <span class="typ">Formatter</span>(Sink)
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Constructors</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.this.html" class="public">
+									<code>this</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Fields</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.caseDepth.html" class="public"><code>caseDepth</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.currentThing.html" class="public"><code>currentThing</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/formatter/Formatter.What.html"><span class="typ">Formatter<wbr/></span><span class="pun">.<wbr/></span><span class="typ">What</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.ignoreNewlines.html" class="public"><code>ignoreNewlines</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.indentLevel.html" class="public"><code>indentLevel</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.indentWidth.html" class="public"><code>indentWidth</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.lastThing.html" class="public"><code>lastThing</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/formatter/Formatter.What.html"><span class="typ">Formatter<wbr/></span><span class="pun">.<wbr/></span><span class="typ">What</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.lineLength.html" class="public"><code>lineLength</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.maxLineLength.html" class="public"><code>maxLineLength</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.sink.html" class="public"><code>sink</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">Sink</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.style.html" class="public"><code>style</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/formatter/IndentStyle.html"><span class="typ">IndentStyle</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.useTabs.html" class="public"><code>useTabs</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span></code></td><td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.binary.html" class="public">
+									<code>binary</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.endBlock.html" class="public">
+									<code>endBlock</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.format.html" class="public">
+									<code>format</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.formatCaseDecls.html" class="public">
+									<code>formatCaseDecls</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.getIndent.html" class="public">
+									<code>getIndent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.indent.html" class="public">
+									<code>indent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.isEmptyDeclaration.html" class="public">
+									<code>isEmptyDeclaration</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.lineGap.html" class="public">
+									<code>lineGap</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.maybeIndent.html" class="public">
+									<code>maybeIndent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.needIndent.html" class="public">
+									<code>needIndent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.needIndent.html" class="public">
+									<code>needIndent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.needIndent.html" class="public">
+									<code>needIndent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.newline.html" class="public">
+									<code>newline</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.newlineIndent.html" class="public">
+									<code>newlineIndent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.newThing.html" class="public">
+									<code>newThing</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.outdent.html" class="public">
+									<code>outdent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.put.html" class="public">
+									<code>put</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.putAttrs.html" class="public">
+									<code>putAttrs</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.putComment.html" class="public">
+									<code>putComment</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.putIndent.html" class="public">
+									<code>putIndent</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.space.html" class="public">
+									<code>space</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.startBlock.html" class="public">
+									<code>startBlock</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.tokenRep.html" class="public">
+									<code>tokenRep</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.tokenRep.html" class="public">
+									<code>tokenRep</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Enums</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/formatter/Formatter.What.html" class="public">
+									<code>What</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

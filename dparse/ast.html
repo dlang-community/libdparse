@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Module dparse.ast</title>
+		<link rel="stylesheet" href="../css/style.min.css"/>
+		<script type="text/javascript" src="../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module selected">
+							<a href="../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Module dparse.ast</h1><p>This module defines an Abstract Syntax Tree for the D language
+</p><section></section>
+
+				<section><section><h2>Examples</h2>
+<pre class="code"><code class="lang-d"><span class="com">// TODO</span></code></pre>
+</section>
+</section>
+				<section>
+					<h2>Interfaces</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ASTNode" class="public" href="../dparse/ast/ASTNode.html">ASTNode</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Classes</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AddExpression" class="public" href="../dparse/ast/AddExpression.html">AddExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AliasDeclaration" class="public" href="../dparse/ast/AliasDeclaration.html">AliasDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AliasInitializer" class="public" href="../dparse/ast/AliasInitializer.html">AliasInitializer</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AliasThisDeclaration" class="public" href="../dparse/ast/AliasThisDeclaration.html">AliasThisDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AlignAttribute" class="public" href="../dparse/ast/AlignAttribute.html">AlignAttribute</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AndAndExpression" class="public" href="../dparse/ast/AndAndExpression.html">AndAndExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AndExpression" class="public" href="../dparse/ast/AndExpression.html">AndExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AnonymousEnumDeclaration" class="public" href="../dparse/ast/AnonymousEnumDeclaration.html">AnonymousEnumDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AnonymousEnumMember" class="public" href="../dparse/ast/AnonymousEnumMember.html">AnonymousEnumMember</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ArgumentList" class="public" href="../dparse/ast/ArgumentList.html">ArgumentList</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Arguments" class="public" href="../dparse/ast/Arguments.html">Arguments</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ArrayInitializer" class="public" href="../dparse/ast/ArrayInitializer.html">ArrayInitializer</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ArrayLiteral" class="public" href="../dparse/ast/ArrayLiteral.html">ArrayLiteral</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ArrayMemberInitialization" class="public" href="../dparse/ast/ArrayMemberInitialization.html">ArrayMemberInitialization</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmAddExp" class="public" href="../dparse/ast/AsmAddExp.html">AsmAddExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmAndExp" class="public" href="../dparse/ast/AsmAndExp.html">AsmAndExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmBrExp" class="public" href="../dparse/ast/AsmBrExp.html">AsmBrExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmEqualExp" class="public" href="../dparse/ast/AsmEqualExp.html">AsmEqualExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmExp" class="public" href="../dparse/ast/AsmExp.html">AsmExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmInstruction" class="public" href="../dparse/ast/AsmInstruction.html">AsmInstruction</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmLogAndExp" class="public" href="../dparse/ast/AsmLogAndExp.html">AsmLogAndExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmLogOrExp" class="public" href="../dparse/ast/AsmLogOrExp.html">AsmLogOrExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmMulExp" class="public" href="../dparse/ast/AsmMulExp.html">AsmMulExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmOrExp" class="public" href="../dparse/ast/AsmOrExp.html">AsmOrExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmPrimaryExp" class="public" href="../dparse/ast/AsmPrimaryExp.html">AsmPrimaryExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmRelExp" class="public" href="../dparse/ast/AsmRelExp.html">AsmRelExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmShiftExp" class="public" href="../dparse/ast/AsmShiftExp.html">AsmShiftExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmStatement" class="public" href="../dparse/ast/AsmStatement.html">AsmStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmTypePrefix" class="public" href="../dparse/ast/AsmTypePrefix.html">AsmTypePrefix</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmUnaExp" class="public" href="../dparse/ast/AsmUnaExp.html">AsmUnaExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AsmXorExp" class="public" href="../dparse/ast/AsmXorExp.html">AsmXorExp</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AssertExpression" class="public" href="../dparse/ast/AssertExpression.html">AssertExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AssignExpression" class="public" href="../dparse/ast/AssignExpression.html">AssignExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AssocArrayLiteral" class="public" href="../dparse/ast/AssocArrayLiteral.html">AssocArrayLiteral</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ASTVisitor" class="public" href="../dparse/ast/ASTVisitor.html">ASTVisitor</a>
+								</code>
+							</td>
+							<td>Implements the <a href="http://en.wikipedia.org/wiki/Visitor_pattern">Visitor Pattern</a>
+ for the various AST classes
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AtAttribute" class="public" href="../dparse/ast/AtAttribute.html">AtAttribute</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Attribute" class="public" href="../dparse/ast/Attribute.html">Attribute</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AttributeDeclaration" class="public" href="../dparse/ast/AttributeDeclaration.html">AttributeDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AutoDeclaration" class="public" href="../dparse/ast/AutoDeclaration.html">AutoDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AutoDeclarationPart" class="public" href="../dparse/ast/AutoDeclarationPart.html">AutoDeclarationPart</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="BaseClass" class="public" href="../dparse/ast/BaseClass.html">BaseClass</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="BaseClassList" class="public" href="../dparse/ast/BaseClassList.html">BaseClassList</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="BlockStatement" class="public" href="../dparse/ast/BlockStatement.html">BlockStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="BodyStatement" class="public" href="../dparse/ast/BodyStatement.html">BodyStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="BreakStatement" class="public" href="../dparse/ast/BreakStatement.html">BreakStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="CaseRangeStatement" class="public" href="../dparse/ast/CaseRangeStatement.html">CaseRangeStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="CaseStatement" class="public" href="../dparse/ast/CaseStatement.html">CaseStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="CastExpression" class="public" href="../dparse/ast/CastExpression.html">CastExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="CastQualifier" class="public" href="../dparse/ast/CastQualifier.html">CastQualifier</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Catch" class="public" href="../dparse/ast/Catch.html">Catch</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Catches" class="public" href="../dparse/ast/Catches.html">Catches</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ClassDeclaration" class="public" href="../dparse/ast/ClassDeclaration.html">ClassDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="CmpExpression" class="public" href="../dparse/ast/CmpExpression.html">CmpExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="CompileCondition" class="public" href="../dparse/ast/CompileCondition.html">CompileCondition</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ConditionalDeclaration" class="public" href="../dparse/ast/ConditionalDeclaration.html">ConditionalDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ConditionalStatement" class="public" href="../dparse/ast/ConditionalStatement.html">ConditionalStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Constraint" class="public" href="../dparse/ast/Constraint.html">Constraint</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Constructor" class="public" href="../dparse/ast/Constructor.html">Constructor</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ContinueStatement" class="public" href="../dparse/ast/ContinueStatement.html">ContinueStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DebugCondition" class="public" href="../dparse/ast/DebugCondition.html">DebugCondition</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DebugSpecification" class="public" href="../dparse/ast/DebugSpecification.html">DebugSpecification</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Declaration" class="public" href="../dparse/ast/Declaration.html">Declaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DeclarationOrStatement" class="public" href="../dparse/ast/DeclarationOrStatement.html">DeclarationOrStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DeclarationsAndStatements" class="public" href="../dparse/ast/DeclarationsAndStatements.html">DeclarationsAndStatements</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Declarator" class="public" href="../dparse/ast/Declarator.html">Declarator</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DeclaratorIdentifierList" class="public" href="../dparse/ast/DeclaratorIdentifierList.html">DeclaratorIdentifierList</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DefaultStatement" class="public" href="../dparse/ast/DefaultStatement.html">DefaultStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DeleteExpression" class="public" href="../dparse/ast/DeleteExpression.html">DeleteExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DeleteStatement" class="public" href="../dparse/ast/DeleteStatement.html">DeleteStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Deprecated" class="public" href="../dparse/ast/Deprecated.html">Deprecated</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Destructor" class="public" href="../dparse/ast/Destructor.html">Destructor</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DoStatement" class="public" href="../dparse/ast/DoStatement.html">DoStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="EnumBody" class="public" href="../dparse/ast/EnumBody.html">EnumBody</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="EnumDeclaration" class="public" href="../dparse/ast/EnumDeclaration.html">EnumDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="EnumMember" class="public" href="../dparse/ast/EnumMember.html">EnumMember</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="EnumMemberAttribute" class="public" href="../dparse/ast/EnumMemberAttribute.html">EnumMemberAttribute</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="EponymousTemplateDeclaration" class="public" href="../dparse/ast/EponymousTemplateDeclaration.html">EponymousTemplateDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="EqualExpression" class="public" href="../dparse/ast/EqualExpression.html">EqualExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Expression" class="public" href="../dparse/ast/Expression.html">Expression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ExpressionNode" class="public" href="../dparse/ast/ExpressionNode.html">ExpressionNode</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ExpressionStatement" class="public" href="../dparse/ast/ExpressionStatement.html">ExpressionStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Finally" class="public" href="../dparse/ast/Finally.html">Finally</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="FinalSwitchStatement" class="public" href="../dparse/ast/FinalSwitchStatement.html">FinalSwitchStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Foreach" class="public" href="../dparse/ast/Foreach.html">Foreach</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ForeachType" class="public" href="../dparse/ast/ForeachType.html">ForeachType</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ForeachTypeList" class="public" href="../dparse/ast/ForeachTypeList.html">ForeachTypeList</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ForStatement" class="public" href="../dparse/ast/ForStatement.html">ForStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="FunctionAttribute" class="public" href="../dparse/ast/FunctionAttribute.html">FunctionAttribute</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="FunctionBody" class="public" href="../dparse/ast/FunctionBody.html">FunctionBody</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="FunctionCallExpression" class="public" href="../dparse/ast/FunctionCallExpression.html">FunctionCallExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="FunctionDeclaration" class="public" href="../dparse/ast/FunctionDeclaration.html">FunctionDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="FunctionLiteralExpression" class="public" href="../dparse/ast/FunctionLiteralExpression.html">FunctionLiteralExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="GotoStatement" class="public" href="../dparse/ast/GotoStatement.html">GotoStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="IdentifierChain" class="public" href="../dparse/ast/IdentifierChain.html">IdentifierChain</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="IdentifierOrTemplateChain" class="public" href="../dparse/ast/IdentifierOrTemplateChain.html">IdentifierOrTemplateChain</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="IdentifierOrTemplateInstance" class="public" href="../dparse/ast/IdentifierOrTemplateInstance.html">IdentifierOrTemplateInstance</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="IdentityExpression" class="public" href="../dparse/ast/IdentityExpression.html">IdentityExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="IfStatement" class="public" href="../dparse/ast/IfStatement.html">IfStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ImportBind" class="public" href="../dparse/ast/ImportBind.html">ImportBind</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ImportBindings" class="public" href="../dparse/ast/ImportBindings.html">ImportBindings</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ImportDeclaration" class="public" href="../dparse/ast/ImportDeclaration.html">ImportDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ImportExpression" class="public" href="../dparse/ast/ImportExpression.html">ImportExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Index" class="public" href="../dparse/ast/Index.html">Index</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="IndexExpression" class="public" href="../dparse/ast/IndexExpression.html">IndexExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="InExpression" class="public" href="../dparse/ast/InExpression.html">InExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Initialize" class="public" href="../dparse/ast/Initialize.html">Initialize</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Initializer" class="public" href="../dparse/ast/Initializer.html">Initializer</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="InStatement" class="public" href="../dparse/ast/InStatement.html">InStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="InterfaceDeclaration" class="public" href="../dparse/ast/InterfaceDeclaration.html">InterfaceDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Invariant" class="public" href="../dparse/ast/Invariant.html">Invariant</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="IsExpression" class="public" href="../dparse/ast/IsExpression.html">IsExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="KeyValuePair" class="public" href="../dparse/ast/KeyValuePair.html">KeyValuePair</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="KeyValuePairs" class="public" href="../dparse/ast/KeyValuePairs.html">KeyValuePairs</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="LabeledStatement" class="public" href="../dparse/ast/LabeledStatement.html">LabeledStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="LastCatch" class="public" href="../dparse/ast/LastCatch.html">LastCatch</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="LinkageAttribute" class="public" href="../dparse/ast/LinkageAttribute.html">LinkageAttribute</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="MemberFunctionAttribute" class="public" href="../dparse/ast/MemberFunctionAttribute.html">MemberFunctionAttribute</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="MixinDeclaration" class="public" href="../dparse/ast/MixinDeclaration.html">MixinDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="MixinExpression" class="public" href="../dparse/ast/MixinExpression.html">MixinExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="MixinTemplateDeclaration" class="public" href="../dparse/ast/MixinTemplateDeclaration.html">MixinTemplateDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="MixinTemplateName" class="public" href="../dparse/ast/MixinTemplateName.html">MixinTemplateName</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Module" class="public" href="../dparse/ast/Module.html">Module</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ModuleDeclaration" class="public" href="../dparse/ast/ModuleDeclaration.html">ModuleDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="MulExpression" class="public" href="../dparse/ast/MulExpression.html">MulExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="NewAnonClassExpression" class="public" href="../dparse/ast/NewAnonClassExpression.html">NewAnonClassExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="NewExpression" class="public" href="../dparse/ast/NewExpression.html">NewExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="NonVoidInitializer" class="public" href="../dparse/ast/NonVoidInitializer.html">NonVoidInitializer</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Operands" class="public" href="../dparse/ast/Operands.html">Operands</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="OrExpression" class="public" href="../dparse/ast/OrExpression.html">OrExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="OrOrExpression" class="public" href="../dparse/ast/OrOrExpression.html">OrOrExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="OutStatement" class="public" href="../dparse/ast/OutStatement.html">OutStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Parameter" class="public" href="../dparse/ast/Parameter.html">Parameter</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Parameters" class="public" href="../dparse/ast/Parameters.html">Parameters</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Postblit" class="public" href="../dparse/ast/Postblit.html">Postblit</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="PowExpression" class="public" href="../dparse/ast/PowExpression.html">PowExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="PragmaDeclaration" class="public" href="../dparse/ast/PragmaDeclaration.html">PragmaDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="PragmaExpression" class="public" href="../dparse/ast/PragmaExpression.html">PragmaExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="PragmaStatement" class="public" href="../dparse/ast/PragmaStatement.html">PragmaStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="PrimaryExpression" class="public" href="../dparse/ast/PrimaryExpression.html">PrimaryExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Register" class="public" href="../dparse/ast/Register.html">Register</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="RelExpression" class="public" href="../dparse/ast/RelExpression.html">RelExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ReturnStatement" class="public" href="../dparse/ast/ReturnStatement.html">ReturnStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ScopeGuardStatement" class="public" href="../dparse/ast/ScopeGuardStatement.html">ScopeGuardStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="SharedStaticConstructor" class="public" href="../dparse/ast/SharedStaticConstructor.html">SharedStaticConstructor</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="SharedStaticDestructor" class="public" href="../dparse/ast/SharedStaticDestructor.html">SharedStaticDestructor</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ShiftExpression" class="public" href="../dparse/ast/ShiftExpression.html">ShiftExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="SingleImport" class="public" href="../dparse/ast/SingleImport.html">SingleImport</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Statement" class="public" href="../dparse/ast/Statement.html">Statement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StatementNoCaseNoDefault" class="public" href="../dparse/ast/StatementNoCaseNoDefault.html">StatementNoCaseNoDefault</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StaticAssertDeclaration" class="public" href="../dparse/ast/StaticAssertDeclaration.html">StaticAssertDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StaticAssertStatement" class="public" href="../dparse/ast/StaticAssertStatement.html">StaticAssertStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StaticConstructor" class="public" href="../dparse/ast/StaticConstructor.html">StaticConstructor</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StaticDestructor" class="public" href="../dparse/ast/StaticDestructor.html">StaticDestructor</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StaticForeachStatement" class="public" href="../dparse/ast/StaticForeachStatement.html">StaticForeachStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StaticIfCondition" class="public" href="../dparse/ast/StaticIfCondition.html">StaticIfCondition</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StorageClass" class="public" href="../dparse/ast/StorageClass.html">StorageClass</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StructBody" class="public" href="../dparse/ast/StructBody.html">StructBody</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StructDeclaration" class="public" href="../dparse/ast/StructDeclaration.html">StructDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StructInitializer" class="public" href="../dparse/ast/StructInitializer.html">StructInitializer</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StructMemberInitializer" class="public" href="../dparse/ast/StructMemberInitializer.html">StructMemberInitializer</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StructMemberInitializers" class="public" href="../dparse/ast/StructMemberInitializers.html">StructMemberInitializers</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="SwitchStatement" class="public" href="../dparse/ast/SwitchStatement.html">SwitchStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Symbol" class="public" href="../dparse/ast/Symbol.html">Symbol</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="SynchronizedStatement" class="public" href="../dparse/ast/SynchronizedStatement.html">SynchronizedStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateAliasParameter" class="public" href="../dparse/ast/TemplateAliasParameter.html">TemplateAliasParameter</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateArgument" class="public" href="../dparse/ast/TemplateArgument.html">TemplateArgument</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateArgumentList" class="public" href="../dparse/ast/TemplateArgumentList.html">TemplateArgumentList</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateArguments" class="public" href="../dparse/ast/TemplateArguments.html">TemplateArguments</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateDeclaration" class="public" href="../dparse/ast/TemplateDeclaration.html">TemplateDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateInstance" class="public" href="../dparse/ast/TemplateInstance.html">TemplateInstance</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateMixinExpression" class="public" href="../dparse/ast/TemplateMixinExpression.html">TemplateMixinExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateParameter" class="public" href="../dparse/ast/TemplateParameter.html">TemplateParameter</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateParameterList" class="public" href="../dparse/ast/TemplateParameterList.html">TemplateParameterList</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateParameters" class="public" href="../dparse/ast/TemplateParameters.html">TemplateParameters</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateSingleArgument" class="public" href="../dparse/ast/TemplateSingleArgument.html">TemplateSingleArgument</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateThisParameter" class="public" href="../dparse/ast/TemplateThisParameter.html">TemplateThisParameter</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateTupleParameter" class="public" href="../dparse/ast/TemplateTupleParameter.html">TemplateTupleParameter</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateTypeParameter" class="public" href="../dparse/ast/TemplateTypeParameter.html">TemplateTypeParameter</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateValueParameter" class="public" href="../dparse/ast/TemplateValueParameter.html">TemplateValueParameter</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TemplateValueParameterDefault" class="public" href="../dparse/ast/TemplateValueParameterDefault.html">TemplateValueParameterDefault</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TernaryExpression" class="public" href="../dparse/ast/TernaryExpression.html">TernaryExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ThrowStatement" class="public" href="../dparse/ast/ThrowStatement.html">ThrowStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TraitsExpression" class="public" href="../dparse/ast/TraitsExpression.html">TraitsExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TryStatement" class="public" href="../dparse/ast/TryStatement.html">TryStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Type" class="public" href="../dparse/ast/Type.html">Type</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Type2" class="public" href="../dparse/ast/Type2.html">Type2</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TypeIdentifierPart" class="public" href="../dparse/ast/TypeIdentifierPart.html">TypeIdentifierPart</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TypeidExpression" class="public" href="../dparse/ast/TypeidExpression.html">TypeidExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TypeofExpression" class="public" href="../dparse/ast/TypeofExpression.html">TypeofExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TypeSpecialization" class="public" href="../dparse/ast/TypeSpecialization.html">TypeSpecialization</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TypeSuffix" class="public" href="../dparse/ast/TypeSuffix.html">TypeSuffix</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="UnaryExpression" class="public" href="../dparse/ast/UnaryExpression.html">UnaryExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="UnionDeclaration" class="public" href="../dparse/ast/UnionDeclaration.html">UnionDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Unittest" class="public" href="../dparse/ast/Unittest.html">Unittest</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="VariableDeclaration" class="public" href="../dparse/ast/VariableDeclaration.html">VariableDeclaration</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Vector" class="public" href="../dparse/ast/Vector.html">Vector</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="VersionCondition" class="public" href="../dparse/ast/VersionCondition.html">VersionCondition</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="VersionSpecification" class="public" href="../dparse/ast/VersionSpecification.html">VersionSpecification</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="WhileStatement" class="public" href="../dparse/ast/WhileStatement.html">WhileStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="WithStatement" class="public" href="../dparse/ast/WithStatement.html">WithStatement</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="XorExpression" class="public" href="../dparse/ast/XorExpression.html">XorExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Templates</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="BinaryExpressionBody" class="public" href="../dparse/ast/BinaryExpressionBody.html">BinaryExpressionBody</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="OpEquals" class="public" href="../dparse/ast/OpEquals.html">OpEquals</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Manifest constants</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a id="generateOpEquals" class="public" href="../dparse/ast/generateOpEquals.html">
+									<code>generateOpEquals</code>
+								</a>
+							</td>
+							<td>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Global variables</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a id="visitIfNotNull" class="public" href="../dparse/ast/visitIfNotNull.html">
+									<code>visitIfNotNull</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">void</span></code>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Aliases</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a id="ForeachStatement" class="public" href="../dparse/ast/ForeachStatement.html">
+									<code>ForeachStatement</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(false)</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a id="StaticForeachDeclaration" class="public" href="../dparse/ast/StaticForeachDeclaration.html">
+									<code>StaticForeachDeclaration</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true)</code>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</div>
+			<footer>
+				<div id="license-info">
+					<p>Brian Schott
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

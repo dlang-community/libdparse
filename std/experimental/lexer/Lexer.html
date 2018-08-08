@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Template Lexer</title>
+		<link rel="stylesheet" href="../../../css/style.min.css"/>
+		<script type="text/javascript" src="../../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view ">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module selected">
+							<a href="../../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Template Lexer</h1><p>The implementation of the lexer is contained within this mixin template.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">template</span> <span class="pln">Lexer</span>(Token, alias defaultTokenFunction, alias tokenSeparatingFunction, alias staticTokens, alias dynamicTokens, alias possibleDefaultTokens, alias tokenHandlers)
+				;
+						</div>
+					</code>
+				</div>
+				<section><p>To use it, this template should be mixed in to a struct that represents the
+ lexer for your language. This struct should implement the following methods:
+ <ul>     <li>popFront, which should call this mixin's popFront() and
+         additionally perform any token filtering or shuffling you deem
+         necessary. For example, you can implement popFront to skip comment or
+          tokens.</li>
+     <li>A function that serves as the default token lexing function. For
+         most languages this will be the identifier lexing function. This
+         should then be passed to the Lexer template mixin as the
+         <a href="#.defaultTokenFunction defaultTokenFunction"></a> template
+         parameter.</li>
+     <li>A function that is able to determine if an identifier/keyword has
+         come to an end. This function must return <font color=blue>bool</font> and take
+         a single <font color=blue>size_t</font> argument representing the number of
+         bytes to skip over before looking for a separating character.</li>
+     <li>Any functions referred to in the tokenHandlers template paramater.
+         These functions must be marked <font color=blue>pure nothrow</font>, take no
+         arguments, and return a token</li>
+     <li>A constructor that initializes the range field as well as calls
+         popFront() exactly once (to initialize the front field).</li>
+ </ul>
+</p>
+</section>
+
+				<section><h2>Contained Variables</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.range.html">range</a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../../std/experimental/lexer/LexerRange.html"><span class="typ">LexerRange</span></a></code></td><td>The lexer input.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer._front.html">_front</a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">Token</span></code></td><td>The token that is currently at the front of the range.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Contained Functions</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.advance.html">advance</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.calcSplitCount.html">calcSplitCount</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.empty.html">empty</a>
+							</td>
+							<td>Implements the range primitive empty.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.escape.html">escape</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.front.html">front</a>
+							</td>
+							<td>Implements the range primitive front.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.generateByteMask.html">generateByteMask</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.generateMask.html">generateMask</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.generateStatements.html">generateStatements</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.generateStatementsStep.html">generateStatementsStep</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.getBeginningChars.html">getBeginningChars</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.getFront.html">getFront</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer.printCase.html">printCase</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer._popFront.html">_popFront</a>
+							</td>
+							<td>Advances the lexer to the next token and stores the new current token in
+ the front variable.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Contained Aliases</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer._IDType.html">_IDType</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Parameters</h2>
+<table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
+<tr><td id="Token">Token</td><td> TokenStructure</td></tr>
+<tr><td id="defaultTokenFunction">defaultTokenFunction</td><td> <a href="#.defaultTokenFunction">defaultTokenFunction</a></td></tr>
+<tr><td id="tokenSeparatingFunction">tokenSeparatingFunction</td><td> <a href="#.tokenSeparatingFunction">tokenSeparatingFunction</a></td></tr>
+<tr><td id="staticTokens">staticTokens</td><td> <a href="#.staticTokens">staticTokens</a></td></tr>
+<tr><td id="dynamicTokens">dynamicTokens</td><td> <a href="#.dynamicTokens">dynamicTokens</a></td></tr>
+<tr><td id="possibleDefaultTokens">possibleDefaultTokens</td><td> <a href="#.possibleDefaultTokens">possibleDefaultTokens</a></td></tr>
+<tr><td id="tokenHandlers">tokenHandlers</td><td> <a href="#.tokenHandlers">tokenHandlers</a></td></tr>
+</table>
+</section>
+<section><h2>Examples</h2>
+<pre class="code"><code class="lang-d"><span class="kwd">struct </span><span class="typ">CalculatorLexer
+</span><span class="pun">{
+    </span><span class="kwd">mixin </span><span class="typ">Lexer</span><span class="pun">!(</span><span class="typ">IdType</span><span class="pun">, </span><span class="typ">Token</span><span class="pun">, </span><span class="pln">defaultTokenFunction</span><span class="pun">, </span><span class="pln">isSeparating</span><span class="pun">,
+        </span><span class="pln">staticTokens</span><span class="pun">, </span><span class="pln">dynamicTokens</span><span class="pun">, </span><span class="pln">possibleDefaultTokens</span><span class="pun">, </span><span class="pln">tokenHandlers</span><span class="pun">);
+
+    </span><span class="kwd">this </span><span class="pun">(</span><span class="typ">ubyte</span><span class="pun">[] </span><span class="pln">bytes</span><span class="pun">)
+    {
+        </span><span class="kwd">this<wbr/></span><span class="pun">.</span><span class="pln">range </span><span class="pun">= <a href="../../../std/experimental/lexer/LexerRange.html"></span><span class="typ">LexerRange</span></a><span class="pun">(</span><span class="pln">bytes</span><span class="pun">);
+        </span><span class="pln">popFront</span><span class="pun">();
+    }
+
+    </span><span class="typ">void </span><span class="pln">popFront</span><span class="pun">() </span><span class="kwd">pure
+    </span><span class="pun">{
+        <a href="../../../std/experimental/lexer/Lexer._popFront.html"></span><span class="pln">_popFront</span></a><span class="pun">();
+    }
+
+    </span><span class="typ">Token </span><span class="pln">lexNumber</span><span class="pun">() </span><span class="kwd">pure nothrow @safe
+    </span><span class="pun">{
+        </span><span class="com">// implementation goes here
+    </span><span class="pun">}
+
+    </span><span class="typ">Token </span><span class="pln">lexWhitespace</span><span class="pun">() </span><span class="kwd">pure nothrow @safe
+    </span><span class="pun">{
+        </span><span class="com">// implementation goes here
+    </span><span class="pun">}
+
+    </span><span class="typ">Token </span><span class="pln">defaultTokenFunction</span><span class="pun">() </span><span class="kwd">pure nothrow @safe
+    </span><span class="pun">{
+        </span><span class="com">// There is no default token in the example calculator language, so
+        // this is always an error.
+        </span><span class="pln">range<wbr/></span><span class="pun">.</span><span class="pln">popFront</span><span class="pun">();
+        </span><span class="kwd">return </span><span class="typ">Token</span><span class="pun">(</span><span class="pln">tok</span><span class="pun">!</span><span class="str">""</span><span class="pun">);
+    }
+
+    </span><span class="typ">bool </span><span class="pln">isSeparating</span><span class="pun">(</span><span class="pln">size_t offset</span><span class="pun">) </span><span class="kwd">pure nothrow @safe
+    </span><span class="pun">{
+        </span><span class="com">// For this example language, always return true.
+        </span><span class="kwd">return true</span><span class="pun">;
+    }
+}</span></code></pre>
+</section>
+
+			</div>
+			<footer>
+				<div id="license-info">
+					<p>Brian Schott, with ideas shamelessly stolen from Andrei Alexandrescu
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

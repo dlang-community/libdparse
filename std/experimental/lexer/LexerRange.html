@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Struct LexerRange</title>
+		<link rel="stylesheet" href="../../../css/style.min.css"/>
+		<script type="text/javascript" src="../../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view ">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module selected">
+							<a href="../../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Struct LexerRange</h1><p>Range structure that wraps the lexer's input.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">struct</span> <span class="typ">LexerRange</span>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Constructors</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.this.html" class="public">
+									<code>this</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Fields</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.bytes.html" class="public"><code>bytes</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><span class="typ">ubyte</span><span class="pun">)</span><span class="pun">[]</span></code></td><td>The input bytes.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.column.html" class="public"><code>column</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ulong</span></code></td><td>The current column number.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.index.html" class="public"><code>index</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ulong</span></code></td><td>The range's current position.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.line.html" class="public"><code>line</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ulong</span></code></td><td>The current line number.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.canPeek.html" class="public">
+									<code>canPeek</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.empty.html" class="public">
+									<code>empty</code>
+								</a>
+							</td>
+							<td>Implements the range primitive empty.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.front.html" class="public">
+									<code>front</code>
+								</a>
+							</td>
+							<td>Implements the range primitive front.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.incrementLine.html" class="public">
+									<code>incrementLine</code>
+								</a>
+							</td>
+							<td>Increments the range's line number and resets the column counter.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.mark.html" class="public">
+									<code>mark</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.peek.html" class="public">
+									<code>peek</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.peekAt.html" class="public">
+									<code>peekAt</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.popFront.html" class="public">
+									<code>popFront</code>
+								</a>
+							</td>
+							<td>Implements the range primitive popFront.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.popFrontN.html" class="public">
+									<code>popFrontN</code>
+								</a>
+							</td>
+							<td>Implements the algorithm popFrontN more efficiently. This function does
+ not detect or handle newlines.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.seek.html" class="public">
+									<code>seek</code>
+								</a>
+							</td>
+							<td>Sets the range to the given position.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.slice.html" class="public">
+									<code>slice</code>
+								</a>
+							</td>
+							<td>Returns a slice of the input byte array between the given mark and the
+ current position.
+ Params m = the beginning index of the slice to return
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/LexerRange.startsWith.html" class="public">
+									<code>startsWith</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					<p>Brian Schott, with ideas shamelessly stolen from Andrei Alexandrescu
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

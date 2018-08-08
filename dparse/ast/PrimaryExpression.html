@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Class PrimaryExpression</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Class PrimaryExpression</h1><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">class</span> <span class="typ">PrimaryExpression</span>
+				<br>&nbsp;&nbsp;: <a href="../../dparse/ast/ExpressionNode.html"><span class="typ">ExpressionNode</span></a>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Fields</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.arguments.html" class="public"><code>arguments</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/Arguments.html"><span class="typ">Arguments</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.arrayLiteral.html" class="public"><code>arrayLiteral</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/ArrayLiteral.html"><span class="typ">ArrayLiteral</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.assocArrayLiteral.html" class="public"><code>assocArrayLiteral</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/AssocArrayLiteral.html"><span class="typ">AssocArrayLiteral</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.basicType.html" class="public"><code>basicType</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.dot.html" class="public"><code>dot</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.expression.html" class="public"><code>expression</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/Expression.html"><span class="typ">Expression</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.functionLiteralExpression.html" class="public"><code>functionLiteralExpression</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/FunctionLiteralExpression.html"><span class="typ">FunctionLiteralExpression</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.identifierOrTemplateInstance.html" class="public"><code>identifierOrTemplateInstance</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/IdentifierOrTemplateInstance.html"><span class="typ">IdentifierOrTemplateInstance</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.importExpression.html" class="public"><code>importExpression</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/ImportExpression.html"><span class="typ">ImportExpression</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.isExpression.html" class="public"><code>isExpression</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/IsExpression.html"><span class="typ">IsExpression</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.mixinExpression.html" class="public"><code>mixinExpression</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/MixinExpression.html"><span class="typ">MixinExpression</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.primary.html" class="public"><code>primary</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.traitsExpression.html" class="public"><code>traitsExpression</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/TraitsExpression.html"><span class="typ">TraitsExpression</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.type.html" class="public"><code>type</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/Type.html"><span class="typ">Type</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.typeConstructor.html" class="public"><code>typeConstructor</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.typeidExpression.html" class="public"><code>typeidExpression</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/TypeidExpression.html"><span class="typ">TypeidExpression</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.typeofExpression.html" class="public"><code>typeofExpression</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/TypeofExpression.html"><span class="typ">TypeofExpression</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.vector.html" class="public"><code>vector</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/Vector.html"><span class="typ">Vector</span></a></code></td><td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/PrimaryExpression.accept.html" class="public">
+									<code>accept</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					<p>Brian Schott
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

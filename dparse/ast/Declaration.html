@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Class Declaration</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Class Declaration</h1><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">class</span> <span class="typ">Declaration</span>
+				<br>&nbsp;&nbsp;: <a href="../../dparse/ast/ASTNode.html"><span class="typ">ASTNode</span></a>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Fields</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.attributes.html" class="public"><code>attributes</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a><span class="pun">[]</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.declarations.html" class="public"><code>declarations</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/Declaration.html"><span class="typ">Declaration</span></a><span class="pun">[]</span></code></td><td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Properties</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.aliasDeclaration.html" class="public property"><code>aliasDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AliasDeclaration.html"><span class="typ">AliasDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.aliasDeclaration.html" class="public property"><code>aliasDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AliasDeclaration.html"><span class="typ">AliasDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.aliasThisDeclaration.html" class="public property"><code>aliasThisDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AliasThisDeclaration.html"><span class="typ">AliasThisDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.aliasThisDeclaration.html" class="public property"><code>aliasThisDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AliasThisDeclaration.html"><span class="typ">AliasThisDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.anonymousEnumDeclaration.html" class="public property"><code>anonymousEnumDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AnonymousEnumDeclaration.html"><span class="typ">AnonymousEnumDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.anonymousEnumDeclaration.html" class="public property"><code>anonymousEnumDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AnonymousEnumDeclaration.html"><span class="typ">AnonymousEnumDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.attributeDeclaration.html" class="public property"><code>attributeDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AttributeDeclaration.html"><span class="typ">AttributeDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.attributeDeclaration.html" class="public property"><code>attributeDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AttributeDeclaration.html"><span class="typ">AttributeDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.classDeclaration.html" class="public property"><code>classDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ClassDeclaration.html"><span class="typ">ClassDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.classDeclaration.html" class="public property"><code>classDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ClassDeclaration.html"><span class="typ">ClassDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.conditionalDeclaration.html" class="public property"><code>conditionalDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ConditionalDeclaration.html"><span class="typ">ConditionalDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.conditionalDeclaration.html" class="public property"><code>conditionalDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ConditionalDeclaration.html"><span class="typ">ConditionalDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.constructor.html" class="public property"><code>constructor</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Constructor.html"><span class="typ">Constructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.constructor.html" class="public property"><code>constructor</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Constructor.html"><span class="typ">Constructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.debugSpecification.html" class="public property"><code>debugSpecification</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/DebugSpecification.html"><span class="typ">DebugSpecification</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.debugSpecification.html" class="public property"><code>debugSpecification</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/DebugSpecification.html"><span class="typ">DebugSpecification</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.destructor.html" class="public property"><code>destructor</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Destructor.html"><span class="typ">Destructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.destructor.html" class="public property"><code>destructor</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Destructor.html"><span class="typ">Destructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.enumDeclaration.html" class="public property"><code>enumDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/EnumDeclaration.html"><span class="typ">EnumDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.enumDeclaration.html" class="public property"><code>enumDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/EnumDeclaration.html"><span class="typ">EnumDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.eponymousTemplateDeclaration.html" class="public property"><code>eponymousTemplateDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/EponymousTemplateDeclaration.html"><span class="typ">EponymousTemplateDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.eponymousTemplateDeclaration.html" class="public property"><code>eponymousTemplateDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/EponymousTemplateDeclaration.html"><span class="typ">EponymousTemplateDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.functionDeclaration.html" class="public property"><code>functionDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/FunctionDeclaration.html"><span class="typ">FunctionDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.functionDeclaration.html" class="public property"><code>functionDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/FunctionDeclaration.html"><span class="typ">FunctionDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.importDeclaration.html" class="public property"><code>importDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ImportDeclaration.html"><span class="typ">ImportDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.importDeclaration.html" class="public property"><code>importDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ImportDeclaration.html"><span class="typ">ImportDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.interfaceDeclaration.html" class="public property"><code>interfaceDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/InterfaceDeclaration.html"><span class="typ">InterfaceDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.interfaceDeclaration.html" class="public property"><code>interfaceDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/InterfaceDeclaration.html"><span class="typ">InterfaceDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.invariant_.html" class="public property"><code>invariant_</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Invariant.html"><span class="typ">Invariant</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.invariant_.html" class="public property"><code>invariant_</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Invariant.html"><span class="typ">Invariant</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.mixinDeclaration.html" class="public property"><code>mixinDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/MixinDeclaration.html"><span class="typ">MixinDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.mixinDeclaration.html" class="public property"><code>mixinDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/MixinDeclaration.html"><span class="typ">MixinDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.mixinTemplateDeclaration.html" class="public property"><code>mixinTemplateDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/MixinTemplateDeclaration.html"><span class="typ">MixinTemplateDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.mixinTemplateDeclaration.html" class="public property"><code>mixinTemplateDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/MixinTemplateDeclaration.html"><span class="typ">MixinTemplateDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.postblit.html" class="public property"><code>postblit</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Postblit.html"><span class="typ">Postblit</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.postblit.html" class="public property"><code>postblit</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Postblit.html"><span class="typ">Postblit</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.pragmaDeclaration.html" class="public property"><code>pragmaDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/PragmaDeclaration.html"><span class="typ">PragmaDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.pragmaDeclaration.html" class="public property"><code>pragmaDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/PragmaDeclaration.html"><span class="typ">PragmaDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.sharedStaticConstructor.html" class="public property"><code>sharedStaticConstructor</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/SharedStaticConstructor.html"><span class="typ">SharedStaticConstructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.sharedStaticConstructor.html" class="public property"><code>sharedStaticConstructor</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/SharedStaticConstructor.html"><span class="typ">SharedStaticConstructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.sharedStaticDestructor.html" class="public property"><code>sharedStaticDestructor</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/SharedStaticDestructor.html"><span class="typ">SharedStaticDestructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.sharedStaticDestructor.html" class="public property"><code>sharedStaticDestructor</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/SharedStaticDestructor.html"><span class="typ">SharedStaticDestructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.staticAssertDeclaration.html" class="public property"><code>staticAssertDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StaticAssertDeclaration.html"><span class="typ">StaticAssertDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.staticAssertDeclaration.html" class="public property"><code>staticAssertDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StaticAssertDeclaration.html"><span class="typ">StaticAssertDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.staticConstructor.html" class="public property"><code>staticConstructor</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StaticConstructor.html"><span class="typ">StaticConstructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.staticConstructor.html" class="public property"><code>staticConstructor</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StaticConstructor.html"><span class="typ">StaticConstructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.staticDestructor.html" class="public property"><code>staticDestructor</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StaticDestructor.html"><span class="typ">StaticDestructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.staticDestructor.html" class="public property"><code>staticDestructor</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StaticDestructor.html"><span class="typ">StaticDestructor</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.staticForeachDeclaration.html" class="public property"><code>staticForeachDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true)<span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.staticForeachDeclaration.html" class="public property"><code>staticForeachDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true)<span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.structDeclaration.html" class="public property"><code>structDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StructDeclaration.html"><span class="typ">StructDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.structDeclaration.html" class="public property"><code>structDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StructDeclaration.html"><span class="typ">StructDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.templateDeclaration.html" class="public property"><code>templateDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/TemplateDeclaration.html"><span class="typ">TemplateDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.templateDeclaration.html" class="public property"><code>templateDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/TemplateDeclaration.html"><span class="typ">TemplateDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.unionDeclaration.html" class="public property"><code>unionDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/UnionDeclaration.html"><span class="typ">UnionDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.unionDeclaration.html" class="public property"><code>unionDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/UnionDeclaration.html"><span class="typ">UnionDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.unittest_.html" class="public property"><code>unittest_</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Unittest.html"><span class="typ">Unittest</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.unittest_.html" class="public property"><code>unittest_</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Unittest.html"><span class="typ">Unittest</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.variableDeclaration.html" class="public property"><code>variableDeclaration</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/VariableDeclaration.html"><span class="typ">VariableDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.variableDeclaration.html" class="public property"><code>variableDeclaration</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/VariableDeclaration.html"><span class="typ">VariableDeclaration</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.versionSpecification.html" class="public property"><code>versionSpecification</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/VersionSpecification.html"><span class="typ">VersionSpecification</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.versionSpecification.html" class="public property"><code>versionSpecification</code></a><span class="tableEntryAnnotation">[set]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/VersionSpecification.html"><span class="typ">VersionSpecification</span></a><span class="pun">)</span></code></td><td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.accept.html" class="public">
+									<code>accept</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.opEquals.html" class="public">
+									<code>opEquals</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Aliases</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/Declaration.DeclarationTypes.html" class="public">
+									<code>DeclarationTypes</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					<p>Brian Schott
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

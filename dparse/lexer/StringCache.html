@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Struct StringCache</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Struct StringCache</h1><p>The string cache is used for string interning.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">struct</span> <span class="typ">StringCache</span>
+				<span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				<section><p>It will only store a single copy of any string that it is asked to hold.
+ Interned strings can be compared for equality by comparing their <b>.ptr</b>
+ field.
+</p>
+
+<p> Default and postbilt constructors are disabled. When a StringCache goes out
+ of scope, the memory held by it is freed.
+</p>
+</section>
+
+				<section><h2>Constructors</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/lexer/StringCache.this.html" class="public">
+									<code>this</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/lexer/StringCache.this.html" class="public">
+									<code>this</code>
+								</a>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Methods</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/lexer/StringCache.intern.html" class="public">
+									<code>intern</code>
+								</a>
+							</td>
+							<td>Caches a string.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>See also</h2>
+<p><a href="http://en.wikipedia.org/wiki/String_interning">http://en.wikipedia.org/wiki/String_interning</a>
+</p>
+</section>
+<section><h2>Example</h2>
+<p>Test \x char sequence
+</p>
+<pre class="code"><code class="lang-d"><span class="kwd">auto </span><span class="pln">toks </span><span class="pun">= (</span><span class="typ">string </span><span class="pln">s</span><span class="pun">) =&gt; <a href="../../dparse/lexer/byToken.html"></span><span class="pln">byToken</span></a><span class="pun">(</span><span class="kwd">cast</span><span class="pun">(</span><span class="typ">ubyte</span><span class="pun">[])</span><span class="pln">s</span><span class="pun">);
+
+</span><span class="com">// valid
+</span><span class="kwd">immutable </span><span class="pln">hex </span><span class="pun">= [</span><span class="str">'0'</span><span class="pun">,</span><span class="str">'1'</span><span class="pun">,</span><span class="str">'2'</span><span class="pun">,</span><span class="str">'3'</span><span class="pun">,</span><span class="str">'4'</span><span class="pun">,</span><span class="str">'5'</span><span class="pun">,</span><span class="str">'6'</span><span class="pun">,</span><span class="str">'7'</span><span class="pun">,</span><span class="str">'8'</span><span class="pun">,</span><span class="str">'9'</span><span class="pun">,</span><span class="str">'a'</span><span class="pun">,</span><span class="str">'b'</span><span class="pun">,</span><span class="str">'c'</span><span class="pun">,</span><span class="str">'d'</span><span class="pun">,</span><span class="str">'e'</span><span class="pun">,</span><span class="str">'f'</span><span class="pun">,</span><span class="str">'A'</span><span class="pun">,</span><span class="str">'B'</span><span class="pun">,</span><span class="str">'C'</span><span class="pun">,</span><span class="str">'D'</span><span class="pun">,</span><span class="str">'E'</span><span class="pun">,</span><span class="str">'F'</span><span class="pun">];
+</span><span class="kwd">auto </span><span class="pln">source </span><span class="pun">= </span><span class="str">""</span><span class="pun">;
+</span><span class="kwd">foreach </span><span class="pun">(</span><span class="pln">h1</span><span class="pun">; </span><span class="pln">hex</span><span class="pun">)
+    </span><span class="kwd">foreach </span><span class="pun">(</span><span class="pln">h2</span><span class="pun">; </span><span class="pln">hex</span><span class="pun">)
+        </span><span class="pln">source </span><span class="pun">~= </span><span class="str">"'\\x" </span><span class="pun">~ </span><span class="pln">h1 </span><span class="pun">~ </span><span class="pln">h2 </span><span class="pun">~ </span><span class="str">"'"</span><span class="pun">;
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="pln">source</span><span class="pun">)<wbr/>.</span><span class="pln">filter</span><span class="pun">!(</span><span class="pln">t </span><span class="pun">=&gt; </span><span class="pln">t<wbr/></span><span class="pun">.</span><span class="pln">type </span><span class="pun">!= <a href="../../dparse/lexer/tok.html"></span><span class="pln">tok</span></a><span class="pun">!</span><span class="str">"characterLiteral"</span><span class="pun">)<wbr/>.</span><span class="pln">empty</span><span class="pun">);
+
+</span><span class="com">// invalid
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\x'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\x_'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xA'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">5</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xAY'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">5</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xXX'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span></code></pre>
+</section>
+
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Module std.experimental.lexer</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view ">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module selected">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Module std.experimental.lexer</h1><p>Summary
+ This module contains a range-based compile-time lexer generator.
+</p><section><p>Overview
+ The lexer generator consists of a template mixin, Lexer, along with
+ several helper templates for generating such things as token identifiers.
+</p>
+
+<p> To write a lexer using this API:
+ <ol>     <li>Create the string array constants for your language.
+         <ul>             <li><a href="#.staticTokens">staticTokens</a></li>
+             <li><a href="#.dynamicTokens">dynamicTokens</a></li>
+             <li><a href="#.possibleDefaultTokens">possibleDefaultTokens</a></li>
+             <li><a href="#.tokenHandlers">tokenHandlers</a></li>
+         </ul></li>
+     <li>Create aliases for the various token and token identifier types
+         specific to your language.
+         <ul>             <li>TokenIdType</li>
+             <li>tokenStringRepresentation</li>
+             <li>TokenStructure</li>
+             <li>TokenId</li>
+         </ul></li>
+     <li>Create a struct that mixes in the Lexer template mixin and
+         implements the necessary functions.
+         <ul>             <li>Lexer</li>
+         </ul></li>
+ </ol>
+</p>
+</section>
+
+				<section><section><h2>Examples</h2>
+<p><ul> <li>A lexer for D is available <a href="https://github.com/Hackerpilot/Dscanner/blob/master/std/d/lexer.d">here</a>.</li>
+ <li>A lexer for Lua is available <a href="https://github.com/Hackerpilot/lexer-demo/blob/master/lualexer.d">here</a>.</li>
+ <li>A lexer for JSON is available <a href="https://github.com/Hackerpilot/lexer-demo/blob/master/jsonlexer.d">here</a>.</li>
+ </ul>
+ <a name="TemplateParameters"></a> Template Parameter Definitions
+ <dl> <dt><a name="defaultTokenFunction"></a> <b>defaultTokenFunction</b>
+ <dd>A function that serves as the default token lexing function. For most
+     languages this will be the identifier lexing function.</dd></dt>
+ <dt><a name="tokenSeparatingFunction"></a> <b>tokenSeparatingFunction</b></dt>
+ <dd>A function that is able to determine if an identifier/keyword has come
+     to an end. This function must return bool and take a single size_t
+     argument representing the number of bytes to skip over before looking for
+     a separating character.</dd>
+ <dt><a name="staticTokens"></a> <b>staticTokens</b></dt>
+ <dd>A listing of the tokens whose exact value never changes and which cannot
+     possibly be a token handled by the default token lexing function. The
+     most common example of this kind of token is an operator such as
+     <font color=red>"*"</font>, or <font color=red>"-"</font> in a programming language.</dd>
+ <dt><a name="dynamicTokens"></a> <b>dynamicTokens</b></dt>
+ <dd>A listing of tokens whose value is variable, such as whitespace,
+     identifiers, number literals, and string literals.</dd>
+ <dt><a name="possibleDefaultTokens"></a> <b>possibleDefaultTokens</b></dt>
+ <dd>A listing of tokens that could posibly be one of the tokens handled by
+     the default token handling function. An common example of this is
+     a keyword such as <font color=red>"for"</font>, which looks like the beginning of
+     the identifier <font color=red>"fortunate"</font>. <b>tokenSeparatingFunction</b> is
+     called to determine if the character after the <font color=red>'r'</font> separates
+     the identifier, indicating that the token is <font color=red>"for"</font>, or if
+     lexing should be turned over to the <b>defaultTokenFunction</b>.</dd>
+ <dt><a name="tokenHandlers"></a> <b>tokenHandlers</b></dt>
+ <dd>A mapping of prefixes to custom token handling function names. The
+     generated lexer will search for the even-index elements of this array,
+     and then call the function whose name is the element immedately after the
+     even-indexed element. This is used for lexing complex tokens whose prefix
+     is fixed.</dd>
+ </dl>
+</p>
+
+<p> Here are some example constants for a simple calculator lexer:
+</p>
+<pre class="code"><code class="lang-d"><span class="com">// There are a near infinite number of valid number literals, so numbers are
+// dynamic tokens.
+</span><span class="kwd">enum </span><span class="typ">string</span><span class="pun">[] </span><span class="pln">dynamicTokens </span><span class="pun">= [</span><span class="str">"numberLiteral"</span><span class="pun">, </span><span class="str">"whitespace"</span><span class="pun">];
+
+</span><span class="com">// The operators are always the same, and cannot start a numberLiteral, so
+// they are staticTokens
+</span><span class="kwd">enum </span><span class="typ">string</span><span class="pun">[] </span><span class="pln">staticTokens </span><span class="pun">= [</span><span class="str">"-"</span><span class="pun">, </span><span class="str">"+"</span><span class="pun">, </span><span class="str">"*"</span><span class="pun">, </span><span class="str">"/"</span><span class="pun">];
+
+</span><span class="com">// In this simple example there are no keywords or other tokens that could
+// look like dynamic tokens, so this is blank.
+</span><span class="kwd">enum </span><span class="typ">string</span><span class="pun">[] </span><span class="pln">possibleDefaultTokens </span><span class="pun">= [];
+
+</span><span class="com">// If any whitespace character or digit is encountered, pass lexing over to
+// our custom handler functions. These will be demonstrated in an example
+// later on.
+</span><span class="kwd">enum </span><span class="typ">string</span><span class="pun">[] </span><span class="pln">tokenHandlers </span><span class="pun">= [
+    </span><span class="str">"0"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"1"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"2"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"3"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"4"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"5"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"6"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"7"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"8"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">"9"</span><span class="pun">, </span><span class="str">"lexNumber"</span><span class="pun">,
+    </span><span class="str">" "</span><span class="pun">, </span><span class="str">"lexWhitespace"</span><span class="pun">,
+    </span><span class="str">"\n"</span><span class="pun">, </span><span class="str">"lexWhitespace"</span><span class="pun">,
+    </span><span class="str">"\t"</span><span class="pun">, </span><span class="str">"lexWhitespace"</span><span class="pun">,
+    </span><span class="str">"\r"</span><span class="pun">, </span><span class="str">"lexWhitespace"
+</span><span class="pun">];</span></code></pre>
+</section>
+</section>
+				<section>
+					<h2>Functions</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="tokenStringRepresentation" class="public property" href="../../std/experimental/lexer/tokenStringRepresentation.html">tokenStringRepresentation</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td>Looks up the string representation of the given token type.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Structs</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="LexerRange" class="public" href="../../std/experimental/lexer/LexerRange.html">LexerRange</a>
+								</code>
+							</td>
+							<td>Range structure that wraps the lexer's input.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="TokenStructure" class="public" href="../../std/experimental/lexer/TokenStructure.html">TokenStructure</a>
+								</code>
+							</td>
+							<td>The token that is returned by the lexer.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Templates</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="Lexer" class="public" href="../../std/experimental/lexer/Lexer.html">Lexer</a>
+								</code>
+							</td>
+							<td>The implementation of the lexer is contained within this mixin template.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Aliases</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a id="TokenId" class="public" href="../../std/experimental/lexer/TokenId.html">
+									<code>TokenId</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="pln">id</span></code>
+							</td>
+							<td>Generates the token type identifier for the given symbol.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="TokenIdType" class="public" href="../../std/experimental/lexer/TokenIdType.html">
+									<code>TokenIdType</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">ubyte</span></code>
+							</td>
+							<td>Template for determining the type used for a token type.
+</td>
+						</tr>
+					</table>
+				</section>
+			</div>
+			<footer>
+				<div id="license-info">
+					<p>Brian Schott, with ideas shamelessly stolen from Andrei Alexandrescu
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

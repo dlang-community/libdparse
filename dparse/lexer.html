@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Module dparse.lexer</title>
+		<link rel="stylesheet" href="../css/style.min.css"/>
+		<script type="text/javascript" src="../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Module dparse.lexer</h1><p></p>
+				<section></section>
+				<section>
+					<h2>Functions</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="byToken" class="public" href="../dparse/lexer/byToken.html">byToken</a><span class="decoration">(range)</span>
+								</code>
+							</td>
+							<td>Creates a token range from the given source code. Creates a default lexer
+ configuration and a GC-managed string cache.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="byToken" class="public" href="../dparse/lexer/byToken.html">byToken</a><span class="decoration">(range, cache)</span>
+								</code>
+							</td>
+							<td>Creates a token range from the given source code. Uses the given string
+ cache.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="byToken" class="public" href="../dparse/lexer/byToken.html">byToken</a><span class="decoration">(range, config, cache)</span>
+								</code>
+							</td>
+							<td>Creates a token range from the given source code. Uses the provided lexer
+ configuration and string cache.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="getTokensForParser" class="public" href="../dparse/lexer/getTokensForParser.html">getTokensForParser</a><span class="decoration">(sourceCode, config, cache)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isBasicType" class="public" href="../dparse/lexer/isBasicType.html">isBasicType</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isIntegerLiteral" class="public" href="../dparse/lexer/isIntegerLiteral.html">isIntegerLiteral</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isKeyword" class="public" href="../dparse/lexer/isKeyword.html">isKeyword</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isLiteral" class="public" href="../dparse/lexer/isLiteral.html">isLiteral</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isNumberLiteral" class="public" href="../dparse/lexer/isNumberLiteral.html">isNumberLiteral</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isOperator" class="public" href="../dparse/lexer/isOperator.html">isOperator</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isProtection" class="public" href="../dparse/lexer/isProtection.html">isProtection</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isSpecialToken" class="public" href="../dparse/lexer/isSpecialToken.html">isSpecialToken</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isStringLiteral" class="public" href="../dparse/lexer/isStringLiteral.html">isStringLiteral</a><span class="decoration">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="newlineMask" class="public" href="../dparse/lexer/newlineMask.html">newlineMask</a><span class="decoration">(_param_0)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="newlineMask" class="public" href="../dparse/lexer/newlineMask.html">newlineMask</a><span class="decoration">(_param_0)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="rangeMatch" class="public" href="../dparse/lexer/rangeMatch.html">rangeMatch</a><span class="decoration">()</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="rangeMatch" class="public" href="../dparse/lexer/rangeMatch.html">rangeMatch</a><span class="decoration">()</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="skip" class="public" href="../dparse/lexer/skip.html">skip</a><span class="decoration">(, , )</span>
+								</code>
+							</td>
+							<td>Skips between 0 and 16 bytes that match (or do not match) one of the
+ given <b>chars</b>.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="skip" class="public" href="../dparse/lexer/skip.html">skip</a><span class="decoration">(, , )</span>
+								</code>
+							</td>
+							<td>Skips between 0 and 16 bytes that match (or do not match) one of the
+ given <b>chars</b>.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="unDecorateComment" class="public" href="../dparse/lexer/unDecorateComment.html">unDecorateComment</a><span class="decoration">(comment, outputRange)</span>
+								</code>
+							</td>
+							<td>Removes "decoration" such as leading whitespace, leading + and * characters,
+ and places the result into the given output range
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Structs</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DLexer" class="public" href="../dparse/lexer/DLexer.html">DLexer</a>
+								</code>
+							</td>
+							<td>The D lexer struct.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="LexerConfig" class="public" href="../dparse/lexer/LexerConfig.html">LexerConfig</a>
+								</code>
+							</td>
+							<td>Lexer configuration struct
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StringCache" class="public" href="../dparse/lexer/StringCache.html">StringCache</a>
+								</code>
+							</td>
+							<td>The string cache is used for string interning.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Enums</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="CommentBehavior" class="public" href="../dparse/lexer/CommentBehavior.html">CommentBehavior</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StringBehavior" class="public" href="../dparse/lexer/StringBehavior.html">StringBehavior</a>
+								</code>
+							</td>
+							<td>Configure string lexing behavior
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="WhitespaceBehavior" class="public" href="../dparse/lexer/WhitespaceBehavior.html">WhitespaceBehavior</a>
+								</code>
+							</td>
+							<td>Configure whitespace handling
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Manifest constants</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a id="ByteCombine" class="public" href="../dparse/lexer/ByteCombine.html">
+									<code>ByteCombine</code>
+								</a>
+							</td>
+							<td>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a id="ByteCombine" class="public" href="../dparse/lexer/ByteCombine.html">
+									<code>ByteCombine</code>
+								</a>
+							</td>
+							<td>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Aliases</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a id="BasicTypes" class="public" href="../dparse/lexer/BasicTypes.html">
+									<code>BasicTypes</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td>Basic type token types.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="IdType" class="public" href="../dparse/lexer/IdType.html">
+									<code>IdType</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">ubyte</span></code>
+							</td>
+							<td>Token ID type for the D lexer.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="IntegerLiterals" class="public" href="../dparse/lexer/IntegerLiterals.html">
+									<code>IntegerLiterals</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td>Number literal token types.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="Keywords" class="public" href="../dparse/lexer/Keywords.html">
+									<code>Keywords</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td>Keyword token types.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="Literals" class="public" href="../dparse/lexer/Literals.html">
+									<code>Literals</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a id="NumberLiterals" class="public" href="../dparse/lexer/NumberLiterals.html">
+									<code>NumberLiterals</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td>Number literal token types.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="Operators" class="public" href="../dparse/lexer/Operators.html">
+									<code>Operators</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td>Operator token types.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="Protections" class="public" href="../dparse/lexer/Protections.html">
+									<code>Protections</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td>Protection token types.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="SpecialTokens" class="public" href="../dparse/lexer/SpecialTokens.html">
+									<code>SpecialTokens</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a id="str" class="public" href="../dparse/lexer/str.html">
+									<code>str</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td>Function used for converting an IdType to a string.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="StringLiterals" class="public" href="../dparse/lexer/StringLiterals.html">
+									<code>StringLiterals</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"></code>
+							</td>
+							<td>String literal token types
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="tok" class="public" href="../dparse/lexer/tok.html">
+									<code>tok</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../std/experimental/lexer/TokenId.html"><span class="typ">TokenId</span></a>!(IdType,operators,dynamicTokens,keywords,token)</code>
+							</td>
+							<td>Template used to refer to D token types.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="Token" class="public" href="../dparse/lexer/Token.html">
+									<code>Token</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code>
+							</td>
+							<td>The token type in the D lexer
+</td>
+						</tr>
+					</table>
+				</section>
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>
