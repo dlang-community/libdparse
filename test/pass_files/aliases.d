@@ -16,6 +16,13 @@ struct S
 	int a;
 	alias a this;
 }
+class Foo
+{
+	void bar()
+	{
+		alias self = this;
+	}
+}
 
 // C-style aliases
 alias int GetterType() @property;
