@@ -270,6 +270,7 @@ public:
     /** */ void visit(const OrExpression orExpression) { orExpression.accept(this); }
     /** */ void visit(const OrOrExpression orOrExpression) { orOrExpression.accept(this); }
     /** */ void visit(const OutStatement outStatement) { outStatement.accept(this); }
+    /** */ void visit(const ParameterAttribute parameterAttribute) { parameterAttribute.accept(this); }
     /** */ void visit(const Parameter parameter) { parameter.accept(this); }
     /** */ void visit(const Parameters parameters) { parameters.accept(this); }
     /** */ void visit(const Postblit postblit) { postblit.accept(this); }
@@ -2429,6 +2430,16 @@ public:
     mixin OpEquals;
 }
 
+final class ParameterAttribute : ASTNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(atAttribute));
+    }
+    /** */ IdType idType;
+    /** */ AtAttribute atAttribute;
+}
+
 ///
 final class Parameter : ASTNode
 {
@@ -2438,7 +2449,7 @@ public:
         mixin (visitIfNotNull!(type, name, default_));
     }
 
-    /** */ IdType[] parameterAttributes;
+    /** */ ParameterAttribute[] parameterAttributes;
     /** */ Type type;
     /** */ Token name;
     /** */ bool vararg;

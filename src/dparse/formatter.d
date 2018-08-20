@@ -2255,12 +2255,22 @@ class Formatter(Sink)
         format(stmnt.blockStatement);
     }
 
+    void format(const ParameterAttribute pa)
+    {
+        debug(verbose) writeln("ParameterAttribute");
+
+        if (pa.atAttribute)
+            format(pa.atAttribute);
+        else
+            put(tokenRep(pa.idType));
+    }
+
     void format(const Parameter parameter)
     {
         debug(verbose) writeln("Parameter");
 
         /**
-        IdType[] parameterAttributes;
+        ParameterAttribute[] parameterAttributes;
         Type type;
         Token name;
         bool vararg;
@@ -2271,7 +2281,7 @@ class Formatter(Sink)
         foreach (count, attribute; parameter.parameterAttributes)
         {
             if (count) space();
-            put(tokenRep(attribute));
+            format(attribute);
         }
 
         if (parameter.parameterAttributes.length > 0)
