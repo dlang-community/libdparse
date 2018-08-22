@@ -4512,11 +4512,10 @@ class Parser
         StackBuffer parameterAttributes;
         while (moreTokens())
         {
-            IdType type = parseParameterAttribute(false);
-            if (type == tok!"")
-                break;
+            if (ParameterAttribute pa = parseParameterAttribute(false))
+                parameterAttributes.put(pa);
             else
-                parameterAttributes.put(type);
+                break;
         }
         ownArray(node.parameterAttributes, parameterAttributes);
         mixin(parseNodeQ!(`node.type`, `Type`));
@@ -4565,7 +4564,8 @@ class Parser
      * Parses a ParameterAttribute
      *
      * $(GRAMMAR $(RULEDEF parameterAttribute):
-     *       $(RULE typeConstructor)
+     *       $(RULE atAttribute)
+     *     | $(RULE typeConstructor)
      *     | $(LITERAL 'final')
      *     | $(LITERAL 'in')
      *     | $(LITERAL 'lazy')
@@ -4576,17 +4576,28 @@ class Parser
      *     | $(LITERAL 'return')
      *     ;)
      */
-    IdType parseParameterAttribute(bool validate = false)
+    ParameterAttribute parseParameterAttribute(bool validate = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!ParameterAttribute;
         switch (current.type)
         {
+        case tok!"@":
+            if (AtAttribute aa = parseAtAttribute())
+            {
+                return node;
+            }
+            else
+            {
+                validate = true;
+                goto default;
+            }
         case tok!"immutable":
         case tok!"shared":
         case tok!"const":
         case tok!"inout":
             if (peekIs(tok!"("))
-                return tok!"";
+                return null;
             else
                 goto case;
         case tok!"final":
@@ -4597,11 +4608,12 @@ class Parser
         case tok!"scope":
         case tok!"auto":
         case tok!"return":
-            return advance().type;
+            node.idType = advance().type;
+            return node;
         default:
             if (validate)
                 error("Parameter attribute expected");
-            return tok!"";
+            return null;
         }
     }
 

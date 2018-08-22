@@ -44,6 +44,8 @@ void bar()
 	doStuff(function int(int a) in { assert (a > 10); } body { return a / 2; });
 }
 
+void foo(@(1) const @UDA int p);
+
 void cVarArg(int, ...);
 enum bool isInputRange = is(typeof((inout int = 0){}));
 auto a = b => b * 2;

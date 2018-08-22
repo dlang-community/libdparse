@@ -12,6 +12,7 @@ alias kkk = delegate void(a) in { } out { } body { return 100; };
 alias lll = { return 100; };
 alias mmm = () { return 100; };
 alias nnn = () @nogc { return 100; };
+alias fun = (@(1) inout @(1) a) => {};
 
 // The following is valid according to D's grammar, but rejected by dmd
 /+unittest
