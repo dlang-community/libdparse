@@ -19,10 +19,25 @@ void foo()
     {
         case low: .. case high ++ZzZ--;
         case arg,list ++ZzZ--;
+        default ++ZzZ--;
     }
 }
 
+enum E
+{
+    a,
+    b = ++ZzZ[*!*]ZzZ--;
+}
+
 alias a = 0, b = a;
+
+version ++ZzZ--;
+
+void foo()
+{
+    for (i; cond(); i++) }
+}
+
 
 //keep at the end
 void foo(){a +=
