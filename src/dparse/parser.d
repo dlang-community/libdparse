@@ -3085,7 +3085,11 @@ class Parser
                         inStatements.put(s);
                     else return null;
                 }
-                else return null;
+                else
+                {
+                    error("`{` or `(` expected");
+                    return null;
+                }
             }
             else if (currentIs(tok!"out"))
             {
@@ -3120,7 +3124,11 @@ class Parser
                         outStatements.put(s);
                     else return null;
                 }
-                else return null;
+                else
+                {
+                    error("`(` expected");
+                    return null;
+                }
             }
             else break;
         }
