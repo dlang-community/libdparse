@@ -5,3 +5,4 @@ interface D(T) if (Z) : B {}
 interface E(T) : B if (Z) {}
 interface F(T);
 interface G(T) if (Z);
+interface H{ void hat() in {} }
