@@ -3149,12 +3149,12 @@ class Parser
         {
             mixin(parseNodeQ!(`node.bodyStatement`, `BodyStatement`));
         }
-        else if (requireDo)
+        else if (requireDo && currentIs(tok!"{"))
         {
             error("`do` exptected after InStatement or OutStatement");
             return null;
         }
-        else
+        else if (!inStatements.length && !outStatements.length)
         {
             error("`in`, `out`, `body`, or block statement expected");
             return null;
