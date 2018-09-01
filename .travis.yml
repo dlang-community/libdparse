@@ -12,9 +12,23 @@ matrix:
     addons:
       apt:
         packages:
+          - pkg-config
           - libevent-dev
+
+install:
+  - pyenv global system 3.6
+  - pip3 install 'meson==0.47'
+  - mkdir .ntmp
+  - curl -L https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip -o .ntmp/ninja-linux.zip
+  - unzip .ntmp/ninja-linux.zip -d .ntmp
+
+before_script:
+  export PATH=$PATH:$PWD/.ntmp
+
 script:
   # note: for dlang project tester, which doesn't clone automatically
+  - meson build && ninja -j8 -C build
+  - ninja -j8 -C build test -v
   - git submodule update --init --recursive
   #
   - cd test && ./run_tests.sh && cd ..
