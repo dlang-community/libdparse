@@ -3145,7 +3145,7 @@ class Parser
             advance();
             return node;
         }
-        else if (currentIs(tok!"do") || current.text == "body")
+        else if (currentIs(tok!"do") || (currentIs(tok!"identifier") && current.text == "body"))
         {
             mixin(parseNodeQ!(`node.bodyStatement`, `BodyStatement`));
         }
