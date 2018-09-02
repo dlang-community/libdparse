@@ -21,6 +21,18 @@ void foo()
         case arg,list ++ZzZ--;
         default ++ZzZ--;
     }
+    switch(foo)
+    {
+        case ++
+    }
+    switch(foo)
+    {
+        case one: final a;
+    }
+    switch(foo)
+    {
+        case one: static a;
+    }
 }
 
 enum E
@@ -37,6 +49,18 @@ void foo()
 {
     for (i; cond(); i++) }
 }
+
+alias @++ const void null;
+
+alias int fun() @++;
+
+alias T = @++ U;
+
+alias T = extern ++ZzZ-- U;
+
+int[8] a = [+o+,+o+];
+
+import ++;
 
 
 //keep at the end

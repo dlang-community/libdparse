@@ -5124,8 +5124,6 @@ class Parser
             advance(); // =
         }
         mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
-        if (node.identifierChain is null)
-            return null;
         return node;
     }
 
