@@ -3079,10 +3079,14 @@ class Parser
                 }
                 else if (next.type == tok!"(")
                 {
+                    const size_t inTokenLocation = current.index;
                     advance();
                     advance();
                     if (InStatement s = parseContractExpression!InStatement())
+                    {
+                        s.inTokenLocation = inTokenLocation;
                         inStatements.put(s);
+                    }
                     else return null;
                 }
                 else
@@ -3104,6 +3108,7 @@ class Parser
                 }
                 else if (next.type == tok!"(")
                 {
+                    const size_t outTokenLocation = current.index;
                     advance();
                     advance();
                     if (currentIs(tok!";"))
@@ -3121,7 +3126,10 @@ class Parser
                         return null;
                     }
                     if (OutStatement s = parseContractExpression!OutStatement())
+                    {
+                        s.outTokenLocation = outTokenLocation;
                         outStatements.put(s);
+                    }
                     else return null;
                 }
                 else
