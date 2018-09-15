@@ -3908,12 +3908,14 @@ class Parser
         }
         else if (currentIs(tok!"("))
         {
+            const idx = current.index;
+            const lne = current.line;
             advance();
             if (Invariant node = parseContractExpression!Invariant())
             {
                 mixin(tokenCheck!";");
-                node.index = current.index;
-                node.line = current.line;
+                node.index = idx;
+                node.line = lne;
                 return node;
             }
             else return null;
