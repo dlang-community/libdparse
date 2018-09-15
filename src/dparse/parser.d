@@ -3882,7 +3882,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF invariant):
      *       $(LITERAL 'invariant') $(RULE blockStatement)
-     *     | $(LITERAL 'invariant') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     | $(LITERAL 'invariant') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)') $(LITERAL ';')
      *     ;)
      */
     Invariant parseInvariant()
@@ -3910,7 +3910,10 @@ class Parser
         {
             advance();
             if (Invariant node = parseContractExpression!Invariant())
+            {
+                mixin(tokenCheck!";");
                 return node;
+            }
             else return null;
         }
         else return null;
