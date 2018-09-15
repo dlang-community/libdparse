@@ -3912,6 +3912,8 @@ class Parser
             if (Invariant node = parseContractExpression!Invariant())
             {
                 mixin(tokenCheck!";");
+                node.index = current.index;
+                node.line = current.line;
                 return node;
             }
             else return null;
