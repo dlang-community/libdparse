@@ -558,6 +558,11 @@ class Parser
             else if (!currentIs(tok!";"))
                 mixin(parseNodeQ!(`node.operands`, `Operands`));
         }
+        else
+        {
+            error("identifier or `align` expected");
+            return null;
+        }
         return node;
     }
 
