@@ -1,7 +1,7 @@
  project('dparse', 'd',
     meson_version: '>=0.44',
     license: 'BSL-1.0',
-    version: '0.9.4'
+    version: '0.9.9'
 )
 
 project_soversion = '0'
