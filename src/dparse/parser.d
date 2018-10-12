@@ -4613,6 +4613,7 @@ class Parser
         case tok!"@":
             if (AtAttribute aa = parseAtAttribute())
             {
+                node.atAttribute = aa;
                 return node;
             }
             else
