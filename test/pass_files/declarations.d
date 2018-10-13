@@ -16,9 +16,9 @@ auto a = [1, 2, 3];
 auto a = [a:1, b:2, c:3];
 auto a = b, c = d;
 static if (true)
-	int a;
+    int a;
 else
-	int b;
+    int b;
 
 debug void foo();
 debug(something) void foo();
@@ -36,7 +36,7 @@ mixin something!A;
 mixin duff!(i, j, delegate { foo13(i); });
 mixin typeof(something!A).x;
 template mix(){
-	int x;
+    int x;
 }
 mixin .mix;
 __vector(int[4]) intVector;
@@ -90,3 +90,5 @@ struct Foo(T);
 union Foo(T);
 class Foo(T);
 interface Foo(T);
+
+mixin("auto a = 1 + ", 1, ";");

@@ -2068,7 +2068,7 @@ class Formatter(Sink)
         debug(verbose) writeln("MixinExpression");
 
         put("mixin (");
-        format(mixinExpression.assignExpression);
+        format(mixinExpression.argumentList);
         put(")");
     }
 

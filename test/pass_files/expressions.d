@@ -32,6 +32,7 @@ auto a = function() { return 100; };
 auto a = delegate() { return 100; };
 auto a = function { return 100; };
 auto a = delegate { return 100; };
+auto a = mixin("1 + ", 1);
 void foo()
 {
 	a = b;
