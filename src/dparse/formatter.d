@@ -3951,7 +3951,7 @@ void testFormatNode(Node)(string sourceCode)
     StringCache cache = StringCache(32);
     RollbackAllocator rba;
     auto toks = getTokensForParser(code, config, &cache);
-    Module mod = parseModule(toks, "stdin", &rba);
+    Module mod = parseModule(ParserConfig(toks, "stdin", &rba));
     (new CatchInterestingStuff).visit(mod);
 }
 
