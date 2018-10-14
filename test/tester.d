@@ -309,7 +309,7 @@ int main(string[] args)
         config.fileName = arg;
         const(Token)[] tokens = getTokensForParser(fileBytes, config, &cache);
         RollbackAllocator rba;
-        parseModule(tokens, arg, &rba, &messageFunction);
+        parseModule(ParserConfig(tokens, arg, &rba, &messageFunction));
     }
     writefln("Finished parsing with %d errors and %d warnings.",
             errorCount, warningCount);

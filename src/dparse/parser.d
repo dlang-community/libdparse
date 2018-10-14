@@ -17,50 +17,86 @@ import std.string : format;
 // Caution: generates 180 megabytes of logging for std.datetime
 //version = dparse_verbose;
 
+
+/**
+ * Prototype for a custom parser message function or delegate.
+ * Params:
+ *      fileName = The source file name.
+ *      line = The line in the source, 0 based.
+ *      column = The column in the source, 0 based.
+ *      message = Datailed message.
+ *      isError = Indicates if the message is a warning (`false`) or a if it's an error (`true`).
+ */
+alias MessageFunction = void function(string fileName , size_t line, size_t column, string message, bool isError);
+
+/// ditto
+alias MessageDelegate = void delegate(string, size_t, size_t, string, bool);
+
+/**
+ * Parser configuration struct
+ */
+struct ParserConfig
+{
+    /// The tokens parsed by dparse.lexer.
+    const(Token)[] tokens;
+    /// The name of the file being parsed
+    string fileName;
+    /// A pointer to a rollback allocator.
+    RollbackAllocator* allocator;
+    /// An optional function used to handle warnings and errors.
+    MessageFunction messageFunction;
+    /// An optional delegate used to handle warnings and errors.
+    /// Set either this one or messageFunction, not both.
+    MessageDelegate messageDelegate;
+    /// An optional pointer to a variable receiving the error count.
+    uint* errorCount;
+    /// An optional pointer to a variable receiving the warning count.
+    uint* warningCount;
+}
+
+
 /**
  * Params:
- *     tokens = the tokens parsed by dparse.lexer
- *     fileName = the name of the file being parsed
- *     messageFunction = a function to call on error or warning messages.
- *         The parameters are the file name, line number, column number,
- *         the error or warning message, and a boolean (true means error, false
- *         means warning).
- * Returns: the parsed module
+ *      parserConfig = a parser configuration.
+ * Returns:
+ *      The parsed module
  */
-Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
-    void delegate(string, size_t, size_t, string, bool) messageFunction = null,
-    uint* errorCount = null, uint* warningCount = null)
+Module parseModule()(auto ref ParserConfig parserConfig)
 {
     auto parser = new Parser();
-    parser.fileName = fileName;
-    parser.tokens = tokens;
-    parser.messageDg = messageFunction;
-    parser.allocator = allocator;
-    auto mod = parser.parseModule();
-    if (warningCount !is null)
-        *warningCount = parser.warningCount;
-    if (errorCount !is null)
-        *errorCount = parser.errorCount;
+    with (parserConfig)
+    {
+        parser.fileName = fileName;
+        parser.tokens = tokens;
+        parser.messageFunction = messageFunction;
+        parser.messageDelegate = messageDelegate;
+        parser.allocator = allocator;
+    }
+    Module mod = parser.parseModule();
+    with (parserConfig)
+    {
+        if (warningCount !is null)
+            *warningCount = parser.warningCount;
+        if (errorCount !is null)
+            *errorCount = parser.errorCount;
+    }
     return mod;
 }
 
-/// Ditto
-deprecated("Use the overload accepting a delegate instead of a function")
+deprecated("Use the parseModule overload that takes a ParserConfig instead")
 Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
-    void function(string, size_t, size_t, string, bool) messageFunction,
-    uint* errorCount = null, uint* warningCount = null)
+    MessageFunction messageFunction, uint* errorCount = null, uint* warningCount = null)
 {
-    auto parser = new Parser();
-    parser.fileName = fileName;
-    parser.tokens = tokens;
-    parser.messageFunction = messageFunction;
-    parser.allocator = allocator;
-    auto mod = parser.parseModule();
-    if (warningCount !is null)
-        *warningCount = parser.warningCount;
-    if (errorCount !is null)
-        *errorCount = parser.errorCount;
-    return mod;
+    return ParserConfig(tokens, fileName, allocator, messageFunction, null,
+        errorCount, warningCount).parseModule();
+}
+
+deprecated("Use the parseModule overload that takes a ParserConfig instead")
+Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
+    MessageDelegate messageDelegate, uint* errorCount = null, uint* warningCount = null)
+{
+    return ParserConfig(tokens, fileName, allocator, null, messageDelegate,
+        errorCount, warningCount).parseModule();
 }
 
 /**
@@ -7047,18 +7083,14 @@ class Parser
     RollbackAllocator* allocator;
 
     /**
-     * Function that is called when a warning or error is encountered.
+     * Function or delegate that is called when a warning or error is encountered.
      * The parameters are the file name, line number, column number,
      * and the error or warning message.
      */
-    deprecated("Use 'messageDg' instead")
-    public alias messageFunction = messageFunction_;
+    MessageFunction messageFunction;
 
     /// Ditto
-    public void delegate(string, size_t, size_t, string, bool) messageDg;
-
-    /// Ditto
-    private void function(string, size_t, size_t, string, bool) messageFunction_;
+    MessageDelegate messageDelegate;
 
     void setTokens(const(Token)[] tokens)
     {
@@ -7528,10 +7560,10 @@ protected: final:
         ++warningCount;
         auto column = index < tokens.length ? tokens[index].column : 0;
         auto line = index < tokens.length ? tokens[index].line : 0;
-        if (messageDg !is null)
-            messageDg(fileName, line, column, message, false);
-        else if (messageFunction_ !is null)
-            messageFunction_(fileName, line, column, message, false);
+        if (messageDelegate !is null)
+            messageDelegate(fileName, line, column, message, false);
+        else if (messageFunction !is null)
+            messageFunction(fileName, line, column, message, false);
         else
             stderr.writefln("%s(%d:%d)[warn]: %s", fileName, line, column, message);
     }
@@ -7544,10 +7576,10 @@ protected: final:
             ++errorCount;
             auto column = index < tokens.length ? tokens[index].column : tokens[$ - 1].column;
             auto line = index < tokens.length ? tokens[index].line : tokens[$ - 1].line;
-            if (messageDg !is null)
-                messageDg(fileName, line, column, message, true);
-            else if (messageFunction_ !is null)
-                messageFunction_(fileName, line, column, message, true);
+            if (messageDelegate !is null)
+                messageDelegate(fileName, line, column, message, true);
+            else if (messageFunction !is null)
+                messageFunction(fileName, line, column, message, true);
             else
                 stderr.writefln("%s(%d:%d)[error]: %s", fileName, line, column, message);
         }

@@ -3258,7 +3258,7 @@ unittest // issue #133
     RollbackAllocator ra;
     LexerConfig cf = LexerConfig("", StringBehavior.source);
     StringCache ca = StringCache(16);
-    Module m = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
+    Module m = ParserConfig(getTokensForParser(src, cf, &ca), "", &ra).parseModule();
     TkTest t = new TkTest;
     t.visit(m);
 }
@@ -3276,7 +3276,7 @@ unittest // issue #165
     RollbackAllocator ra;
     LexerConfig cf = LexerConfig("", StringBehavior.source);
     StringCache ca = StringCache(16);
-    Module m = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
+    Module m = ParserConfig(getTokensForParser(src, cf, &ca), "", &ra).parseModule();
     EpoTest et = new EpoTest;
     et.visit(m);
     assert(et.visited);
@@ -3312,7 +3312,7 @@ unittest // issue #156
     {
         // no colon so array.
         string src1 = q{void main(){const arr = [[0]];}};
-        Module m = parseModule(getTokensForParser(src1, cf, &ca), "", &ra);
+        Module m = parseModule(ParserConfig(getTokensForParser(src1, cf, &ca), "", &ra));
         Test t = new Test;
         t.visit(m);
         assert(t.arrValueOnly);
@@ -3320,7 +3320,7 @@ unittest // issue #156
     {
         // simple primary before colon, assume array.
         string src2 = q{void main(){const arr = [0:0];}};
-        Module m = parseModule(getTokensForParser(src2, cf, &ca), "", &ra);
+        Module m = ParserConfig(getTokensForParser(src2, cf, &ca), "", &ra).parseModule();
         Test t = new Test;
         t.visit(m);
         assert(t.arrIndex);
@@ -3330,7 +3330,7 @@ unittest // issue #156
     {
         // more complex exp before colon, assume AA.
         string src3 = q{void main(){const arr = [[0]:0];}};
-        Module m = parseModule(getTokensForParser(src3, cf, &ca), "", &ra);
+        Module m = ParserConfig(getTokensForParser(src3, cf, &ca), "", &ra).parseModule();
         Test t = new Test;
         t.visit(m);
         assert(!t.arrIndex);
@@ -3363,12 +3363,12 @@ unittest // issue #170
     LexerConfig cf = LexerConfig("", StringBehavior.source);
     StringCache ca = StringCache(16);
 
-    Module m = parseModule(getTokensForParser(Test170_F.src, cf, &ca), "", &ra);
+    Module m = ParserConfig(getTokensForParser(Test170_F.src, cf, &ca), "", &ra).parseModule();
     Test170_F t170_f = new Test170_F;
     t170_f.visit(m);
     assert(t170_f.visited);
 
-    m = parseModule(getTokensForParser(Test170_S.src, cf, &ca), "", &ra);
+    m = ParserConfig(getTokensForParser(Test170_S.src, cf, &ca), "", &ra).parseModule();
     Test170_S t170_s = new Test170_S;
     t170_s.visit(m);
     assert(t170_s.visited);
@@ -3423,7 +3423,7 @@ unittest // issue #193
     LexerConfig cf = LexerConfig("", StringBehavior.source);
     StringCache ca = StringCache(16);
 
-    Module m = parseModule(getTokensForParser(Test193.src, cf, &ca), "", &ra);
+    Module m = ParserConfig(getTokensForParser(Test193.src, cf, &ca), "", &ra).parseModule();
     Test193 t193 = new Test193;
     t193.visit(m);
 }
