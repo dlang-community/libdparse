@@ -48,6 +48,9 @@ struct ParserConfig
     uint* errorCount;
     /// An optional pointer to a variable receiving the warning count.
     uint* warningCount;
+    /// Indicates wether array initializers are fully parsed or just a single element,
+    /// which reduces memory usage.
+    bool singleArrayInitElement;
 }
 
 
@@ -67,6 +70,7 @@ Module parseModule()(auto ref ParserConfig parserConfig)
         parser.messageFunction = messageFunction;
         parser.messageDelegate = messageDelegate;
         parser.allocator = allocator;
+        parser.singleArrayInitElement = singleArrayInitElement;
     }
     Module mod = parser.parseModule();
     with (parserConfig)
@@ -101,6 +105,7 @@ Module parseModule(F)(const(Token)[] tokens, string fileName, RollbackAllocator*
  */
 class Parser
 {
+
     /**
      * Parses an AddExpression.
      *
@@ -341,6 +346,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!ArrayInitializer;
+        const openPos = index;
         const open = expect(tok!"[");
         mixin (nullCheck!`open`);
         node.startLocation = open.index;
@@ -352,7 +358,16 @@ class Parser
             if (!arrayMemberInitializations.put(parseArrayMemberInitialization()))
                 return null;
             if (currentIs(tok!","))
-                advance();
+            {
+                if (singleArrayInitElement)
+                {
+                    index = openPos;
+                    skipBrackets();
+                    index--;
+                }
+                else
+                    advance();
+            }
             else
                 break;
         }
@@ -7049,6 +7064,13 @@ class Parser
         return parseLeftAssocBinaryExpression!(XorExpression, AndExpression,
             tok!"^")();
     }
+
+    /**
+     * When parsing array initializers, only make an AST node
+     * for the first element of each dimension, which saves
+     * memory.
+     */
+    bool singleArrayInitElement;
 
     /**
      * Current error count

@@ -3433,12 +3433,55 @@ unittest // there used to be a small regression when adding the ParserConfig
     import dparse.lexer, dparse.parser, dparse.rollback_allocator;
 
     auto src = q{module m;};
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+    Module m1 = parseModule(getTokensForParser(src, cf, &ca), "", &ra , null);
+    Module m2 = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
+}
+
+unittest
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+    import dparse.formatter, std.array, std.string;
+
+    final class TestArrayInitVisitor : ASTVisitor
+    {
+        static string src1 = q{ auto a = ["0",]; };
+        static string src2 = q{ auto a = [["0", "1"],["2", "3"]]; };
+        size_t tc;
+        alias visit = ASTVisitor.visit;
+        override void visit(const ArrayMemberInitialization ami)
+        {
+            tc++;
+        }
+    }
 
     RollbackAllocator ra;
     LexerConfig cf = LexerConfig("", StringBehavior.source);
     StringCache ca = StringCache(16);
+    ParserConfig pf;
+    uint ec;
+    pf.fileName = "";
+    pf.tokens = getTokensForParser(TestArrayInitVisitor.src1, cf, &ca);
+    pf.allocator = &ra;
+    pf.singleArrayInitElement = true;
+    pf.errorCount = &ec;
+    Module m = parseModule(pf);
+    TestArrayInitVisitor tav = new TestArrayInitVisitor;
+    tav.visit(m);
+    assert(tav.tc == 1);
+    assert(ec == 0);
+    tav.tc = 0;
+    pf.tokens = getTokensForParser(TestArrayInitVisitor.src2, cf, &ca);
+    m = parseModule(pf);
+    tav.visit(m);
+    assert(tav.tc == 1);
+    assert(ec == 0);
 
-    Module m1 = parseModule(getTokensForParser(src, cf, &ca), "", &ra , null);
-    Module m2 = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
+    Appender!(char[]) app;
+    format(&app, m);
+    // we have the right amount of dim and the type, enough to infer
+    assert(app.data.stripLeft == "auto a = [[\"0\"]];");
 }
 

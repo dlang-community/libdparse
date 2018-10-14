@@ -494,9 +494,16 @@ class Formatter(Sink)
         debug(verbose) writeln("AutoDeclaration");
 
         /**
+        StorageClasses[] storageClasses;
         Token[] identifiers;
         Initializer[] initializers;
         **/
+
+        foreach(sc; decl.storageClasses)
+        {
+            format(sc);
+            space();
+        }
 
         // zip doesn't work here, dmd 2.064.2
         foreach(i, part; decl.parts)
