@@ -1824,8 +1824,9 @@ final class IfStatement : ASTNode
         mixin (visitIfNotNull!(identifier, type, expression, thenStatement,
             elseStatement));
     }
-    /** */ Token identifier;
+    /** */ IdType[] typeCtors;
     /** */ Type type;
+    /** */ Token identifier;
     /** */ Expression expression;
     /** */ DeclarationOrStatement thenStatement;
     /** */ DeclarationOrStatement elseStatement;

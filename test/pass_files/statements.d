@@ -3,7 +3,7 @@ deprecated void foo()
 	if (a) b();
 	if (a) b(); else c();
 	if (auto a = i == 10) b();
-	if (int i = x < 100) b();
+	if (int i = a < 100) b();
 	switch (x) {}
 	switch (x) { case 10: break; }
 	switch (x) { case 10: break; default: break; }
