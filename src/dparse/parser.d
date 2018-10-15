@@ -3571,7 +3571,7 @@ class Parser
 
         // most commn case: rel expression and such
         if (Expression e = parseExpression())
-            if (moreTokens && currentIs(tok!")"))
+           // if (moreTokens && currentIs(tok!")"))
         {
             node.expression = e;
             abandonBookmark(b);
@@ -4918,6 +4918,7 @@ class Parser
             }
             else if (currentIs(tok!"("))
                 mixin(parseNodeQ!(`node.arguments`, `Arguments`));
+            else goto default;
             break;
         case tok!"function":
         case tok!"delegate":
