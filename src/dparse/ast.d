@@ -2093,9 +2093,9 @@ final class MixinExpression : ExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(assignExpression));
+        mixin (visitIfNotNull!(argumentList));
     }
-    /** */ ExpressionNode assignExpression;
+    /** */ ArgumentList argumentList;
     mixin OpEquals;
 }
 

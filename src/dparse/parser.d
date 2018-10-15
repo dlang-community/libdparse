@@ -4173,7 +4173,7 @@ class Parser
      * Parses a MixinExpression
      *
      * $(GRAMMAR $(RULEDEF mixinExpression):
-     *     $(LITERAL 'mixin') $(LITERAL '$(LPAREN)') $(RULE assignExpression) $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'mixin') $(LITERAL '$(LPAREN)') $(RULE argumentList) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     MixinExpression parseMixinExpression()
@@ -4182,7 +4182,7 @@ class Parser
         auto node = allocator.make!MixinExpression;
         expect(tok!"mixin");
         expect(tok!"(");
-        mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+        mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
         expect(tok!")");
         return node;
     }

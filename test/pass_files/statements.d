@@ -71,4 +71,5 @@ label:
 	{
 		assert(i-- > 0);
 	}
+	mixin("auto a = 1 +", 1);
 }
