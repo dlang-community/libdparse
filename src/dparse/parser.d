@@ -3567,10 +3567,23 @@ class Parser
         if (moreTokens)
             node.startIndex = current().index;
         mixin(tokenCheck!"(");
-        const b = setBookmark();
+        Bookmark b = setBookmark();
+
+        // most commn case: rel expression and such
+        if (Expression e = parseExpression())
+            if (moreTokens && currentIs(tok!")"))
+        {
+            node.expression = e;
+            abandonBookmark(b);
+        }
+        if (!node.expression)
+        {
+            goToBookmark(b);
+            b = setBookmark();
+        }
 
         // auto identifier = exp
-        if (moreTokens && currentIs(tok!"auto") && peekIs(tok!"identifier"))
+        if (!node.expression && currentIs(tok!"auto") && peekIs(tok!"identifier"))
         {
             abandonBookmark(b);
             advance();
@@ -3593,7 +3606,7 @@ class Parser
         }
 
         // const identifier = exp
-        if (!node.expression && moreTokens && node.typeCtors.length &&
+        if (!node.expression && node.typeCtors.length &&
             currentIs(tok!"identifier") && peekIs(tok!"="))
         {
             abandonBookmark(b);
@@ -3614,14 +3627,6 @@ class Parser
                 advance();
                 mixin(parseNodeQ!(`node.expression`, `Expression`));
             }
-        }
-
-        // most commn case: rel expression and such
-        if (!node.expression)
-        {
-            goToBookmark(b);
-            if (Expression e = parseExpression())
-                node.expression = e;
         }
 
         // in all cases now there must be a valid expression
