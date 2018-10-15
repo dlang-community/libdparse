@@ -4,7 +4,6 @@ template a(b, c) if (d) {}
 template a(alias int a : 10) {}
 template a(alias int a : int) {}
 template a(alias int a : 10) {}
-//template a(alias int a : 10 = int) {}
 template a(alias int a : int = 10) {}
 template a(alias int a : int) {}
 template a(alias int a = 10) {}

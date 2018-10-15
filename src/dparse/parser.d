@@ -3571,7 +3571,6 @@ class Parser
 
         // most commn case: rel expression and such
         if (Expression e = parseExpression())
-           // if (moreTokens && currentIs(tok!")"))
         {
             node.expression = e;
             abandonBookmark(b);
