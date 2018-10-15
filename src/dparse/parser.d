@@ -3594,14 +3594,12 @@ class Parser
         // const shared ...
         if (!node.expression && moreTokens && isTypeCtor(current.type))
         {
-            StackBuffer idTypes;
             while (moreTokens)
             {
                 if (!isTypeCtor(current.type) || peekIs(tok!"("))
                     break;
-                idTypes.put(advance());
+                node.typeCtors ~= advance().type;
             }
-            ownArray(node.typeCtors, idTypes);
         }
 
         // const identifier = exp
