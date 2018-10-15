@@ -3560,58 +3560,75 @@ class Parser
     IfStatement parseIfStatement()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!IfStatement;
+        IfStatement node = allocator.make!IfStatement;
         node.line = current().line;
         node.column = current().column;
         mixin(tokenCheck!"if");
         if (moreTokens)
             node.startIndex = current().index;
         mixin(tokenCheck!"(");
+        const b = setBookmark();
 
-        if (currentIs(tok!"auto"))
+        // auto identifier = exp
+        if (moreTokens && currentIs(tok!"auto") && peekIs(tok!"identifier"))
         {
+            abandonBookmark(b);
             advance();
-            const i = expect(tok!"identifier");
-            if (i !is null)
-                node.identifier = *i;
-            expect(tok!"=");
+            node.identifier = advance();
+            mixin(tokenCheck!"=");
             mixin(parseNodeQ!(`node.expression`, `Expression`));
         }
-        else
-        {
-            // consume for TypeCtors = identifier
-            if (isTypeCtor(current.type))
-            {
-                while (isTypeCtor(current.type))
-                {
-                    const prev = current.type;
-                    advance();
-                    if (current.type == prev)
-                        warn("redundant type constructor");
-                }
-                // goes back for TypeCtor(Type) = identifier
-                if (currentIs(tok!"("))
-                    index--;
-            }
 
-            immutable b = setBookmark();
-            immutable c = allocator.setCheckpoint();
-            auto type = parseType();
-            if (type is null || !currentIs(tok!"identifier")
-                || !peekIs(tok!"="))
+        // const shared ...
+        if (!node.expression && moreTokens && isTypeCtor(current.type))
+        {
+            StackBuffer idTypes;
+            while (moreTokens)
             {
-                allocator.rollback(c);
-                goToBookmark(b);
-                mixin(parseNodeQ!(`node.expression`, `Expression`));
+                if (!isTypeCtor(current.type) || peekIs(tok!"("))
+                    break;
+                idTypes.put(advance());
             }
-            else
+            ownArray(node.typeCtors, idTypes);
+        }
+
+        // const identifier = exp
+        if (!node.expression && moreTokens && node.typeCtors.length &&
+            currentIs(tok!"identifier") && peekIs(tok!"="))
+        {
+            abandonBookmark(b);
+            node.identifier = advance();
+            advance();
+            mixin(parseNodeQ!(`node.expression`, `Expression`));
+        }
+
+        // type following optional node.typeCtors
+        if (!node.expression)
+            if (Type tp = parseType())
+        {
+            if (currentIs(tok!"identifier") && peekIs(tok!"="))
             {
                 abandonBookmark(b);
-                node.type = type;
-                mixin(tokenCheck!(`node.identifier`, "identifier"));
-                mixin(tokenCheck!"=");
+                node.type = tp;
+                node.identifier = advance();
+                advance();
                 mixin(parseNodeQ!(`node.expression`, `Expression`));
             }
+        }
+
+        // most commn case: rel expression and such
+        if (!node.expression)
+        {
+            goToBookmark(b);
+            if (Expression e = parseExpression())
+                node.expression = e;
+        }
+
+        // in all cases now there must be a valid expression
+        if (!node.expression)
+        {
+            goToBookmark(b);
+            error("expression or declaration expected");
         }
 
         mixin(tokenCheck!")");

@@ -1650,8 +1650,9 @@ class Formatter(Sink)
         debug(verbose) writeln("IfStatement");
 
         /**
-        Token identifier;
+        IdType[] typeCtors;
         Type type;
+        Token identifier;
         Expression expression;
         DeclarationOrStatement thenStatement;
         DeclarationOrStatement elseStatement;
@@ -1660,11 +1661,16 @@ class Formatter(Sink)
         with(ifStatement)
         {
             bool isAuto = identifier != tok!"" && !type;
-            bool isAssign = isAuto || type;
+            bool isAssign = isAuto || type || typeCtors.length;
 
             put("if (");
 
             if (isAuto) put("auto ");
+            foreach(tct; typeCtors)
+            {
+                put(str(tct));
+                space();
+            }
             if (type)
             {
                 format(type);
