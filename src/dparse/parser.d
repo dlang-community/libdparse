@@ -3084,6 +3084,7 @@ class Parser
                 }
                 else if (next.type == tok!"(")
                 {
+                    requireDo = false;
                     const size_t inTokenLocation = current.index;
                     advance();
                     advance();
@@ -3113,6 +3114,7 @@ class Parser
                 }
                 else if (next.type == tok!"(")
                 {
+                    requireDo = false;
                     const size_t outTokenLocation = current.index;
                     advance();
                     advance();
@@ -3164,7 +3166,7 @@ class Parser
         }
         else if (requireDo && currentIs(tok!"{"))
         {
-            error("`do` exptected after InStatement or OutStatement");
+            error("`do` expected after InStatement or OutStatement");
             return null;
         }
         else if (!inStatements.length && !outStatements.length)
