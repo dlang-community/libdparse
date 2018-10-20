@@ -3046,7 +3046,9 @@ class Parser
     }
 
     /**
-     * Parses a FunctionBody
+     * Parses a FunctionBody.
+     * Note that any change of this function must also be applied in dsymbol SimpleParser, which can be found
+     * $(LINK2 https://github.com/dlang-community/dsymbol/blob/master/src/dsymbol/conversion/package.d, here).
      *
      * $(GRAMMAR $(RULEDEF functionBody):
      *       $(RULE blockStatement)
