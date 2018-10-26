@@ -7092,6 +7092,9 @@ class Parser
     /// Ditto
     MessageDelegate messageDelegate;
 
+    deprecated("Use messageDelegate instead")
+    alias messageDg = messageDelegate;
+
     void setTokens(const(Token)[] tokens)
     {
         this.tokens = tokens;
