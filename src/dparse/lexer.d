@@ -1806,14 +1806,6 @@ private pure nothrow @safe:
     bool haveSSE42;
 }
 
-/// copy from phobos b/c we need to build on older versions of dmd
-/// Returns : the next power of two from a given value
-private static size_t nextPow2(size_t value)
-{
-    import core.bitop : bsr;
-    return 1 << bsr(value) + 1;
-}
-
 /**
  * Creates a token range from the given source code. Creates a default lexer
  * configuration and a GC-managed string cache.
@@ -1821,10 +1813,8 @@ private static size_t nextPow2(size_t value)
 public auto byToken(R)(R range)
 if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
 {
-    uint bc = cast(uint)((range.length > 2^^31UL) ? 2^^31
-        : nextPow2(1 + range.length / 32));
     LexerConfig config;
-    StringCache* cache = new StringCache(bc);
+    StringCache* cache = new StringCache(range.length.optimalBucketCount);
     return DLexer(range, config, cache);
 }
 
@@ -2014,6 +2004,28 @@ unittest
     stderr.writeln("Unittest for unDecorateComment passed.");
 }
 
+
+/**
+ * Helper function used to avoid too much allocations while lexing.
+ *
+ * Params:
+ *      size = The length in bytes of the source file.
+ *
+ * Returns:
+ *      The optimal initial bucket count a `StringCache` should have.
+ */
+size_t optimalBucketCount(size_t size)
+{
+    import std.math : nextPow2;
+    return nextPow2(size / 32).max(16).min(1 << 30);
+}
+///
+unittest
+{
+    assert(optimalBucketCount(1) == 16);
+    assert(optimalBucketCount(9000 * 32) == 16384);
+    assert(optimalBucketCount(100_000_000_000UL) == 1 << 30);
+}
 
 /**
  * The string cache is used for string interning.
