@@ -85,7 +85,7 @@ Module parseModule()(auto ref ParserConfig parserConfig)
 
 deprecated("Use the parseModule overload that takes a ParserConfig instead")
 Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
-    MessageFunction messageFunction, uint* errorCount = null, uint* warningCount = null)
+    MessageFunction messageFunction = null, uint* errorCount = null, uint* warningCount = null)
 {
     return ParserConfig(tokens, fileName, allocator, messageFunction, null,
         errorCount, warningCount).parseModule();
@@ -93,7 +93,7 @@ Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* al
 
 deprecated("Use the parseModule overload that takes a ParserConfig instead")
 Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
-    MessageDelegate messageDelegate, uint* errorCount = null, uint* warningCount = null)
+    MessageDelegate messageDelegate = null, uint* errorCount = null, uint* warningCount = null)
 {
     return ParserConfig(tokens, fileName, allocator, null, messageDelegate,
         errorCount, warningCount).parseModule();
