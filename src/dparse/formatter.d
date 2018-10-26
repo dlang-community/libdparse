@@ -494,9 +494,16 @@ class Formatter(Sink)
         debug(verbose) writeln("AutoDeclaration");
 
         /**
+        StorageClasses[] storageClasses;
         Token[] identifiers;
         Initializer[] initializers;
         **/
+
+        foreach(sc; decl.storageClasses)
+        {
+            format(sc);
+            space();
+        }
 
         // zip doesn't work here, dmd 2.064.2
         foreach(i, part; decl.parts)
@@ -3968,4 +3975,5 @@ unittest
     testFormatNode!(VariableDeclaration)(`.T!0[] t;`);
     testFormatNode!(VariableDeclaration)(`T!(0)[] t;`);
     testFormatNode!(VariableDeclaration)(`T!(0)[dim] t;`);
+    testFormatNode!(VariableDeclaration)(`const shared t = [0, 1];`);
 }
