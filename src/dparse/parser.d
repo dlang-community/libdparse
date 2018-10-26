@@ -20,12 +20,8 @@ import std.string : format;
 
 /**
  * Prototype for a custom parser message function or delegate.
- * Params:
- *      fileName = The source file name.
- *      line = The line in the source, 0 based.
- *      column = The column in the source, 0 based.
- *      message = Datailed message.
- *      isError = Indicates if the message is a warning (`false`) or a if it's an error (`true`).
+ * Parameters passed are a file name, a line, a column, a message and a `bool`
+ * that indicates if the message is a warning (`false`) or a if it's an error (`true`).
  */
 alias MessageFunction = void function(string fileName , size_t line, size_t column, string message, bool isError);
 
@@ -84,19 +80,16 @@ Module parseModule()(auto ref ParserConfig parserConfig)
 }
 
 deprecated("Use the parseModule overload that takes a ParserConfig instead")
-Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
-    MessageFunction messageFunction = null, uint* errorCount = null, uint* warningCount = null)
+Module parseModule(F)(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
+    F messageFunction = null, uint* errorCount = null, uint* warningCount = null)
 {
-    return ParserConfig(tokens, fileName, allocator, messageFunction, null,
-        errorCount, warningCount).parseModule();
-}
-
-deprecated("Use the parseModule overload that takes a ParserConfig instead")
-Module parseModule(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
-    MessageDelegate messageDelegate = null, uint* errorCount = null, uint* warningCount = null)
-{
-    return ParserConfig(tokens, fileName, allocator, null, messageDelegate,
-        errorCount, warningCount).parseModule();
+    static if (!is(typeof(F)) || is(F == MessageFunction))
+        return ParserConfig(tokens, fileName, allocator, messageFunction, null,
+            errorCount, warningCount).parseModule();
+    else static if (is(F == MessageDelegate))
+        return ParserConfig(tokens, fileName, allocator, null, messageFunction,
+            errorCount, warningCount).parseModule();
+    else static assert(0, "F must be null, a MessageFunction or a MessageDelegate");
 }
 
 /**

@@ -3428,3 +3428,17 @@ unittest // issue #193
     t193.visit(m);
 }
 
+unittest // there used to be a small regression when adding the ParserConfig
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+    auto src = q{module m;};
+
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+
+    Module m1 = parseModule(getTokensForParser(src, cf, &ca), "", &ra , null);
+    Module m2 = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
+}
+
