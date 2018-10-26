@@ -20,12 +20,8 @@ import std.string : format;
 
 /**
  * Prototype for a custom parser message function or delegate.
- * Params:
- *      fileName = The source file name.
- *      line = The line in the source, 0 based.
- *      column = The column in the source, 0 based.
- *      message = Datailed message.
- *      isError = Indicates if the message is a warning (`false`) or a if it's an error (`true`).
+ * Parameters passed are a file name, a line, a column, a message and a `bool`
+ * that indicates if the message is a warning (`false`) or a if it's an error (`true`).
  */
 alias MessageFunction = void function(string fileName , size_t line, size_t column, string message, bool isError);
 
