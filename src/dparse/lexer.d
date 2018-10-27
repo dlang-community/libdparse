@@ -2017,12 +2017,12 @@ unittest
 size_t optimalBucketCount(size_t size)
 {
     import std.math : nextPow2;
-    return nextPow2(size / 32).max(16).min(1 << 30);
+    return nextPow2((size + 31U) / 32U).min(1U << 30U);
 }
 ///
 unittest
 {
-    assert(optimalBucketCount(1) == 16);
+    assert(optimalBucketCount(1) == 2);
     assert(optimalBucketCount(9000 * 32) == 16384);
     assert(optimalBucketCount(100_000_000_000UL) == 1 << 30);
 }
