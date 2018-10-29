@@ -303,7 +303,7 @@ int main(string[] args)
         immutable ulong fileSize = f.size();
         ubyte[] fileBytes = new ubyte[](fileSize);
         enforce(f.rawRead(fileBytes).length == fileSize);
-        StringCache cache = StringCache(StringCache.defaultBucketCount);
+        StringCache cache = StringCache(fileSize.optimalBucketCount);
         LexerConfig config;
         config.stringBehavior = StringBehavior.source;
         config.fileName = arg;
