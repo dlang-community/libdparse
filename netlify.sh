@@ -4,7 +4,7 @@ set -uexo pipefail
 
 wget https://dlang.org/install.sh
 # Required for scod - see https://github.com/MartinNowak/scod/pull/15
-. $(bash install.sh dmd-2.080.1 -a)
+. $(bash install.sh dmd-2.083.0 -a)
 
 # just to be save
 git submodule update --init --recursive

@@ -4,6 +4,9 @@ d:
   - dmd
   - dmd-2.075.0
   - ldc
+branches:
+  only:
+  - master  
 matrix:
   include:
     d: dmd-2.078.2
