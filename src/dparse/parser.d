@@ -684,7 +684,7 @@ class Parser
             {
                 trace("Found register");
                 mixin (nullCheck!`(node.register = parseRegister())`);
-                if (current.type == tok!":")
+                if (currentIs(tok!":"))
                 {
                     advance();
                     mixin(parseNodeQ!(`node.segmentOverrideSuffix`, `AsmExp`));
@@ -1296,6 +1296,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!BaseClass;
+        if (!moreTokens)
+            return null;
         if (current.type.isProtection())
         {
             warn("Use of base class protection is deprecated.");
@@ -1443,6 +1445,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!CastQualifier;
+        if (!moreTokens)
+            return null;
         switch (current.type)
         {
         case tok!"inout":
@@ -1612,6 +1616,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!CompileCondition;
+        if (!moreTokens)
+            return null;
         switch (current.type)
         {
         case tok!"version":
@@ -4155,6 +4161,8 @@ class Parser
     MemberFunctionAttribute parseMemberFunctionAttribute()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (!moreTokens)
+            return null;
         auto node = allocator.make!MemberFunctionAttribute;
         switch (current.type)
         {
@@ -4430,11 +4438,11 @@ class Parser
                 advance();
                 ExpressionNode e;
                 // issue 170: try to find a valid ExpressionStatement / EmptyStatement
-                if (current.type != tok!";" && current.type != tok!"}")
+                if (!currentIsOneOf(tok!";", tok!"}"))
                 {
                     e = parseAssignExpression();
                 }
-                if ((current.type == tok!";" && e) || (!e && current.type == tok!";"))
+                if ((currentIs(tok!";") && e) || (!e && currentIs(tok!";")))
                 {
                     goToBookmark(g);
                     mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
@@ -4659,6 +4667,8 @@ class Parser
     ParameterAttribute parseParameterAttribute(bool validate = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (!moreTokens)
+            return null;
         auto node = allocator.make!ParameterAttribute;
         switch (current.type)
         {
@@ -5490,6 +5500,8 @@ class Parser
      */
     StorageClass parseStorageClass()
     {
+        if (!moreTokens)
+            return null;
         auto node = allocator.make!StorageClass;
         switch (current.type)
         {
@@ -5955,6 +5967,8 @@ class Parser
     TemplateParameter parseTemplateParameter()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (!moreTokens)
+            return null;
         auto node = allocator.make!TemplateParameter;
         switch (current.type)
         {
