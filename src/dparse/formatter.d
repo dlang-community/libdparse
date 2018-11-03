@@ -1442,8 +1442,12 @@ class Formatter(Sink)
             }
             foreach(inStatement; inStatements)
                 format(inStatement);
+            foreach(inContractExpression; inContractExpressions)
+                format(inContractExpression);
             foreach(outStatement; outStatements)
                 format(outStatement);
+            foreach(outContractExpression; outContractExpressions)
+                format(outContractExpression);
             if (bodyStatement)
                 format(bodyStatement);
         }
@@ -1834,6 +1838,20 @@ class Formatter(Sink)
         }
     }
 
+    void format(const InContractExpression expression)
+    {
+        debug(verbose) writeln("InContractExpression");
+
+        put("in (");
+        format(expression.assertion);
+        if (expression.message !is null)
+        {
+            put(", ");
+            format(expression.message);
+        }
+        put(")");
+    }
+
     void format(const InExpression inExpression)
     {
         debug(verbose) writeln("InExpression");
@@ -1916,8 +1934,22 @@ class Formatter(Sink)
 
         putComment(invariant_.comment);
         putAttrs(attrs);
-        put("invariant()");
-        format(invariant_.blockStatement);
+        put("invariant(");
+        if (invariant_.blockStatement !is null)
+        {
+            put(")");
+            format(invariant_.blockStatement);
+        }
+        else
+        {
+            format(invariant_.assertion);
+            if (invariant_.message !is null)
+            {
+                put("; ");
+                format(invariant_.message);
+            }
+            put(")");
+        }
     }
 
     void format(const IsExpression isExpression)
@@ -2247,6 +2279,23 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("OrOrExpression");
         mixin(binary("orOrExpression", "||"));
+    }
+
+    void format(const OutContractExpression expression)
+    {
+        debug(verbose) writeln("OutContractExpression");
+
+        put("out (");
+        if (expression.parameter != tok!"")
+            format(expression.parameter);
+        put("; ");
+        format(expression.assertion);
+        if (expression.message !is null)
+        {
+            put(", ");
+            format(expression.message);
+        }
+        put(")");
     }
 
     void format(const OutStatement stmnt)
