@@ -3095,7 +3095,9 @@ class Parser
         }
 
         StackBuffer inStatements;
+        StackBuffer inContractExpressions;
         StackBuffer outStatements;
+        StackBuffer outContractExpressions;
         bool requireDo;
 
         while (currentIsOneOf(tok!"in", tok!"out"))
@@ -3116,14 +3118,8 @@ class Parser
                 else if (next.type == tok!"(")
                 {
                     requireDo = false;
-                    const size_t inTokenLocation = current.index;
-                    advance();
-                    advance();
-                    if (InStatement s = parseContractExpression!InStatement())
-                    {
-                        s.inTokenLocation = inTokenLocation;
-                        inStatements.put(s);
-                    }
+                    if (auto e = parseInContractExpression())
+                        inContractExpressions.put(e);
                     else return null;
                 }
                 else
@@ -3146,28 +3142,8 @@ class Parser
                 else if (next.type == tok!"(")
                 {
                     requireDo = false;
-                    const size_t outTokenLocation = current.index;
-                    advance();
-                    advance();
-                    if (currentIs(tok!";"))
-                    {
-                        advance();
-                    }
-                    else if (currentIs(tok!"identifier") && peekIs(tok!";"))
-                    {
-                        advance();
-                        advance();
-                    }
-                    else
-                    {
-                        error("`;` or identifier expected");
-                        return null;
-                    }
-                    if (OutStatement s = parseContractExpression!OutStatement())
-                    {
-                        s.outTokenLocation = outTokenLocation;
-                        outStatements.put(s);
-                    }
+                    if (auto e = parseOutContractExpression())
+                        outContractExpressions.put(e);
                     else return null;
                 }
                 else
@@ -3180,7 +3156,9 @@ class Parser
         }
 
         ownArray(node.inStatements, inStatements);
+        ownArray(node.inContractExpressions, inContractExpressions);
         ownArray(node.outStatements, outStatements);
+        ownArray(node.outContractExpressions, outContractExpressions);
 
         if (currentIs(tok!"{") && !requireDo)
         {
@@ -3861,6 +3839,37 @@ class Parser
     }
 
     /**
+     * Parses an InContractExpression
+     *
+     * $(GRAMMAR $(RULEDEF inContractExpression):
+     *     $(LITERAL 'in') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     ;)
+     */
+    InContractExpression parseInContractExpression()
+    {
+        auto node = allocator.make!InContractExpression;
+        const i = expect(tok!"in");
+        mixin(nullCheck!`i`);
+        node.inTokenLocation = i.index;
+        mixin(tokenCheck!"(");
+        mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
+        if (currentIs(tok!","))
+        {
+            advance();
+            if (currentIs(tok!")"))
+            {
+                advance();
+                return node;
+            }
+            mixin(parseNodeQ!(`node.message`, `AssignExpression`));
+        }
+        if (currentIs(tok!","))
+            advance();
+        mixin(tokenCheck!")");
+        return node;
+    }
+
+    /**
      * Parses an InExpression
      *
      * $(GRAMMAR $(RULEDEF inExpression):
@@ -3885,8 +3894,7 @@ class Parser
      * Parses an InStatement
      *
      * $(GRAMMAR $(RULEDEF inStatement):
-     *       $(LITERAL 'in') $(RULE blockStatement)
-     *     | $(LITERAL 'in') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'in') $(RULE blockStatement)
      *     ;)
      */
     InStatement parseInStatement()
@@ -3944,40 +3952,46 @@ class Parser
      */
     Invariant parseInvariant()
     {
+        auto node = allocator.make!Invariant;
+        node.index = current.index;
+        node.line = current.line;
         mixin(tokenCheck!"invariant");
+        bool mustHaveBlock;
         if (currentIs(tok!"(") && peekIs(tok!")"))
         {
+            mustHaveBlock = true;
             advance();
             advance();
         }
         if (currentIs(tok!"{"))
         {
-            Invariant node = allocator.make!Invariant;
-            node.index = current.index;
-            node.line = current.line;
             if (currentIs(tok!"("))
             {
                 advance();
                 mixin(tokenCheck!")");
             }
             mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
-            return node;
         }
-        else if (currentIs(tok!"("))
+        else if (!mustHaveBlock && currentIs(tok!"("))
         {
-            const idx = current.index;
-            const lne = current.line;
             advance();
-            if (Invariant node = parseContractExpression!Invariant())
+            mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
+            if (currentIs(tok!","))
             {
-                mixin(tokenCheck!";");
-                node.index = idx;
-                node.line = lne;
-                return node;
+                advance();
+                if (currentIs(tok!")"))
+                {
+                    advance();
+                    return node;
+                }
+                mixin(parseNodeQ!(`node.message`, `AssignExpression`));
             }
-            else return null;
+            if (currentIs(tok!","))
+                advance();
+            mixin(tokenCheck!")");
         }
         else return null;
+        return node;
     }
 
     /**
@@ -4551,11 +4565,44 @@ class Parser
     }
 
     /**
+     * Parses an OutContractExpression
+     *
+     * $(GRAMMAR $(RULEDEF outContractExpression):
+     *     $(LITERAL 'out') $(LITERAL '$(LPAREN)') $(LITERAL Identifier)? $(LITERAL ';') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     ;)
+     */
+    OutContractExpression parseOutContractExpression()
+    {
+        auto node = allocator.make!OutContractExpression;
+        const o = expect(tok!"out");
+        mixin(nullCheck!`o`);
+        node.outTokenLocation = o.index;
+        mixin(tokenCheck!"(");
+        if (currentIs(tok!"identifier"))
+            node.parameter = advance();
+        mixin(tokenCheck!";");
+        mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
+        if (currentIs(tok!","))
+        {
+            advance();
+            if (currentIs(tok!")"))
+            {
+                advance();
+                return node;
+            }
+            mixin(parseNodeQ!(`node.message`, `AssignExpression`));
+        }
+        if (currentIs(tok!","))
+            advance();
+        mixin(tokenCheck!")");
+        return node;
+    }
+
+    /**
      * Parses an OutStatement
      *
      * $(GRAMMAR $(RULEDEF outStatement):
-     *       $(LITERAL 'out') ($(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)'))? $(RULE blockStatement)
-     *     | $(LITERAL 'out') $(LITERAL '$(LPAREN)') $(LITERAL Identifier)? $(LITERAL ';') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'out') ($(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)'))? $(RULE blockStatement)
      *     ;)
      */
     OutStatement parseOutStatement()
@@ -7998,54 +8045,6 @@ protected: final:
         advance();
         return node;
     }
-
-        AssertExpression parseAssertForContractExp()
-        {
-            auto node = allocator.make!AssertExpression;
-            node.line = current.line;
-            node.column = current.column;
-            mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
-            if (currentIs(tok!","))
-            {
-                advance();
-                if (currentIs(tok!")"))
-                {
-                    advance();
-                    return node;
-                }
-                mixin(parseNodeQ!(`node.message`, `AssignExpression`));
-            }
-            if (currentIs(tok!","))
-                advance();
-            mixin(tokenCheck!")");
-            return node;
-        }
-
-        T parseContractExpression(T)()
-        {
-
-            AssertExpression ae = parseAssertForContractExp();
-            if (!ae)
-                return null;
-            T inOrOut = allocator.make!T();
-            inOrOut.blockStatement = allocator.make!BlockStatement();
-            DeclarationsAndStatements d = allocator.make!DeclarationsAndStatements();
-            inOrOut.blockStatement.declarationsAndStatements = d;
-            StackBuffer dos;
-            dos.put(allocator.make!DeclarationOrStatement());
-            ownArray(d.declarationsAndStatements, dos);
-            Statement s = allocator.make!Statement();
-            d.declarationsAndStatements[0].statement = s;
-            s.statementNoCaseNoDefault = allocator.make!StatementNoCaseNoDefault();
-            s.statementNoCaseNoDefault.expressionStatement = allocator.make!ExpressionStatement();
-            Expression e = allocator.make!Expression();
-            s.statementNoCaseNoDefault.expressionStatement.expression = e;
-            StackBuffer en;
-            en.put(ae);
-            ownArray(e.items, en);
-
-            return inOrOut;
-        }
 
     int suppressMessages;
     size_t index;

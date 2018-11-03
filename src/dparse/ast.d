@@ -242,6 +242,7 @@ abstract class ASTVisitor
     /** */ void visit(const ImportDeclaration importDeclaration) { importDeclaration.accept(this); }
     /** */ void visit(const ImportExpression importExpression) { importExpression.accept(this); }
     /** */ void visit(const IndexExpression indexExpression) { indexExpression.accept(this); }
+    /** */ void visit(const InContractExpression inContractExpression) { inContractExpression.accept(this); }
     /** */ void visit(const InExpression inExpression) { inExpression.accept(this); }
     /** */ void visit(const InStatement inStatement) { inStatement.accept(this); }
     /** */ void visit(const Initialize initialize) { initialize.accept(this); }
@@ -268,6 +269,7 @@ abstract class ASTVisitor
     /** */ void visit(const Operands operands) { operands.accept(this); }
     /** */ void visit(const OrExpression orExpression) { orExpression.accept(this); }
     /** */ void visit(const OrOrExpression orOrExpression) { orOrExpression.accept(this); }
+    /** */ void visit(const OutContractExpression outContractExpression) { outContractExpression.accept(this); }
     /** */ void visit(const OutStatement outStatement) { outStatement.accept(this); }
     /** */ void visit(const ParameterAttribute parameterAttribute) { parameterAttribute.accept(this); }
     /** */ void visit(const Parameter parameter) { parameter.accept(this); }
@@ -1671,14 +1673,17 @@ final class FunctionBody : ASTNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(inStatements, outStatements, bodyStatement,
+        mixin (visitIfNotNull!(inStatements, inContractExpressions,
+            outStatements, outContractExpressions, bodyStatement,
             blockStatement));
     }
 
     /** */ BlockStatement blockStatement;
     /** */ BodyStatement bodyStatement;
     /** */ OutStatement[] outStatements;
+    /** */ OutContractExpression[] outContractExpressions;
     /** */ InStatement[] inStatements;
+    /** */ InContractExpression[] inContractExpressions;
     mixin OpEquals;
 }
 
@@ -1910,6 +1915,19 @@ final class IndexExpression : ExpressionNode
 }
 
 ///
+final class InContractExpression : ASTNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(assertion, message));
+    }
+    /** */ size_t inTokenLocation;
+    /** */ ExpressionNode assertion;
+    /** */ ExpressionNode message;
+    mixin OpEquals;
+}
+
+///
 final class InExpression : ExpressionNode
 {
     override void accept(ASTVisitor visitor) const
@@ -1977,9 +1995,11 @@ final class Invariant : ASTNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(blockStatement));
+        mixin (visitIfNotNull!(blockStatement, assertion, message));
     }
     /** */ BlockStatement blockStatement;
+    /** */ ExpressionNode assertion;
+    /** */ ExpressionNode message;
     /** */ string comment;
     size_t line;
     size_t index;
@@ -2285,6 +2305,20 @@ final class OrOrExpression : ExpressionNode
         mixin (visitIfNotNull!(left, right));
     }
     mixin BinaryExpressionBody;
+    mixin OpEquals;
+}
+
+///
+final class OutContractExpression : ASTNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(parameter, assertion, message));
+    }
+    /** */ size_t outTokenLocation;
+    /** */ Token parameter;
+    /** */ ExpressionNode assertion;
+    /** */ ExpressionNode message;
     mixin OpEquals;
 }
 
