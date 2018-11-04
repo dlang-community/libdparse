@@ -1247,24 +1247,6 @@ class Parser
     }
 
     /**
-     * Parses a BodyStatement
-     *
-     * $(GRAMMAR $(RULEDEF bodyStatement):
-     *     ($(LITERAL 'body') | $(LITERAL 'do')) $(RULE blockStatement)
-     *     ;)
-     */
-    BodyStatement parseBodyStatement()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!BodyStatement;
-        if (!currentIs(tok!"do") && current.text != "body")
-            return null;
-        advance();
-        mixin(simpleParseItem!("blockStatement|parseBlockStatement"));
-        return node;
-    }
-
-    /**
      * Parses a BreakStatement
      *
      * $(GRAMMAR $(RULEDEF breakStatement):

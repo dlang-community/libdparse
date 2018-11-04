@@ -547,16 +547,6 @@ class Formatter(Sink)
             endBlock();
         }
     }
-
-    void format(const BodyStatement bodyStatement)
-    {
-        debug(verbose) writeln("BodyStatement");
-
-        newline();
-        put("do");
-        format(bodyStatement.blockStatement);
-    }
-
     void format(const BreakStatement breakStatement)
     {
         debug(verbose) writeln("BreakStatement");

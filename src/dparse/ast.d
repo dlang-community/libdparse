@@ -180,7 +180,6 @@ abstract class ASTVisitor
     /** */ void visit(const AutoDeclaration autoDeclaration) { autoDeclaration.accept(this); }
     /** */ void visit(const AutoDeclarationPart autoDeclarationPart) { autoDeclarationPart.accept(this); }
     /** */ void visit(const BlockStatement blockStatement) { blockStatement.accept(this); }
-    /** */ void visit(const BodyStatement bodyStatement) { bodyStatement.accept(this); }
     /** */ void visit(const BreakStatement breakStatement) { breakStatement.accept(this); }
     /** */ void visit(const BaseClass baseClass) { baseClass.accept(this); }
     /** */ void visit(const BaseClassList baseClassList) { baseClassList.accept(this); }
@@ -969,17 +968,6 @@ final class BlockStatement : ASTNode
     size_t endLocation;
 
     /** */ DeclarationsAndStatements declarationsAndStatements;
-    mixin OpEquals;
-}
-
-///
-final class BodyStatement : ASTNode
-{
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(blockStatement));
-    }
-    /** */ BlockStatement blockStatement;
     mixin OpEquals;
 }
 
