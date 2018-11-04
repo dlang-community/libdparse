@@ -170,6 +170,7 @@ abstract class ASTVisitor
     /** */ void visit(const AsmTypePrefix asmTypePrefix) { asmTypePrefix.accept(this); }
     /** */ void visit(const AsmUnaExp asmUnaExp) { asmUnaExp.accept(this); }
     /** */ void visit(const AsmXorExp asmXorExp) { asmXorExp.accept(this); }
+    /** */ void visit(const AssertArguments assertArguments) { assertArguments.accept(this); }
     /** */ void visit(const AssertExpression assertExpression) { assertExpression.accept(this); }
     /** */ void visit(const AssignExpression assignExpression) { assignExpression.accept(this); }
     /** */ void visit(const AssocArrayLiteral assocArrayLiteral) { assocArrayLiteral.accept(this); }
@@ -819,16 +820,27 @@ final class AsmXorExp : ExpressionNode
 }
 
 ///
-final class AssertExpression : ExpressionNode
+final class AssertArguments : ASTNode
 {
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(assertion, message));
     }
-    /** */ size_t line;
-    /** */ size_t column;
     /** */ ExpressionNode assertion;
     /** */ ExpressionNode message;
+    mixin OpEquals;
+}
+
+///
+final class AssertExpression : ExpressionNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(assertArguments));
+    }
+    /** */ size_t line;
+    /** */ size_t column;
+    /** */ AssertArguments assertArguments;
     mixin OpEquals;
 }
 
@@ -1919,11 +1931,10 @@ final class InContractExpression : ASTNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(assertion, message));
+        mixin (visitIfNotNull!(assertArguments));
     }
     /** */ size_t inTokenLocation;
-    /** */ ExpressionNode assertion;
-    /** */ ExpressionNode message;
+    /** */ AssertArguments assertArguments;
     mixin OpEquals;
 }
 
@@ -1995,11 +2006,10 @@ final class Invariant : ASTNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(blockStatement, assertion, message));
+        mixin (visitIfNotNull!(blockStatement, assertArguments));
     }
     /** */ BlockStatement blockStatement;
-    /** */ ExpressionNode assertion;
-    /** */ ExpressionNode message;
+    /** */ AssertArguments assertArguments;
     /** */ string comment;
     size_t line;
     size_t index;
@@ -2313,12 +2323,11 @@ final class OutContractExpression : ASTNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(parameter, assertion, message));
+        mixin (visitIfNotNull!(parameter, assertArguments));
     }
     /** */ size_t outTokenLocation;
     /** */ Token parameter;
-    /** */ ExpressionNode assertion;
-    /** */ ExpressionNode message;
+    /** */ AssertArguments assertArguments;
     mixin OpEquals;
 }
 

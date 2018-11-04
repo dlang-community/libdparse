@@ -373,7 +373,7 @@ class Formatter(Sink)
         assert(false);
     }
 
-    void format(const AssertExpression assertExpression)
+    void format(const AssertArguments assertArguments)
     {
         debug(verbose) writeln("AssertExpression");
 
@@ -382,15 +382,29 @@ class Formatter(Sink)
         AssignExpression message;
         **/
 
-        with(assertExpression)
+        with(assertArguments)
         {
-            put("assert (");
             format(assertion);
             if (message)
             {
                 put(", ");
                 format(message);
             }
+        }
+    }
+
+    void format(const AssertExpression assertExpression)
+    {
+        debug(verbose) writeln("AssertExpression");
+
+        /**
+        AssertArguments assertArguments;
+        **/
+
+        with(assertExpression)
+        {
+            put("assert (");
+            format(assertArguments);
             put(")");
         }
     }
@@ -1843,12 +1857,7 @@ class Formatter(Sink)
         debug(verbose) writeln("InContractExpression");
 
         put("in (");
-        format(expression.assertion);
-        if (expression.message !is null)
-        {
-            put(", ");
-            format(expression.message);
-        }
+        format(expression.assertArguments);
         put(")");
     }
 
@@ -1942,12 +1951,7 @@ class Formatter(Sink)
         }
         else
         {
-            format(invariant_.assertion);
-            if (invariant_.message !is null)
-            {
-                put("; ");
-                format(invariant_.message);
-            }
+            format(invariant_.assertArguments);
             put(")");
         }
     }
@@ -2289,12 +2293,7 @@ class Formatter(Sink)
         if (expression.parameter != tok!"")
             format(expression.parameter);
         put("; ");
-        format(expression.assertion);
-        if (expression.message !is null)
-        {
-            put(", ");
-            format(expression.message);
-        }
+        format(expression.assertArguments);
         put(")");
     }
 

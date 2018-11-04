@@ -896,10 +896,31 @@ class Parser
     }
 
     /**
+     * Parses an AssertArguments
+     *
+     * $(GRAMMAR $(RULEDEF assertArguments):
+     *     $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')?
+     *     ;)
+     */
+    AssertArguments parseAssertArguments()
+    {
+        auto node = allocator.make!AssertArguments;
+        mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
+        if (currentIs(tok!","))
+            advance();
+        if (currentIs(tok!")"))
+            return node;
+        mixin(parseNodeQ!(`node.message`, `AssignExpression`));
+        if (currentIs(tok!","))
+            advance();
+        return node;
+    }
+
+    /**
      * Parses an AssertExpression
      *
      * $(GRAMMAR $(RULEDEF assertExpression):
-     *     $(LITERAL 'assert') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'assert') $(LITERAL '$(LPAREN)') $(RULE assertArguments) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     AssertExpression parseAssertExpression()
@@ -910,19 +931,7 @@ class Parser
         node.column = current.column;
         advance(); // "assert"
         mixin(tokenCheck!"(");
-        mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
-        if (currentIs(tok!","))
-        {
-            advance();
-            if (currentIs(tok!")"))
-            {
-                advance();
-                return node;
-            }
-            mixin(parseNodeQ!(`node.message`, `AssignExpression`));
-        }
-        if (currentIs(tok!","))
-            advance();
+        mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
         mixin(tokenCheck!")");
         return node;
     }
@@ -3842,7 +3851,7 @@ class Parser
      * Parses an InContractExpression
      *
      * $(GRAMMAR $(RULEDEF inContractExpression):
-     *     $(LITERAL 'in') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'in') $(LITERAL '$(LPAREN)') $(RULE assertArguments) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     InContractExpression parseInContractExpression()
@@ -3852,19 +3861,7 @@ class Parser
         mixin(nullCheck!`i`);
         node.inTokenLocation = i.index;
         mixin(tokenCheck!"(");
-        mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
-        if (currentIs(tok!","))
-        {
-            advance();
-            if (currentIs(tok!")"))
-            {
-                advance();
-                return node;
-            }
-            mixin(parseNodeQ!(`node.message`, `AssignExpression`));
-        }
-        if (currentIs(tok!","))
-            advance();
+        mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
         mixin(tokenCheck!")");
         return node;
     }
@@ -3946,8 +3943,8 @@ class Parser
      * Parses an Invariant
      *
      * $(GRAMMAR $(RULEDEF invariant):
-     *       $(LITERAL 'invariant') $(RULE blockStatement)
-     *     | $(LITERAL 'invariant') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)') $(LITERAL ';')
+     *       $(LITERAL 'invariant') ($(LITERAL '$(LPAREN)') $(LITERAL '$(LPAREN)'))? $(RULE blockStatement)
+     *     | $(LITERAL 'invariant') $(LITERAL '$(LPAREN)') $(RULE assertArguments) $(LITERAL '$(RPAREN)') $(LITERAL ';')
      *     ;)
      */
     Invariant parseInvariant()
@@ -3975,19 +3972,7 @@ class Parser
         else if (!mustHaveBlock && currentIs(tok!"("))
         {
             advance();
-            mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
-            if (currentIs(tok!","))
-            {
-                advance();
-                if (currentIs(tok!")"))
-                {
-                    advance();
-                    return node;
-                }
-                mixin(parseNodeQ!(`node.message`, `AssignExpression`));
-            }
-            if (currentIs(tok!","))
-                advance();
+            mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
             mixin(tokenCheck!")");
         }
         else return null;
@@ -4568,7 +4553,7 @@ class Parser
      * Parses an OutContractExpression
      *
      * $(GRAMMAR $(RULEDEF outContractExpression):
-     *     $(LITERAL 'out') $(LITERAL '$(LPAREN)') $(LITERAL Identifier)? $(LITERAL ';') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'out') $(LITERAL '$(LPAREN)') $(LITERAL Identifier)? $(LITERAL ';') $(RULE assertArguments) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     OutContractExpression parseOutContractExpression()
@@ -4581,19 +4566,7 @@ class Parser
         if (currentIs(tok!"identifier"))
             node.parameter = advance();
         mixin(tokenCheck!";");
-        mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
-        if (currentIs(tok!","))
-        {
-            advance();
-            if (currentIs(tok!")"))
-            {
-                advance();
-                return node;
-            }
-            mixin(parseNodeQ!(`node.message`, `AssignExpression`));
-        }
-        if (currentIs(tok!","))
-            advance();
+        mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
         mixin(tokenCheck!")");
         return node;
     }
