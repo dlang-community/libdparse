@@ -4175,7 +4175,7 @@ class Parser
             if (expect(tok!";") is null)
                 return null;
         }
-        else if (currentIs(tok!"do") || current.text == "body")
+        else if (moreTokens() && (currentIs(tok!"do") || current.text == "body"))
             return null;
         return node;
     }
