@@ -5253,8 +5253,8 @@ class Parser
         }
         ownArray(node.functionContracts, contracts);
 
-        if (current.type == tok!"do"
-                || (current.type == tok!"identifier" && current.text == "body"))
+        if (currentIs(tok!"do")
+                || (currentIs(tok!"identifier") && current.text == "body"))
         {
             requireDo = false;
             advance();
