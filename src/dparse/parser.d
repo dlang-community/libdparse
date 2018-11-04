@@ -3856,6 +3856,7 @@ class Parser
      */
     InContractExpression parseInContractExpression()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!InContractExpression;
         const i = expect(tok!"in");
         mixin(nullCheck!`i`);
@@ -3875,6 +3876,7 @@ class Parser
      */
     ExpressionNode parseInExpression(ExpressionNode shift = null)
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!InExpression;
         mixin(nullCheck!`node.left = shift is null ? parseShiftExpression() : shift`);
         if (currentIs(tok!"!"))
@@ -3896,6 +3898,7 @@ class Parser
      */
     InStatement parseInStatement()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!InStatement;
         const i = expect(tok!"in");
         mixin(nullCheck!`i`);
@@ -3914,6 +3917,7 @@ class Parser
      */
     Initializer parseInitializer()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!Initializer;
         if (currentIs(tok!"void") && peekIsOneOf(tok!",", tok!";"))
             advance();
@@ -3949,6 +3953,7 @@ class Parser
      */
     Invariant parseInvariant()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!Invariant;
         node.index = current.index;
         node.line = current.line;
@@ -4558,6 +4563,7 @@ class Parser
      */
     OutContractExpression parseOutContractExpression()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!OutContractExpression;
         const o = expect(tok!"out");
         mixin(nullCheck!`o`);
@@ -4580,6 +4586,7 @@ class Parser
      */
     OutStatement parseOutStatement()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!OutStatement;
         const o = expect(tok!"out");
         mixin(nullCheck!`o`);
