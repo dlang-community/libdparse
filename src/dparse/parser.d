@@ -3089,108 +3089,27 @@ class Parser
      * $(LINK2 https://github.com/dlang-community/dsymbol/blob/master/src/dsymbol/conversion/package.d, here).
      *
      * $(GRAMMAR $(RULEDEF functionBody):
-     *       $(RULE blockStatement)
-     *     | ($(RULE inStatement) | $(RULE outStatement))* $(RULE bodyStatement)?
+     *       $(RULE specifiedFunctionBody)
+     *     | $(RULE missingFunctionBody)
      *     ;)
      */
     FunctionBody parseFunctionBody()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!FunctionBody;
-        if (currentIs(tok!";"))
+        immutable b = setBookmark();
+        immutable c = allocator.setCheckpoint();
+        auto missingFunctionBody = parseMissingFunctionBody();
+        if (missingFunctionBody !is null)
         {
-            advance();
-            return node;
+            abandonBookmark(b);
+            node.missingFunctionBody = missingFunctionBody;
         }
-
-        StackBuffer inStatements;
-        StackBuffer inContractExpressions;
-        StackBuffer outStatements;
-        StackBuffer outContractExpressions;
-        bool requireDo;
-
-        while (currentIsOneOf(tok!"in", tok!"out"))
+        else
         {
-            const(Token)* next = peek();
-            if (next is null)
-                return null;
-
-            if (currentIs(tok!"in"))
-            {
-                if (next.type == tok!"{")
-                {
-                    requireDo = true;
-                    if (auto s = parseInStatement())
-                        inStatements.put(s);
-                    else return null;
-                }
-                else if (next.type == tok!"(")
-                {
-                    requireDo = false;
-                    if (auto e = parseInContractExpression())
-                        inContractExpressions.put(e);
-                    else return null;
-                }
-                else
-                {
-                    error("`{` or `(` expected");
-                    return null;
-                }
-            }
-            else if (currentIs(tok!"out"))
-            {
-                if (next.type == tok!"{" || (index < tokens.length - 3  &&
-                    tokens[index + 2].type == tok!("identifier") &&
-                    tokens[index + 3].type == tok!(")")))
-                {
-                    requireDo = true;
-                    if (auto s = parseOutStatement())
-                        outStatements.put(s);
-                    else return null;
-                }
-                else if (next.type == tok!"(")
-                {
-                    requireDo = false;
-                    if (auto e = parseOutContractExpression())
-                        outContractExpressions.put(e);
-                    else return null;
-                }
-                else
-                {
-                    error("`(` expected");
-                    return null;
-                }
-            }
-            else break;
-        }
-
-        ownArray(node.inStatements, inStatements);
-        ownArray(node.inContractExpressions, inContractExpressions);
-        ownArray(node.outStatements, outStatements);
-        ownArray(node.outContractExpressions, outContractExpressions);
-
-        if (currentIs(tok!"{") && !requireDo)
-        {
-            mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
-        }
-        else if (currentIs(tok!";"))
-        {
-            advance();
-            return node;
-        }
-        else if (currentIs(tok!"do") || (currentIs(tok!"identifier") && current.text == "body"))
-        {
-            mixin(parseNodeQ!(`node.bodyStatement`, `BodyStatement`));
-        }
-        else if (requireDo && currentIs(tok!"{"))
-        {
-            error("`do` expected after InStatement or OutStatement");
-            return null;
-        }
-        else if (!inStatements.length && !outStatements.length)
-        {
-            error("`in`, `out`, `body`, or block statement expected");
-            return null;
+            allocator.rollback(c);
+            goToBookmark(b);
+            mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
         }
         return node;
     }
@@ -3229,6 +3148,34 @@ class Parser
                 mixin(parseNodeQ!(`node.templateArguments`, `TemplateArguments`));
             if (unary !is null)
                 mixin(parseNodeQ!(`node.arguments`, `Arguments`));
+        }
+        return node;
+    }
+
+    /**
+     * Parses a FunctionContract
+     *
+     * $(GRAMMAR $(RULEDEF functionContract):
+     *       $(RULE inOutContractExpression)
+     *     | $(RULE inOutStatement)
+     *     ;)
+     */
+    FunctionContract parseFunctionContract()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!FunctionContract;
+        if (peekIs(tok!"{") || (currentIs(tok!"out") &&
+                index < tokens.length - 3  &&
+                tokens[index + 1].type == tok!("(") &&
+                tokens[index + 2].type == tok!("identifier") &&
+                tokens[index + 3].type == tok!(")")))
+            mixin(parseNodeQ!(`node.inOutStatement`, `InOutStatement`));
+        else if (peekIs(tok!"("))
+            mixin(parseNodeQ!(`node.inOutContractExpression`, `InOutContractExpression`));
+        else
+        {
+            error("`{` or `(` expected");
+            return null;
         }
         return node;
     }
@@ -3313,10 +3260,10 @@ class Parser
      * Parses a FunctionLiteralExpression
      *
      * $(GRAMMAR $(RULEDEF functionLiteralExpression):
-     *     | $(LITERAL 'delegate') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE functionBody)
-     *     | $(LITERAL 'function') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE functionBody)
-     *     | $(RULE parameters) $(RULE functionAttribute)* $(RULE functionBody)
-     *     | $(RULE functionBody)
+     *     | $(LITERAL 'delegate') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE specifiedFunctionBody)
+     *     | $(LITERAL 'function') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE specifiedFunctionBody)
+     *     | $(RULE parameters) $(RULE functionAttribute)* $(RULE specifiedFunctionBody)
+     *     | $(RULE specifiedFunctionBody)
      *     | $(LITERAL Identifier) $(LITERAL '=>') $(RULE assignExpression)
      *     | $(LITERAL 'function') $(RULE type)? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
      *     | $(LITERAL 'delegate') $(RULE type)? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
@@ -3364,7 +3311,7 @@ class Parser
             mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
         }
         else
-            mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
+            mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
         return node;
     }
 
@@ -3890,6 +3837,46 @@ class Parser
     }
 
     /**
+     * Parses an InOutContractExpression
+     *
+     * $(GRAMMAR $(RULEDEF inOutContractExpression):
+     *       $(RULE inContractExpression)
+     *     | $(RULE outContractExpression)
+     *     ;)
+     */
+    InOutContractExpression parseInOutContractExpression()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!InOutContractExpression;
+        if (currentIs(tok!"in"))
+            mixin(parseNodeQ!(`node.inContractExpression`, `InContractExpression`));
+        else if (currentIs(tok!"out"))
+            mixin(parseNodeQ!(`node.outContractExpression`, `OutContractExpression`));
+        else return null;
+        return node;
+    }
+
+    /**
+     * Parses an InOutStatement
+     *
+     * $(GRAMMAR $(RULEDEF inOutStatement):
+     *       $(RULE inStatement)
+     *     | $(RULE outStatement)
+     *     ;)
+     */
+    InOutStatement parseInOutStatement()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!InOutStatement;
+        if (currentIs(tok!"in"))
+            mixin(parseNodeQ!(`node.inStatement`, `InStatement`));
+        else if (currentIs(tok!"out"))
+            mixin(parseNodeQ!(`node.outStatement`, `OutStatement`));
+        else return null;
+        return node;
+    }
+
+    /**
      * Parses an InStatement
      *
      * $(GRAMMAR $(RULEDEF inStatement):
@@ -4178,6 +4165,36 @@ class Parser
         default:
             error(`Member funtion attribute expected`);
         }
+        return node;
+    }
+
+    /**
+     * Parses a MissingFunctionBody
+     *
+     * $(GRAMMAR $(RULEDEF missingFunctionBody):
+     *       $(LITERAL ';')
+     *     | $(RULE functionContract)* $(LITERAL ';')
+     *     ;)
+     */
+    MissingFunctionBody parseMissingFunctionBody()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!MissingFunctionBody;
+        StackBuffer contracts;
+        while (currentIsOneOf(tok!"in", tok!"out"))
+        {
+            if (auto c = parseFunctionContract())
+                contracts.put(c);
+        }
+        ownArray(node.functionContracts, contracts);
+        if (node.functionContracts.length == 0
+                || node.functionContracts[$ - 1].inOutContractExpression !is null)
+        {
+            if (expect(tok!";") is null)
+                return null;
+        }
+        else if (currentIs(tok!"do") || current.text == "body")
+            return null;
         return node;
     }
 
@@ -5225,6 +5242,48 @@ class Parser
             advance(); // =
         }
         mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
+        return node;
+    }
+
+    /**
+     * Parses a SpecifiedFunctionBody
+     *
+     * $(GRAMMAR $(RULEDEF specifiedFunctionBody):
+     *       $(LITERAL 'do')? $(RULE blockStatement)
+     *     | $(RULE functionContract)* $(RULE inOutContractExpression) $(LITERAL 'do')? $(RULE blockStatement)
+     *     | $(RULE functionContract)* $(RULE inOutStatement) $(LITERAL 'do') $(RULE blockStatement)
+     *     ;)
+     */
+    SpecifiedFunctionBody parseSpecifiedFunctionBody()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!SpecifiedFunctionBody;
+        StackBuffer contracts;
+        bool requireDo;
+
+        while (currentIsOneOf(tok!"in", tok!"out"))
+        {
+            if (auto c = parseFunctionContract())
+            {
+                requireDo = c.inOutStatement !is null;
+                contracts.put(c);
+            }
+        }
+        ownArray(node.functionContracts, contracts);
+
+        if (current.type == tok!"do"
+                || (current.type == tok!"identifier" && current.text == "body"))
+        {
+            requireDo = false;
+            advance();
+        }
+        if (requireDo)
+        {
+            error("`do` expected after InStatement or OutStatement");
+            return null;
+        }
+
+        mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
         return node;
     }
 

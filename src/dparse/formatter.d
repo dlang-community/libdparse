@@ -1449,21 +1449,8 @@ class Formatter(Sink)
 
         with(functionBody)
         {
-            if (blockStatement)
-            {
-                format(blockStatement);
-                return;
-            }
-            foreach(inStatement; inStatements)
-                format(inStatement);
-            foreach(inContractExpression; inContractExpressions)
-                format(inContractExpression);
-            foreach(outStatement; outStatements)
-                format(outStatement);
-            foreach(outContractExpression; outContractExpressions)
-                format(outContractExpression);
-            if (bodyStatement)
-                format(bodyStatement);
+            if (specifiedFunctionBody) format(specifiedFunctionBody);
+            if (missingFunctionBody) format(missingFunctionBody);
         }
     }
 
@@ -1484,6 +1471,22 @@ class Formatter(Sink)
             if (unaryExpression) format(unaryExpression);
             if (templateArguments) format(templateArguments);
             if (arguments) format(arguments);
+        }
+    }
+
+    void format(const FunctionContract functionContract)
+    {
+        debug(verbose) writeln("FunctionContract");
+
+        /**
+        InOutContractExpression inOutContractExpression;
+        InOutStatement inOutStatement;
+        **/
+
+        with(functionContract)
+        {
+            if (inOutContractExpression) format(inOutContractExpression);
+            if (inOutStatement) format(inOutStatement);
         }
     }
 
@@ -1536,7 +1539,7 @@ class Formatter(Sink)
         /**
         ExpressionNode assignExpression;
         FunctionAttribute[] functionAttributes;
-        FunctionBody functionBody;
+        SpecifiedFunctionBody specifiedFunctionBody;
         IdType functionOrDelegate;
         MemberFunctionAttribute[] memberFunctionAttributes;
         Parameters parameters;
@@ -1561,8 +1564,8 @@ class Formatter(Sink)
             }
 
             ignoreNewlines = true;
-            if (functionBody)
-                format(functionBody);
+            if (specifiedFunctionBody)
+                format(specifiedFunctionBody);
             else
             {
                 format(identifier);
@@ -1873,6 +1876,29 @@ class Formatter(Sink)
         }
     }
 
+    void format(const InOutContractExpression inOutContractExpression)
+    {
+        debug(verbose) writeln("InOutContractExpression");
+
+        with(inOutContractExpression)
+        {
+            if (inContractExpression) format(inContractExpression);
+            if (outContractExpression) format(outContractExpression);
+            newline();
+        }
+    }
+
+    void format(const InOutStatement inOutStatement)
+    {
+        debug(verbose) writeln("InOutStatement");
+
+        with(inOutStatement)
+        {
+            if (inStatement) format(inStatement);
+            if (outStatement) format(outStatement);
+        }
+    }
+
     void format(const InStatement inStatement)
     {
         debug(verbose) writeln("InStatement");
@@ -2091,6 +2117,18 @@ class Formatter(Sink)
         {
             if (tokenType) put(tokenRep(tokenType));
             else format(atAttribute);
+        }
+    }
+
+    void format(const MissingFunctionBody missingFunctionBody)
+    {
+        debug(verbose) writeln("MissingFunctionBody");
+
+        with(missingFunctionBody)
+        {
+            foreach (contract; functionContracts)
+                format(contract);
+            put(";");
         }
     }
 
@@ -2610,6 +2648,19 @@ class Formatter(Sink)
             put(" = ");
         }
         format(singleImport.identifierChain);
+    }
+
+    void format(const SpecifiedFunctionBody specifiedFunctionBody)
+    {
+        debug(verbose) writeln("SpecifiedFunctionBody");
+
+        with(specifiedFunctionBody)
+        {
+            foreach (contract; functionContracts)
+                format(contract);
+            put("do");
+            format(blockStatement);
+        }
     }
 
     void format(const Statement statement)
