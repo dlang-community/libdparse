@@ -3614,7 +3614,7 @@ class Parser
             node.expression = e;
             abandonBookmark(b);
         }
-        if (!node.expression)
+        else
         {
             goToBookmark(b);
             b = setBookmark();
@@ -3653,15 +3653,19 @@ class Parser
 
         // type following optional node.typeCtors
         if (!node.expression)
-            if (Type tp = parseType())
         {
-            if (currentIs(tok!"identifier") && peekIs(tok!"="))
+            auto c = allocator.setCheckpoint();
+            if (Type tp = parseType())
             {
-                abandonBookmark(b);
-                node.type = tp;
-                node.identifier = advance();
-                advance();
-                mixin(parseNodeQ!(`node.expression`, `Expression`));
+                if (currentIs(tok!"identifier") && peekIs(tok!"="))
+                {
+                    abandonBookmark(b);
+                    node.type = tp;
+                    node.identifier = advance();
+                    advance();
+                    mixin(parseNodeQ!(`node.expression`, `Expression`));
+                }
+                else allocator.rollback(c);
             }
         }
 
