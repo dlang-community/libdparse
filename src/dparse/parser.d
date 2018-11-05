@@ -896,10 +896,31 @@ class Parser
     }
 
     /**
+     * Parses an AssertArguments
+     *
+     * $(GRAMMAR $(RULEDEF assertArguments):
+     *     $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')?
+     *     ;)
+     */
+    AssertArguments parseAssertArguments()
+    {
+        auto node = allocator.make!AssertArguments;
+        mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
+        if (currentIs(tok!","))
+            advance();
+        if (currentIs(tok!")"))
+            return node;
+        mixin(parseNodeQ!(`node.message`, `AssignExpression`));
+        if (currentIs(tok!","))
+            advance();
+        return node;
+    }
+
+    /**
      * Parses an AssertExpression
      *
      * $(GRAMMAR $(RULEDEF assertExpression):
-     *     $(LITERAL 'assert') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'assert') $(LITERAL '$(LPAREN)') $(RULE assertArguments) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     AssertExpression parseAssertExpression()
@@ -910,19 +931,7 @@ class Parser
         node.column = current.column;
         advance(); // "assert"
         mixin(tokenCheck!"(");
-        mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
-        if (currentIs(tok!","))
-        {
-            advance();
-            if (currentIs(tok!")"))
-            {
-                advance();
-                return node;
-            }
-            mixin(parseNodeQ!(`node.message`, `AssignExpression`));
-        }
-        if (currentIs(tok!","))
-            advance();
+        mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
         mixin(tokenCheck!")");
         return node;
     }
@@ -1234,24 +1243,6 @@ class Parser
             node.endLocation = size_t.max;
         }
 
-        return node;
-    }
-
-    /**
-     * Parses a BodyStatement
-     *
-     * $(GRAMMAR $(RULEDEF bodyStatement):
-     *     ($(LITERAL 'body') | $(LITERAL 'do')) $(RULE blockStatement)
-     *     ;)
-     */
-    BodyStatement parseBodyStatement()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!BodyStatement;
-        if (!currentIs(tok!"do") && current.text != "body")
-            return null;
-        advance();
-        mixin(simpleParseItem!("blockStatement|parseBlockStatement"));
         return node;
     }
 
@@ -3086,130 +3077,27 @@ class Parser
      * $(LINK2 https://github.com/dlang-community/dsymbol/blob/master/src/dsymbol/conversion/package.d, here).
      *
      * $(GRAMMAR $(RULEDEF functionBody):
-     *       $(RULE blockStatement)
-     *     | ($(RULE inStatement) | $(RULE outStatement))* $(RULE bodyStatement)?
+     *       $(RULE specifiedFunctionBody)
+     *     | $(RULE missingFunctionBody)
      *     ;)
      */
     FunctionBody parseFunctionBody()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!FunctionBody;
-        if (currentIs(tok!";"))
+        immutable b = setBookmark();
+        immutable c = allocator.setCheckpoint();
+        auto missingFunctionBody = parseMissingFunctionBody();
+        if (missingFunctionBody !is null)
         {
-            advance();
-            return node;
+            abandonBookmark(b);
+            node.missingFunctionBody = missingFunctionBody;
         }
-
-        StackBuffer inStatements;
-        StackBuffer outStatements;
-        bool requireDo;
-
-        while (currentIsOneOf(tok!"in", tok!"out"))
+        else
         {
-            const(Token)* next = peek();
-            if (next is null)
-                return null;
-
-            if (currentIs(tok!"in"))
-            {
-                if (next.type == tok!"{")
-                {
-                    requireDo = true;
-                    if (auto s = parseInStatement())
-                        inStatements.put(s);
-                    else return null;
-                }
-                else if (next.type == tok!"(")
-                {
-                    requireDo = false;
-                    const size_t inTokenLocation = current.index;
-                    advance();
-                    advance();
-                    if (InStatement s = parseContractExpression!InStatement())
-                    {
-                        s.inTokenLocation = inTokenLocation;
-                        inStatements.put(s);
-                    }
-                    else return null;
-                }
-                else
-                {
-                    error("`{` or `(` expected");
-                    return null;
-                }
-            }
-            else if (currentIs(tok!"out"))
-            {
-                if (next.type == tok!"{" || (index < tokens.length - 3  &&
-                    tokens[index + 2].type == tok!("identifier") &&
-                    tokens[index + 3].type == tok!(")")))
-                {
-                    requireDo = true;
-                    if (auto s = parseOutStatement())
-                        outStatements.put(s);
-                    else return null;
-                }
-                else if (next.type == tok!"(")
-                {
-                    requireDo = false;
-                    const size_t outTokenLocation = current.index;
-                    advance();
-                    advance();
-                    if (currentIs(tok!";"))
-                    {
-                        advance();
-                    }
-                    else if (currentIs(tok!"identifier") && peekIs(tok!";"))
-                    {
-                        advance();
-                        advance();
-                    }
-                    else
-                    {
-                        error("`;` or identifier expected");
-                        return null;
-                    }
-                    if (OutStatement s = parseContractExpression!OutStatement())
-                    {
-                        s.outTokenLocation = outTokenLocation;
-                        outStatements.put(s);
-                    }
-                    else return null;
-                }
-                else
-                {
-                    error("`(` expected");
-                    return null;
-                }
-            }
-            else break;
-        }
-
-        ownArray(node.inStatements, inStatements);
-        ownArray(node.outStatements, outStatements);
-
-        if (currentIs(tok!"{") && !requireDo)
-        {
-            mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
-        }
-        else if (currentIs(tok!";"))
-        {
-            advance();
-            return node;
-        }
-        else if (currentIs(tok!"do") || (currentIs(tok!"identifier") && current.text == "body"))
-        {
-            mixin(parseNodeQ!(`node.bodyStatement`, `BodyStatement`));
-        }
-        else if (requireDo && currentIs(tok!"{"))
-        {
-            error("`do` expected after InStatement or OutStatement");
-            return null;
-        }
-        else if (!inStatements.length && !outStatements.length)
-        {
-            error("`in`, `out`, `body`, or block statement expected");
-            return null;
+            allocator.rollback(c);
+            goToBookmark(b);
+            mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
         }
         return node;
     }
@@ -3248,6 +3136,34 @@ class Parser
                 mixin(parseNodeQ!(`node.templateArguments`, `TemplateArguments`));
             if (unary !is null)
                 mixin(parseNodeQ!(`node.arguments`, `Arguments`));
+        }
+        return node;
+    }
+
+    /**
+     * Parses a FunctionContract
+     *
+     * $(GRAMMAR $(RULEDEF functionContract):
+     *       $(RULE inOutContractExpression)
+     *     | $(RULE inOutStatement)
+     *     ;)
+     */
+    FunctionContract parseFunctionContract()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!FunctionContract;
+        if (peekIs(tok!"{") || (currentIs(tok!"out") &&
+                index < tokens.length - 3  &&
+                tokens[index + 1].type == tok!("(") &&
+                tokens[index + 2].type == tok!("identifier") &&
+                tokens[index + 3].type == tok!(")")))
+            mixin(parseNodeQ!(`node.inOutStatement`, `InOutStatement`));
+        else if (peekIs(tok!"("))
+            mixin(parseNodeQ!(`node.inOutContractExpression`, `InOutContractExpression`));
+        else
+        {
+            error("`{` or `(` expected");
+            return null;
         }
         return node;
     }
@@ -3332,10 +3248,10 @@ class Parser
      * Parses a FunctionLiteralExpression
      *
      * $(GRAMMAR $(RULEDEF functionLiteralExpression):
-     *     | $(LITERAL 'delegate') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE functionBody)
-     *     | $(LITERAL 'function') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE functionBody)
-     *     | $(RULE parameters) $(RULE functionAttribute)* $(RULE functionBody)
-     *     | $(RULE functionBody)
+     *     | $(LITERAL 'delegate') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE specifiedFunctionBody)
+     *     | $(LITERAL 'function') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE specifiedFunctionBody)
+     *     | $(RULE parameters) $(RULE functionAttribute)* $(RULE specifiedFunctionBody)
+     *     | $(RULE specifiedFunctionBody)
      *     | $(LITERAL Identifier) $(LITERAL '=>') $(RULE assignExpression)
      *     | $(LITERAL 'function') $(RULE type)? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
      *     | $(LITERAL 'delegate') $(RULE type)? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
@@ -3383,7 +3299,7 @@ class Parser
             mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
         }
         else
-            mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
+            mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
         return node;
     }
 
@@ -3871,6 +3787,26 @@ class Parser
     }
 
     /**
+     * Parses an InContractExpression
+     *
+     * $(GRAMMAR $(RULEDEF inContractExpression):
+     *     $(LITERAL 'in') $(LITERAL '$(LPAREN)') $(RULE assertArguments) $(LITERAL '$(RPAREN)')
+     *     ;)
+     */
+    InContractExpression parseInContractExpression()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!InContractExpression;
+        const i = expect(tok!"in");
+        mixin(nullCheck!`i`);
+        node.inTokenLocation = i.index;
+        mixin(tokenCheck!"(");
+        mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
+        mixin(tokenCheck!")");
+        return node;
+    }
+
+    /**
      * Parses an InExpression
      *
      * $(GRAMMAR $(RULEDEF inExpression):
@@ -3879,6 +3815,7 @@ class Parser
      */
     ExpressionNode parseInExpression(ExpressionNode shift = null)
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!InExpression;
         mixin(nullCheck!`node.left = shift is null ? parseShiftExpression() : shift`);
         if (currentIs(tok!"!"))
@@ -3892,15 +3829,55 @@ class Parser
     }
 
     /**
+     * Parses an InOutContractExpression
+     *
+     * $(GRAMMAR $(RULEDEF inOutContractExpression):
+     *       $(RULE inContractExpression)
+     *     | $(RULE outContractExpression)
+     *     ;)
+     */
+    InOutContractExpression parseInOutContractExpression()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!InOutContractExpression;
+        if (currentIs(tok!"in"))
+            mixin(parseNodeQ!(`node.inContractExpression`, `InContractExpression`));
+        else if (currentIs(tok!"out"))
+            mixin(parseNodeQ!(`node.outContractExpression`, `OutContractExpression`));
+        else return null;
+        return node;
+    }
+
+    /**
+     * Parses an InOutStatement
+     *
+     * $(GRAMMAR $(RULEDEF inOutStatement):
+     *       $(RULE inStatement)
+     *     | $(RULE outStatement)
+     *     ;)
+     */
+    InOutStatement parseInOutStatement()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!InOutStatement;
+        if (currentIs(tok!"in"))
+            mixin(parseNodeQ!(`node.inStatement`, `InStatement`));
+        else if (currentIs(tok!"out"))
+            mixin(parseNodeQ!(`node.outStatement`, `OutStatement`));
+        else return null;
+        return node;
+    }
+
+    /**
      * Parses an InStatement
      *
      * $(GRAMMAR $(RULEDEF inStatement):
-     *       $(LITERAL 'in') $(RULE blockStatement)
-     *     | $(LITERAL 'in') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'in') $(RULE blockStatement)
      *     ;)
      */
     InStatement parseInStatement()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!InStatement;
         const i = expect(tok!"in");
         mixin(nullCheck!`i`);
@@ -3919,6 +3896,7 @@ class Parser
      */
     Initializer parseInitializer()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!Initializer;
         if (currentIs(tok!"void") && peekIsOneOf(tok!",", tok!";"))
             advance();
@@ -3948,46 +3926,41 @@ class Parser
      * Parses an Invariant
      *
      * $(GRAMMAR $(RULEDEF invariant):
-     *       $(LITERAL 'invariant') $(RULE blockStatement)
-     *     | $(LITERAL 'invariant') $(LITERAL '$(LPAREN)') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)') $(LITERAL ';')
+     *       $(LITERAL 'invariant') ($(LITERAL '$(LPAREN)') $(LITERAL '$(LPAREN)'))? $(RULE blockStatement)
+     *     | $(LITERAL 'invariant') $(LITERAL '$(LPAREN)') $(RULE assertArguments) $(LITERAL '$(RPAREN)') $(LITERAL ';')
      *     ;)
      */
     Invariant parseInvariant()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!Invariant;
+        node.index = current.index;
+        node.line = current.line;
         mixin(tokenCheck!"invariant");
+        bool mustHaveBlock;
         if (currentIs(tok!"(") && peekIs(tok!")"))
         {
+            mustHaveBlock = true;
             advance();
             advance();
         }
         if (currentIs(tok!"{"))
         {
-            Invariant node = allocator.make!Invariant;
-            node.index = current.index;
-            node.line = current.line;
             if (currentIs(tok!"("))
             {
                 advance();
                 mixin(tokenCheck!")");
             }
             mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
-            return node;
         }
-        else if (currentIs(tok!"("))
+        else if (!mustHaveBlock && currentIs(tok!"("))
         {
-            const idx = current.index;
-            const lne = current.line;
             advance();
-            if (Invariant node = parseContractExpression!Invariant())
-            {
-                mixin(tokenCheck!";");
-                node.index = idx;
-                node.line = lne;
-                return node;
-            }
-            else return null;
+            mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
+            mixin(tokenCheck!")");
         }
         else return null;
+        return node;
     }
 
     /**
@@ -4186,6 +4159,36 @@ class Parser
         default:
             error(`Member funtion attribute expected`);
         }
+        return node;
+    }
+
+    /**
+     * Parses a MissingFunctionBody
+     *
+     * $(GRAMMAR $(RULEDEF missingFunctionBody):
+     *       $(LITERAL ';')
+     *     | $(RULE functionContract)* $(LITERAL ';')
+     *     ;)
+     */
+    MissingFunctionBody parseMissingFunctionBody()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!MissingFunctionBody;
+        StackBuffer contracts;
+        while (currentIsOneOf(tok!"in", tok!"out"))
+        {
+            if (auto c = parseFunctionContract())
+                contracts.put(c);
+        }
+        ownArray(node.functionContracts, contracts);
+        if (node.functionContracts.length == 0
+                || node.functionContracts[$ - 1].inOutContractExpression !is null)
+        {
+            if (expect(tok!";") is null)
+                return null;
+        }
+        else if (moreTokens() && (currentIs(tok!"do") || current.text == "body"))
+            return null;
         return node;
     }
 
@@ -4563,15 +4566,38 @@ class Parser
     }
 
     /**
+     * Parses an OutContractExpression
+     *
+     * $(GRAMMAR $(RULEDEF outContractExpression):
+     *     $(LITERAL 'out') $(LITERAL '$(LPAREN)') $(LITERAL Identifier)? $(LITERAL ';') $(RULE assertArguments) $(LITERAL '$(RPAREN)')
+     *     ;)
+     */
+    OutContractExpression parseOutContractExpression()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!OutContractExpression;
+        const o = expect(tok!"out");
+        mixin(nullCheck!`o`);
+        node.outTokenLocation = o.index;
+        mixin(tokenCheck!"(");
+        if (currentIs(tok!"identifier"))
+            node.parameter = advance();
+        mixin(tokenCheck!";");
+        mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
+        mixin(tokenCheck!")");
+        return node;
+    }
+
+    /**
      * Parses an OutStatement
      *
      * $(GRAMMAR $(RULEDEF outStatement):
-     *       $(LITERAL 'out') ($(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)'))? $(RULE blockStatement)
-     *     | $(LITERAL 'out') $(LITERAL '$(LPAREN)') $(LITERAL Identifier)? $(LITERAL ';') $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL 'out') ($(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)'))? $(RULE blockStatement)
      *     ;)
      */
     OutStatement parseOutStatement()
     {
+        mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!OutStatement;
         const o = expect(tok!"out");
         mixin(nullCheck!`o`);
@@ -5212,6 +5238,48 @@ class Parser
             advance(); // =
         }
         mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
+        return node;
+    }
+
+    /**
+     * Parses a SpecifiedFunctionBody
+     *
+     * $(GRAMMAR $(RULEDEF specifiedFunctionBody):
+     *       $(LITERAL 'do')? $(RULE blockStatement)
+     *     | $(RULE functionContract)* $(RULE inOutContractExpression) $(LITERAL 'do')? $(RULE blockStatement)
+     *     | $(RULE functionContract)* $(RULE inOutStatement) $(LITERAL 'do') $(RULE blockStatement)
+     *     ;)
+     */
+    SpecifiedFunctionBody parseSpecifiedFunctionBody()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!SpecifiedFunctionBody;
+        StackBuffer contracts;
+        bool requireDo;
+
+        while (currentIsOneOf(tok!"in", tok!"out"))
+        {
+            if (auto c = parseFunctionContract())
+            {
+                requireDo = c.inOutStatement !is null;
+                contracts.put(c);
+            }
+        }
+        ownArray(node.functionContracts, contracts);
+
+        if (currentIs(tok!"do")
+                || (currentIs(tok!"identifier") && current.text == "body"))
+        {
+            requireDo = false;
+            advance();
+        }
+        if (requireDo)
+        {
+            error("`do` expected after InStatement or OutStatement");
+            return null;
+        }
+
+        mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
         return node;
     }
 
@@ -8016,54 +8084,6 @@ protected: final:
         advance();
         return node;
     }
-
-        AssertExpression parseAssertForContractExp()
-        {
-            auto node = allocator.make!AssertExpression;
-            node.line = current.line;
-            node.column = current.column;
-            mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
-            if (currentIs(tok!","))
-            {
-                advance();
-                if (currentIs(tok!")"))
-                {
-                    advance();
-                    return node;
-                }
-                mixin(parseNodeQ!(`node.message`, `AssignExpression`));
-            }
-            if (currentIs(tok!","))
-                advance();
-            mixin(tokenCheck!")");
-            return node;
-        }
-
-        T parseContractExpression(T)()
-        {
-
-            AssertExpression ae = parseAssertForContractExp();
-            if (!ae)
-                return null;
-            T inOrOut = allocator.make!T();
-            inOrOut.blockStatement = allocator.make!BlockStatement();
-            DeclarationsAndStatements d = allocator.make!DeclarationsAndStatements();
-            inOrOut.blockStatement.declarationsAndStatements = d;
-            StackBuffer dos;
-            dos.put(allocator.make!DeclarationOrStatement());
-            ownArray(d.declarationsAndStatements, dos);
-            Statement s = allocator.make!Statement();
-            d.declarationsAndStatements[0].statement = s;
-            s.statementNoCaseNoDefault = allocator.make!StatementNoCaseNoDefault();
-            s.statementNoCaseNoDefault.expressionStatement = allocator.make!ExpressionStatement();
-            Expression e = allocator.make!Expression();
-            s.statementNoCaseNoDefault.expressionStatement.expression = e;
-            StackBuffer en;
-            en.put(ae);
-            ownArray(e.items, en);
-
-            return inOrOut;
-        }
 
     int suppressMessages;
     size_t index;

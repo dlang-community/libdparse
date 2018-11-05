@@ -373,7 +373,7 @@ class Formatter(Sink)
         assert(false);
     }
 
-    void format(const AssertExpression assertExpression)
+    void format(const AssertArguments assertArguments)
     {
         debug(verbose) writeln("AssertExpression");
 
@@ -382,15 +382,29 @@ class Formatter(Sink)
         AssignExpression message;
         **/
 
-        with(assertExpression)
+        with(assertArguments)
         {
-            put("assert (");
             format(assertion);
             if (message)
             {
                 put(", ");
                 format(message);
             }
+        }
+    }
+
+    void format(const AssertExpression assertExpression)
+    {
+        debug(verbose) writeln("AssertExpression");
+
+        /**
+        AssertArguments assertArguments;
+        **/
+
+        with(assertExpression)
+        {
+            put("assert (");
+            format(assertArguments);
             put(")");
         }
     }
@@ -533,16 +547,6 @@ class Formatter(Sink)
             endBlock();
         }
     }
-
-    void format(const BodyStatement bodyStatement)
-    {
-        debug(verbose) writeln("BodyStatement");
-
-        newline();
-        put("do");
-        format(bodyStatement.blockStatement);
-    }
-
     void format(const BreakStatement breakStatement)
     {
         debug(verbose) writeln("BreakStatement");
@@ -1435,17 +1439,8 @@ class Formatter(Sink)
 
         with(functionBody)
         {
-            if (blockStatement)
-            {
-                format(blockStatement);
-                return;
-            }
-            foreach(inStatement; inStatements)
-                format(inStatement);
-            foreach(outStatement; outStatements)
-                format(outStatement);
-            if (bodyStatement)
-                format(bodyStatement);
+            if (specifiedFunctionBody) format(specifiedFunctionBody);
+            if (missingFunctionBody) format(missingFunctionBody);
         }
     }
 
@@ -1466,6 +1461,22 @@ class Formatter(Sink)
             if (unaryExpression) format(unaryExpression);
             if (templateArguments) format(templateArguments);
             if (arguments) format(arguments);
+        }
+    }
+
+    void format(const FunctionContract functionContract)
+    {
+        debug(verbose) writeln("FunctionContract");
+
+        /**
+        InOutContractExpression inOutContractExpression;
+        InOutStatement inOutStatement;
+        **/
+
+        with(functionContract)
+        {
+            if (inOutContractExpression) format(inOutContractExpression);
+            if (inOutStatement) format(inOutStatement);
         }
     }
 
@@ -1518,7 +1529,7 @@ class Formatter(Sink)
         /**
         ExpressionNode assignExpression;
         FunctionAttribute[] functionAttributes;
-        FunctionBody functionBody;
+        SpecifiedFunctionBody specifiedFunctionBody;
         IdType functionOrDelegate;
         MemberFunctionAttribute[] memberFunctionAttributes;
         Parameters parameters;
@@ -1543,8 +1554,8 @@ class Formatter(Sink)
             }
 
             ignoreNewlines = true;
-            if (functionBody)
-                format(functionBody);
+            if (specifiedFunctionBody)
+                format(specifiedFunctionBody);
             else
             {
                 format(identifier);
@@ -1834,6 +1845,15 @@ class Formatter(Sink)
         }
     }
 
+    void format(const InContractExpression expression)
+    {
+        debug(verbose) writeln("InContractExpression");
+
+        put("in (");
+        format(expression.assertArguments);
+        put(")");
+    }
+
     void format(const InExpression inExpression)
     {
         debug(verbose) writeln("InExpression");
@@ -1843,6 +1863,29 @@ class Formatter(Sink)
             if (left) format(left);
             put(negated ? " !in " : " in ");
             if (right) format(right);
+        }
+    }
+
+    void format(const InOutContractExpression inOutContractExpression)
+    {
+        debug(verbose) writeln("InOutContractExpression");
+
+        with(inOutContractExpression)
+        {
+            if (inContractExpression) format(inContractExpression);
+            if (outContractExpression) format(outContractExpression);
+            newline();
+        }
+    }
+
+    void format(const InOutStatement inOutStatement)
+    {
+        debug(verbose) writeln("InOutStatement");
+
+        with(inOutStatement)
+        {
+            if (inStatement) format(inStatement);
+            if (outStatement) format(outStatement);
         }
     }
 
@@ -1916,8 +1959,17 @@ class Formatter(Sink)
 
         putComment(invariant_.comment);
         putAttrs(attrs);
-        put("invariant()");
-        format(invariant_.blockStatement);
+        put("invariant(");
+        if (invariant_.blockStatement !is null)
+        {
+            put(")");
+            format(invariant_.blockStatement);
+        }
+        else
+        {
+            format(invariant_.assertArguments);
+            put(")");
+        }
     }
 
     void format(const IsExpression isExpression)
@@ -2055,6 +2107,18 @@ class Formatter(Sink)
         {
             if (tokenType) put(tokenRep(tokenType));
             else format(atAttribute);
+        }
+    }
+
+    void format(const MissingFunctionBody missingFunctionBody)
+    {
+        debug(verbose) writeln("MissingFunctionBody");
+
+        with(missingFunctionBody)
+        {
+            foreach (contract; functionContracts)
+                format(contract);
+            put(";");
         }
     }
 
@@ -2247,6 +2311,18 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("OrOrExpression");
         mixin(binary("orOrExpression", "||"));
+    }
+
+    void format(const OutContractExpression expression)
+    {
+        debug(verbose) writeln("OutContractExpression");
+
+        put("out (");
+        if (expression.parameter != tok!"")
+            format(expression.parameter);
+        put("; ");
+        format(expression.assertArguments);
+        put(")");
     }
 
     void format(const OutStatement stmnt)
@@ -2562,6 +2638,19 @@ class Formatter(Sink)
             put(" = ");
         }
         format(singleImport.identifierChain);
+    }
+
+    void format(const SpecifiedFunctionBody specifiedFunctionBody)
+    {
+        debug(verbose) writeln("SpecifiedFunctionBody");
+
+        with(specifiedFunctionBody)
+        {
+            foreach (contract; functionContracts)
+                format(contract);
+            put("do");
+            format(blockStatement);
+        }
     }
 
     void format(const Statement statement)
