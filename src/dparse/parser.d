@@ -2319,7 +2319,7 @@ class Parser
     Declarator parseDeclarator()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!Declarator;
+        Declarator node = allocator.make!Declarator;
         const id = expect(tok!"identifier");
         mixin (nullCheck!`id`);
         node.name = *id;
@@ -4446,50 +4446,26 @@ class Parser
     NonVoidInitializer parseNonVoidInitializer()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto node = allocator.make!NonVoidInitializer;
-        if (currentIs(tok!"{"))
+        NonVoidInitializer node = allocator.make!NonVoidInitializer;
+
+        if (!currentIs(tok!"["))
         {
-            const b = peekPastBraces();
-            if (b !is null && (b.type == tok!"("))
+            const b = setBookmark();
+            if (ExpressionNode ae = parseAssignExpression())
             {
-                mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+                abandonBookmark(b);
+                node.assignExpression = ae;
+                return node;
             }
-            else
+            goToBookmark(b);
+            if (StructInitializer si = parseStructInitializer)
             {
-                const g = setBookmark();
-                advance();
-                ExpressionNode e;
-                // issue 170: try to find a valid ExpressionStatement / EmptyStatement
-                if (!currentIsOneOf(tok!";", tok!"}"))
-                {
-                    e = parseAssignExpression();
-                }
-                if ((currentIs(tok!";") && e) || (!e && currentIs(tok!";")))
-                {
-                    goToBookmark(g);
-                    mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
-                }
-                // No ExpressionStatement in the braces : StructInit
-                else
-                {
-                    goToBookmark(g);
-                    assert (currentIs(tok!"{"));
-                    const m = setBookmark();
-                    auto initializer = parseStructInitializer();
-                    if (initializer !is null)
-                    {
-                        node.structInitializer = initializer;
-                        abandonBookmark(m);
-                    }
-                    else
-                    {
-                        goToBookmark(m);
-                        mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
-                    }
-                }
+                node.structInitializer = si;
+                return node;
             }
+            else return null;
         }
-        else if (currentIs(tok!"["))
+        else
         {
             // issue 156:
             // the expression that gives an array element is usually a primary
@@ -4516,11 +4492,11 @@ class Parser
             }
             else mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
         }
-        else
+        /*else
             mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
         if (node.assignExpression is null && node.arrayInitializer is null
                 && node.structInitializer is null)
-            return null;
+            return null;*/
         return node;
     }
 

@@ -3441,9 +3441,33 @@ unittest // issue #170
         override void visit(const FunctionLiteralExpression){visited = true;}
     }
 
+    final class Test170_F1 : ASTVisitor
+    {
+        static string src = q{  const a = {int i;};  };
+        bool visited;
+        alias visit = ASTVisitor.visit;
+        override void visit(const FunctionLiteralExpression){visited = true;}
+    }
+
+    final class Test170_F2 : ASTVisitor
+    {
+        static string src = q{  const a = {};  };
+        bool visited;
+        alias visit = ASTVisitor.visit;
+        override void visit(const FunctionLiteralExpression){visited = true;}
+    }
+
     final class Test170_S : ASTVisitor
     {
         static string src = q{A a = {member : call()};};
+        bool visited;
+        alias visit = ASTVisitor.visit;
+        override void visit(const StructInitializer){visited = true;}
+    }
+
+    final class Test170_S1 : ASTVisitor
+    {
+        static string src = q{  A a = {0};  };
         bool visited;
         alias visit = ASTVisitor.visit;
         override void visit(const StructInitializer){visited = true;}
@@ -3458,10 +3482,25 @@ unittest // issue #170
     t170_f.visit(m);
     assert(t170_f.visited);
 
+    m = ParserConfig(getTokensForParser(Test170_F1.src, cf, &ca), "", &ra).parseModule();
+    Test170_F1 t170_f1 = new Test170_F1;
+    t170_f1.visit(m);
+    assert(t170_f1.visited);
+
+    m = ParserConfig(getTokensForParser(Test170_F2.src, cf, &ca), "", &ra).parseModule();
+    Test170_F2 t170_f2 = new Test170_F2;
+    t170_f2.visit(m);
+    assert(t170_f2.visited);
+
     m = ParserConfig(getTokensForParser(Test170_S.src, cf, &ca), "", &ra).parseModule();
     Test170_S t170_s = new Test170_S;
     t170_s.visit(m);
     assert(t170_s.visited);
+
+    m = ParserConfig(getTokensForParser(Test170_S1.src, cf, &ca), "", &ra).parseModule();
+    Test170_S1 t170_s1 = new Test170_S1;
+    t170_s1.visit(m);
+    assert(t170_s1.visited);
 }
 
 unittest // issue #193
