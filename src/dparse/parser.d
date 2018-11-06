@@ -55,7 +55,7 @@ struct ParserConfig
  * Params:
  *      parserConfig = a parser configuration.
  * Returns:
- *      The parsed module
+ *      The parsed module.
  */
 Module parseModule()(auto ref ParserConfig parserConfig)
 {
@@ -79,17 +79,34 @@ Module parseModule()(auto ref ParserConfig parserConfig)
     return mod;
 }
 
-deprecated("Use the parseModule overload that takes a ParserConfig instead")
+/**
+ * Params:
+ *      tokens = The tokens parsed by dparse.lexer.
+ *      fileName = The name of the file being parsed.
+ *      allocator = A pointer to a rollback allocator.
+ *      messageFuncOrDg = Either a function or a delegate that receives the parser messages.
+ *      errorCount = An optional pointer to a variable receiving the error count.
+ *      warningCount = An optional pointer to a variable receiving the warning count.
+ * Returns:
+ *      The parsed module.
+ */
 Module parseModule(F)(const(Token)[] tokens, string fileName, RollbackAllocator* allocator,
-    F messageFunction = null, uint* errorCount = null, uint* warningCount = null)
+    F messageFuncOrDg = null, uint* errorCount = null, uint* warningCount = null)
 {
-    static if (!is(typeof(F)) || is(F == MessageFunction))
-        return ParserConfig(tokens, fileName, allocator, messageFunction, null,
-            errorCount, warningCount).parseModule();
-    else static if (is(F == MessageDelegate))
-        return ParserConfig(tokens, fileName, allocator, null, messageFunction,
-            errorCount, warningCount).parseModule();
-    else static assert(0, "F must be null, a MessageFunction or a MessageDelegate");
+    static if (is(F))
+    {
+        static if (is(F : MessageFunction))
+            return ParserConfig(tokens, fileName, allocator, messageFuncOrDg, null,
+                errorCount, warningCount).parseModule();
+        else static if (is(F : MessageDelegate))
+            return ParserConfig(tokens, fileName, allocator, null, messageFuncOrDg,
+                errorCount, warningCount).parseModule();
+        else static assert(0, "F must be a MessageFunction or a MessageDelegate");
+    }
+    else
+    {
+        return ParserConfig(tokens, fileName, allocator, null, null, null, null).parseModule();
+    }
 }
 
 /**
