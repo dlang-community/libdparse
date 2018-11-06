@@ -1681,6 +1681,7 @@ final class FunctionBody : ASTNode
         mixin (visitIfNotNull!(specifiedFunctionBody, missingFunctionBody));
     }
 
+    /** */ size_t endLocation;
     /** */ SpecifiedFunctionBody specifiedFunctionBody;
     /** */ MissingFunctionBody missingFunctionBody;
     mixin OpEquals;

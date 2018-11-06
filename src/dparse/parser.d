@@ -3116,6 +3116,7 @@ class Parser
             goToBookmark(b);
             mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
         }
+        node.endLocation =  previous.index;
         return node;
     }
 
