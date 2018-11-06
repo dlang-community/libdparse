@@ -4492,11 +4492,6 @@ class Parser
             }
             else mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
         }
-        /*else
-            mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
-        if (node.assignExpression is null && node.arrayInitializer is null
-                && node.structInitializer is null)
-            return null;*/
         return node;
     }
 
