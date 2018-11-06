@@ -3254,10 +3254,7 @@ class Parser
         if (isTemplate && currentIs(tok!"if"))
             mixin(parseNodeQ!(`node.constraint`, `Constraint`));
 
-        if (currentIs(tok!";"))
-            advance();
-        else
-            mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
+        mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
         ownArray(node.memberFunctionAttributes, memberFunctionAttributes);
         return node;
     }
