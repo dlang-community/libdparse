@@ -3524,6 +3524,10 @@ class Parser
         mixin(tokenCheck!"(");
         Bookmark b = setBookmark();
 
+        // `type ident = ...` "type" would be seen as a valid expression
+        if (currentIs(tok!"identifier") && (peekIs(tok!"identifier")))
+            goto LType;
+
         // most commn case: rel expression and such
         if (Expression e = parseExpression())
         {
@@ -3567,6 +3571,7 @@ class Parser
             mixin(parseNodeQ!(`node.expression`, `Expression`));
         }
 
+        LType:
         // type following optional node.typeCtors
         if (!node.expression)
         {
