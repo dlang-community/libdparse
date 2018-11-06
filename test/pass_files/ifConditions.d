@@ -6,6 +6,8 @@ void foo()
     if (auto a = call()){}
     if (immutable shared(Type) a = call()){}
     if (a) {}
+    if (T t = T.init) {}
+    if (true) {}
 }
 
 void main()
