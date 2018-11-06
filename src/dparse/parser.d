@@ -3525,7 +3525,7 @@ class Parser
      *$(RULEDEF ifCondition):
      *       $(LITERAL 'auto') $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE typeConstructors) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
-     *     | $(RULE type) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
+     *     | $(RULE typeConstructors)? $(RULE type) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE expression)
      *     ;)
      */
@@ -3539,26 +3539,11 @@ class Parser
         if (moreTokens)
             node.startIndex = current().index;
         mixin(tokenCheck!"(");
-        Bookmark b = setBookmark();
+        const b = setBookmark();
 
-        // `type ident = ...` "type" would be seen as a valid expression
-        if (currentIs(tok!"identifier") && (peekIs(tok!"identifier")))
-            goto LType;
-
-        // most commn case: rel expression and such
-        if (Expression e = parseExpression())
-        {
-            node.expression = e;
-            abandonBookmark(b);
-        }
-        else
-        {
-            goToBookmark(b);
-            b = setBookmark();
-        }
-
-        // auto identifier = exp
-        if (!node.expression && currentIs(tok!"auto") && peekIs(tok!"identifier"))
+        // ex. case:
+        //      `if (auto identifier = exp)`
+        if (currentIs(tok!"auto") && peekIs(tok!"identifier"))
         {
             abandonBookmark(b);
             advance();
@@ -3567,18 +3552,20 @@ class Parser
             mixin(parseNodeQ!(`node.expression`, `Expression`));
         }
 
-        // const shared ...
+        // `if (const shared ...`
         if (!node.expression && moreTokens && isTypeCtor(current.type))
         {
             while (moreTokens)
             {
+                // type ctor followed by open param is part of the type
                 if (!isTypeCtor(current.type) || peekIs(tok!"("))
                     break;
                 node.typeCtors ~= advance().type;
             }
         }
 
-        // const identifier = exp
+        // ex. case:
+        //      if (const shared stuff = exp)
         if (!node.expression && node.typeCtors.length &&
             currentIs(tok!"identifier") && peekIs(tok!"="))
         {
@@ -3588,11 +3575,13 @@ class Parser
             mixin(parseNodeQ!(`node.expression`, `Expression`));
         }
 
-        LType:
-        // type following optional node.typeCtors
         if (!node.expression)
         {
-            auto c = allocator.setCheckpoint();
+            const c = allocator.setCheckpoint();
+            // ex. cases:
+            //      if (Type stuff = exp)
+            //      if (const shared Type stuff = exp)
+            //      if (const shared const(Type) stuff = exp)
             if (Type tp = parseType())
             {
                 if (currentIs(tok!"identifier") && peekIs(tok!"="))
@@ -3603,14 +3592,20 @@ class Parser
                     advance();
                     mixin(parseNodeQ!(`node.expression`, `Expression`));
                 }
+                // will try an expr since Type and Expression are ambiguous
                 else allocator.rollback(c);
             }
         }
 
-        // in all cases now there must be a valid expression
+        // Relational expressions, unaries and such as condition
         if (!node.expression)
         {
             goToBookmark(b);
+            mixin(parseNodeQ!(`node.expression`, `Expression`));
+        }
+
+        if (!node.expression)
+        {
             error("expression or declaration expected");
         }
 
