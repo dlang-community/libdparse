@@ -4458,7 +4458,11 @@ class Parser
                 return node;
             }
             goToBookmark(b);
-            if (StructInitializer si = parseStructInitializer)
+            if (!currentIs(tok!"{"))
+            {
+                return null;
+            }
+            else if (StructInitializer si = parseStructInitializer)
             {
                 node.structInitializer = si;
                 return node;
@@ -5685,6 +5689,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto node = allocator.make!StructInitializer;
         const a = expect(tok!"{");
+        mixin (nullCheck!`a`);
         node.startLocation = a.index;
         if (currentIs(tok!"}"))
         {

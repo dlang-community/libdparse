@@ -3544,3 +3544,18 @@ unittest // there used to be a small regression when adding the ParserConfig
     Module m2 = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
 }
 
+unittest //#318 : used to segfault
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+    auto src = q{ auto a = new TestClass( };
+
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+
+    static void shut(string, size_t, size_t, string ,bool){}
+
+    Module m1 = parseModule(getTokensForParser(src, cf, &ca), "", &ra , &shut);
+}
+
