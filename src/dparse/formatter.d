@@ -2649,7 +2649,8 @@ class Formatter(Sink)
             foreach (contract; functionContracts)
                 format(contract);
             put("do");
-            format(blockStatement);
+            if (blockStatement)
+                format(blockStatement);
         }
     }
 
