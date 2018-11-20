@@ -3647,9 +3647,13 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("Vector");
 
-        put("__vector(");
-        format(vector.type);
-        put(")");
+        put("__vector");
+        if (vector.type)
+        {
+            put("(");
+            format(vector.type);
+            put(")");
+        }
     }
 
     void format(const VersionCondition versionCondition)

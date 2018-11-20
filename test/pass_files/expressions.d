@@ -86,4 +86,5 @@ void foo()
 	auto ptr = cast(const shared int*) &val;
 	(cast(Node*) data.ptr).next = null;
 	int[int[string]] aa5 = [["a":1]:2, ["b":3]:4];
+	if (is(typeof(a) == __vector)){}
 }
