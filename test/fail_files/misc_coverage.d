@@ -62,6 +62,10 @@ int[8] a = [+o+,+o+];
 
 import ++;
 
+__vector( a;
+__vector) a;
+__vector() a;
+__vector(__vector) a;
 
 //keep at the end
 void foo(){a +=

@@ -7004,13 +7004,25 @@ class Parser
      * Parses a Vector
      *
      * $(GRAMMAR $(RULEDEF vector):
-     *     $(LITERAL '___vector') $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)')
+     *     $(LITERAL '___vector') ($(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)'))?
      *     ;)
      */
     Vector parseVector()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        mixin (simpleParse!(Vector, tok!"__vector", tok!"(", "type|parseType", tok!")"));
+        if (!currentIs(tok!"__vector"))
+            return null;
+        Vector node = allocator.make!Vector;
+        advance();
+        if (currentIs(tok!"("))
+        {
+            advance();
+            mixin(parseNodeQ!("node.type", "Type"));
+            if (!currentIs(tok!")"))
+                return null;
+            advance();
+        }
+        return node;
     }
 
     /**
