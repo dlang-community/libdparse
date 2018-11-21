@@ -3122,7 +3122,8 @@ final class Type2 : ASTNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(typeofExpression, typeIdentifierPart, type, vector));
+        mixin (visitIfNotNull!(typeofExpression, typeIdentifierPart, type,
+            traitsExpression, vector));
     }
 
     /** */ IdType builtinType;
@@ -3131,6 +3132,7 @@ final class Type2 : ASTNode
     /** */ TypeIdentifierPart typeIdentifierPart;
     /** */ IdType typeConstructor;
     /** */ Type type;
+    /** */ TraitsExpression traitsExpression;
     /** */ Vector vector;
     mixin OpEquals;
 }

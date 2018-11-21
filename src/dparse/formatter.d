@@ -3350,6 +3350,7 @@ class Formatter(Sink)
         IdentifierList identifierList;
         IdType typeConstructor;
         Type type;
+        TraitsExpression traitsExpression;
         **/
 
         if (type2.typeIdentifierPart !is null)
@@ -3372,6 +3373,10 @@ class Formatter(Sink)
             put("(");
             format(type2.type);
             put(")");
+        }
+        else if (type2.traitsExpression)
+        {
+            format(type2.traitsExpression);
         }
         else
         {
@@ -4048,16 +4053,21 @@ void testFormatNode(Node)(string sourceCode)
         }
     }
 
+    static void errorFunc(string,size_t,size_t,string msg, bool)
+    {assert(0, "The AST to format contains error(s) : " ~ msg);}
+
     LexerConfig config;
     StringCache cache = StringCache(32);
     RollbackAllocator rba;
     auto toks = getTokensForParser(code, config, &cache);
-    Module mod = parseModule(ParserConfig(toks, "stdin", &rba));
+    Module mod = parseModule(ParserConfig(toks, "stdin", &rba, &errorFunc));
     (new CatchInterestingStuff).visit(mod);
 }
 
 unittest
 {
+    testFormatNode!(VariableDeclaration)("__traits(getMember, Foo, \"Bar\") fooBar;");
+    testFormatNode!(VariableDeclaration)("const(__traits(getMember, Foo, \"Bar\")) fooBar;");
     testFormatNode!(VariableDeclaration)("T.T y;");
     testFormatNode!(VariableDeclaration)("T[] y;");
     testFormatNode!(VariableDeclaration)("T* y;");
