@@ -2190,6 +2190,7 @@ class Parser
         case tok!"scope":
         case tok!"typeof":
         case tok!"__vector":
+        case tok!"__traits":
         foreach (B; BasicTypes) { case B: }
         type:
             Type t = parseType();
@@ -6424,6 +6425,7 @@ class Parser
      *     | $(LITERAL 'this') $(LITERAL '.') $(RULE typeIdentifierPart)
      *     | $(RULE typeofExpression) ($(LITERAL '.') $(RULE typeIdentifierPart))?
      *     | $(RULE typeConstructor) $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)')
+     *     | $(RULE traitsExpression)
      *     | $(RULE vector)
      *     ;)
      */
@@ -6454,6 +6456,9 @@ class Parser
                 advance();
                 mixin(parseNodeQ!(`node.typeIdentifierPart`, `TypeIdentifierPart`));
             }
+            break;
+        case tok!"__traits":
+            mixin(parseNodeQ!(`node.traitsExpression`, `TraitsExpression`));
             break;
         case tok!"typeof":
             if ((node.typeofExpression = parseTypeofExpression()) is null)
@@ -7374,6 +7379,16 @@ protected: final:
         if (!moreTokens()) return false;
         switch (current.type)
         {
+        case tok!("__traits"):
+            if (peekIs(tok!"("))
+            {
+                immutable b = setBookmark();
+                advance();
+                const ppp = peekPastParens();
+                goToBookmark(b);
+                return ppp && ppp.type == tok!"identifier";
+            }
+            goto default;
         case tok!"final":
             return !peekIs(tok!"switch");
         case tok!"debug":

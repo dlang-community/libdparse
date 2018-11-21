@@ -92,3 +92,13 @@ class Foo(T);
 interface Foo(T);
 
 mixin("auto a = 1 + ", 1, ";");
+
+__traits(getMember, Foo, "Bar") fooBar;
+const(__traits(getMember, Foo, "Bar")) fooBar;
+alias FooBar = __traits(getMember, Foo, "Bar");
+const fooBar = cast(__traits(getMember, Foo, "Bar")) __traits(getMember, Foo, "bar");
+
+void foo()
+{
+    __traits(getMember, Foo, "Bar") fooBar;
+}
