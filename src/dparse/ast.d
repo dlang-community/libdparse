@@ -683,6 +683,7 @@ final class AsmInstruction : ASTNode
     mixin OpEquals;
     /** */ Token identifierOrIntegerOrOpcode;
     /** */ bool hasAlign;
+    /** */ bool isLabel;
     /** */ AsmInstruction asmInstruction;
     /** */ Operands operands;
 }

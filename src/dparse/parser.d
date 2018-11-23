@@ -567,12 +567,18 @@ class Parser
      *     | $(LITERAL 'in') $(RULE operands)
      *     | $(LITERAL 'out') $(RULE operands)
      *     | $(LITERAL 'int') $(RULE operands)
+     *     | $(LITERAL ';')
      *     ;)
      */
     AsmInstruction parseAsmInstruction()
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
         AsmInstruction node = allocator.make!AsmInstruction;
+        if (currentIs(tok!";"))
+        {
+            warn("Empty asm instruction");
+            return node;
+        }
         if (currentIs(tok!"align"))
         {
             advance(); // align
@@ -599,6 +605,9 @@ class Parser
             if (node.identifierOrIntegerOrOpcode == tok!"identifier" && currentIs(tok!":"))
             {
                 advance(); // :
+                node.isLabel = true;
+                if (currentIs(tok!";"))
+                    return node;
                 mixin(parseNodeQ!(`node.asmInstruction`, `AsmInstruction`));
             }
             else if (!currentIs(tok!";"))
