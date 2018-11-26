@@ -39,4 +39,10 @@ void doStuff()
 		out AL,6;
 		int 3;
 	}
+	asm
+	{
+		align 4	;
+		LABEL:	;
+		;
+	}
 }
