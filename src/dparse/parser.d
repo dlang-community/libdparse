@@ -3983,6 +3983,7 @@ class Parser
             advance();
             mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
             mixin(tokenCheck!")");
+            mixin(tokenCheck!";");
         }
         else return null;
         return node;
