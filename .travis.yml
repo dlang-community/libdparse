@@ -4,6 +4,8 @@ d:
   - dmd
   - dmd-2.075.0
   - ldc
+python:
+  - 3.6
 branches:
   only:
   - master  
