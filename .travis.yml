@@ -20,7 +20,7 @@ matrix:
 
 install:
   - pyenv install 3.6.3
-  - pyenv global system
+  - pyenv global 3.6.3
   - pip3 install 'meson==0.47'
   - mkdir .ntmp
   - curl -L https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip -o .ntmp/ninja-linux.zip
