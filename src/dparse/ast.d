@@ -418,7 +418,14 @@ template generateOpEquals(T)
         ~ "\treturn true;\n}\nreturn false;";
 }
 
-abstract class ExpressionNode : ASTNode
+abstract class BaseNode : ASTNode
+{
+    /** List of tokens consumed by this AST node */ const(Token)[] tokens;
+
+    abstract void accept(ASTVisitor visitor) const;
+}
+
+abstract class ExpressionNode : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -447,7 +454,7 @@ final class AddExpression : ExpressionNode
 }
 
 ///
-final class AliasDeclaration : ASTNode
+final class AliasDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -465,7 +472,7 @@ final class AliasDeclaration : ASTNode
 }
 
 ///
-final class AliasInitializer : ASTNode
+final class AliasInitializer : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -481,7 +488,7 @@ final class AliasInitializer : ASTNode
 }
 
 ///
-final class AliasThisDeclaration : ASTNode
+final class AliasThisDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -493,7 +500,7 @@ final class AliasThisDeclaration : ASTNode
 }
 
 ///
-final class AlignAttribute : ASTNode
+final class AlignAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -526,7 +533,7 @@ final class AndExpression : ExpressionNode
 }
 
 ///
-final class AnonymousEnumDeclaration : ASTNode
+final class AnonymousEnumDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -538,7 +545,7 @@ final class AnonymousEnumDeclaration : ASTNode
 }
 
 ///
-final class AnonymousEnumMember : ASTNode
+final class AnonymousEnumMember : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -551,7 +558,7 @@ final class AnonymousEnumMember : ASTNode
 }
 
 ///
-final class ArgumentList : ASTNode
+final class ArgumentList : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -564,7 +571,7 @@ final class ArgumentList : ASTNode
 }
 
 ///
-final class Arguments : ASTNode
+final class Arguments : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -575,7 +582,7 @@ final class Arguments : ASTNode
 }
 
 ///
-final class ArrayInitializer : ASTNode
+final class ArrayInitializer : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -588,7 +595,7 @@ final class ArrayInitializer : ASTNode
 }
 
 ///
-final class ArrayLiteral : ASTNode
+final class ArrayLiteral : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -599,7 +606,7 @@ final class ArrayLiteral : ASTNode
 }
 
 ///
-final class ArrayMemberInitialization : ASTNode
+final class ArrayMemberInitialization : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -674,7 +681,7 @@ final class AsmExp : ExpressionNode
 }
 
 ///
-final class AsmInstruction : ASTNode
+final class AsmInstruction : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -735,7 +742,7 @@ final class AsmOrExp : ExpressionNode
 }
 
 ///
-final class AsmPrimaryExp : ASTNode
+final class AsmPrimaryExp : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -775,7 +782,7 @@ final class AsmShiftExp : ExpressionNode
 }
 
 ///
-final class AsmStatement : ASTNode
+final class AsmStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -787,7 +794,7 @@ final class AsmStatement : ASTNode
 }
 
 ///
-final class AsmTypePrefix : ASTNode
+final class AsmTypePrefix : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -799,7 +806,7 @@ final class AsmTypePrefix : ASTNode
 }
 
 ///
-final class AsmUnaExp : ASTNode
+final class AsmUnaExp : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -825,7 +832,7 @@ final class AsmXorExp : ExpressionNode
 }
 
 ///
-final class AssertArguments : ASTNode
+final class AssertArguments : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -865,7 +872,7 @@ final class AssignExpression : ExpressionNode
 }
 
 ///
-final class AssocArrayLiteral : ASTNode
+final class AssocArrayLiteral : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -876,7 +883,7 @@ final class AssocArrayLiteral : ASTNode
 }
 
 ///
-final class AtAttribute : ASTNode
+final class AtAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -891,7 +898,7 @@ final class AtAttribute : ASTNode
 }
 
 ///
-final class Attribute : ASTNode
+final class Attribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -909,7 +916,7 @@ final class Attribute : ASTNode
 }
 
 ///
-final class AttributeDeclaration : ASTNode
+final class AttributeDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -921,7 +928,7 @@ final class AttributeDeclaration : ASTNode
 }
 
 ///
-final class AutoDeclaration : ASTNode
+final class AutoDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -936,7 +943,7 @@ final class AutoDeclaration : ASTNode
     mixin OpEquals;
 }
 
-final class AutoDeclarationPart : ASTNode
+final class AutoDeclarationPart : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -951,7 +958,7 @@ final class AutoDeclarationPart : ASTNode
 }
 
 ///
-final class BlockStatement : ASTNode
+final class BlockStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -973,7 +980,7 @@ final class BlockStatement : ASTNode
 }
 
 ///
-final class BreakStatement : ASTNode
+final class BreakStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -984,7 +991,7 @@ final class BreakStatement : ASTNode
 }
 
 ///
-final class BaseClass : ASTNode
+final class BaseClass : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -995,7 +1002,7 @@ final class BaseClass : ASTNode
 }
 
 ///
-final class BaseClassList : ASTNode
+final class BaseClassList : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1006,7 +1013,7 @@ final class BaseClassList : ASTNode
 }
 
 ///
-final class CaseRangeStatement : ASTNode
+final class CaseRangeStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1020,7 +1027,7 @@ final class CaseRangeStatement : ASTNode
 }
 
 ///
-final class CaseStatement: ASTNode
+final class CaseStatement: BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1033,7 +1040,7 @@ final class CaseStatement: ASTNode
 }
 
 ///
-final class CastExpression: ASTNode
+final class CastExpression: BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1046,7 +1053,7 @@ final class CastExpression: ASTNode
 }
 
 ///
-final class CastQualifier: ASTNode
+final class CastQualifier: BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1058,7 +1065,7 @@ final class CastQualifier: ASTNode
 }
 
 ///
-final class Catches: ASTNode
+final class Catches: BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1070,7 +1077,7 @@ final class Catches: ASTNode
 }
 
 ///
-final class Catch: ASTNode
+final class Catch: BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1083,7 +1090,7 @@ final class Catch: ASTNode
 }
 
 ///
-final class ClassDeclaration: ASTNode
+final class ClassDeclaration: BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1117,7 +1124,7 @@ final class CmpExpression : ExpressionNode
 }
 
 ///
-final class CompileCondition : ASTNode
+final class CompileCondition : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1130,7 +1137,7 @@ final class CompileCondition : ASTNode
 }
 
 ///
-final class ConditionalDeclaration : ASTNode
+final class ConditionalDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1144,7 +1151,7 @@ final class ConditionalDeclaration : ASTNode
 }
 
 ///
-final class ConditionalStatement : ASTNode
+final class ConditionalStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1157,7 +1164,7 @@ final class ConditionalStatement : ASTNode
 }
 
 ///
-final class Constraint : ASTNode
+final class Constraint : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1169,7 +1176,7 @@ final class Constraint : ASTNode
 }
 
 ///
-final class Constructor : ASTNode
+final class Constructor : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1189,7 +1196,7 @@ final class Constructor : ASTNode
 }
 
 ///
-final class ContinueStatement : ASTNode
+final class ContinueStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1200,7 +1207,7 @@ final class ContinueStatement : ASTNode
 }
 
 ///
-final class DebugCondition : ASTNode
+final class DebugCondition : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1212,7 +1219,7 @@ final class DebugCondition : ASTNode
 }
 
 ///
-final class DebugSpecification : ASTNode
+final class DebugSpecification : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1223,7 +1230,7 @@ final class DebugSpecification : ASTNode
 }
 
 ///
-final class Declaration : ASTNode
+final class Declaration : BaseNode
 {
 
     override void accept(ASTVisitor visitor) const
@@ -1316,7 +1323,7 @@ final class Declaration : ASTNode
 }
 
 ///
-final class DeclarationsAndStatements : ASTNode
+final class DeclarationsAndStatements : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1328,7 +1335,7 @@ final class DeclarationsAndStatements : ASTNode
 }
 
 ///
-final class DeclarationOrStatement : ASTNode
+final class DeclarationOrStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1343,7 +1350,7 @@ final class DeclarationOrStatement : ASTNode
 }
 
 ///
-final class Declarator : ASTNode
+final class Declarator : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1358,7 +1365,7 @@ final class Declarator : ASTNode
 }
 
 ///
-final class DeclaratorIdentifierList : ASTNode
+final class DeclaratorIdentifierList : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1369,7 +1376,7 @@ final class DeclaratorIdentifierList : ASTNode
 }
 
 ///
-final class DefaultStatement : ASTNode
+final class DefaultStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1394,7 +1401,7 @@ final class DeleteExpression : ExpressionNode
 }
 
 ///
-final class DeleteStatement : ASTNode
+final class DeleteStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1405,7 +1412,7 @@ final class DeleteStatement : ASTNode
 }
 
 ///
-final class Deprecated : ASTNode
+final class Deprecated : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1416,7 +1423,7 @@ final class Deprecated : ASTNode
 }
 
 ///
-final class Destructor : ASTNode
+final class Destructor : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1432,7 +1439,7 @@ final class Destructor : ASTNode
 }
 
 ///
-final class DoStatement : ASTNode
+final class DoStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1444,7 +1451,7 @@ final class DoStatement : ASTNode
 }
 
 ///
-final class EnumBody : ASTNode
+final class EnumBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1465,7 +1472,7 @@ final class EnumBody : ASTNode
 }
 
 ///
-final class EnumDeclaration : ASTNode
+final class EnumDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1478,7 +1485,7 @@ final class EnumDeclaration : ASTNode
     mixin OpEquals;
 }
 
-final class EnumMemberAttribute : ASTNode
+final class EnumMemberAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1490,7 +1497,7 @@ final class EnumMemberAttribute : ASTNode
 }
 
 ///
-final class EnumMember : ASTNode
+final class EnumMember : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1505,7 +1512,7 @@ final class EnumMember : ASTNode
 }
 
 ///
-final class EponymousTemplateDeclaration : ASTNode
+final class EponymousTemplateDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1545,7 +1552,7 @@ final class Expression : ExpressionNode
 }
 
 ///
-final class ExpressionStatement : ASTNode
+final class ExpressionStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1556,7 +1563,7 @@ final class ExpressionStatement : ASTNode
 }
 
 ///
-final class FinalSwitchStatement : ASTNode
+final class FinalSwitchStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1567,7 +1574,7 @@ final class FinalSwitchStatement : ASTNode
 }
 
 ///
-final class Finally : ASTNode
+final class Finally : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1578,7 +1585,7 @@ final class Finally : ASTNode
 }
 
 ///
-final class ForStatement : ASTNode
+final class ForStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1595,7 +1602,7 @@ final class ForStatement : ASTNode
 
 
 ///
-final class Foreach(bool declOnly) : ASTNode
+final class Foreach(bool declOnly) : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1625,7 +1632,7 @@ alias StaticForeachDeclaration = Foreach!true;
 alias ForeachStatement = Foreach!false;
 
 ///
-final class StaticForeachStatement : ASTNode
+final class StaticForeachStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1636,7 +1643,7 @@ final class StaticForeachStatement : ASTNode
 }
 
 ///
-final class ForeachType : ASTNode
+final class ForeachType : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1652,7 +1659,7 @@ final class ForeachType : ASTNode
 }
 
 ///
-final class ForeachTypeList : ASTNode
+final class ForeachTypeList : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1663,7 +1670,7 @@ final class ForeachTypeList : ASTNode
 }
 
 ///
-final class FunctionAttribute : ASTNode
+final class FunctionAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1675,7 +1682,7 @@ final class FunctionAttribute : ASTNode
 }
 
 ///
-final class FunctionBody : ASTNode
+final class FunctionBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1703,7 +1710,7 @@ final class FunctionCallExpression : ExpressionNode
 }
 
 ///
-final class FunctionContract : ASTNode
+final class FunctionContract : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1715,7 +1722,7 @@ final class FunctionContract : ASTNode
 }
 
 ///
-final class FunctionDeclaration : ASTNode
+final class FunctionDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1760,7 +1767,7 @@ final class FunctionLiteralExpression : ExpressionNode
 }
 
 ///
-final class GotoStatement : ASTNode
+final class GotoStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1772,7 +1779,7 @@ final class GotoStatement : ASTNode
 }
 
 ///
-final class IdentifierChain : ASTNode
+final class IdentifierChain : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1783,7 +1790,7 @@ final class IdentifierChain : ASTNode
 }
 
 ///
-final class TypeIdentifierPart : ASTNode
+final class TypeIdentifierPart : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1798,7 +1805,7 @@ final class TypeIdentifierPart : ASTNode
 }
 
 ///
-final class IdentifierOrTemplateChain : ASTNode
+final class IdentifierOrTemplateChain : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1810,7 +1817,7 @@ final class IdentifierOrTemplateChain : ASTNode
 }
 
 ///
-final class IdentifierOrTemplateInstance : ASTNode
+final class IdentifierOrTemplateInstance : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1835,7 +1842,7 @@ final class IdentityExpression : ExpressionNode
 }
 
 ///
-final class IfStatement : ASTNode
+final class IfStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1855,7 +1862,7 @@ final class IfStatement : ASTNode
 }
 
 ///
-final class ImportBind : ASTNode
+final class ImportBind : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1867,7 +1874,7 @@ final class ImportBind : ASTNode
 }
 
 ///
-final class ImportBindings : ASTNode
+final class ImportBindings : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1879,7 +1886,7 @@ final class ImportBindings : ASTNode
 }
 
 ///
-final class ImportDeclaration : ASTNode
+final class ImportDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1904,7 +1911,7 @@ final class ImportExpression : ExpressionNode
 }
 
 ///
-final class Index : ASTNode
+final class Index : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1928,7 +1935,7 @@ final class IndexExpression : ExpressionNode
 }
 
 ///
-final class InContractExpression : ASTNode
+final class InContractExpression : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1952,7 +1959,7 @@ final class InExpression : ExpressionNode
 }
 
 ///
-final class InOutContractExpression : ASTNode
+final class InOutContractExpression : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1964,7 +1971,7 @@ final class InOutContractExpression : ASTNode
 }
 
 ///
-final class InOutStatement : ASTNode
+final class InOutStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1976,7 +1983,7 @@ final class InOutStatement : ASTNode
 }
 
 ///
-final class InStatement : ASTNode
+final class InStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1988,7 +1995,7 @@ final class InStatement : ASTNode
 }
 
 ///
-final class Initialize : ASTNode
+final class Initialize : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1999,7 +2006,7 @@ final class Initialize : ASTNode
 }
 
 ///
-final class Initializer : ASTNode
+final class Initializer : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2010,7 +2017,7 @@ final class Initializer : ASTNode
 }
 
 ///
-final class InterfaceDeclaration : ASTNode
+final class InterfaceDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2027,7 +2034,7 @@ final class InterfaceDeclaration : ASTNode
 }
 
 ///
-final class Invariant : ASTNode
+final class Invariant : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2058,7 +2065,7 @@ final class IsExpression : ExpressionNode
 }
 
 ///
-final class KeyValuePair : ASTNode
+final class KeyValuePair : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2070,7 +2077,7 @@ final class KeyValuePair : ASTNode
 }
 
 ///
-final class KeyValuePairs : ASTNode
+final class KeyValuePairs : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2081,7 +2088,7 @@ final class KeyValuePairs : ASTNode
 }
 
 ///
-final class LabeledStatement : ASTNode
+final class LabeledStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2093,7 +2100,7 @@ final class LabeledStatement : ASTNode
 }
 
 ///
-final class LastCatch : ASTNode
+final class LastCatch : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2106,7 +2113,7 @@ final class LastCatch : ASTNode
 }
 
 ///
-final class LinkageAttribute : ASTNode
+final class LinkageAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2120,7 +2127,7 @@ final class LinkageAttribute : ASTNode
 }
 
 ///
-final class MemberFunctionAttribute : ASTNode
+final class MemberFunctionAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2132,7 +2139,7 @@ final class MemberFunctionAttribute : ASTNode
 }
 
 ///
-final class MissingFunctionBody : ASTNode
+final class MissingFunctionBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2143,7 +2150,7 @@ final class MissingFunctionBody : ASTNode
 }
 
 ///
-final class MixinDeclaration : ASTNode
+final class MixinDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2166,7 +2173,7 @@ final class MixinExpression : ExpressionNode
 }
 
 ///
-final class MixinTemplateDeclaration : ASTNode
+final class MixinTemplateDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2177,7 +2184,7 @@ final class MixinTemplateDeclaration : ASTNode
 }
 
 ///
-final class MixinTemplateName : ASTNode
+final class MixinTemplateName : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2190,7 +2197,7 @@ final class MixinTemplateName : ASTNode
 }
 
 ///
-final class Module : ASTNode
+final class Module : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2203,7 +2210,7 @@ final class Module : ASTNode
 }
 
 ///
-final class ModuleDeclaration : ASTNode
+final class ModuleDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2262,7 +2269,7 @@ final class NewExpression : ExpressionNode
 
 
 ///
-final class StatementNoCaseNoDefault : ASTNode
+final class StatementNoCaseNoDefault : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2307,7 +2314,7 @@ final class StatementNoCaseNoDefault : ASTNode
 }
 
 ///
-final class NonVoidInitializer : ASTNode
+final class NonVoidInitializer : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2322,7 +2329,7 @@ final class NonVoidInitializer : ASTNode
 }
 
 ///
-final class Operands : ASTNode
+final class Operands : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2355,7 +2362,7 @@ final class OrOrExpression : ExpressionNode
 }
 
 ///
-final class OutContractExpression : ASTNode
+final class OutContractExpression : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2368,7 +2375,7 @@ final class OutContractExpression : ASTNode
 }
 
 ///
-final class OutStatement : ASTNode
+final class OutStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2380,7 +2387,7 @@ final class OutStatement : ASTNode
     mixin OpEquals;
 }
 
-final class ParameterAttribute : ASTNode
+final class ParameterAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2391,7 +2398,7 @@ final class ParameterAttribute : ASTNode
 }
 
 ///
-final class Parameter : ASTNode
+final class Parameter : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2409,7 +2416,7 @@ final class Parameter : ASTNode
 }
 
 ///
-final class Parameters : ASTNode
+final class Parameters : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2422,7 +2429,7 @@ final class Parameters : ASTNode
 }
 
 ///
-final class Postblit : ASTNode
+final class Postblit : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2448,7 +2455,7 @@ final class PowExpression : ExpressionNode
 }
 
 ///
-final class PragmaDeclaration : ASTNode
+final class PragmaDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2471,7 +2478,7 @@ final class PragmaExpression : ExpressionNode
 }
 
 ///
-final class PragmaStatement : ASTNode
+final class PragmaStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2516,7 +2523,7 @@ final class PrimaryExpression : ExpressionNode
 }
 
 ///
-final class Register : ASTNode
+final class Register : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2541,7 +2548,7 @@ final class RelExpression : ExpressionNode
 }
 
 ///
-final class ReturnStatement : ASTNode
+final class ReturnStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2554,7 +2561,7 @@ final class ReturnStatement : ASTNode
 }
 
 ///
-final class ScopeGuardStatement : ASTNode
+final class ScopeGuardStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2566,7 +2573,7 @@ final class ScopeGuardStatement : ASTNode
 }
 
 ///
-final class SharedStaticConstructor : ASTNode
+final class SharedStaticConstructor : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2582,7 +2589,7 @@ final class SharedStaticConstructor : ASTNode
 }
 
 ///
-final class SharedStaticDestructor : ASTNode
+final class SharedStaticDestructor : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2610,7 +2617,7 @@ final class ShiftExpression : ExpressionNode
 }
 
 ///
-final class SingleImport : ASTNode
+final class SingleImport : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2622,7 +2629,7 @@ final class SingleImport : ASTNode
 }
 
 ///
-final class SpecifiedFunctionBody : ASTNode
+final class SpecifiedFunctionBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2634,7 +2641,7 @@ final class SpecifiedFunctionBody : ASTNode
 }
 
 ///
-final class Statement : ASTNode
+final class Statement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2649,7 +2656,7 @@ final class Statement : ASTNode
 }
 
 ///
-final class StaticAssertDeclaration : ASTNode
+final class StaticAssertDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2660,7 +2667,7 @@ final class StaticAssertDeclaration : ASTNode
 }
 
 ///
-final class StaticAssertStatement : ASTNode
+final class StaticAssertStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2671,7 +2678,7 @@ final class StaticAssertStatement : ASTNode
 }
 
 ///
-final class StaticConstructor : ASTNode
+final class StaticConstructor : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2687,7 +2694,7 @@ final class StaticConstructor : ASTNode
 }
 
 ///
-final class StaticDestructor : ASTNode
+final class StaticDestructor : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2703,7 +2710,7 @@ final class StaticDestructor : ASTNode
 }
 
 ///
-final class StaticIfCondition : ASTNode
+final class StaticIfCondition : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2714,7 +2721,7 @@ final class StaticIfCondition : ASTNode
 }
 
 ///
-final class StorageClass : ASTNode
+final class StorageClass : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2730,7 +2737,7 @@ final class StorageClass : ASTNode
 }
 
 ///
-final class StructBody : ASTNode
+final class StructBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2751,7 +2758,7 @@ final class StructBody : ASTNode
 }
 
 ///
-final class StructDeclaration : ASTNode
+final class StructDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2766,7 +2773,7 @@ final class StructDeclaration : ASTNode
 }
 
 ///
-final class StructInitializer : ASTNode
+final class StructInitializer : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2779,7 +2786,7 @@ final class StructInitializer : ASTNode
 }
 
 ///
-final class StructMemberInitializer : ASTNode
+final class StructMemberInitializer : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2791,7 +2798,7 @@ final class StructMemberInitializer : ASTNode
 }
 
 ///
-final class StructMemberInitializers : ASTNode
+final class StructMemberInitializers : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2802,7 +2809,7 @@ final class StructMemberInitializers : ASTNode
 }
 
 ///
-final class SwitchStatement : ASTNode
+final class SwitchStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2814,7 +2821,7 @@ final class SwitchStatement : ASTNode
 }
 
 ///
-final class Symbol : ASTNode
+final class Symbol : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2827,7 +2834,7 @@ final class Symbol : ASTNode
 }
 
 ///
-final class SynchronizedStatement : ASTNode
+final class SynchronizedStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2839,7 +2846,7 @@ final class SynchronizedStatement : ASTNode
 }
 
 ///
-final class TemplateAliasParameter : ASTNode
+final class TemplateAliasParameter : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2856,7 +2863,7 @@ final class TemplateAliasParameter : ASTNode
 }
 
 ///
-final class TemplateArgument : ASTNode
+final class TemplateArgument : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2868,7 +2875,7 @@ final class TemplateArgument : ASTNode
 }
 
 ///
-final class TemplateArgumentList : ASTNode
+final class TemplateArgumentList : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2879,7 +2886,7 @@ final class TemplateArgumentList : ASTNode
 }
 
 ///
-final class TemplateArguments : ASTNode
+final class TemplateArguments : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2891,7 +2898,7 @@ final class TemplateArguments : ASTNode
 }
 
 ///
-final class TemplateDeclaration : ASTNode
+final class TemplateDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2916,7 +2923,7 @@ final class TemplateDeclaration : ASTNode
 }
 
 ///
-final class TemplateInstance : ASTNode
+final class TemplateInstance : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2941,7 +2948,7 @@ final class TemplateMixinExpression : ExpressionNode
 }
 
 ///
-final class TemplateParameter : ASTNode
+final class TemplateParameter : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2958,7 +2965,7 @@ final class TemplateParameter : ASTNode
 }
 
 ///
-final class TemplateParameterList : ASTNode
+final class TemplateParameterList : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2969,7 +2976,7 @@ final class TemplateParameterList : ASTNode
 }
 
 ///
-final class TemplateParameters : ASTNode
+final class TemplateParameters : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2980,7 +2987,7 @@ final class TemplateParameters : ASTNode
 }
 
 ///
-final class TemplateSingleArgument : ASTNode
+final class TemplateSingleArgument : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2991,7 +2998,7 @@ final class TemplateSingleArgument : ASTNode
 }
 
 ///
-final class TemplateThisParameter : ASTNode
+final class TemplateThisParameter : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3002,7 +3009,7 @@ final class TemplateThisParameter : ASTNode
 }
 
 ///
-final class TemplateTupleParameter : ASTNode
+final class TemplateTupleParameter : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3013,7 +3020,7 @@ final class TemplateTupleParameter : ASTNode
 }
 
 ///
-final class TemplateTypeParameter : ASTNode
+final class TemplateTypeParameter : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3026,7 +3033,7 @@ final class TemplateTypeParameter : ASTNode
 }
 
 ///
-final class TemplateValueParameter : ASTNode
+final class TemplateValueParameter : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3041,7 +3048,7 @@ final class TemplateValueParameter : ASTNode
 }
 
 ///
-final class TemplateValueParameterDefault : ASTNode
+final class TemplateValueParameterDefault : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3068,7 +3075,7 @@ final class TernaryExpression : ExpressionNode
 }
 
 ///
-final class ThrowStatement : ASTNode
+final class ThrowStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3091,7 +3098,7 @@ final class TraitsExpression : ExpressionNode
 }
 
 ///
-final class TryStatement : ASTNode
+final class TryStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3104,7 +3111,7 @@ final class TryStatement : ASTNode
 }
 
 ///
-final class Type : ASTNode
+final class Type : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3118,7 +3125,7 @@ final class Type : ASTNode
 }
 
 ///
-final class Type2 : ASTNode
+final class Type2 : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3138,7 +3145,7 @@ final class Type2 : ASTNode
 }
 
 ///
-final class TypeSpecialization : ASTNode
+final class TypeSpecialization : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3150,7 +3157,7 @@ final class TypeSpecialization : ASTNode
 }
 
 ///
-final class TypeSuffix : ASTNode
+final class TypeSuffix : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3222,7 +3229,7 @@ final class UnaryExpression : ExpressionNode
 }
 
 ///
-final class UnionDeclaration : ASTNode
+final class UnionDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3238,7 +3245,7 @@ final class UnionDeclaration : ASTNode
 }
 
 ///
-final class Unittest : ASTNode
+final class Unittest : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3253,7 +3260,7 @@ final class Unittest : ASTNode
 }
 
 ///
-final class VariableDeclaration : ASTNode
+final class VariableDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3268,7 +3275,7 @@ final class VariableDeclaration : ASTNode
 }
 
 ///
-final class Vector : ASTNode
+final class Vector : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3279,7 +3286,7 @@ final class Vector : ASTNode
 }
 
 ///
-final class VersionCondition : ASTNode
+final class VersionCondition : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3291,7 +3298,7 @@ final class VersionCondition : ASTNode
 }
 
 ///
-final class VersionSpecification : ASTNode
+final class VersionSpecification : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3302,7 +3309,7 @@ final class VersionSpecification : ASTNode
 }
 
 ///
-final class WhileStatement : ASTNode
+final class WhileStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3316,7 +3323,7 @@ final class WhileStatement : ASTNode
 }
 
 ///
-final class WithStatement : ASTNode
+final class WithStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
