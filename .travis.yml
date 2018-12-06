@@ -19,8 +19,8 @@ matrix:
           - libevent-dev
 
 install:
-  - pyenv install 3.6.3
-  - pyenv global 3.6.3
+  - PYVER=$(grep -o -e "3\.[0-9]\.[0-9]" <<< $(python3 --version))
+  - pyenv global $PYVER
   - pip3 install 'meson==0.47'
   - mkdir .ntmp
   - curl -L https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip -o .ntmp/ninja-linux.zip
