@@ -19,7 +19,6 @@ matrix:
           - libevent-dev
 
 install:
-  - pyenv install 3.7.0
   - pyenv global system 3.7.0
   - pip3 install 'meson==0.47'
   - mkdir .ntmp
