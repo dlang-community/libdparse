@@ -327,11 +327,8 @@ class Parser
             error("argument list expected instead of EOF");
             return null;
         }
-        size_t startLocation = current().index;
         auto node = parseCommaSeparatedRule!(ArgumentList, AssignExpression)(true);
         mixin (nullCheck!`node`);
-        node.startLocation = startLocation;
-        if (moreTokens) node.endLocation = current().index;
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -371,7 +368,6 @@ class Parser
         auto node = allocator.make!ArrayInitializer;
         const open = expect(tok!"[");
         mixin (nullCheck!`open`);
-        node.startLocation = open.index;
         StackBuffer arrayMemberInitializations;
         while (moreTokens())
         {
@@ -387,7 +383,6 @@ class Parser
         ownArray(node.arrayMemberInitializations, arrayMemberInitializations);
         const close = expect(tok!"]");
         mixin (nullCheck!`close`);
-        node.endLocation = close.index;
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -1090,7 +1085,6 @@ class Parser
             error("`(`, or identifier expected");
             return null;
         }
-        node.startLocation = start.index;
         switch (current.type)
         {
         case tok!"identifier":
@@ -1115,7 +1109,6 @@ class Parser
             error("`(`, or identifier expected");
             return null;
         }
-        if (moreTokens) node.endLocation = current().index;
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -1305,18 +1298,14 @@ class Parser
         auto node = allocator.make!BlockStatement;
         const openBrace = expect(tok!"{");
         mixin (nullCheck!`openBrace`);
-        node.startLocation = openBrace.index;
         if (!currentIs(tok!"}"))
         {
             mixin(parseNodeQ!(`node.declarationsAndStatements`, `DeclarationsAndStatements`));
         }
         const closeBrace = expect(tok!"}");
-        if (closeBrace !is null)
-            node.endLocation = closeBrace.index;
-        else
+        if (closeBrace is null)
         {
             trace("Could not find end of block statement.");
-            node.endLocation = size_t.max;
         }
 
         node.tokens = tokens[startIndex .. index];
@@ -2391,8 +2380,6 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!DeclarationOrStatement;
-        if (moreTokens)
-            node.startLocation = current.index;
         // "Any ambiguities in the grammar between Statements and
         // Declarations are resolved by the declarations taking precedence."
         immutable b = setBookmark();
@@ -2413,8 +2400,6 @@ class Parser
             goToBookmark(b);
             node.declaration = parseDeclaration(true, true);
         }
-        if (moreTokens)
-            node.endLocation = current.index;
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -2635,7 +2620,6 @@ class Parser
         EnumBody node = allocator.make!EnumBody;
         const open = expect(tok!"{");
         mixin (nullCheck!`open`);
-        node.startLocation = open.index;
         StackBuffer enumMembers;
         EnumMember last;
         while (moreTokens())
@@ -2673,9 +2657,7 @@ class Parser
                 error("Enum member expected");
         }
         ownArray(node.enumMembers, enumMembers);
-        const close = expect (tok!"}");
-        if (close !is null)
-            node.endLocation = close.index;
+        expect(tok!"}");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -2995,8 +2977,6 @@ class Parser
         auto startIndex = index;
         auto node = allocator.make!ForStatement;
         mixin(tokenCheck!"for");
-        if (moreTokens)
-            node.startIndex = current().index;
         mixin(tokenCheck!"(");
 
         if (currentIs(tok!";"))
@@ -3089,8 +3069,6 @@ class Parser
             error("`foreach` or `foreach_reverse` expected");
             return null;
         }
-        if (moreTokens)
-            node.startIndex = current().index;
         mixin(tokenCheck!"(");
         ForeachTypeList feType = parseForeachTypeList();
         mixin (nullCheck!`feType`);
@@ -3717,11 +3695,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         IfStatement node = allocator.make!IfStatement;
-        node.line = current().line;
-        node.column = current().column;
         mixin(tokenCheck!"if");
-        if (moreTokens)
-            node.startIndex = current().index;
         mixin(tokenCheck!"(");
         const b = setBookmark();
 
@@ -3882,7 +3856,6 @@ class Parser
     {
         auto startIndex = index;
         auto node = allocator.make!ImportDeclaration;
-        node.startIndex = current().index;
         mixin(tokenCheck!"import");
         SingleImport si = parseSingleImport();
         if (si is null)
@@ -3917,7 +3890,6 @@ class Parser
             }
             ownArray(node.singleImports, singleImports);
         }
-        node.endIndex = (moreTokens() ? current() : previous()).index + 1;
         mixin(tokenCheck!";");
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -4161,8 +4133,6 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!Invariant;
-        node.index = current.index;
-        node.line = current.line;
         mixin(tokenCheck!"invariant");
         bool mustHaveBlock;
         if (currentIs(tok!"(") && peekIs(tok!")"))
@@ -4595,10 +4565,7 @@ class Parser
         if (node.comment is null)
             node.comment = start.trailingComment;
         comment = null;
-        const end = expect(tok!";");
-        node.startLocation = start.index;
-        if (end !is null)
-            node.endLocation = end.index;
+        expect(tok!";");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -5407,12 +5374,10 @@ class Parser
         auto node = allocator.make!ReturnStatement;
         const start = expect(tok!"return");
         mixin(nullCheck!`start`);
-        node.startLocation = start.index;
         if (!currentIs(tok!";"))
             mixin(parseNodeQ!(`node.expression`, `Expression`));
         const semicolon = expect(tok!";");
         mixin(nullCheck!`semicolon`);
-        node.endLocation = semicolon.index;
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -5637,7 +5602,6 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!StatementNoCaseNoDefault;
-        node.startLocation = current().index;
         switch (current.type)
         {
         case tok!"{":
@@ -5744,7 +5708,6 @@ class Parser
             mixin(parseNodeQ!(`node.expressionStatement`, `ExpressionStatement`));
             break;
         }
-        node.endLocation = tokens[index - 1].index;
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -5914,7 +5877,6 @@ class Parser
         auto startIndex = index;
         auto node = allocator.make!StructBody;
         const start = expect(tok!"{");
-        if (start !is null) node.startLocation = start.index;
         StackBuffer declarations;
         while (!currentIs(tok!"}") && moreTokens())
         {
@@ -5923,8 +5885,7 @@ class Parser
                 allocator.rollback(c);
         }
         ownArray(node.declarations, declarations);
-        const end = expect(tok!"}");
-        if (end !is null) node.endLocation = end.index;
+        expect(tok!"}");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -5988,10 +5949,8 @@ class Parser
         auto node = allocator.make!StructInitializer;
         const a = expect(tok!"{");
         mixin (nullCheck!`a`);
-        node.startLocation = a.index;
         if (currentIs(tok!"}"))
         {
-            node.endLocation = current.index;
             advance();
         }
         else
@@ -5999,7 +5958,6 @@ class Parser
             mixin(parseNodeQ!(`node.structMemberInitializers`, `StructMemberInitializers`));
             const e = expect(tok!"}");
             mixin (nullCheck!`e`);
-            node.endLocation = e.index;
         }
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -6287,7 +6245,6 @@ class Parser
         }
         ownArray(node.declarations, declarations);
         const end = expect(tok!"}");
-        if (end !is null) node.endLocation = end.index;
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -7413,7 +7370,6 @@ class Parser
         auto node = allocator.make!VersionCondition;
         const v = expect(tok!"version");
         mixin(nullCheck!`v`);
-        node.versionIndex = v.index;
         mixin(tokenCheck!"(");
         if (currentIsOneOf(tok!"intLiteral", tok!"identifier", tok!"unittest", tok!"assert"))
             node.token = advance();
@@ -7465,8 +7421,6 @@ class Parser
         auto startIndex = index;
         auto node = allocator.make!WhileStatement;
         mixin(tokenCheck!"while");
-        if (moreTokens)
-            node.startIndex = current().index;
         mixin(tokenCheck!"(");
         mixin(parseNodeQ!(`node.expression`, `Expression`));
         mixin(tokenCheck!")");
