@@ -398,9 +398,8 @@ template generateOpEquals(T)
         {
             enum opEqualsPart = opEqualsPart!(p[0 .. $/2]) ~ opEqualsPart!(p[$/2 .. $]);
         }
-        else static if (p.length && !p[0].among("comment", "line", "column", "endLocation",
-                "startLocation", "endIndex", "startIndex", "index", "dotLocation", "parenOpenLocation")
-            && !isSomeFunction!(typeof(__traits(getMember, T, p[0]))))
+        else static if (p.length && !isSomeFunction!(typeof(__traits(getMember, T, p[0])))
+            && !p[0].among("comment", "line", "column", "endLocation", "startLocation", "index", "dotLocation"))
         {
             static if (isDynamicArray!(typeof(__traits(getMember, T, p[0]))))
             {
@@ -567,9 +566,8 @@ final class ArgumentList : BaseNode
     }
     mixin OpEquals;
     /** */ ExpressionNode[] items;
-
-    /** */ size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-    /** */ size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
 }
 
 ///
@@ -591,10 +589,9 @@ final class ArrayInitializer : BaseNode
         mixin (visitIfNotNull!(arrayMemberInitializations));
     }
     mixin OpEquals;
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     /** */ ArrayMemberInitialization[] arrayMemberInitializations;
-
-    /** */ size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-    /** */ size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
 }
 
 ///
@@ -895,9 +892,8 @@ final class AtAttribute : BaseNode
     /** */ ArgumentList argumentList;
     /** */ TemplateInstance templateInstance;
     /** */ Token identifier;
-    /** */ size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-    /** */ size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     mixin OpEquals;
 }
 
@@ -972,12 +968,12 @@ final class BlockStatement : BaseNode
     /**
      * Byte position of the opening brace
      */
-    size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
+    size_t startLocation;
 
     /**
      * Byte position of the closing brace
      */
-    size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.max; }
+    size_t endLocation;
 
     /** */ DeclarationsAndStatements declarationsAndStatements;
     mixin OpEquals;
@@ -1348,9 +1344,8 @@ final class DeclarationOrStatement : BaseNode
 
     /** */ Declaration declaration;
     /** */ Statement statement;
-    /** */ size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-    /** */ size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     mixin OpEquals;
 }
 
@@ -1467,13 +1462,12 @@ final class EnumBody : BaseNode
     /**
      * Byte position of the opening brace
      */
-    size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
+    size_t startLocation;
 
     /**
      * Byte position of the closing brace
      */
-    size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
+    size_t endLocation;
     mixin OpEquals;
 }
 
@@ -1602,13 +1596,7 @@ final class ForStatement : BaseNode
     /** */ Expression test;
     /** */ Expression increment;
     /** */ DeclarationOrStatement declarationOrStatement;
-    /** */ size_t parenOpenLocation() @property
-    {
-        return tokens.length > 1 ? tokens[1].index : size_t.init;
-    }
-
-    deprecated("use parenOpenLocation or tokens instead") alias startIndex = parenOpenLocation;
-
+    /** */ size_t startIndex;
     mixin OpEquals;
 }
 
@@ -1629,19 +1617,11 @@ final class Foreach(bool declOnly) : BaseNode
     /** */ ForeachType foreachType;
     /** */ Expression low;
     /** */ Expression high;
+    /** */ size_t startIndex;
     static if (declOnly)
         /** */ Declaration[] declarations;
     else
         /** */ DeclarationOrStatement declarationOrStatement;
-
-    /** */ size_t parenOpenLocation() @property
-    {
-        enum startLocation = declOnly ? 2 : 1;
-        return tokens.length > startLocation ? tokens[startLocation].index : size_t.init;
-    }
-
-    deprecated("use parenOpenLocation or tokens instead") alias startIndex = parenOpenLocation;
-
     mixin OpEquals;
 }
 
@@ -1875,23 +1855,9 @@ final class IfStatement : BaseNode
     /** */ Expression expression;
     /** */ DeclarationOrStatement thenStatement;
     /** */ DeclarationOrStatement elseStatement;
-    /** */ size_t parenOpenLocation() @property
-    {
-        return tokens.length > 1 ? tokens[1].index : size_t.init;
-    }
-
-    /** */ size_t line() @property
-    {
-        return tokens.length > 0 ? tokens[0].line : size_t.init;
-    }
-
-    /** */ size_t column() @property
-    {
-        return tokens.length > 0 ? tokens[0].column : size_t.init;
-    }
-
-    deprecated("use parenOpenLocation or tokens instead") alias startIndex = parenOpenLocation;
-
+    /** */ size_t startIndex;
+    /** */ size_t line;
+    /** */ size_t column;
     mixin OpEquals;
 }
 
@@ -1928,19 +1894,8 @@ final class ImportDeclaration : BaseNode
     }
     /** */ SingleImport[] singleImports;
     /** */ ImportBindings importBindings;
-    /** */ size_t startIndex() @property
-    {
-        return tokens.length > 0 ? tokens[0].index : size_t.init;
-    }
-
-    /** */ size_t endIndex() @property
-    {
-        if (tokens.length == 0)
-            return size_t.init;
-        else // ";" token
-            return tokens[$ - 1].index + 1;
-    }
-
+    /** */ size_t startIndex;
+    /** */ size_t endIndex;
     mixin OpEquals;
 }
 
@@ -2088,9 +2043,8 @@ final class Invariant : BaseNode
     /** */ BlockStatement blockStatement;
     /** */ AssertArguments assertArguments;
     /** */ string comment;
-    /** */ size_t line() const @property { return tokens.length > 1 ? tokens[0].line : size_t.init; }
-    /** */ size_t index() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-
+    size_t line;
+    size_t index;
     mixin OpEquals;
 }
 
@@ -2264,18 +2218,9 @@ final class ModuleDeclaration : BaseNode
     }
     /** */ Deprecated deprecated_;
     /** */ IdentifierChain moduleName;
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     /** */ string comment;
-    size_t startLocation() const @property
-    {
-        auto module_ = tokens.countUntil!(a => a.type == tok!"module");
-        if (module_ == -1)
-            return size_t.init;
-        else
-            return tokens[module_].index;
-    }
-
-    size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
     mixin OpEquals;
 }
 
@@ -2363,9 +2308,8 @@ final class StatementNoCaseNoDefault : BaseNode
     /** */ VersionSpecification versionSpecification;
     /** */ DebugSpecification debugSpecification;
     /** */ ExpressionStatement expressionStatement;
-    /** */ size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-    /** */ size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     mixin OpEquals;
 }
 
@@ -2611,9 +2555,8 @@ final class ReturnStatement : BaseNode
         mixin (visitIfNotNull!(expression));
     }
     /** */ Expression expression;
-    /** */ size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-    /** */ size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     mixin OpEquals;
 }
 
@@ -2804,13 +2747,12 @@ final class StructBody : BaseNode
     /**
      * Byte position of the opening brace
      */
-    size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
+    size_t startLocation;
 
     /**
      * Byte position of the closing brace
      */
-    size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
+    size_t endLocation;
     /** */ Declaration[] declarations;
     mixin OpEquals;
 }
@@ -2838,9 +2780,8 @@ final class StructInitializer : BaseNode
         mixin (visitIfNotNull!(structMemberInitializers));
     }
     /** */ StructMemberInitializers structMemberInitializers;
-    /** */ size_t startLocation() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-    /** */ size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
     mixin OpEquals;
 }
 
@@ -2977,8 +2918,7 @@ final class TemplateDeclaration : BaseNode
     /**
      * Byte position of the closing brace
      */
-    size_t endLocation() const @property { return tokens.length > 1 ? tokens[$ - 1].index : size_t.init; }
-
+    size_t endLocation;
     mixin OpEquals;
 }
 
@@ -3352,8 +3292,7 @@ final class VersionCondition : BaseNode
     {
         mixin (visitIfNotNull!(token));
     }
-    /** */ size_t versionIndex() const @property { return tokens.length > 1 ? tokens[0].index : size_t.init; }
-
+    /** */ size_t versionIndex;
     /** */ Token token;
     mixin OpEquals;
 }
@@ -3379,13 +3318,7 @@ final class WhileStatement : BaseNode
 
     /** */ Expression expression;
     /** */ DeclarationOrStatement declarationOrStatement;
-    /** */ size_t parenOpenLocation() @property
-    {
-        return tokens.length > 1 ? tokens[1].index : size_t.init;
-    }
-
-    deprecated("use parenOpenLocation or tokens instead") alias startIndex = parenOpenLocation;
-
+    /** */ size_t startIndex;
     mixin OpEquals;
 }
 
