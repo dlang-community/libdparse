@@ -630,7 +630,7 @@ class Parser
                 node.isLabel = true;
                 if (currentIs(tok!";"))
                 {
-                node.tokens = tokens[startIndex .. index];
+                    node.tokens = tokens[startIndex .. index];
                     return node;
                 }
                 mixin(parseNodeQ!(`node.asmInstruction`, `AsmInstruction`));
@@ -2828,7 +2828,7 @@ class Parser
             node = allocator.make!EnumMemberAttribute;
             mixin(parseNodeQ!(`node.deprecated_`, `Deprecated`));
         }
-        node.tokens = tokens[startIndex .. index];
+        if (node) node.tokens = tokens[startIndex .. index];
         return node;
     }
 
@@ -3045,7 +3045,7 @@ class Parser
         auto startIndex = index;
         mixin(tokenCheck!"static");
         auto decl = parseForeach!true();
-        decl.tokens = tokens[startIndex .. index];
+        if (decl) decl.tokens = tokens[startIndex .. index];
         return decl;
     }
 
@@ -7210,7 +7210,7 @@ class Parser
             {
                 error("Error, expected parameters or `)`", false);
                 advance();
-                newUnary.tokens = tokens[startIndex .. index];
+                if (newUnary) newUnary.tokens = tokens[startIndex .. index];
                 return newUnary;
             }
             mixin (nullCheck!`newUnary.functionCallExpression = parseFunctionCallExpression(node)`);
@@ -8392,7 +8392,7 @@ protected: final:
                 node.comment ~= semicolon.trailingComment;
             }
         }
-        node.tokens = tokens[startIndex .. index];
+        if (node) node.tokens = tokens[startIndex .. index];
         return node;
     }
 
@@ -8430,7 +8430,7 @@ protected: final:
             advance();
         else
             mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
-        node.tokens = tokens[startIndex .. index];
+        if (node) node.tokens = tokens[startIndex .. index];
         return node;
     }
 
