@@ -724,10 +724,7 @@ class Parser
         AsmPrimaryExp node = allocator.make!AsmPrimaryExp();
         switch (current().type)
         {
-        case tok!"doubleLiteral":
-        case tok!"floatLiteral":
-        case tok!"intLiteral":
-        case tok!"longLiteral":
+        foreach (NL; NumberLiterals) {case NL:}
         case tok!"stringLiteral":
         case tok!"$":
             node.token = advance();

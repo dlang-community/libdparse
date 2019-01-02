@@ -8,6 +8,8 @@ void doStuff()
 	}
 	asm
 	{
+		mov EAX, 10u;
+		mov RAX, 10UL;
 		mov RAX, a;
 		ret;
 		mov RAX, a[100];
