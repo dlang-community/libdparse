@@ -227,7 +227,6 @@ void testTokenChecks()
         case tok!"union":
         case tok!"unittest":
         case tok!"version":
-        case tok!"volatile":
         case tok!"while":
         case tok!"with":
         case tok!"__DATE__":
