@@ -158,7 +158,6 @@ again:
 	case tok!"typeof":
 	case tok!"unittest":
 	case tok!"version":
-	case tok!"volatile":
 	case tok!"__DATE__":
 	case tok!"__EOF__":
 	case tok!"__FILE__":
