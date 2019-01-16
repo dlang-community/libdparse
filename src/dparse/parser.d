@@ -1356,43 +1356,16 @@ class Parser
     }
 
     /**
-     * Parses a BaseClass
-     *
-     * $(GRAMMAR $(RULEDEF baseClass):
-     *     $(RULE type2)
-     *     ;)
-     */
-    BaseClass parseBaseClass()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto startIndex = index;
-        auto node = allocator.make!BaseClass;
-        if (!moreTokens)
-            return null;
-        if (current.type.isProtection())
-        {
-            warn("Use of base class protection is deprecated.");
-            advance();
-        }
-        if ((node.type2 = parseType2()) is null)
-        {
-            return null;
-        }
-        node.tokens = tokens[startIndex .. index];
-        return node;
-    }
-
-    /**
      * Parses a BaseClassList
      *
      * $(GRAMMAR $(RULEDEF baseClassList):
-     *     $(RULE baseClass) ($(LITERAL ',') $(RULE baseClass))*
+     *     $(RULE type) ($(LITERAL ',') $(RULE type))*
      *     ;)
      */
     BaseClassList parseBaseClassList()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        return parseCommaSeparatedRule!(BaseClassList, BaseClass)();
+        return parseCommaSeparatedRule!(BaseClassList, Type)();
     }
 
     /**
@@ -3593,6 +3566,8 @@ class Parser
             expect(tok!"]");
             if (!currentIs(tok!"."))
             {
+                // goes back and consider the indexer as a type suffix giving
+                // a static array dim.
                 if (node.indexer !is null)
                 {
                     allocator.rollback(c);
