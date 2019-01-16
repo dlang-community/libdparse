@@ -231,9 +231,9 @@ again:
 		break;
 	case tok!"identifier":
 		write("ident ");
+		break;
 	default:
 		goto again;
-		break;
 	}
 }
 
@@ -261,7 +261,7 @@ void writeDoubleQuoteStringLiteral()
 		auto j = uniform(0, 128);
 		switch (j)
 		{
-		case 0: .. case 6: goto again; break;
+		case 0: .. case 6: goto again;
 		case 7:  write(`\a`); break;
 		case 8:  write(`\b`); break;
 		case 9:  write(`\t`); break;
@@ -269,7 +269,7 @@ void writeDoubleQuoteStringLiteral()
 		case 11: write(`\v`); break;
 		case 12: write(`\f`); break;
 		case 13: write(`\r`); break;
-		case 14: .. case 31: goto again; break;
+		case 14: .. case 31: goto again;
 		case 32: .. case 33:
 		case 35: .. case 91:
 		case 93: .. case 176:
@@ -277,7 +277,7 @@ void writeDoubleQuoteStringLiteral()
 			break;
 		case 34: write(`\"`); break;
 		case 92: write(`\\`); break;
-		default: goto again; break;
+		default: goto again;
 		}
 	}
 	write('"');
