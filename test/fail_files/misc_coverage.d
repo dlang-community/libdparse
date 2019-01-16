@@ -67,5 +67,7 @@ __vector) a;
 __vector() a;
 __vector(__vector) a;
 
+class A : SomeDynarray[] {}
+
 //keep at the end
 void foo(){a +=

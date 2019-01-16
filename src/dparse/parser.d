@@ -3558,6 +3558,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF typeIdentifierPart):
      *       $(RULE identifierOrTemplateInstance)
      *     | $(RULE identifierOrTemplateInstance) $(LITERAL '.') $(RULE typeIdentifierPart)
+     *     | $(RULE identifierOrTemplateInstance) $(LITERAL '[') $(RULE assignExpression) $(LITERAL ']')
      *     | $(RULE identifierOrTemplateInstance) $(LITERAL '[') $(RULE assignExpression) $(LITERAL ']') $(LITERAL '.') $(RULE typeIdentifierPart)
      *     ;)
      */
@@ -3573,33 +3574,28 @@ class Parser
         mixin(parseNodeQ!(`node.identifierOrTemplateInstance`, `IdentifierOrTemplateInstance`));
         if (currentIs(tok!"["))
         {
-            size_t c;
+            // dyn arrays -> type suffixes
+            if (peekIs(tok!"]"))
+            {
+                node.tokens = tokens[startIndex .. index - 1];
+                return node;
+            }
             const b = setBookmark();
             advance();
-            if (!currentIs(tok!"]"))
+            node.indexer = parseAssignExpression();
+            // here we can have a type (AA key)
+            if (node.indexer is null)
             {
-                node.indexer = parseAssignExpression();
-                if (node.indexer is null)
-                {
-                    goToBookmark(b);
-                    node.tokens = tokens[startIndex .. index];
-                    return node;
-                }
-                c = allocator.setCheckpoint;
+                goToBookmark(b);
+                return node;
             }
+            // otherwise either the index of a type list or a dim
+            abandonBookmark(b);
             expect(tok!"]");
             if (!currentIs(tok!"."))
             {
-                if (node.indexer !is null)
-                {
-                    allocator.rollback(c);
-                    node.indexer = null;
-                }
-                goToBookmark(b);
-            }
-            else
-            {
-                abandonBookmark(b);
+                node.tokens = tokens[startIndex .. index];
+                return node;
             }
         }
         if (currentIs(tok!"."))
