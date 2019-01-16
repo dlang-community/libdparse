@@ -7333,8 +7333,6 @@ class Parser
         node.comment = comment;
         comment = null;
 
-        // TODO: handle function bodies correctly
-
         StackBuffer declarators;
         Declarator last;
         while (true)
