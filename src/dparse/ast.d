@@ -181,7 +181,6 @@ abstract class ASTVisitor
     /** */ void visit(const AutoDeclarationPart autoDeclarationPart) { autoDeclarationPart.accept(this); }
     /** */ void visit(const BlockStatement blockStatement) { blockStatement.accept(this); }
     /** */ void visit(const BreakStatement breakStatement) { breakStatement.accept(this); }
-    /** */ void visit(const BaseClass baseClass) { baseClass.accept(this); }
     /** */ void visit(const BaseClassList baseClassList) { baseClassList.accept(this); }
     /** */ void visit(const CaseRangeStatement caseRangeStatement) { caseRangeStatement.accept(this); }
     /** */ void visit(const CaseStatement caseStatement) { caseStatement.accept(this); }
@@ -991,24 +990,13 @@ final class BreakStatement : BaseNode
 }
 
 ///
-final class BaseClass : BaseNode
-{
-    override void accept(ASTVisitor visitor) const
-    {
-        mixin (visitIfNotNull!(type2));
-    }
-    /** */ Type2 type2;
-    mixin OpEquals;
-}
-
-///
 final class BaseClassList : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(items));
     }
-    /** */ BaseClass[] items;
+    /** */ Type[] items;
     mixin OpEquals;
 }
 

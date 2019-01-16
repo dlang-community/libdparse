@@ -560,15 +560,6 @@ class Formatter(Sink)
         put(";");
     }
 
-    void format(const BaseClass baseClass)
-    {
-        debug(verbose) writeln("BaseClass");
-        with(baseClass)
-        {
-            if (type2) format(type2);
-        }
-    }
-
     void format(const BaseClassList baseClassList)
     {
         debug(verbose) writeln("BaseClassList");
