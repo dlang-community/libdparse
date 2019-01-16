@@ -7306,7 +7306,6 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF variableDeclaration):
      *       $(RULE storageClass)* $(RULE _type) $(RULE declarator) ($(LITERAL ',') $(RULE declarator))* $(LITERAL ';')
-     *     | $(RULE storageClass)* $(RULE _type) $(LITERAL identifier) $(LITERAL '=') $(RULE functionBody) $(LITERAL ';')
      *     | $(RULE autoDeclaration)
      *     ;)
      */
