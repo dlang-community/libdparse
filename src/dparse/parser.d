@@ -7303,7 +7303,6 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF variableDeclaration):
      *       $(RULE storageClass)* $(RULE _type) $(RULE declarator) ($(LITERAL ',') $(RULE declarator))* $(LITERAL ';')
-     *     | $(RULE storageClass)* $(RULE _type) $(LITERAL identifier) $(LITERAL '=') $(RULE functionBody) $(LITERAL ';')
      *     | $(RULE autoDeclaration)
      *     ;)
      */
@@ -7330,8 +7329,6 @@ class Parser
         node.type = type is null ? parseType() : type;
         node.comment = comment;
         comment = null;
-
-        // TODO: handle function bodies correctly
 
         StackBuffer declarators;
         Declarator last;
