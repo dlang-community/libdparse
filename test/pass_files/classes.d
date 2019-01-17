@@ -1,6 +1,8 @@
 class A;
 class B {}
 class C : B {}
+class C : TList[0] {}
+class C : TList[0].TList[0].Prop {}
 class D(T) if (Z) : B {}
 class E(T) : B if (Z) {}
 class F(T);
