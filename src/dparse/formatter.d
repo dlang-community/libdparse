@@ -808,7 +808,7 @@ class Formatter(Sink)
                 format(d);
             endBlock();
         }
-        else if (decl.trueDeclarations.length == 0)
+        else if (decl.trueDeclarations.length == 1)
             maybeIndent(decl.trueDeclarations[0]);
         else
             put("{}");
@@ -825,8 +825,6 @@ class Formatter(Sink)
         }
         else if (decl.falseDeclarations.length == 1)
             maybeIndent(decl.falseDeclarations[0]);
-        else
-            put("{}");
     }
 
     void format(const ConditionalStatement stmnt)
@@ -839,7 +837,7 @@ class Formatter(Sink)
         DeclarationOrStatement falseStatement;
         **/
 
-        newThing(What.other);
+        newThing(What.conditionalDecl);
         if (stmnt.compileCondition)
             format(stmnt.compileCondition);
 
@@ -3806,7 +3804,7 @@ protected:
                     lineGap(1);
                     break;
                 case conditionalDecl:
-                    lineGap(1);
+                    //lineGap(1);
                     break;
                 case variableDecl:
                     lineGap(1);
@@ -4037,7 +4035,7 @@ protected:
 }
 
 version (unittest)
-void testFormatNode(Node)(string sourceCode)
+void testFormatNode(Node)(string sourceCode, string expected = "")
 {
     Appender!string fmt;
     ubyte[] code = cast(ubyte[]) sourceCode;
@@ -4049,7 +4047,10 @@ void testFormatNode(Node)(string sourceCode)
         {
             stuff.accept(this);
             format(&fmt, stuff);
-            assert(fmt.data.canFind(code), fmt.data);
+            if (expected.length)
+                assert(fmt.data.canFind(expected), "\n" ~ fmt.data);
+            else
+                assert(fmt.data.canFind(sourceCode), "\n" ~ fmt.data);
         }
     }
 
@@ -4080,4 +4081,18 @@ unittest
     testFormatNode!(VariableDeclaration)(`T!(0)[] t;`);
     testFormatNode!(VariableDeclaration)(`T!(0)[dim] t;`);
     testFormatNode!(VariableDeclaration)(`const shared t = [0, 1];`);
+
+    testFormatNode!(OutStatement)(
+`
+void foo()
+out{static if (true) {baz();}}
+do{}
+`,
+`out
+{
+    static if (true)
+    {
+        baz();
+    }
+}`);
 }
