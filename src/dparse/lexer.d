@@ -1885,7 +1885,7 @@ do
         break;
     case "/++":
     case "/**":
-        alias CL = MultiLineCommentHelper!(ElementEncodingType!(typeof(comment)), 512);
+        alias CL = MultiLineCommentHelper!(ElementEncodingType!(typeof(comment)));
         CL cl = CL(comment);
         cl.process(outputRange);
         break;
@@ -1978,32 +1978,29 @@ unittest
 }
 
 /** Gives a line per line view on DDOC comments of type `/++` and `/**` which
- * makes easier to remove the decoration and in an almost 100% nogc way.
- * drawback: to remain fast and nogc only up to MaxLines lines are handled
- */
-private struct MultiLineCommentHelper(CharType : const(char), ushort MaxLines)
+ * makes easier to remove the decoration and in an almost 100% nogc way. */
+private struct MultiLineCommentHelper(CharType : const(char))
 {
-    // this struct is more used as a function with nested functions would.
+    // this struct is more used as a 'function with nested functions' would.
     this() @disable;
     this(this) @disable;
     auto opAssign(T)(T t) @disable;
 
 private:
 
-    char[][MaxLines] lines;
-    ushort numLines;
-    // either 0 or 1, depending on if first line only opens
-    uint firstLineInBlock;
-    // either numLines or numLines-1, depending on if last line only closes
-    uint lastLineInBlockPlusOne;
+    char[][] lines;
+    // either lines.length or lines.length-1, depending on if last line only closes
+    size_t lastLineInBlockPlusOne;
     // either '*' or '+'
     const(char) commentChar;
+    // either 0 or 1, depending on if first line only opens
+    ubyte firstLineInBlock;
 
     import std.ascii : isWhite;
 
     void stripIndent() @safe @nogc pure nothrow
     {
-        if (numLines < 2)
+        if (lines.length < 2)
             return;
         size_t count;
         foreach (const j; 0 .. lines[1].length)
@@ -2014,7 +2011,7 @@ private:
         }
         if (count < 2)
             return;
-        foreach (const i; 1 .. numLines)
+        foreach (const i; 1 .. lines.length)
         {
             foreach (const j; 0 .. lines[i].length)
             {
@@ -2031,7 +2028,7 @@ private:
 
     void processFirstLine() @safe @nogc pure nothrow
     {
-        assert(numLines);
+        assert(lines.length);
         if (lines[0].length > 3)
         {
             foreach (const i; 1..lines[0].length)
@@ -2059,7 +2056,7 @@ private:
             }
         }
         lines[0][0..3] = "   ";
-        if (numLines == 1 &&
+        if (lines.length == 1 &&
             lines[0][$-2] == commentChar && lines[0][$-1] == '/')
         {
             lines[0][$-2..$] = "  ";
@@ -2072,48 +2069,48 @@ private:
 
     void processLastLine() @safe @nogc pure nothrow
     {
-        lastLineInBlockPlusOne = numLines;
-        if (numLines == 1)
+        lastLineInBlockPlusOne = lines.length;
+        if (lines.length == 1)
             return;
         size_t closeStartIndex = size_t.max;
-        foreach (const i; 0..lines[numLines-1].length)
+        foreach (const i; 0..lines[$-1].length)
         {
-            if (lines[numLines-1][i] == commentChar)
+            if (lines[$-1][i] == commentChar)
             {
                 if (closeStartIndex == size_t.max)
                     closeStartIndex = i;
-                if (i == lines[numLines-1].length - 2)
+                if (i == lines[$-1].length - 2)
                 {
                     // see the FIXME note in unDecorate()
-                    lastLineInBlockPlusOne = closeStartIndex == 0 ? numLines -1 : numLines;
+                    lastLineInBlockPlusOne = closeStartIndex == 0 ? lines.length-1 : lines.length;
 
-                    lines[numLines-1][closeStartIndex..$] = ' ';
+                    lines[$-1][closeStartIndex..$] = ' ';
                     break;
                 }
             }
             else
             {
                 closeStartIndex = size_t.max;
-                lastLineInBlockPlusOne = numLines;
+                lastLineInBlockPlusOne = lines.length;
             }
         }
     }
 
     void unDecorate() @safe @nogc pure nothrow
     {
-        if (numLines == 1 || numLines == 2 && lines[numLines-1].length == 0)
+        if (lines.length == 1 || lines.length == 2 && lines[$-1].length == 0)
             return;
         bool allDecorated;
         static immutable char[2][2] pattern = [[' ', '*'],[' ', '+']];
         const ubyte patternIndex = commentChar == '+';
         // first line is never decorated
         const size_t lo = 1;
-        // although very uncommon, the last line can be considered decorated
-        // e.g  `* lastline */`
+        // although very uncommon, the last line can be decorated e.g in `* lastline */`:
+        // the first '*' is a deco if all prev lines are also decorated.
         // FIXME: `hi` should be set to `lastLineInBlockPlusOne`...
-        const size_t hi = (lines[numLines-1].length > 1 &&
-            (lines[numLines-1][0] == commentChar || lines[numLines-1][0..2] == pattern[patternIndex]))
-            ?  numLines : numLines-1;
+        const size_t hi = (lines[$-1].length > 1 &&
+            (lines[$-1][0] == commentChar || lines[$-1][0..2] == pattern[patternIndex]))
+            ?  lines.length : lines.length-1;
         // deco with a leading white
         foreach (const i; lo .. hi)
         {
@@ -2151,7 +2148,7 @@ private:
             lines[0] = lines[0][i..$];
             break;
         }
-        if (numLines == 1)
+        if (lines.length == 1)
             return;
         while (true)
         {
@@ -2177,7 +2174,7 @@ private:
 
     void stripRight() @safe @nogc pure nothrow
     {
-        foreach (const i; 0 .. numLines)
+        foreach (const i; 0 .. lines.length)
         {
             if (lines[i].length == 0)
                 continue;
@@ -2207,13 +2204,15 @@ public:
     {
         commentChar = text[1];
         size_t startIndex, i;
+        Appender!(char[][]) linesApp;
+        linesApp.reserve(512);
 
         void storeLine(size_t endIndexPlusOne)
         {
             static if (isMutable!CharType)
-                lines[numLines++] = text[startIndex..endIndexPlusOne];
+                linesApp ~= text[startIndex..endIndexPlusOne];
             else
-                lines[numLines++] = text[startIndex..endIndexPlusOne].dup;
+                linesApp ~= text[startIndex..endIndexPlusOne].dup;
         }
 
         while (true)
@@ -2235,17 +2234,16 @@ public:
                 startIndex = i + 1;
             }
             i++;
-            if (numLines == MaxLines)
-                break;
         }
+        lines = linesApp.data;
     }
 
     void process(T)(ref T outbuffer)
     {
         run();
-        outbuffer.reserve(numLines * 90);
+        outbuffer.reserve(lines.length * 90);
         bool prevWritten, empties;
-        foreach (const i; firstLineInBlock .. numLines)
+        foreach (const i; firstLineInBlock .. lines.length)
         {
             if (lines[i].length != 0)
             {
