@@ -2011,15 +2011,15 @@ private:
         }
         if (count < 2)
             return;
-        foreach (const i; 1 .. lines.length)
+        foreach (ref line; lines[1 .. $])
         {
-            foreach (const j; 0 .. lines[i].length)
+            foreach (const j; 0 .. line.length)
             {
-                if (!(lines[i][j]).isWhite)
+                if (!(line[j]).isWhite)
                     break;
                 if (j == count - 1)
                 {
-                    lines[i] = lines[i][j .. $];
+                    line = line[j .. $];
                     break;
                 }
             }
@@ -2136,8 +2136,8 @@ private:
             return;
 
         const size_t indexToChange = (lines[lo][0] == commentChar) ? 0 : 1;
-        foreach (const i; lo .. hi)
-            lines[i][indexToChange] = ' ';
+        foreach (ref line; lines[lo .. hi])
+            line[indexToChange] = ' ';
     }
 
     void stripLeft() @safe @nogc pure nothrow
@@ -2153,37 +2153,37 @@ private:
         while (true)
         {
             bool processColumn;
-            foreach (const i; 1 .. lastLineInBlockPlusOne)
+            foreach (ref line; lines[1 .. lastLineInBlockPlusOne])
             {
-                if (lines[i].length == 0)
+                if (line.length == 0)
                     continue;
-                if (!(lines[i][0]).isWhite)
+                if (!(line[0]).isWhite)
                     return;
                 processColumn = true;
             }
             if (!processColumn)
                 return;
-            foreach (const i; 1 .. lastLineInBlockPlusOne)
+            foreach (ref line; lines[1 .. lastLineInBlockPlusOne])
             {
-                if (lines[i].length == 0)
+                if (line.length == 0)
                     continue;
-                lines[i] = lines[i][1..$];
+                line = line[1..$];
             }
         }
     }
 
     void stripRight() @safe @nogc pure nothrow
     {
-        foreach (const i; 0 .. lines.length)
+        foreach (ref line; lines[0 .. lines.length])
         {
-            if (lines[i].length == 0)
+            if (line.length == 0)
                 continue;
-            if ((lines[i][$-1]).isWhite)
+            if ((line[$-1]).isWhite)
             {
-                ptrdiff_t firstWhite = lines[i].length;
-                while (firstWhite > 0 && (lines[i][firstWhite-1]).isWhite)
+                size_t firstWhite = line.length;
+                while (firstWhite > 0 && (line[firstWhite-1]).isWhite)
                     firstWhite--;
-                lines[i] = lines[i][0..firstWhite];
+                line = line[0..firstWhite];
             }
         }
     }
@@ -2243,9 +2243,9 @@ public:
         run();
         outbuffer.reserve(lines.length * 90);
         bool prevWritten, empties;
-        foreach (const i; firstLineInBlock .. lines.length)
+        foreach (ref line; lines[firstLineInBlock .. lines.length])
         {
-            if (lines[i].length != 0)
+            if (line.length != 0)
             {
                 // close preceeding line
                 if (prevWritten)
@@ -2254,7 +2254,7 @@ public:
                 if (prevWritten && empties)
                     outbuffer ~= "\n";
 
-                outbuffer ~= lines[i];
+                outbuffer ~= line;
                 prevWritten = true;
                 empties = false;
             }
