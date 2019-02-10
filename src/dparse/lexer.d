@@ -1844,7 +1844,7 @@ if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
  * and places the result into the given output range
  */
 public void unDecorateComment(T)(string comment, auto ref T outputRange)
-    if (isOutputRange!(T, string))
+if (isOutputRange!(T, string))
 in
 {
     assert (comment.length >= 3);
@@ -1852,14 +1852,6 @@ in
 do
 {
     import std.string : lineSplitter, stripRight;
-
-    static void adjustBeginningAndEnd(string s, ref size_t a, ref size_t b) pure nothrow @nogc @safe
-    {
-        immutable char c = s[1];
-        while (a < b && s[a] == c) a++;
-        while (b > a && s[b] == c) b--;
-        b++;
-    }
 
     string leadingChars;
     size_t i = 3;
@@ -1893,63 +1885,12 @@ do
         break;
     case "/++":
     case "/**":
-        if (comment.length == 3)
-        {
-            comment = "";
-            goto default;
-        }
-        j = comment.length - 2;
-        // Skip beginning and ending stars and plusses
-        adjustBeginningAndEnd(comment, i, j);
-        foreach (line; lineSplitter(comment[i .. j]))
-        {
-            immutable string stripped = line.stripRight();
-            if (leadingChars.empty)
-            {
-                size_t k = 0;
-                while (k < line.length && (line[k] == ' ' || line[k] == '\t')) k++;
-                if (k < line.length && line[k] == comment[1])
-                {
-                    k++;
-                    while (k < line.length && (line[k] == ' ' || line[k] == '\t')) k++;
-                }
-                if (k == stripped.length)
-                    continue;
-                leadingChars = line[0 .. k];
-            }
-
-            if (stripped.startsWith(leadingChars))
-            {
-                if (stripped.length > leadingChars.length)
-                {
-                    if (hasOutput)
-                        outputRange.put('\n');
-                    hasOutput = true;
-                    if (lastWasBlank)
-                        outputRange.put('\n');
-                    lastWasBlank = false;
-                    outputRange.put(stripped[leadingChars.length .. $]);
-                }
-            }
-            else if (hasOutput && stripped.length == leadingChars.stripRight().length)
-                lastWasBlank = true;
-            else if (!stripped.empty && !leadingChars.startsWith(stripped))
-            {
-                if (hasOutput)
-                    outputRange.put('\n');
-                hasOutput = true;
-                if (lastWasBlank)
-                    outputRange.put('\n');
-                lastWasBlank = false;
-                outputRange.put(stripped);
-            }
-            else
-                lastWasBlank = false;
-        }
+        alias CL = MultiLineCommentHelper!(ElementEncodingType!(typeof(comment)));
+        CL cl = CL(comment);
+        cl.process(outputRange);
         break;
     default:
         outputRange.put(comment);
-        break;
     }
 }
 
@@ -1960,21 +1901,29 @@ unittest
     import std.stdio:stderr;
     stderr.writeln("Running unittest for unDecorateComment...");
 
-
     string[] inputs = [
         "/***************\n*******************/",
         "/***************\n *\n ******************/",
         "/**\n*/",
         "/** */",
         "/***/",
-        "/** abcde */",
-        "/// abcde\n/// abcde",
-        "/**\n * stuff\n */",
-        "/**\n *\n * stuff\n */",
-        "/**\n *\n * stuff\n *\n */",
-        "/**\n *\n * stuff\n *\n*/",
-        "/**\n *  abcde\n *    abcde \n */",
-        "/**\n * abcde\n *\n * abcde\n */",
+        "/******/",
+        "/** abcde1 */",
+        "/// abcde2\n/// abcde2",
+        "/**\n * stuff1\n */",
+        "/**\n *\n * stuff2\n */",
+        "/**\n *\n * stuff3\n *\n */",
+        "/**\n *\n * stuff4\n *\n*/",
+        "/**\n *  abcde3\n *    abcde3 \n */",
+        "/**\n * abcde4\n *\n * abcde4\n */",
+        "/**abcde5\n*abcde5\n*/",
+        "/** abcde6\n * abcde6\n*/",
+        "/**\n1\n\n\n\n*/",
+        "/**\r\n1\r\n\r\n\r\n\r\n*/",
+        "/**\na1\n\na2\n\n*/",
+        "/**b1\n*b2\n*b3*/",
+        "/**c1\n    *c2\n    *c3*/",
+        "/**d1\n    *d2\n    *d3\n*/",
     ];
     string[] outputs = [
         "",
@@ -1982,15 +1931,33 @@ unittest
         "",
         "",
         "",
-        "abcde",
-        "abcde\nabcde",
-        "stuff",
-        "stuff",
-        "stuff",
-        "stuff",
-        "abcde\n  abcde",
-        "abcde\n\nabcde"
+        "",
+        "abcde1",
+        "abcde2\nabcde2",
+        "stuff1",
+        "stuff2",
+        "stuff3",
+        "stuff4",
+        "abcde3\n  abcde3",
+        "abcde4\n\nabcde4",
+        "abcde5\nabcde5",
+        "abcde6\nabcde6",
+        "1",
+        "1",
+        "a1\n\na2",
+        "b1\nb2\nb3",
+        "c1\nc2\nc3",
+        "d1\nd2\nd3",
     ];
+
+    // tests where * and + are not interchangeable
+    string[2][] np =
+    [
+        ["/**\n * d1\n d2\n */", "* d1\nd2"],
+        ["/**\n + d1\n d2\n */", "+ d1\nd2"],
+        ["/**d1\n\n\n*d2\n*/",  "d1\n\n*d2"],
+    ];
+
     assert(inputs.length == outputs.length);
     foreach (pair; zip(inputs, outputs))
     {
@@ -2001,9 +1968,300 @@ unittest
             assert(pair[1] == app.data, "[[" ~ pair[0] ~ "]] => [[" ~ app.data ~ "]]");
         }
     }
+    foreach (pair; np)
+    {
+        auto app = appender!string();
+        unDecorateComment(pair[0], app);
+        assert(pair[1] == app.data, "[[" ~ pair[0] ~ "]] => [[" ~ app.data ~ "]]");
+    }
     stderr.writeln("Unittest for unDecorateComment passed.");
 }
 
+/** Gives a line per line view on DDOC comments of type `/++` and `/**` which
+ * makes easier to remove the decoration and in an almost 100% nogc way. */
+private struct MultiLineCommentHelper(CharType : const(char))
+{
+    // this struct is more used as a 'function with nested functions' would.
+    this() @disable;
+    this(this) @disable;
+    auto opAssign(T)(T t) @disable;
+
+private:
+
+    char[][] lines;
+    // either lines.length or lines.length-1, depending on if last line only closes
+    size_t lastLineInBlockPlusOne;
+    // either '*' or '+'
+    const(char) commentChar;
+    // either 0 or 1, depending on if first line only opens
+    ubyte firstLineInBlock;
+
+    import std.ascii : isWhite;
+
+    void stripIndent() @safe @nogc pure nothrow
+    {
+        if (lines.length < 2)
+            return;
+        size_t count;
+        foreach (const j; 0 .. lines[1].length)
+            if (!(lines[1][j]).isWhite)
+        {
+            count = j;
+            break;
+        }
+        if (count < 2)
+            return;
+        foreach (ref line; lines[1 .. $])
+        {
+            foreach (const j; 0 .. line.length)
+            {
+                if (!(line[j]).isWhite)
+                    break;
+                if (j == count - 1)
+                {
+                    line = line[j .. $];
+                    break;
+                }
+            }
+        }
+    }
+
+    void processFirstLine() @safe @nogc pure nothrow
+    {
+        assert(lines.length);
+        if (lines[0].length > 3)
+        {
+            foreach (const i; 1..lines[0].length)
+            {
+                if (lines[0][i] == commentChar)
+                {
+                    if (i < lines[0].length - 2)
+                        continue;
+                    if (i == lines[0].length - 2 && lines[0][i+1] == '/')
+                    {
+                        lines[0][] = ' ';
+                        break;
+                    }
+                    if (i == lines[0].length - 1)
+                    {
+                        lines[0][] = ' ';
+                        break;
+                    }
+                }
+                else
+                {
+                    lines[0][0..i] = ' ';
+                    break;
+                }
+            }
+        }
+        lines[0][0..3] = "   ";
+        if (lines.length == 1 &&
+            lines[0][$-2] == commentChar && lines[0][$-1] == '/')
+        {
+            lines[0][$-2..$] = "  ";
+        }
+        foreach (const i; 0..lines[0].length)
+            if (!(lines[0][i].isWhite))
+                return;
+        firstLineInBlock = 1;
+    }
+
+    void processLastLine() @safe @nogc pure nothrow
+    {
+        lastLineInBlockPlusOne = lines.length;
+        if (lines.length == 1)
+            return;
+        size_t closeStartIndex = size_t.max;
+        foreach (const i; 0..lines[$-1].length)
+        {
+            if (lines[$-1][i] == commentChar)
+            {
+                if (closeStartIndex == size_t.max)
+                    closeStartIndex = i;
+                if (i == lines[$-1].length - 2)
+                {
+                    // see the FIXME note in unDecorate()
+                    lastLineInBlockPlusOne = closeStartIndex == 0 ? lines.length-1 : lines.length;
+
+                    lines[$-1][closeStartIndex..$] = ' ';
+                    break;
+                }
+            }
+            else
+            {
+                closeStartIndex = size_t.max;
+                lastLineInBlockPlusOne = lines.length;
+            }
+        }
+    }
+
+    void unDecorate() @safe @nogc pure nothrow
+    {
+        if (lines.length == 1 || lines.length == 2 && lines[$-1].length == 0)
+            return;
+        bool allDecorated;
+        static immutable char[2][2] pattern = [[' ', '*'],[' ', '+']];
+        const ubyte patternIndex = commentChar == '+';
+        // first line is never decorated
+        const size_t lo = 1;
+        // although very uncommon, the last line can be decorated e.g in `* lastline */`:
+        // the first '*' is a deco if all prev lines are also decorated.
+        // FIXME: `hi` should be set to `lastLineInBlockPlusOne`...
+        const size_t hi = (lines[$-1].length > 1 &&
+            (lines[$-1][0] == commentChar || lines[$-1][0..2] == pattern[patternIndex]))
+            ?  lines.length : lines.length-1;
+        // deco with a leading white
+        foreach (const i; lo .. hi)
+        {
+            if (lines[i].length < 2)
+                break;
+            else if (lines[i][0..2] != pattern[patternIndex])
+                break;
+            else if (i == hi-1)
+                allDecorated = true;
+        }
+        // deco w/o leading white
+        if (!allDecorated)
+            foreach (const i; lo .. hi)
+        {
+            if (lines[i].length == 0)
+                break;
+            if (lines[i][0] != commentChar)
+                break;
+            else if (i == hi-1)
+                allDecorated = true;
+        }
+        if (!allDecorated)
+            return;
+
+        const size_t indexToChange = (lines[lo][0] == commentChar) ? 0 : 1;
+        foreach (ref line; lines[lo .. hi])
+            line[indexToChange] = ' ';
+    }
+
+    void stripLeft() @safe @nogc pure nothrow
+    {
+        foreach (const i; 0 .. lines[0].length)
+            if (!(lines[0][i]).isWhite)
+        {
+            lines[0] = lines[0][i..$];
+            break;
+        }
+        if (lines.length == 1)
+            return;
+        while (true)
+        {
+            bool processColumn;
+            foreach (ref line; lines[1 .. lastLineInBlockPlusOne])
+            {
+                if (line.length == 0)
+                    continue;
+                if (!(line[0]).isWhite)
+                    return;
+                processColumn = true;
+            }
+            if (!processColumn)
+                return;
+            foreach (ref line; lines[1 .. lastLineInBlockPlusOne])
+            {
+                if (line.length == 0)
+                    continue;
+                line = line[1..$];
+            }
+        }
+    }
+
+    void stripRight() @safe @nogc pure nothrow
+    {
+        foreach (ref line; lines[0 .. lines.length])
+        {
+            if (line.length == 0)
+                continue;
+            if ((line[$-1]).isWhite)
+            {
+                size_t firstWhite = line.length;
+                while (firstWhite > 0 && (line[firstWhite-1]).isWhite)
+                    firstWhite--;
+                line = line[0..firstWhite];
+            }
+        }
+    }
+
+    void run() @safe @nogc pure nothrow
+    {
+        stripIndent();
+        processFirstLine();
+        processLastLine();
+        unDecorate();
+        stripLeft();
+        stripRight();
+    }
+
+public:
+
+    this(CharType[] text) @safe pure nothrow
+    {
+        commentChar = text[1];
+        size_t startIndex, i;
+        Appender!(char[][]) linesApp;
+        linesApp.reserve(512);
+
+        void storeLine(size_t endIndexPlusOne)
+        {
+            static if (isMutable!CharType)
+                linesApp ~= text[startIndex..endIndexPlusOne];
+            else
+                linesApp ~= text[startIndex..endIndexPlusOne].dup;
+        }
+
+        while (true)
+        {
+            if (i == text.length - 1)
+            {
+                storeLine(text.length);
+                break;
+            }
+            if (text[i] == '\n')
+            {
+                storeLine(i);
+                startIndex = i + 1;
+            }
+            else if (text[i .. i+2] == "\r\n")
+            {
+                storeLine(i);
+                i++;
+                startIndex = i + 1;
+            }
+            i++;
+        }
+        lines = linesApp.data;
+    }
+
+    void process(T)(ref T outbuffer)
+    {
+        run();
+        outbuffer.reserve(lines.length * 90);
+        bool prevWritten, empties;
+        foreach (ref line; lines[firstLineInBlock .. lines.length])
+        {
+            if (line.length != 0)
+            {
+                // close preceeding line
+                if (prevWritten)
+                    outbuffer ~= "\n";
+                // insert new empty line
+                if (prevWritten && empties)
+                    outbuffer ~= "\n";
+
+                outbuffer ~= line;
+                prevWritten = true;
+                empties = false;
+            }
+            else empties = true;
+        }
+    }
+}
 
 /**
  * Helper function used to avoid too much allocations while lexing.
