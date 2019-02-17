@@ -2368,6 +2368,11 @@ class Parser
                 allocator.rollback(c);
                 if (suppressMessages > 0)
                     return null;
+                // better for DCD, if the end of the block is reached then
+                // go back, allowing the following declarations to be in
+                // the right scope, instead of the block we were in.
+                if (index > 0 && previous == tok!"}")
+                    index -= 1;
             }
         }
         ownArray(node.declarationsAndStatements, declarationsAndStatements);
