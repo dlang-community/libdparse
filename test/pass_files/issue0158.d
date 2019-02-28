@@ -11,3 +11,4 @@ T.T[8].T y;
 .T!0[] t;
 T!(0)[] t;
 T!(0)[dim] t;
+alias SubList = T[lo.lo .. hi.hi];

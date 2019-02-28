@@ -3587,10 +3587,19 @@ class Parser
             }
             const b = setBookmark();
             advance();
+            const cp = allocator.setCheckpoint;
             node.indexer = parseAssignExpression();
             // here we can have a type (AA key)
             if (node.indexer is null)
             {
+                goToBookmark(b);
+                return node;
+            }
+            // indexer followed by ".." -> sliceExp -> type suffix
+            else if (currentIs(tok!".."))
+            {
+                allocator.rollback(cp);
+                node.indexer = null;
                 goToBookmark(b);
                 return node;
             }
