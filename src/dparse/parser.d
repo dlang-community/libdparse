@@ -5481,7 +5481,7 @@ class Parser
         mixin(tokenCheck!"shared");
         mixin(tokenCheck!"static");
         mixin(tokenCheck!"~");
-        return parseStaticCtorDtorCommon(node, index);
+        return parseStaticCtorDtorCommon(node, startIndex);
     }
 
     /**
