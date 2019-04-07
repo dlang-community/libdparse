@@ -1761,6 +1761,7 @@ final class FunctionLiteralExpression : ExpressionNode
     /** */ Parameters parameters;
     /** */ Token identifier;
     /** */ Type returnType;
+    /** */ bool isReturnRef;
     /** */ size_t line;
     /** */ size_t column;
     mixin OpEquals;

@@ -1,3 +1,4 @@
+#!dmd -g
 module dparse.formatter;
 
 import std.algorithm;
@@ -143,14 +144,22 @@ class Formatter(Sink)
 
         /**
         Token name;
+        StorageClass[] storageClasses;
+        TemplateParameters templateParameters;
         Type type;
-        **/
+        FunctionLiteralExpression functionLiteralExpression;
+        */
 
         with(aliasInitializer)
         {
             format(name);
+            if (templateParameters)
+                format(templateParameters);
             put(" = ");
-            format(type);
+            if (type)
+                format(type);
+            if (functionLiteralExpression)
+                format(functionLiteralExpression);
         }
     }
 
@@ -529,6 +538,7 @@ class Formatter(Sink)
             put(" = ");
             format(part.initializer);
         }
+        put(";");
     }
 
     void format(const BlockStatement blockStatement)
@@ -1533,14 +1543,16 @@ class Formatter(Sink)
         Parameters parameters;
         Token identifier;
         Type returnType;
+        bool isReturnRef;
         **/
 
         with(functionLiteralExpression)
         {
             put(tokenRep(functionOrDelegate));
 
-            if (returnType || parameters)
-                space();
+            if (isReturnRef) put("ref ");
+            //if (returnType || parameters)
+              //  space();
 
             if (returnType) format(returnType);
             if (parameters) format(parameters);
@@ -3330,7 +3342,7 @@ class Formatter(Sink)
         }
 
         if (type.typeConstructors.length) space();
-        format(type.type2);
+        if (type.type2) format(type.type2);
 
         foreach (suffix; type.typeSuffixes)
             format(suffix);
@@ -4095,4 +4107,8 @@ do{}
         baz();
     }
 }`);
+
+    testFormatNode!(AutoDeclaration)("auto f = a;");
+    testFormatNode!(AutoDeclaration)("auto f = ref () => a;");
+    testFormatNode!(AliasDeclaration)("alias f = ref () => a;");
 }
