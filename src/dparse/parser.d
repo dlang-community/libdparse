@@ -212,8 +212,13 @@ class Parser
                 return true;
             if (startsWith(tok!"identifier", tok!"=>"))
                 return true;
-            if (currentIs(tok!"("))
+            const b = setBookmark();
+            scope(exit)
+                goToBookmark(b);
+            if (currentIs(tok!"(") || currentIs(tok!"ref") && peekIs(tok!"("))
             {
+                if (currentIs(tok!"ref"))
+                    advance();
                 const t = peekPastParens();
                 if (t !is null)
                 {
@@ -3434,14 +3439,14 @@ class Parser
      * Parses a FunctionLiteralExpression
      *
      * $(GRAMMAR $(RULEDEF functionLiteralExpression):
-     *     | $(LITERAL 'delegate') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE specifiedFunctionBody)
-     *     | $(LITERAL 'function') $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE specifiedFunctionBody)
-     *     | $(RULE parameters) $(RULE functionAttribute)* $(RULE specifiedFunctionBody)
+     *     | $(LITERAL 'delegate') $(LITERAL 'ref')? $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE specifiedFunctionBody)
+     *     | $(LITERAL 'function') $(LITERAL 'ref')? $(RULE type)? ($(RULE parameters) $(RULE functionAttribute)*)? $(RULE specifiedFunctionBody)
+     *     | $(LITERAL 'ref')? $(RULE parameters) $(RULE functionAttribute)* $(RULE specifiedFunctionBody)
      *     | $(RULE specifiedFunctionBody)
      *     | $(LITERAL Identifier) $(LITERAL '=>') $(RULE assignExpression)
-     *     | $(LITERAL 'function') $(RULE type)? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
-     *     | $(LITERAL 'delegate') $(RULE type)? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
-     *     | $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
+     *     | $(LITERAL 'function') $(LITERAL 'ref')? $(RULE type)? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
+     *     | $(LITERAL 'delegate') $(LITERAL 'ref')? $(RULE type)? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
+     *     | $(LITERAL 'ref')? $(RULE parameters) $(RULE functionAttribute)* $(LITERAL '=>') $(RULE assignExpression)
      *     ;)
      */
     FunctionLiteralExpression parseFunctionLiteralExpression()
@@ -3454,6 +3459,11 @@ class Parser
         if (currentIsOneOf(tok!"function", tok!"delegate"))
         {
             node.functionOrDelegate = advance().type;
+            if (currentIs(tok!"ref"))
+            {
+                advance();
+                node.isReturnRef = true;
+            }
             if (!currentIsOneOf(tok!"(", tok!"in", tok!"do",
                     tok!"out", tok!"{", tok!"=>") && current.text != "body")
                 mixin(parseNodeQ!(`node.returnType`, `Type`));
@@ -3466,8 +3476,13 @@ class Parser
             node.tokens = tokens[startIndex .. index];
             return node;
         }
-        else if (currentIs(tok!"("))
+        else if (currentIs(tok!"(") || currentIs(tok!"ref") && peekIs(tok!"("))
         {
+            if (currentIs(tok!"ref"))
+            {
+                advance();
+                node.isReturnRef = true;
+            }
             mixin(parseNodeQ!(`node.parameters`, `Parameters`));
             StackBuffer memberFunctionAttributes;
             while (currentIsMemberFunctionAttribute())
@@ -5282,6 +5297,13 @@ class Parser
             else
                 mixin(parseNodeQ!(`node.arrayLiteral`, `ArrayLiteral`));
             break;
+        case tok!"ref":
+            if (peekIs(tok!"("))
+            {
+                mixin(parseNodeQ!(`node.functionLiteralExpression`, `FunctionLiteralExpression`));
+                break;
+            }
+            else goto default;
         case tok!"(":
             immutable b = setBookmark();
             skipParens();
