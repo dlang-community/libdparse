@@ -485,6 +485,8 @@ final class AliasInitializer : BaseNode
     /** */ TemplateParameters templateParameters;
     /** */ Type type;
     /** */ FunctionLiteralExpression functionLiteralExpression;
+    /** */ Parameters parameters;
+    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
 }
 
 ///

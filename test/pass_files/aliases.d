@@ -64,3 +64,9 @@ alias extern(Windows) int F15(int);
 alias int F16(int);
 alias ref int F17(int);
 alias @property int F18(int);
+
+// function types with '='
+alias Fun1(T) = T(T t) @safe;
+alias Fun2 = void(int,int,int) pure nothrow;
+alias Fun3 = const void(int,int,int) @trusted;
+alias Fun4(T...) = shared const(Foo!Bar)(T t) const;

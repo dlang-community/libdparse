@@ -98,6 +98,8 @@ class Formatter(Sink)
         Token name;
         AliasInitializer[] initializers;
         string comment;
+        Parameters parameters;
+        MemberFunctionAttribute[] memberFunctionAttributes;
         **/
 
         with(aliasDeclaration)
@@ -133,6 +135,15 @@ class Formatter(Sink)
                 {
                     format(declaratorIdentifierList);
                 }
+                if (parameters)
+                {
+                    format(parameters);
+                }
+                foreach(a; memberFunctionAttributes)
+                {
+                    space();
+                    format(a);
+                }
             }
             put(";");
         }
@@ -148,6 +159,8 @@ class Formatter(Sink)
         TemplateParameters templateParameters;
         Type type;
         FunctionLiteralExpression functionLiteralExpression;
+        Parameters parameters;
+        MemberFunctionAttribute[] memberFunctionAttributes;
         */
 
         with(aliasInitializer)
@@ -160,6 +173,13 @@ class Formatter(Sink)
                 format(type);
             if (functionLiteralExpression)
                 format(functionLiteralExpression);
+            if (parameters)
+                format(parameters);
+            foreach(att; memberFunctionAttributes)
+            {
+                space();
+                format(att);
+            }
         }
     }
 
@@ -4111,4 +4131,11 @@ do{}
     testFormatNode!(AutoDeclaration)("auto f = a;");
     testFormatNode!(AutoDeclaration)("auto f = ref () => a;");
     testFormatNode!(AliasDeclaration)("alias f = ref () => a;");
+
+    testFormatNode!(AliasDeclaration)("alias int F(int);");
+    testFormatNode!(AliasDeclaration)("alias const int F(int);");
+    testFormatNode!(AliasDeclaration)("alias const int F(int) nothrow;");
+    testFormatNode!(AliasDeclaration)("alias f(T) = void(T t);");
+    testFormatNode!(AliasDeclaration)("alias f(T) = void(int, int, int) const pure nothrow;");
+
 }
