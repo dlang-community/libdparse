@@ -2371,13 +2371,26 @@ class Parser
             if (!declarationsAndStatements.put(parseDeclarationOrStatement()))
             {
                 allocator.rollback(c);
+
+                // detect the pattern ".}" for DCD. This is what happens when
+                // located at the end of a well delimited body/scope and requesting
+                // completion. This is also a case where it's sure sure that
+                // there's no ambiguity, even if it happens during a lookup:
+                // it's not a decl, it's not a statement, it's an error.
+                if (currentIs(tok!"}") && index > 0 && previous == tok!".")
+                    break;
+
                 if (suppressMessages > 0)
                     return null;
+
                 // better for DCD, if the end of the block is reached then
                 // go back, allowing the following declarations to be in
                 // the right scope, instead of the block we were in.
                 if (index > 0 && previous == tok!"}")
+                {
                     index -= 1;
+                    break;
+                }
             }
         }
         ownArray(node.declarationsAndStatements, declarationsAndStatements);
