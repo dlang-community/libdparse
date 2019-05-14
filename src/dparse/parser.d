@@ -5252,8 +5252,6 @@ class Parser
             node.dot = advance();
             goto case;
         case tok!"identifier":
-            if (current.text == "body")
-                goto case tok!"do";
             if (peekIs(tok!"=>"))
                 mixin(parseNodeQ!(`node.functionLiteralExpression`, `FunctionLiteralExpression`));
             else
