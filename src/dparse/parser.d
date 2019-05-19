@@ -193,6 +193,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF aliasInitializer):
      *       $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE storageClass)* $(RULE type)
+     *     | $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE storageClass)* $(RULE type) $(RULE paraemters) $(RULE memberFunctionAttribute)*
      *     | $(LITERAL Identifier) $(RULE templateParameters)? $(LITERAL '=') $(RULE functionLiteralExpression)
      *     ;)
      */
@@ -240,6 +241,15 @@ class Parser
                     return null;
             ownArray(node.storageClasses, storageClasses);
             mixin (parseNodeQ!(`node.type`, `Type`));
+            if (currentIs(tok!"("))
+            {
+                mixin (parseNodeQ!(`node.parameters`, `Parameters`));
+                StackBuffer memberFunctionAttributes;
+                while (moreTokens() && currentIsMemberFunctionAttribute())
+                    if (!memberFunctionAttributes.put(parseMemberFunctionAttribute()))
+                        return null;
+                ownArray(node.memberFunctionAttributes, memberFunctionAttributes);
+            }
         }
         node.tokens = tokens[startIndex .. index];
         return node;
