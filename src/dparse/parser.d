@@ -2318,10 +2318,19 @@ class Parser
                     error("no identifier for declarator");
                 return null;
             }
-            if (peekIs(tok!"("))
-                mixin (nullCheck!`node.functionDeclaration = parseFunctionDeclaration(t, false)`);
-            else
-                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(t, false)`);
+            const b2 = setBookmark();
+            node.variableDeclaration = parseVariableDeclaration(t, false);
+            if (node.variableDeclaration is null)
+            {
+                goToBookmark(b2);
+                node.functionDeclaration = parseFunctionDeclaration(t, false);
+            }
+            else abandonBookmark(b2);
+            if (!node.variableDeclaration && !node.functionDeclaration)
+            {
+                error("invalid variable declaration or function declaration", false);
+                return null;
+            }
             break;
         case tok!"version":
             if (peekIs(tok!"("))
