@@ -97,8 +97,12 @@ __traits(getMember, Foo, "Bar") fooBar;
 const(__traits(getMember, Foo, "Bar")) fooBar;
 alias FooBar = __traits(getMember, Foo, "Bar");
 const fooBar = cast(__traits(getMember, Foo, "Bar")) __traits(getMember, Foo, "bar");
+int twice(int x) = 2 * x;
+const int twice(int x) = 2 * x;
+immutable int twice(int x) = 2 * x;
 
 void foo()
 {
     __traits(getMember, Foo, "Bar") fooBar;
+    immutable int twice(int x) = 2 * x;
 }
