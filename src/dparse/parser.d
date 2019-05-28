@@ -2319,10 +2319,13 @@ class Parser
                 return null;
             }
             const b2 = setBookmark();
+            auto savedComment = comment;
             node.variableDeclaration = parseVariableDeclaration(t, false);
             if (node.variableDeclaration is null)
             {
                 goToBookmark(b2);
+                if (savedComment && comment is null)
+                    comment = savedComment;
                 node.functionDeclaration = parseFunctionDeclaration(t, false);
             }
             else abandonBookmark(b2);
