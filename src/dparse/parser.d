@@ -5698,6 +5698,8 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
+        if (!moreTokens())
+            return null;
         auto node = allocator.make!StatementNoCaseNoDefault;
         node.startLocation = current().index;
         switch (current.type)
