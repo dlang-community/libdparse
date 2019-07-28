@@ -3569,3 +3569,17 @@ unittest //#318 : used to segfault
     Module m1 = parseModule(getTokensForParser(src, cf, &ca), "", &ra , &shut);
 }
 
+unittest //#365 : used to segfault
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+    auto src = " o[{scope(x ";
+
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+
+    static void shut(string, size_t, size_t, string ,bool){}
+
+    Module m1 = parseModule(getTokensForParser(src, cf, &ca), "", &ra , &shut);
+}
