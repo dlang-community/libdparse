@@ -6837,6 +6837,7 @@ class Parser
      *     | $(RULE typeConstructor) $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)')
      *     | $(RULE traitsExpression)
      *     | $(RULE vector)
+     *     | $(RULE mixinExpression)
      *     ;)
      */
     Type2 parseType2()
@@ -6880,6 +6881,9 @@ class Parser
                 mixin(parseNodeQ!(`node.typeIdentifierPart`, `TypeIdentifierPart`));
             }
             break;
+        case tok!"mixin":
+            mixin(parseNodeQ!(`node.mixinExpression`, `MixinExpression`));
+            break;
         case tok!"const":
         case tok!"immutable":
         case tok!"inout":
@@ -6894,7 +6898,8 @@ class Parser
                 return null;
             break;
         default:
-            error("Basic type, type constructor, symbol, or typeof expected");
+            error("Basic type, type constructor, symbol, `typeof`, `__traits`, " ~
+                "`__vector` or `mixin` expected");
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -7816,7 +7821,8 @@ protected: final:
     bool isDeclaration()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        if (!moreTokens()) return false;
+        if (!moreTokens())
+            return false;
         switch (current.type)
         {
         case tok!("__traits"):
@@ -7829,6 +7835,8 @@ protected: final:
                 return ppp && ppp.type == tok!"identifier";
             }
             goto default;
+        case tok!("mixin"):
+            return peekIs(tok!"(");
         case tok!"final":
             return !peekIs(tok!"switch");
         case tok!"debug":

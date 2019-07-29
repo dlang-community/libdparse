@@ -106,3 +106,10 @@ void foo()
     __traits(getMember, Foo, "Bar") fooBar;
     immutable int twice(int x) = 2 * x;
 }
+
+alias Mt1 = mixin("foo", ".", "bar");
+alias Mt2 = mixin("int");
+const(mixin("int")) globalInt1;
+shared const(mixin("int")) globalInt2;
+const(mixin("int"))[][] globalIntMtx1;
+

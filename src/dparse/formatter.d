@@ -3381,6 +3381,7 @@ class Formatter(Sink)
         IdType typeConstructor;
         Type type;
         TraitsExpression traitsExpression;
+        MixinExpression mixinExpression;
         **/
 
         if (type2.typeIdentifierPart !is null)
@@ -3407,6 +3408,10 @@ class Formatter(Sink)
         else if (type2.traitsExpression)
         {
             format(type2.traitsExpression);
+        }
+        else if (type2.mixinExpression)
+        {
+            format(type2.mixinExpression);
         }
         else
         {
@@ -4138,4 +4143,5 @@ do{}
     testFormatNode!(AliasDeclaration)("alias f(T) = void(T t);");
     testFormatNode!(AliasDeclaration)("alias f(T) = void(int, int, int) const pure nothrow;");
 
+    testFormatNode!(AliasDeclaration)("alias MT = mixin (strEnum1, strEnum2);");
 }

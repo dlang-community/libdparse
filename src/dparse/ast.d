@@ -3133,7 +3133,7 @@ final class Type2 : BaseNode
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(typeofExpression, typeIdentifierPart, type,
-            traitsExpression, vector));
+            traitsExpression, vector, mixinExpression));
     }
 
     /** */ IdType builtinType;
@@ -3144,6 +3144,7 @@ final class Type2 : BaseNode
     /** */ Type type;
     /** */ TraitsExpression traitsExpression;
     /** */ Vector vector;
+    /** */ MixinExpression mixinExpression;
     mixin OpEquals;
 }
 
