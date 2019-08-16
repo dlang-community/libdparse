@@ -2560,54 +2560,6 @@ unittest
 version (iasm64NotWindows)
 {
     /**
-     * Returns:
-     */
-    ushort newlineMask(const ubyte*) pure nothrow @trusted @nogc
-    {
-        asm pure nothrow @nogc
-        {
-            naked;
-            movdqu XMM1, [RDI];
-            mov RAX, 3;
-            mov RDX, 16;
-            mov R8, 0x0d0d0d0d0d0d0d0dL;
-            movq XMM2, R8;
-            shufpd XMM2, XMM2, 0;
-            pcmpeqb XMM2, XMM1;
-            mov R9, 0x0a0a0a0a0a0a0a0aL;
-            movq XMM3, R9;
-            shufpd XMM3, XMM3, 0;
-            pcmpeqb XMM3, XMM1;
-            mov R10, 0xe280a8L;
-            movq XMM4, R10;
-            pcmpestrm XMM4, XMM1, 0b01001100;
-            movdqa XMM4, XMM0;
-            mov R11, 0xe280a9L;
-            movq XMM5, R11;
-            pcmpestrm XMM5, XMM1, 0b01001100;
-            movdqa XMM5, XMM0;
-            mov RCX, 0x0a0d;
-            dec RAX;
-            movq XMM6, RCX;
-            pcmpestrm XMM6, XMM1, 0b01001100;
-            movdqa XMM6, XMM0;
-            movdqa XMM7, XMM6;
-            pslldq XMM7, 1;
-            movdqa XMM0, XMM4;
-            por XMM0, XMM5;
-            por XMM7, XMM6;
-            movdqa XMM1, XMM2;
-            por XMM1, XMM3;
-            pxor XMM7, XMM1;
-            por XMM7, XMM0;
-            por XMM7, XMM6;
-            pmovmskb RAX, XMM7;
-            and RAX, 0b0011_1111_1111_1111;
-            ret;
-        }
-    }
-
-    /**
      * Skips between 0 and 16 bytes that match (or do not match) one of the
      * given $(B chars).
      */
