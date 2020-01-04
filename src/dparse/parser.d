@@ -2318,22 +2318,30 @@ class Parser
                     error("no identifier for declarator");
                 return null;
             }
-            const b2 = setBookmark();
-            auto savedComment = comment;
-            node.variableDeclaration = parseVariableDeclaration(t, false);
-            if (node.variableDeclaration is null)
+            if (peekIs(tok!"("))
             {
-                goToBookmark(b2);
-                if (savedComment && comment is null)
-                    comment = savedComment;
-                node.functionDeclaration = parseFunctionDeclaration(t, false);
+                // here we can have either
+                //   ident (TemplateParams)(FuncParams)
+                //   ident (TemplateParams) = Initializer;
+                const b2 = setBookmark();
+                auto savedComment = comment;
+                node.variableDeclaration = parseVariableDeclaration(t, false);
+                if (node.variableDeclaration is null)
+                {
+                    goToBookmark(b2);
+                    if (savedComment && comment is null)
+                        comment = savedComment;
+                    node.functionDeclaration = parseFunctionDeclaration(t, false);
+                }
+                else abandonBookmark(b2);
+                if (!node.variableDeclaration && !node.functionDeclaration)
+                {
+                    error("invalid variable declaration or function declaration", false);
+                    return null;
+                }
             }
-            else abandonBookmark(b2);
-            if (!node.variableDeclaration && !node.functionDeclaration)
-            {
-                error("invalid variable declaration or function declaration", false);
-                return null;
-            }
+            else
+                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(t, false)`);
             break;
         case tok!"version":
             if (peekIs(tok!"("))
