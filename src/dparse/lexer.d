@@ -1851,32 +1851,32 @@ in
 }
 do
 {
-    import std.string : lineSplitter, stripRight, KeepTerminator;
+    import std.string : chompPrefix, KeepTerminator, lineSplitter, stripRight;
 
     string leadingChars;
 
-	enum LineType { none, normal, strange }
-	LineType prevLineType;
+    enum LineType { none, normal, strange }
+    LineType prevLineType;
 
     switch (comment[0 .. 3])
     {
     case "///":
         foreach (line; lineSplitter!(KeepTerminator.yes)(comment))
         {
-			immutable LineType currentLineType = line.endsWith("\n")
-					|| line.endsWith("\r")
-					|| line.endsWith("\u2029")
-					|| line.endsWith("\u2030")
-				? LineType.normal
-				: LineType.strange;
-			if (prevLineType == LineType.strange)
-			{
-				outputRange.put(line);
-				prevLineType = currentLineType;
-				break;
-			}
-			else
-				prevLineType = currentLineType;
+            immutable LineType currentLineType = line.endsWith("\n")
+                    || line.endsWith("\r")
+                    || line.endsWith("\u2028")
+                    || line.endsWith("\u2029")
+                ? LineType.normal
+                : LineType.strange;
+            if (prevLineType == LineType.strange)
+            {
+                outputRange.put(line);
+                prevLineType = currentLineType;
+                continue;
+            }
+            else
+                prevLineType = currentLineType;
             auto l = line[3 .. $];
             if (leadingChars.empty)
             {
@@ -1884,10 +1884,7 @@ do
                 while (k < l.length && (l[k] == ' ' || l[k] == '\t')) k++;
                 leadingChars = l[0 .. k];
             }
-            if (l.length >= leadingChars.length && l.startsWith(leadingChars))
-                outputRange.put(l[leadingChars.length .. $]);
-            else
-                outputRange.put(l);
+            outputRange.put(l.chompPrefix(leadingChars));
         }
         break;
     case "/++":
