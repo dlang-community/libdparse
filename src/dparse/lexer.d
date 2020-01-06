@@ -1851,20 +1851,32 @@ in
 }
 do
 {
-    import std.string : lineSplitter, stripRight;
+    import std.string : lineSplitter, stripRight, KeepTerminator;
 
     string leadingChars;
-    size_t i = 3;
-    size_t j;
-    bool hasOutput = false;
-    bool lastWasBlank = false;
+
+	enum LineType { none, normal, strange }
+	LineType prevLineType;
+
     switch (comment[0 .. 3])
     {
     case "///":
-        j = comment.length;
-
-        foreach (line; lineSplitter(comment))
+        foreach (line; lineSplitter!(KeepTerminator.yes)(comment))
         {
+			immutable LineType currentLineType = line.endsWith("\n")
+					|| line.endsWith("\r")
+					|| line.endsWith("\u2029")
+					|| line.endsWith("\u2030")
+				? LineType.normal
+				: LineType.strange;
+			if (prevLineType == LineType.strange)
+			{
+				outputRange.put(line);
+				prevLineType = currentLineType;
+				break;
+			}
+			else
+				prevLineType = currentLineType;
             auto l = line[3 .. $];
             if (leadingChars.empty)
             {
@@ -1872,15 +1884,10 @@ do
                 while (k < l.length && (l[k] == ' ' || l[k] == '\t')) k++;
                 leadingChars = l[0 .. k];
             }
-            immutable string stripped = l.stripRight();
-            if (hasOutput)
-                outputRange.put('\n');
+            if (l.length >= leadingChars.length && l.startsWith(leadingChars))
+                outputRange.put(l[leadingChars.length .. $]);
             else
-                hasOutput = true;
-            if (stripped.length >= leadingChars.length && stripped.startsWith(leadingChars))
-                outputRange.put(stripped[leadingChars.length .. $]);
-            else
-                outputRange.put(stripped);
+                outputRange.put(l);
         }
         break;
     case "/++":
