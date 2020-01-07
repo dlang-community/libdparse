@@ -1863,28 +1863,14 @@ do
     case "///":
         foreach (line; lineSplitter!(KeepTerminator.yes)(comment))
         {
-            immutable LineType currentLineType = line.endsWith("\n")
-                    || line.endsWith("\r")
-                    || line.endsWith("\u2028")
-                    || line.endsWith("\u2029")
-                ? LineType.normal
-                : LineType.strange;
-            if (prevLineType == LineType.strange)
-            {
-                outputRange.put(line);
-                prevLineType = currentLineType;
-                continue;
-            }
-            else
-                prevLineType = currentLineType;
-            auto l = line[3 .. $];
             if (leadingChars.empty)
             {
-                size_t k = 0;
-                while (k < l.length && (l[k] == ' ' || l[k] == '\t')) k++;
-                leadingChars = l[0 .. k];
+                size_t k = 3;
+                while (k < line.length && (line[k] == ' ' || line[k] == '\t'))
+                    k++;
+                leadingChars = line[0 .. k];
             }
-            outputRange.put(l.chompPrefix(leadingChars));
+            outputRange.put(line.chompPrefix(leadingChars));
         }
         break;
     case "/++":
@@ -1928,6 +1914,7 @@ unittest
         "/**b1\n*b2\n*b3*/",
         "/**c1\n    *c2\n    *c3*/",
         "/**d1\n    *d2\n    *d3\n*/",
+        "///a\fbc\n///def"
     ];
     string[] outputs = [
         "",
@@ -1952,6 +1939,7 @@ unittest
         "b1\nb2\nb3",
         "c1\nc2\nc3",
         "d1\nd2\nd3",
+        "a\fbc\ndef"
     ];
 
     // tests where * and + are not interchangeable
