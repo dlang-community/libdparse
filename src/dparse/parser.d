@@ -2402,7 +2402,7 @@ class Parser
                 if (currentIs(tok!"}") && index > 0 && previous == tok!".")
                     break;
 
-                if (suppressMessages > 0)
+                if (!suppressMessages.empty)
                     return null;
 
                 // better for DCD, if the end of the block is reached then
@@ -6260,19 +6260,31 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        if (suppressedErrorCount > MAX_ERRORS) return null;
+        auto p = index in cachedTypeChecks;
         auto node = allocator.make!TemplateArgument;
-        immutable b = setBookmark();
-        auto t = parseType();
-        if (t !is null && currentIsOneOf(tok!",", tok!")"))
+        if (p !is null)
         {
-            abandonBookmark(b);
-            node.type = t;
+            if (*p)
+                node.type = parseType();
+            else
+                mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
         }
         else
         {
-            goToBookmark(b);
-            mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+            immutable b = setBookmark();
+            auto t = parseType();
+            if (t !is null && currentIsOneOf(tok!",", tok!")"))
+            {
+                cachedTypeChecks[startIndex] = true;
+                abandonBookmark(b);
+                node.type = t;
+            }
+            else
+            {
+                cachedTypeChecks[startIndex] = false;
+                goToBookmark(b);
+                mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+            }
         }
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -6302,7 +6314,6 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        if (suppressedErrorCount > MAX_ERRORS) return null;
         auto node = allocator.make!TemplateArguments;
         expect(tok!"!");
         if (currentIs(tok!"("))
@@ -6367,7 +6378,6 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        if (suppressedErrorCount > MAX_ERRORS) return null;
         auto node = allocator.make!TemplateInstance;
         const ident = expect(tok!"identifier");
         mixin(nullCheck!`ident`);
@@ -7642,8 +7652,6 @@ class Parser
 
 protected: final:
 
-    uint suppressedErrorCount;
-
     enum MAX_ERRORS = 500;
 
     void ownArray(T)(ref T[] arr, ref StackBuffer sb)
@@ -7716,7 +7724,7 @@ protected: final:
         other
     }
 
-    DecType isAutoDeclaration(ref size_t beginIndex) nothrow @nogc @safe
+    DecType isAutoDeclaration(ref size_t beginIndex) nothrow @safe
     {
         immutable b = setBookmark();
         scope(exit) goToBookmark(b);
@@ -8107,7 +8115,7 @@ protected: final:
     void warn(lazy string message)
     {
         import std.stdio : stderr;
-        if (suppressMessages > 0)
+        if (!suppressMessages.empty)
             return;
         ++warningCount;
         auto column = index < tokens.length ? tokens[index].column : 0;
@@ -8123,7 +8131,7 @@ protected: final:
     void error(string message, bool shouldAdvance = true)
     {
         import std.stdio : stderr;
-        if (suppressMessages == 0)
+        if (suppressMessages.empty)
         {
             ++errorCount;
             auto column = index < tokens.length ? tokens[index].column : tokens[$ - 1].column;
@@ -8136,7 +8144,7 @@ protected: final:
                 stderr.writefln("%s(%d:%d)[error]: %s", fileName, line, column, message);
         }
         else
-            ++suppressedErrorCount;
+            ++suppressMessages[$ - 1];
         while (shouldAdvance && moreTokens())
         {
             if (currentIsOneOf(tok!";", tok!"}",
@@ -8330,25 +8338,21 @@ protected: final:
 
     alias Bookmark = size_t;
 
-    Bookmark setBookmark() pure nothrow @safe @nogc
+    Bookmark setBookmark() pure nothrow @safe
     {
 //        mixin(traceEnterAndExit!(__FUNCTION__));
-        ++suppressMessages;
+        suppressMessages ~= suppressedErrorCount();
         return index;
     }
 
     void abandonBookmark(Bookmark) pure nothrow @safe @nogc
     {
-        --suppressMessages;
-        if (suppressMessages == 0)
-            suppressedErrorCount = 0;
+        suppressMessages.popBack();
     }
 
     void goToBookmark(Bookmark bookmark) pure nothrow @safe @nogc
     {
-        --suppressMessages;
-        if (suppressMessages == 0)
-            suppressedErrorCount = 0;
+        suppressMessages.popBack();
         index = bookmark;
     }
 
@@ -8559,9 +8563,15 @@ protected: final:
         return node;
     }
 
-    int suppressMessages;
+    uint suppressedErrorCount() const pure nothrow @nogc @safe
+    {
+        return suppressMessages.empty ? 0 : suppressMessages.back();
+    }
+
+    uint[] suppressMessages;
     size_t index;
     int _traceDepth;
     string comment;
     bool[typeof(Token.index)] cachedAAChecks;
+    bool[typeof(Token.index)] cachedTypeChecks;
 }
