@@ -8414,7 +8414,7 @@ protected: final:
         import std.stdio : stderr;
         void trace(string message)
         {
-            if (suppressMessages > 0)
+            if (!suppressMessages.empty)
                 return;
             auto depth = format("%4d ", _traceDepth);
             if (index < tokens.length)
