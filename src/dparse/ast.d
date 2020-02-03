@@ -894,6 +894,7 @@ final class AtAttribute : BaseNode
     /** */ ArgumentList argumentList;
     /** */ TemplateInstance templateInstance;
     /** */ Token identifier;
+    /** */ bool useParen;
     /** */ size_t startLocation;
     /** */ size_t endLocation;
     mixin OpEquals;
@@ -1149,6 +1150,8 @@ final class ConditionalDeclaration : BaseNode
     /** */ Declaration[] trueDeclarations;
     /** */ Declaration[] falseDeclarations;
     /** */ bool hasElse;
+    /** */ bool useBraceForTrueDeclarations;
+    /** */ bool useBraceForFalseDeclarations;
     mixin OpEquals;
 }
 
@@ -1619,6 +1622,7 @@ final class Foreach(bool declOnly) : BaseNode
     /** */ ForeachType foreachType;
     /** */ Expression low;
     /** */ Expression high;
+    /** */ bool useBrace;
     /** */ size_t startIndex;
     static if (declOnly)
         /** */ Declaration[] declarations;
@@ -2045,6 +2049,7 @@ final class Invariant : BaseNode
     }
     /** */ BlockStatement blockStatement;
     /** */ AssertArguments assertArguments;
+    /** */ bool useParen;
     /** */ string comment;
     size_t line;
     size_t index;
@@ -2640,6 +2645,7 @@ final class SpecifiedFunctionBody : BaseNode
     }
     /** */ FunctionContract[] functionContracts;
     /** */ BlockStatement blockStatement;
+    /** */ bool hasDo;
     mixin OpEquals;
 }
 

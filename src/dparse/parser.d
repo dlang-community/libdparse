@@ -1113,6 +1113,7 @@ class Parser
             if (currentIs(tok!"("))
             {
                 advance(); // (
+                node.useParen = true;
                 if (!currentIs(tok!")"))
                     mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
                 expect(tok!")");
@@ -1120,6 +1121,7 @@ class Parser
             break;
         case tok!"(":
             advance();
+            node.useParen = true;
             mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
             expect(tok!")");
             break;
@@ -1770,6 +1772,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = advance() == tok!"{";
+            node.useBraceForTrueDeclarations = brace;
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 immutable c = allocator.setCheckpoint();
@@ -1802,6 +1805,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = currentIs(tok!"{");
+            node.useBraceForFalseDeclarations = brace;
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
                 if (!falseDeclarations.put(parseDeclaration(strict, true)))
@@ -3170,6 +3174,7 @@ class Parser
             if (currentIs(tok!"{"))
             {
                 advance();
+                node.useBrace = true;
                 while (moreTokens() && !currentIs(tok!"}"))
                 {
                     immutable b = setBookmark();
@@ -4225,6 +4230,7 @@ class Parser
         if (currentIs(tok!"(") && peekIs(tok!")"))
         {
             mustHaveBlock = true;
+            node.useParen = true;
             advance();
             advance();
         }
@@ -4240,6 +4246,7 @@ class Parser
         else if (!mustHaveBlock && currentIs(tok!"("))
         {
             advance();
+            node.useParen = true;
             mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
             mixin(tokenCheck!")");
             mixin(tokenCheck!";");
