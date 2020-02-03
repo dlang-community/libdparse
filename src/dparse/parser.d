@@ -5284,7 +5284,7 @@ class Parser
         case tok!"inout":
         case tok!"shared":
             {
-                advance();
+                node.typeConstructor = advance();
                 expect(tok!"(");
                 mixin(parseNodeQ!(`node.type`, `Type`));
                 expect(tok!")");
