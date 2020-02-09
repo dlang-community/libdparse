@@ -72,9 +72,12 @@ public:
         }
         else
             assert(contains(point), "Attepmted to roll back to a point not in the allocator.");
+
+        // while `first !is null` is always going to pass after the contains(point) check, it may no longer pass after deallocateNode
         while (first !is null && !first.contains(point))
             deallocateNode();
         assert(first !is null);
+
         immutable begin = point - cast(size_t) first.mem.ptr;
         version (debug_rollback_allocator)
             (cast(ubyte[]) first.mem)[begin .. $] = 0;
