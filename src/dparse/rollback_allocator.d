@@ -66,7 +66,7 @@ public:
         }
         else
             assert(contains(point), "Attepmted to roll back to a point not in the allocator.");
-        while (!first.contains(point))
+        while (first !is null && !first.contains(point))
             deallocateNode();
         assert(first !is null);
         immutable begin = point - cast(size_t) first.mem.ptr;
@@ -122,7 +122,7 @@ private:
 
         bool contains(size_t p) const pure nothrow @nogc @safe
         {
-            return p >= cast(size_t) mem.ptr && p <= cast(size_t) mem.ptr + mem.length;
+            return p >= cast(size_t) mem.ptr && p < cast(size_t) mem.ptr + mem.length;
         }
     }
 
