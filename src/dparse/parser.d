@@ -5610,6 +5610,8 @@ class Parser
         }
         ownArray(node.functionContracts, contracts);
 
+        node.hasDo = currentIs(tok!"do");
+
         if (currentIs(tok!"do")
                 || (currentIs(tok!"identifier") && current.text == "body"))
         {
