@@ -1625,12 +1625,16 @@ final class Foreach(bool declOnly) : BaseNode
     /** */ ForeachType foreachType;
     /** */ Expression low;
     /** */ Expression high;
-    /** */ StatementBlockStyle style;
     /** */ size_t startIndex;
     static if (declOnly)
+    {
         /** */ Declaration[] declarations;
+        /** */ DeclarationListStyle style;
+    }
     else
+    {
         /** */ DeclarationOrStatement declarationOrStatement;
+    }
     mixin OpEquals;
 }
 
