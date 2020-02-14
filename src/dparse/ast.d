@@ -75,6 +75,9 @@ shared static this()
     typeMap[typeid(XorExpression)] = 48;
 }
 
+/// Statement block style
+enum StatementBlockStyle : ubyte { single, colon, block }
+
 /**
  * Implements the $(LINK2 http://en.wikipedia.org/wiki/Visitor_pattern, Visitor Pattern)
  * for the various AST classes
@@ -1150,8 +1153,8 @@ final class ConditionalDeclaration : BaseNode
     /** */ Declaration[] trueDeclarations;
     /** */ Declaration[] falseDeclarations;
     /** */ bool hasElse;
-    /** */ bool useBraceForTrueDeclarations;
-    /** */ bool useBraceForFalseDeclarations;
+    /** */ StatementBlockStyle trueStyle;
+    /** */ StatementBlockStyle falseStyle;
     mixin OpEquals;
 }
 
@@ -1622,7 +1625,7 @@ final class Foreach(bool declOnly) : BaseNode
     /** */ ForeachType foreachType;
     /** */ Expression low;
     /** */ Expression high;
-    /** */ bool useBrace;
+    /** */ StatementBlockStyle style;
     /** */ size_t startIndex;
     static if (declOnly)
         /** */ Declaration[] declarations;
