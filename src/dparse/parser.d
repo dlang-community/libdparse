@@ -1772,7 +1772,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = advance() == tok!"{";
-            node.trueStyle = currentIs(tok!":") ? StatementBlockStyle.colon : brace ? StatementBlockStyle.block : StatementBlockStyle.single;
+            node.trueStyle = currentIs(tok!":") ? DeclarationListStyle.colon : brace ? DeclarationListStyle.block : DeclarationListStyle.single;
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 immutable c = allocator.setCheckpoint();
@@ -1805,7 +1805,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = currentIs(tok!"{");
-            node.falseStyle = currentIs(tok!":") ? StatementBlockStyle.colon : brace ? StatementBlockStyle.block : StatementBlockStyle.single;
+            node.falseStyle = currentIs(tok!":") ? DeclarationListStyle.colon : brace ? DeclarationListStyle.block : DeclarationListStyle.single;
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
                 if (!falseDeclarations.put(parseDeclaration(strict, true)))
@@ -3170,7 +3170,7 @@ class Parser
         }
         static if (declOnly)
         {
-            node.style = currentIs(tok!"{") ? StatementBlockStyle.block : StatementBlockStyle.single;
+            node.style = currentIs(tok!"{") ? DeclarationListStyle.block : DeclarationListStyle.single;
             StackBuffer declarations;
             if (currentIs(tok!"{"))
             {

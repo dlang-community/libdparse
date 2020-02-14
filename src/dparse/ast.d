@@ -75,8 +75,16 @@ shared static this()
     typeMap[typeid(XorExpression)] = 48;
 }
 
-/// Statement block style
-enum StatementBlockStyle : ubyte { single, colon, block }
+/// Describes which syntax was used in a list of declarations in the containing AST node
+enum DeclarationListStyle : ubyte
+{
+	/// A declaration directly after the containing AST node making it the only child
+	single,
+	/// A colon (`:`) was used in the containing AST node meaning all following declarations are part here.
+	colon,
+	/// The declarations have been specified in a block denoted by starting `{` and ending `}` tokens.
+	block
+}
 
 /**
  * Implements the $(LINK2 http://en.wikipedia.org/wiki/Visitor_pattern, Visitor Pattern)
@@ -1153,8 +1161,8 @@ final class ConditionalDeclaration : BaseNode
     /** */ Declaration[] trueDeclarations;
     /** */ Declaration[] falseDeclarations;
     /** */ bool hasElse;
-    /** */ StatementBlockStyle trueStyle;
-    /** */ StatementBlockStyle falseStyle;
+    /** */ DeclarationListStyle trueStyle;
+    /** */ DeclarationListStyle falseStyle;
     mixin OpEquals;
 }
 
