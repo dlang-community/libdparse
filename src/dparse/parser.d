@@ -520,6 +520,11 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
+        if (!moreTokens)
+        {
+            error("Found end-of-file when expecting an AsmBrExp", false);
+            return null;
+        }
         AsmBrExp node = allocator.make!AsmBrExp();
         size_t line = current.line;
         size_t column = current.column;
@@ -626,7 +631,8 @@ class Parser
                 if (!currentIs(tok!";"))
                 {
                     error("`;` expected.");
-                    advance();
+                    if (moreTokens())
+                        advance();
                     return null;
                 }
             }
@@ -819,7 +825,7 @@ class Parser
             }
         }
         ownArray(node.functionAttributes, functionAttributes);
-        advance(); // {
+        expect(tok!"{");
         StackBuffer instructions;
         while (moreTokens() && !currentIs(tok!"}"))
         {
@@ -7674,6 +7680,8 @@ protected: final:
 
     bool isCastQualifier() const
     {
+        if (!moreTokens())
+            return false;
         switch (current.type)
         {
         case tok!"const":
@@ -7696,6 +7704,8 @@ protected: final:
     bool isAssociativeArrayLiteral()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
+        if (!moreTokens())
+            return false;
         if (auto p = current.index in cachedAAChecks)
             return *p;
         size_t currentIndex = current.index;
@@ -7770,7 +7780,7 @@ protected: final:
                     advance();
                     if (currentIs(tok!"("))
                         skipParens();
-                    else
+                    else if (moreTokens())
                         advance();
                 }
                 if (currentIs(tok!"("))
