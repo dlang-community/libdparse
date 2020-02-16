@@ -75,6 +75,17 @@ shared static this()
     typeMap[typeid(XorExpression)] = 48;
 }
 
+/// Describes which syntax was used in a list of declarations in the containing AST node
+enum DeclarationListStyle : ubyte
+{
+	/// A declaration directly after the containing AST node making it the only child
+	single,
+	/// A colon (`:`) was used in the containing AST node meaning all following declarations are part here.
+	colon,
+	/// The declarations have been specified in a block denoted by starting `{` and ending `}` tokens.
+	block
+}
+
 /**
  * Implements the $(LINK2 http://en.wikipedia.org/wiki/Visitor_pattern, Visitor Pattern)
  * for the various AST classes
@@ -894,6 +905,7 @@ final class AtAttribute : BaseNode
     /** */ ArgumentList argumentList;
     /** */ TemplateInstance templateInstance;
     /** */ Token identifier;
+    /** */ bool useParen;
     /** */ size_t startLocation;
     /** */ size_t endLocation;
     mixin OpEquals;
@@ -1149,6 +1161,8 @@ final class ConditionalDeclaration : BaseNode
     /** */ Declaration[] trueDeclarations;
     /** */ Declaration[] falseDeclarations;
     /** */ bool hasElse;
+    /** */ DeclarationListStyle trueStyle;
+    /** */ DeclarationListStyle falseStyle;
     mixin OpEquals;
 }
 
@@ -1621,9 +1635,14 @@ final class Foreach(bool declOnly) : BaseNode
     /** */ Expression high;
     /** */ size_t startIndex;
     static if (declOnly)
+    {
         /** */ Declaration[] declarations;
+        /** */ DeclarationListStyle style;
+    }
     else
+    {
         /** */ DeclarationOrStatement declarationOrStatement;
+    }
     mixin OpEquals;
 }
 
@@ -2045,6 +2064,7 @@ final class Invariant : BaseNode
     }
     /** */ BlockStatement blockStatement;
     /** */ AssertArguments assertArguments;
+    /** */ bool useParen;
     /** */ string comment;
     size_t line;
     size_t index;
@@ -2640,6 +2660,7 @@ final class SpecifiedFunctionBody : BaseNode
     }
     /** */ FunctionContract[] functionContracts;
     /** */ BlockStatement blockStatement;
+    /** */ bool hasDo;
     mixin OpEquals;
 }
 

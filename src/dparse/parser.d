@@ -1113,6 +1113,7 @@ class Parser
             if (currentIs(tok!"("))
             {
                 advance(); // (
+                node.useParen = true;
                 if (!currentIs(tok!")"))
                     mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
                 expect(tok!")");
@@ -1120,6 +1121,7 @@ class Parser
             break;
         case tok!"(":
             advance();
+            node.useParen = true;
             mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
             expect(tok!")");
             break;
@@ -1770,6 +1772,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = advance() == tok!"{";
+            node.trueStyle = currentIs(tok!":") ? DeclarationListStyle.colon : brace ? DeclarationListStyle.block : DeclarationListStyle.single;
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 immutable c = allocator.setCheckpoint();
@@ -1802,6 +1805,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = currentIs(tok!"{");
+            node.falseStyle = currentIs(tok!":") ? DeclarationListStyle.colon : brace ? DeclarationListStyle.block : DeclarationListStyle.single;
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
                 if (!falseDeclarations.put(parseDeclaration(strict, true)))
@@ -3166,6 +3170,7 @@ class Parser
         }
         static if (declOnly)
         {
+            node.style = currentIs(tok!"{") ? DeclarationListStyle.block : DeclarationListStyle.single;
             StackBuffer declarations;
             if (currentIs(tok!"{"))
             {
@@ -4225,6 +4230,7 @@ class Parser
         if (currentIs(tok!"(") && peekIs(tok!")"))
         {
             mustHaveBlock = true;
+            node.useParen = true;
             advance();
             advance();
         }
@@ -4240,6 +4246,7 @@ class Parser
         else if (!mustHaveBlock && currentIs(tok!"("))
         {
             advance();
+            node.useParen = true;
             mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
             mixin(tokenCheck!")");
             mixin(tokenCheck!";");
@@ -5602,6 +5609,8 @@ class Parser
             }
         }
         ownArray(node.functionContracts, contracts);
+
+        node.hasDo = currentIs(tok!"do");
 
         if (currentIs(tok!"do")
                 || (currentIs(tok!"identifier") && current.text == "body"))
