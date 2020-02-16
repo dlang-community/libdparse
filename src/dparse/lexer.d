@@ -1851,36 +1851,26 @@ in
 }
 do
 {
-    import std.string : lineSplitter, stripRight;
+    import std.string : chompPrefix, KeepTerminator, lineSplitter, stripRight;
 
     string leadingChars;
-    size_t i = 3;
-    size_t j;
-    bool hasOutput = false;
-    bool lastWasBlank = false;
+
+    enum LineType { none, normal, strange }
+    LineType prevLineType;
+
     switch (comment[0 .. 3])
     {
     case "///":
-        j = comment.length;
-
-        foreach (line; lineSplitter(comment))
+        foreach (line; lineSplitter!(KeepTerminator.yes)(comment))
         {
-            auto l = line[3 .. $];
             if (leadingChars.empty)
             {
-                size_t k = 0;
-                while (k < l.length && (l[k] == ' ' || l[k] == '\t')) k++;
-                leadingChars = l[0 .. k];
+                size_t k = 3;
+                while (k < line.length && (line[k] == ' ' || line[k] == '\t'))
+                    k++;
+                leadingChars = line[0 .. k];
             }
-            immutable string stripped = l.stripRight();
-            if (hasOutput)
-                outputRange.put('\n');
-            else
-                hasOutput = true;
-            if (stripped.length >= leadingChars.length && stripped.startsWith(leadingChars))
-                outputRange.put(stripped[leadingChars.length .. $]);
-            else
-                outputRange.put(stripped);
+            outputRange.put(line.chompPrefix(leadingChars));
         }
         break;
     case "/++":
@@ -1924,6 +1914,7 @@ unittest
         "/**b1\n*b2\n*b3*/",
         "/**c1\n    *c2\n    *c3*/",
         "/**d1\n    *d2\n    *d3\n*/",
+        "///a\fbc\n///def"
     ];
     string[] outputs = [
         "",
@@ -1948,6 +1939,7 @@ unittest
         "b1\nb2\nb3",
         "c1\nc2\nc3",
         "d1\nd2\nd3",
+        "a\fbc\ndef"
     ];
 
     // tests where * and + are not interchangeable
