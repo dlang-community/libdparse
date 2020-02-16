@@ -520,12 +520,12 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        AsmBrExp node = allocator.make!AsmBrExp();
         if (!moreTokens)
         {
             error("Found end-of-file when expecting an AsmBrExp", false);
             return null;
         }
+        AsmBrExp node = allocator.make!AsmBrExp();
         size_t line = current.line;
         size_t column = current.column;
         if (currentIs(tok!"["))
