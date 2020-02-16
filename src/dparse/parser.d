@@ -1113,6 +1113,7 @@ class Parser
             if (currentIs(tok!"("))
             {
                 advance(); // (
+                node.useParen = true;
                 if (!currentIs(tok!")"))
                     mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
                 expect(tok!")");
@@ -1120,6 +1121,7 @@ class Parser
             break;
         case tok!"(":
             advance();
+            node.useParen = true;
             mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
             expect(tok!")");
             break;
@@ -1770,6 +1772,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = advance() == tok!"{";
+            node.trueStyle = currentIs(tok!":") ? DeclarationListStyle.colon : brace ? DeclarationListStyle.block : DeclarationListStyle.single;
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 immutable c = allocator.setCheckpoint();
@@ -1802,6 +1805,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = currentIs(tok!"{");
+            node.falseStyle = currentIs(tok!":") ? DeclarationListStyle.colon : brace ? DeclarationListStyle.block : DeclarationListStyle.single;
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
                 if (!falseDeclarations.put(parseDeclaration(strict, true)))
@@ -2402,7 +2406,7 @@ class Parser
                 if (currentIs(tok!"}") && index > 0 && previous == tok!".")
                     break;
 
-                if (suppressMessages > 0)
+                if (!suppressMessages.empty)
                     return null;
 
                 // better for DCD, if the end of the block is reached then
@@ -3166,6 +3170,7 @@ class Parser
         }
         static if (declOnly)
         {
+            node.style = currentIs(tok!"{") ? DeclarationListStyle.block : DeclarationListStyle.single;
             StackBuffer declarations;
             if (currentIs(tok!"{"))
             {
@@ -4225,6 +4230,7 @@ class Parser
         if (currentIs(tok!"(") && peekIs(tok!")"))
         {
             mustHaveBlock = true;
+            node.useParen = true;
             advance();
             advance();
         }
@@ -4240,6 +4246,7 @@ class Parser
         else if (!mustHaveBlock && currentIs(tok!"("))
         {
             advance();
+            node.useParen = true;
             mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
             mixin(tokenCheck!")");
             mixin(tokenCheck!";");
@@ -5284,7 +5291,7 @@ class Parser
         case tok!"inout":
         case tok!"shared":
             {
-                advance();
+                node.typeConstructor = advance();
                 expect(tok!"(");
                 mixin(parseNodeQ!(`node.type`, `Type`));
                 expect(tok!")");
@@ -5602,6 +5609,8 @@ class Parser
             }
         }
         ownArray(node.functionContracts, contracts);
+
+        node.hasDo = currentIs(tok!"do");
 
         if (currentIs(tok!"do")
                 || (currentIs(tok!"identifier") && current.text == "body"))
@@ -6260,19 +6269,31 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        if (suppressedErrorCount > MAX_ERRORS) return null;
+        auto p = index in cachedTypeChecks;
         auto node = allocator.make!TemplateArgument;
-        immutable b = setBookmark();
-        auto t = parseType();
-        if (t !is null && currentIsOneOf(tok!",", tok!")"))
+        if (p !is null)
         {
-            abandonBookmark(b);
-            node.type = t;
+            if (*p)
+                node.type = parseType();
+            else
+                mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
         }
         else
         {
-            goToBookmark(b);
-            mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+            immutable b = setBookmark();
+            auto t = parseType();
+            if (t !is null && currentIsOneOf(tok!",", tok!")"))
+            {
+                cachedTypeChecks[startIndex] = true;
+                abandonBookmark(b);
+                node.type = t;
+            }
+            else
+            {
+                cachedTypeChecks[startIndex] = false;
+                goToBookmark(b);
+                mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
+            }
         }
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -6302,7 +6323,6 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        if (suppressedErrorCount > MAX_ERRORS) return null;
         auto node = allocator.make!TemplateArguments;
         expect(tok!"!");
         if (currentIs(tok!"("))
@@ -6367,7 +6387,6 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        if (suppressedErrorCount > MAX_ERRORS) return null;
         auto node = allocator.make!TemplateInstance;
         const ident = expect(tok!"identifier");
         mixin(nullCheck!`ident`);
@@ -7642,8 +7661,6 @@ class Parser
 
 protected: final:
 
-    uint suppressedErrorCount;
-
     enum MAX_ERRORS = 500;
 
     void ownArray(T)(ref T[] arr, ref StackBuffer sb)
@@ -7716,7 +7733,7 @@ protected: final:
         other
     }
 
-    DecType isAutoDeclaration(ref size_t beginIndex) nothrow @nogc @safe
+    DecType isAutoDeclaration(ref size_t beginIndex) nothrow @safe
     {
         immutable b = setBookmark();
         scope(exit) goToBookmark(b);
@@ -8107,7 +8124,7 @@ protected: final:
     void warn(lazy string message)
     {
         import std.stdio : stderr;
-        if (suppressMessages > 0)
+        if (!suppressMessages.empty)
             return;
         ++warningCount;
         auto column = index < tokens.length ? tokens[index].column : 0;
@@ -8123,7 +8140,7 @@ protected: final:
     void error(string message, bool shouldAdvance = true)
     {
         import std.stdio : stderr;
-        if (suppressMessages == 0)
+        if (suppressMessages.empty)
         {
             ++errorCount;
             auto column = index < tokens.length ? tokens[index].column : tokens[$ - 1].column;
@@ -8136,7 +8153,7 @@ protected: final:
                 stderr.writefln("%s(%d:%d)[error]: %s", fileName, line, column, message);
         }
         else
-            ++suppressedErrorCount;
+            ++suppressMessages[$ - 1];
         while (shouldAdvance && moreTokens())
         {
             if (currentIsOneOf(tok!";", tok!"}",
@@ -8330,25 +8347,21 @@ protected: final:
 
     alias Bookmark = size_t;
 
-    Bookmark setBookmark() pure nothrow @safe @nogc
+    Bookmark setBookmark() pure nothrow @safe
     {
 //        mixin(traceEnterAndExit!(__FUNCTION__));
-        ++suppressMessages;
+        suppressMessages ~= suppressedErrorCount();
         return index;
     }
 
     void abandonBookmark(Bookmark) pure nothrow @safe @nogc
     {
-        --suppressMessages;
-        if (suppressMessages == 0)
-            suppressedErrorCount = 0;
+        suppressMessages.popBack();
     }
 
     void goToBookmark(Bookmark bookmark) pure nothrow @safe @nogc
     {
-        --suppressMessages;
-        if (suppressMessages == 0)
-            suppressedErrorCount = 0;
+        suppressMessages.popBack();
         index = bookmark;
     }
 
@@ -8410,7 +8423,7 @@ protected: final:
         import std.stdio : stderr;
         void trace(string message)
         {
-            if (suppressMessages > 0)
+            if (!suppressMessages.empty)
                 return;
             auto depth = format("%4d ", _traceDepth);
             if (index < tokens.length)
@@ -8559,9 +8572,15 @@ protected: final:
         return node;
     }
 
-    int suppressMessages;
+    uint suppressedErrorCount() const pure nothrow @nogc @safe
+    {
+        return suppressMessages.empty ? 0 : suppressMessages.back();
+    }
+
+    uint[] suppressMessages;
     size_t index;
     int _traceDepth;
     string comment;
     bool[typeof(Token.index)] cachedAAChecks;
+    bool[typeof(Token.index)] cachedTypeChecks;
 }
