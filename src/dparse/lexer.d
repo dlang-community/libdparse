@@ -543,6 +543,31 @@ public struct DLexer
             && _front.type == tok!"whitespace");
     }
 
+    /**
+     * Lexer error/warning message.
+     */
+    static struct Message
+    {
+        /// 1-based line number
+        size_t line;
+        /// 1-based byte offset
+        size_t column;
+        /// Text of the message
+        string message;
+        /// `true` for an error, `false` for a warning
+        bool isError;
+    }
+
+    /**
+     * Returns: An array of all of the warnings and errors generated so far
+     *     during lexing. It may make sense to only check this when `empty`
+     *     returns `true`.
+     */
+    const(Message[]) messages() const @property
+    {
+        return _messages;
+    }
+
 private pure nothrow @safe:
 
     bool isWhitespace()
@@ -1783,24 +1808,16 @@ private pure nothrow @safe:
 
     void error(string message)
     {
-        messages ~= Message(range.line, range.column, message, true);
+        _messages ~= Message(range.line, range.column, message, true);
     }
 
     void warning(string message)
     {
-        messages ~= Message(range.line, range.column, message, false);
-        assert (messages.length > 0);
+        _messages ~= Message(range.line, range.column, message, false);
+        assert (_messages.length > 0);
     }
 
-    static struct Message
-    {
-        size_t line;
-        size_t column;
-        string message;
-        bool isError;
-    }
-
-    Message[] messages;
+    Message[] _messages;
     StringCache* cache;
     LexerConfig config;
     bool haveSSE42;
