@@ -1211,7 +1211,11 @@ private pure nothrow @safe:
             }
             else if (range.bytes[range.index] == '\\')
             {
-                lexEscapeSequence();
+                if (!lexEscapeSequence())
+                {
+                    token = Token.init;
+                    return;
+                }
             }
             else
                 popFrontWhitespaceAware();
@@ -1615,12 +1619,13 @@ private pure nothrow @safe:
             }
             break;
         default:
+            error("Invalid escape sequence");
             while (true)
             {
                 if (range.index >= range.bytes.length)
                 {
                     error("Error: non-terminated character escape sequence.");
-                    return false;
+                    break;
                 }
                 if (range.bytes[range.index] == ';')
                 {
@@ -1632,6 +1637,7 @@ private pure nothrow @safe:
                     range.popFront();
                 }
             }
+            return false;
         }
         return true;
     }
@@ -2646,4 +2652,16 @@ unittest
 
     assertNotThrown!RangeError(getTokensForParser(src1, cf, &ca));
     assertNotThrown!RangeError(getTokensForParser(src2, cf, &ca));
+}
+
+unittest
+{
+    static immutable src = `"\eeee"`;
+
+    LexerConfig cf;
+    StringCache ca = StringCache(16);
+
+    auto l = DLexer(src, cf, &ca);
+    assert(l.front().type == tok!"");
+    assert(!l.messages.empty);
 }
