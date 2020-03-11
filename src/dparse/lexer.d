@@ -2217,6 +2217,9 @@ public:
 
     this(CharType[] text) @safe pure nothrow
     {
+        assert(text.length >= 3 && text[0] == '/',
+            "MultiLineCommentHelper text must start with a comment in form /++ or /**");
+
         commentChar = text[1];
         size_t startIndex, i;
         Appender!(char[][]) linesApp;
@@ -2230,9 +2233,11 @@ public:
                 linesApp ~= text[startIndex..endIndexPlusOne].dup;
         }
 
-        while (true)
+        // if we go over text length (in \r\n) we already stored the line, so just exit there
+        while (i < text.length)
         {
-            if (i == text.length - 1)
+            // check if next char is going to be end of text, store until then & break
+            if (i + 1 == text.length)
             {
                 storeLine(text.length);
                 break;
@@ -2242,7 +2247,7 @@ public:
                 storeLine(i);
                 startIndex = i + 1;
             }
-            else if (text[i .. i+2] == "\r\n")
+            else if (i + 1 < text.length && text[i .. i+2] == "\r\n")
             {
                 storeLine(i);
                 i++;
@@ -2276,6 +2281,32 @@ public:
             else empties = true;
         }
     }
+}
+
+unittest
+{
+    import std.conv : to;
+
+    alias SC = MultiLineCommentHelper!(immutable(char));
+
+    // checks full comment processing on the given string and compares the generated lines
+    void check(string comment, string[] lines, size_t lineNo = __LINE__)
+    {
+        auto sc = SC(comment);
+        sc.run();
+        assert(sc.lines == lines, sc.lines.to!string ~ " != " ~ lines.to!string
+            ~ " (for check on line " ~ lineNo.to!string ~ ")");
+    }
+
+    // check common cases while typing
+    check("/++", [""]);
+    check("/++\r", [""]);
+    check("/++\n", [""]);
+    check("/++\r\n", [""]);
+    check("/++\r\n+", ["", "+"]);
+    check("/++\r\n+ ok", ["", "ok"]);
+    check("/++\r\n+ ok\r\n+/", ["", "ok", ""]);
+    check("/++/", [""]);
 }
 
 /**
