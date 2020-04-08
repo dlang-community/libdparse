@@ -255,75 +255,78 @@ template TokenId(IdType, alias staticTokens, alias dynamicTokens,
  */
 struct TokenStructure(IdType, string extraFields = "")
 {
-public pure nothrow @safe @nogc:
-
-    bool opEquals(ref const typeof(this) other) const
+    public pure nothrow @safe @nogc
     {
-        return this.type == other.type && this.text == other.text;
+
+        bool opEquals(ref const typeof(this) other) const
+        {
+            return this.type == other.type && this.text == other.text;
+        }
+
+        /**
+        * Returns: true if the token has the given type, false otherwise.
+        */
+        bool opEquals(IdType type) const
+        {
+            return this.type == type;
+        }
+
+        /**
+        * Constructs a token from a token type.
+        * Params: type = the token type
+        */
+        this(IdType type)
+        {
+            this.type = type;
+        }
+
+        /**
+        * Constructs a token.
+        * Params:
+        *     type = the token type
+        *     text = the text of the token, which may be null
+        *     line = the line number at which this token occurs
+        *     column = the column number at which this token occurs
+        *     index = the byte offset from the beginning of the input at which this
+        *         token occurs
+        */
+        this(IdType type, string text, size_t line, size_t column, size_t index)
+        {
+            this.text = text;
+            this.line = line;
+            this.column = column;
+            this.type = type;
+            this.index = index;
+        }
+
+        /**
+        * The _text of the token.
+        */
+        string text;
+
+        /**
+        * The _line number at which this token occurs.
+        */
+        size_t line;
+
+        /**
+        * The _column number at which this token occurs. This is measured in bytes
+        * and may not be correct when tab characters are involved.
+        */
+        size_t column;
+
+        /**
+        * The byte offset from the beginning of the input at which this token
+        * occurs.
+        */
+        size_t index;
+
+        /**
+        * The token type.
+        */
+        IdType type;
+
     }
-
-    /**
-     * Returns: true if the token has the given type, false otherwise.
-     */
-    bool opEquals(IdType type) const
-    {
-        return this.type == type;
-    }
-
-    /**
-     * Constructs a token from a token type.
-     * Params: type = the token type
-     */
-    this(IdType type)
-    {
-        this.type = type;
-    }
-
-    /**
-     * Constructs a token.
-     * Params:
-     *     type = the token type
-     *     text = the text of the token, which may be null
-     *     line = the line number at which this token occurs
-     *     column = the column number at which this token occurs
-     *     index = the byte offset from the beginning of the input at which this
-     *         token occurs
-     */
-    this(IdType type, string text, size_t line, size_t column, size_t index)
-    {
-        this.text = text;
-        this.line = line;
-        this.column = column;
-        this.type = type;
-        this.index = index;
-    }
-
-    /**
-     * The _text of the token.
-     */
-    string text;
-
-    /**
-     * The _line number at which this token occurs.
-     */
-    size_t line;
-
-    /**
-     * The _column number at which this token occurs. This is measured in bytes
-     * and may not be correct when tab characters are involved.
-     */
-    size_t column;
-
-    /**
-     * The byte offset from the beginning of the input at which this token
-     * occurs.
-     */
-    size_t index;
-
-    /**
-     * The token type.
-     */
-    IdType type;
 
     mixin (extraFields);
 }
