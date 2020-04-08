@@ -2696,3 +2696,70 @@ unittest
     assert(l.front().type == tok!"");
     assert(!l.messages.empty);
 }
+
+// legacy code using compatibility comment and trailingComment
+unittest
+{
+    import std.conv : to;
+    import std.exception : enforce;
+
+    static immutable src = `/// this is a module.
+// mixed
+/// it can do stuff
+module foo.bar;
+
+// hello
+
+/**
+ * some doc
+ * hello
+ */
+int x; /// very nice
+
+// TODO: do stuff
+void main() {
+    #line 40
+    /// could be better
+    writeln(":)");
+}
+
+/// end of file`;
+
+    LexerConfig cf;
+    StringCache ca = StringCache(16);
+
+    const tokens = getTokensForParser(src, cf, &ca);
+
+    void assertEquals(T)(T a, T b, string what, string file = __FILE__, size_t line = __LINE__)
+    {
+        enforce(a == b, "Failed " ~ what ~ " '" ~ a.to!string ~ "' == '" ~ b.to!string ~ "'", file, line);
+    }
+
+    void test(size_t index, IdType type, string comment, string trailingComment,
+            string file = __FILE__, size_t line = __LINE__)
+    {
+        assertEquals(tokens[index].type, type, "type", file, line);
+        assertEquals(tokens[index].comment, comment, "comment", file, line);
+        assertEquals(tokens[index].trailingComment, trailingComment, "trailingComment", file, line);
+    }
+
+    test(0, tok!"module", "this is a module.\nit can do stuff", "");
+    test(1, tok!"identifier", "", "");
+    test(2, tok!".", "", "");
+    test(3, tok!"identifier", "", "");
+    test(4, tok!";", "", "");
+    test(5, tok!"int", "some doc\nhello", "");
+    test(6, tok!"identifier", "", "");
+    test(7, tok!";", "", "very nice");
+    test(8, tok!"void", "", "");
+    test(9, tok!"identifier", "", "");
+    test(10, tok!"(", "", "");
+    test(11, tok!")", "", "");
+    test(12, tok!"{", "", "");
+    test(13, tok!"identifier", "could be better", "");
+    test(14, tok!"(", "", "");
+    test(15, tok!"stringLiteral", "", "");
+    test(16, tok!")", "", "");
+    test(17, tok!";", "", "");
+    test(18, tok!"}", "", "");
+}
