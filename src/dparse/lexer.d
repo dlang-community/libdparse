@@ -119,20 +119,64 @@ public template tok(string token)
     alias tok = TokenId!(IdType, operators, dynamicTokens, keywords, token);
 }
 
-private enum extraFields = q{
-    string comment;
-    string trailingComment;
+mixin template TokenTriviaFields()
+{
+    /**
+     * Whitespace and comment tokens attached to this token.
+     *
+     * All trivia tokens must have the text property set to the text with
+     * which they identify with. This means you can map all trivia tokens to
+     * their .text property and join them together to get the source code back
+     * without any loss of information.
+     *
+     * Trivia is only included when calling getTokensForParser. When iterating
+     * over DLexer all tokens will be in their raw form and none will be
+     * converted to trivia.
+     *
+     * Note: in the future you might need to explicitly pass
+     * WhitespaceBehavior.include (or keep the default) as getTokensForParser
+     * currently overrides it to include.
+     *
+     * Contains: `comment`, `whitespace`, `specialTokenSequence`
+     */
+    const(typeof(this))[] leadingTrivia;
+    /// ditto
+    const(typeof(this))[] trailingTrivia;
 
-    int opCmp(size_t i) const pure nothrow @safe {
+    string memoizedLeadingComment = null;
+    string memoizedTrailingComment = null;
+
+    /// Legacy property to get documentation comments, with comment border
+    /// stripped off, which is attached to this token.
+    string comment() const pure nothrow @safe @property {
+        import dparse.trivia : extractLeadingDdoc;
+        if (memoizedLeadingComment !is null)
+            return memoizedLeadingComment;
+        return (cast()memoizedLeadingComment) = this.extractLeadingDdoc;
+    }
+
+    /// ditto
+    string trailingComment() const pure nothrow @safe @property {
+        import dparse.trivia : extractTrailingDdoc;
+        if (memoizedTrailingComment !is null)
+            return memoizedTrailingComment;
+        return (cast()memoizedTrailingComment) = this.extractTrailingDdoc;
+    }
+
+    int opCmp(size_t i) const pure nothrow @safe @nogc {
         if (index < i) return -1;
         if (index > i) return 1;
         return 0;
     }
 
-    int opCmp(ref const typeof(this) other) const pure nothrow @safe {
+    int opCmp(ref const typeof(this) other) const pure nothrow @safe @nogc {
         return opCmp(other.index);
     }
-};
+}
+
+// mixin in from dparse.lexer to make error messages more managable size as the
+// entire string is dumped when there is a type mismatch.
+private enum extraFields = "import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;";
 
 /// The token type in the D lexer
 public alias Token = std.experimental.lexer.TokenStructure!(IdType, extraFields);
@@ -410,97 +454,61 @@ public bool isLiteral(IdType type) pure nothrow @safe @nogc
 }
 
 /**
- * Returns: an array of tokens lexed from the given source code to the output range. All
- * whitespace tokens are skipped and comments are attached to the token nearest
- * to them.
+ * Returns: an array of tokens lexed from the given source code to the output
+ * range. All whitespace, comment and specialTokenSequence tokens (trivia) are
+ * attached to the token nearest to them.
+ *
+ * Trivia is put on the last token as `trailingTrivia` if it is on the same
+ * line as the trivia, otherwise it will be attached to the next token in the
+ * `leadingTrivia` until there is the EOF, where it will be attached as
+ * `trailingTrivia` again.
  */
 const(Token)[] getTokensForParser(R)(R sourceCode, LexerConfig config, StringCache* cache)
 if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
 {
-    enum CommentType : ubyte
-    {
-        notDoc,
-        line,
-        block
-    }
-
-    static CommentType commentType(string comment) pure nothrow @safe
-    {
-        if (comment.length < 3)
-            return CommentType.notDoc;
-        if (comment[0 ..3] == "///")
-            return CommentType.line;
-        if (comment[0 ..3] == "/++" || comment[0 ..3] == "/**")
-            return CommentType.block;
-        return CommentType.notDoc;
-    }
-
-    config.whitespaceBehavior = WhitespaceBehavior.skip;
+    config.whitespaceBehavior = WhitespaceBehavior.include;
     config.commentBehavior = CommentBehavior.noIntern;
 
-    auto leadingCommentAppender = appender!(char[])();
-    leadingCommentAppender.reserve(1024);
-    auto trailingCommentAppender = appender!(char[])();
-    trailingCommentAppender.reserve(1024);
-    bool hadDdoc;
-    string empty = cache.intern("");
+    auto leadingTriviaAppender = appender!(Token[])();
+    leadingTriviaAppender.reserve(128);
+    auto trailingTriviaAppender = appender!(Token[])();
+    trailingTriviaAppender.reserve(128);
+
     auto output = appender!(typeof(return))();
     auto lexer = DLexer(sourceCode, config, cache);
-    size_t tokenCount;
     loop: while (!lexer.empty) switch (lexer.front.type)
     {
     case tok!"specialTokenSequence":
     case tok!"whitespace":
+    case tok!"comment":
+        if (!output.data.empty && lexer.front.line == output.data[$ - 1].line)
+            trailingTriviaAppender.put(lexer.front);
+        else
+            leadingTriviaAppender.put(lexer.front);
         lexer.popFront();
         break;
-    case tok!"comment":
-        final switch (commentType(lexer.front.text))
-        {
-        case CommentType.block:
-        case CommentType.line:
-            if (tokenCount > 0 && lexer.front.line == output.data[tokenCount - 1].line)
-            {
-                if (!trailingCommentAppender.data.empty)
-                    trailingCommentAppender.put('\n');
-                unDecorateComment(lexer.front.text, trailingCommentAppender);
-                hadDdoc = true;
-            }
-            else
-            {
-                if (!leadingCommentAppender.data.empty)
-                    leadingCommentAppender.put('\n');
-                unDecorateComment(lexer.front.text, leadingCommentAppender);
-                hadDdoc = true;
-            }
-            lexer.popFront();
-            break;
-        case CommentType.notDoc:
-            lexer.popFront();
-            break;
-        }
-        break;
     case tok!"__EOF__":
-        if (!trailingCommentAppender.data.empty)
-            (cast() output.data[$ - 1].trailingComment) = cache.intern(cast(string) trailingCommentAppender.data);
         break loop;
     default:
         Token t = lexer.front;
         lexer.popFront();
-        tokenCount++;
-        if (!output.data.empty && !trailingCommentAppender.data.empty)
-        {
-            (cast() output.data[$ - 1].trailingComment) =
-                cache.intern(cast(string) trailingCommentAppender.data);
-            hadDdoc = false;
-        }
-        t.comment = leadingCommentAppender.data.length > 0
-            ? cache.intern(cast(string) leadingCommentAppender.data) : (hadDdoc ? empty : null);
-        leadingCommentAppender.clear();
-        trailingCommentAppender.clear();
-        hadDdoc = false;
+
+        if (!output.data.empty && !trailingTriviaAppender.data.empty)
+            (cast() output.data[$ - 1].trailingTrivia) = trailingTriviaAppender.data.dup;
+        t.leadingTrivia = leadingTriviaAppender.data.dup;
+        leadingTriviaAppender.clear();
+        trailingTriviaAppender.clear();
+
         output.put(t);
         break;
     }
+
+    if (!output.data.empty)
+    {
+        trailingTriviaAppender.put(leadingTriviaAppender.data);
+        (cast() output.data[$ - 1].trailingTrivia) = trailingTriviaAppender.data.dup;
+    }
+
     return output.data;
 }
 

@@ -507,3 +507,190 @@ unittest
     check("/++\r\n+ ok\r\n+/", ["", "ok", ""]);
     check("/++/", [""]);
 }
+
+/// Extracts and combines ddoc comments from trivia comments.
+string extractDdocFromTrivia(Tokens)(Tokens tokens) pure nothrow @safe
+    if (isInputRange!Tokens && is(ElementType!Tokens : Token))
+{
+    auto ret = appender!string;
+    foreach (trivia; tokens)
+    {
+        if (trivia.type == tok!"comment"
+            && trivia.text.determineCommentType.isDocComment)
+        {
+            if (!ret.data.empty)
+                ret.put('\n');
+            unDecorateComment(trivia.text, ret);
+        }
+    }
+    return ret.data;
+}
+
+string extractLeadingDdoc(const Token token) pure nothrow @safe
+{
+    return extractDdocFromTrivia(token.leadingTrivia);
+}
+
+string extractTrailingDdoc(const Token token) pure nothrow @safe
+{
+    return extractDdocFromTrivia(token.trailingTrivia.filter!(a => a.line == token.line));
+}
+
+// test token trivia members
+unittest
+{
+    import std.conv : to;
+    import std.exception : enforce;
+
+    static immutable src = `/// this is a module.
+// mixed
+/// it can do stuff
+module foo.bar;
+
+// hello
+
+/**
+ * some doc
+ * hello
+ */
+int x; /// very nice
+
+// TODO: do stuff
+void main() {
+    #line 40
+    /// could be better
+    writeln(":)");
+}
+
+/// end of file`;
+
+    LexerConfig cf;
+    StringCache ca = StringCache(16);
+
+    const tokens = getTokensForParser(src, cf, &ca);
+
+    assert(tokens.length == 19);
+
+    assert(tokens[0].type == tok!"module");
+    assert(tokens[0].leadingTrivia.length == 6);
+    assert(tokens[0].leadingTrivia[0].type == tok!"comment");
+    assert(tokens[0].leadingTrivia[0].text == "/// this is a module.");
+    assert(tokens[0].leadingTrivia[1].type == tok!"whitespace");
+    assert(tokens[0].leadingTrivia[1].text == "\n");
+    assert(tokens[0].leadingTrivia[2].type == tok!"comment");
+    assert(tokens[0].leadingTrivia[2].text == "// mixed");
+    assert(tokens[0].leadingTrivia[3].type == tok!"whitespace");
+    assert(tokens[0].leadingTrivia[3].text == "\n");
+    assert(tokens[0].leadingTrivia[4].type == tok!"comment");
+    assert(tokens[0].leadingTrivia[4].text == "/// it can do stuff");
+    assert(tokens[0].leadingTrivia[5].type == tok!"whitespace");
+    assert(tokens[0].leadingTrivia[5].text == "\n");
+    assert(tokens[0].trailingTrivia.length == 1);
+    assert(tokens[0].trailingTrivia[0].type == tok!"whitespace");
+    assert(tokens[0].trailingTrivia[0].text == " ");
+
+    assert(tokens[1].type == tok!"identifier");
+    assert(tokens[1].text == "foo");
+    assert(!tokens[1].leadingTrivia.length);
+    assert(!tokens[1].trailingTrivia.length);
+
+    assert(tokens[2].type == tok!".");
+    assert(!tokens[2].leadingTrivia.length);
+    assert(!tokens[2].trailingTrivia.length);
+
+    assert(tokens[3].type == tok!"identifier");
+    assert(tokens[3].text == "bar");
+    assert(!tokens[3].leadingTrivia.length);
+    assert(!tokens[3].trailingTrivia.length);
+
+    assert(tokens[4].type == tok!";");
+    assert(!tokens[4].leadingTrivia.length);
+    assert(tokens[4].trailingTrivia.length == 1);
+    assert(tokens[4].trailingTrivia[0].type == tok!"whitespace");
+    assert(tokens[4].trailingTrivia[0].text == "\n\n");
+
+    assert(tokens[5].type == tok!"int");
+    assert(tokens[5].leadingTrivia.length == 4);
+    assert(tokens[5].leadingTrivia[0].text == "// hello");
+    assert(tokens[5].leadingTrivia[1].text == "\n\n");
+    assert(tokens[5].leadingTrivia[2].text == "/**\n * some doc\n * hello\n */");
+    assert(tokens[5].leadingTrivia[3].text == "\n");
+    assert(tokens[5].trailingTrivia.length == 1);
+    assert(tokens[5].trailingTrivia[0].text == " ");
+
+    assert(tokens[6].type == tok!"identifier");
+    assert(tokens[6].text == "x");
+    assert(!tokens[6].leadingTrivia.length);
+    assert(!tokens[6].trailingTrivia.length);
+
+    assert(tokens[7].type == tok!";");
+    assert(!tokens[7].leadingTrivia.length);
+    assert(tokens[7].trailingTrivia.length == 3);
+    assert(tokens[7].trailingTrivia[0].text == " ");
+    assert(tokens[7].trailingTrivia[1].text == "/// very nice");
+    assert(tokens[7].trailingTrivia[2].text == "\n\n");
+
+    assert(tokens[8].type == tok!"void");
+    assert(tokens[8].leadingTrivia.length == 2);
+    assert(tokens[8].leadingTrivia[0].text == "// TODO: do stuff");
+    assert(tokens[8].leadingTrivia[1].text == "\n");
+    assert(tokens[8].trailingTrivia.length == 1);
+    assert(tokens[8].trailingTrivia[0].text == " ");
+
+    assert(tokens[9].type == tok!"identifier");
+    assert(tokens[9].text == "main");
+    assert(!tokens[9].leadingTrivia.length);
+    assert(!tokens[9].trailingTrivia.length);
+
+    assert(tokens[10].type == tok!"(");
+    assert(!tokens[10].leadingTrivia.length);
+    assert(!tokens[10].trailingTrivia.length);
+
+    assert(tokens[11].type == tok!")");
+    assert(!tokens[11].leadingTrivia.length);
+    assert(tokens[11].trailingTrivia.length == 1);
+    assert(tokens[11].trailingTrivia[0].text == " ");
+
+    assert(tokens[12].type == tok!"{");
+    assert(!tokens[12].leadingTrivia.length);
+    assert(tokens[12].trailingTrivia.length == 1);
+    assert(tokens[12].trailingTrivia[0].text == "\n    ");
+
+    assert(tokens[13].type == tok!"identifier");
+    assert(tokens[13].text == "writeln");
+    assert(tokens[13].leadingTrivia.length == 4);
+    assert(tokens[13].leadingTrivia[0].type == tok!"specialTokenSequence");
+    assert(tokens[13].leadingTrivia[0].text == "#line 40");
+    assert(tokens[13].leadingTrivia[1].type == tok!"whitespace");
+    assert(tokens[13].leadingTrivia[1].text == "\n    ");
+    assert(tokens[13].leadingTrivia[2].type == tok!"comment");
+    assert(tokens[13].leadingTrivia[2].text == "/// could be better");
+    assert(tokens[13].leadingTrivia[3].type == tok!"whitespace");
+    assert(tokens[13].leadingTrivia[3].text == "\n    ");
+    assert(!tokens[13].trailingTrivia.length);
+
+    assert(tokens[14].type == tok!"(");
+    assert(!tokens[14].leadingTrivia.length);
+    assert(!tokens[14].trailingTrivia.length);
+
+    assert(tokens[15].type == tok!"stringLiteral");
+    assert(!tokens[15].leadingTrivia.length);
+    assert(!tokens[15].trailingTrivia.length);
+
+    assert(tokens[16].type == tok!")");
+    assert(!tokens[16].leadingTrivia.length);
+    assert(!tokens[16].trailingTrivia.length);
+
+    assert(tokens[17].type == tok!";");
+    assert(!tokens[17].leadingTrivia.length);
+    assert(tokens[17].trailingTrivia.length == 1);
+    assert(tokens[17].trailingTrivia[0].text == "\n");
+
+    assert(tokens[18].type == tok!"}");
+    assert(!tokens[18].leadingTrivia.length);
+    assert(tokens[18].trailingTrivia.length == 2);
+    assert(tokens[18].trailingTrivia[0].type == tok!"whitespace");
+    assert(tokens[18].trailingTrivia[0].text == "\n\n");
+    assert(tokens[18].trailingTrivia[1].type == tok!"comment");
+    assert(tokens[18].trailingTrivia[1].text == "/// end of file");
+}
