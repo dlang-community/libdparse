@@ -20,6 +20,7 @@ dparse_src = [
     'src/dparse/parser.d',
     'src/dparse/rollback_allocator.d',
     'src/dparse/stack_buffer.d',
+    'src/dparse/trivia.d',
     'src/std/experimental/lexer.d',
 ]
 
