@@ -1891,7 +1891,8 @@ unittest
 {
     assert(optimalBucketCount(1) == 2);
     assert(optimalBucketCount(9000 * 32) == 16384);
-    assert(optimalBucketCount(100_000_000_000UL) == 1 << 30);
+    static if (size_t.sizeof == ulong.sizeof)
+        assert(optimalBucketCount(100_000_000_000UL) == 1 << 30);
 }
 
 /**
