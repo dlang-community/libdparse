@@ -2841,16 +2841,16 @@ class Parser
         mixin (tokenCheck!(`node.name`, `identifier`));
         node.comment = comment;
         comment = null;
+        if (currentIs(tok!":"))
+        {
+            advance(); // skip ':'
+            mixin(parseNodeQ!(`node.type`, `Type`));
+        }
         if (currentIs(tok!";"))
         {
             advance();
             node.tokens = tokens[startIndex .. index];
             return node;
-        }
-        if (currentIs(tok!":"))
-        {
-            advance(); // skip ':'
-            mixin(parseNodeQ!(`node.type`, `Type`));
         }
         mixin(parseNodeQ!(`node.enumBody`, `EnumBody`));
         node.tokens = tokens[startIndex .. index];

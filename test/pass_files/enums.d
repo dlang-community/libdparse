@@ -18,3 +18,7 @@ enum E
     @A @B deprecated("meep") member,
     deprecated("meep") member
 }
+
+// https://github.com/dlang-community/libdparse/issues/390
+enum F;
+enum G : long;
