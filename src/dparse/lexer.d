@@ -139,9 +139,9 @@ mixin template TokenTriviaFields()
      *
      * Contains: `comment`, `whitespace`, `specialTokenSequence`
      */
-    const(typeof(this))[] leadingTrivia;
+    immutable(typeof(this))[] leadingTrivia;
     /// ditto
-    const(typeof(this))[] trailingTrivia;
+    immutable(typeof(this))[] trailingTrivia;
 
     string memoizedLeadingComment = null;
     string memoizedTrailingComment = null;
@@ -494,8 +494,8 @@ if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
         lexer.popFront();
 
         if (!output.data.empty && !trailingTriviaAppender.data.empty)
-            (cast() output.data[$ - 1].trailingTrivia) = trailingTriviaAppender.data.dup;
-        t.leadingTrivia = leadingTriviaAppender.data.dup;
+            (cast() output.data[$ - 1].trailingTrivia) = trailingTriviaAppender.data.idup;
+        t.leadingTrivia = leadingTriviaAppender.data.idup;
         leadingTriviaAppender.clear();
         trailingTriviaAppender.clear();
 
@@ -506,7 +506,7 @@ if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
     if (!output.data.empty)
     {
         trailingTriviaAppender.put(leadingTriviaAppender.data);
-        (cast() output.data[$ - 1].trailingTrivia) = trailingTriviaAppender.data.dup;
+        (cast() output.data[$ - 1].trailingTrivia) = trailingTriviaAppender.data.idup;
     }
 
     return output.data;
@@ -2327,3 +2327,21 @@ void main() {
     test(17, tok!";", "", "");
     test(18, tok!"}", "", "");
 }
+
+// dlang-community/D-Scanner#805
+unittest
+{
+	final class SomeExpr
+	{
+		Token tok;
+	}
+
+	auto e1 = new SomeExpr();
+	const e2 = new SomeExpr();
+	immutable e3 = new immutable SomeExpr();
+
+	immutable t1 = e1.tok;
+	immutable t2 = e2.tok;
+	immutable t3 = e3.tok;
+}
+
