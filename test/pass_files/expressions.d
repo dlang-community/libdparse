@@ -33,6 +33,10 @@ auto a = delegate() { return 100; };
 auto a = function { return 100; };
 auto a = delegate { return 100; };
 auto a = mixin("1 + ", 1);
+enum a = is(_execinfo == module);
+enum a = is(_execinfo == package);
+enum a = is(_execinfo == __vector);
+
 void foo()
 {
 	a = b;
@@ -68,6 +72,9 @@ void foo()
 	auto a = b((int a) {return a + 2;});
 	enum a = typeof(b);
 	enum a = typeid(b);
+	enum a = is(_execinfo == module);
+	enum a = is(_execinfo == package);
+	enum a = is(_execinfo == __vector);
 	enum a = is(a : b);
 	enum a = __traits(classInstanceSize, b);
 	enum a = mixin("something");

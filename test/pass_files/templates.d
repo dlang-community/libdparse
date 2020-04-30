@@ -21,7 +21,6 @@ template a(b) if (is (a : function)) {}
 template a(b) if (is (a : delegate)) {}
 template a(b) if (is (a : super)) {}
 template a(b) if (is (a : return)) {}
-template a(b) if (is (a : typedef)) {}
 template a(b) if (is (a : __parameters)) {}
 template a(b) if (is (a : const)) {}
 template a(b) if (is (a : immutable)) {}

@@ -6992,6 +6992,7 @@ class Parser
      *     | $(LITERAL 'class')
      *     | $(LITERAL 'interface')
      *     | $(LITERAL 'enum')
+     *     | $(LITERAL '__vector')
      *     | $(LITERAL 'function')
      *     | $(LITERAL 'delegate')
      *     | $(LITERAL 'super')
@@ -7000,8 +7001,9 @@ class Parser
      *     | $(LITERAL 'inout')
      *     | $(LITERAL 'shared')
      *     | $(LITERAL 'return')
-     *     | $(LITERAL 'typedef')
-     *     | $(LITERAL '___parameters')
+     *     | $(LITERAL '__parameters')
+     *     | $(LITERAL 'module')
+     *     | $(LITERAL 'package')
      *     ;)
      */
     TypeSpecialization parseTypeSpecialization()
@@ -7016,16 +7018,18 @@ class Parser
         case tok!"class":
         case tok!"interface":
         case tok!"enum":
+        case tok!"__vector":
         case tok!"function":
         case tok!"delegate":
         case tok!"super":
-        case tok!"return":
-        case tok!"typedef":
-        case tok!"__parameters":
         case tok!"const":
         case tok!"immutable":
         case tok!"inout":
         case tok!"shared":
+        case tok!"return":
+        case tok!"__parameters":
+        case tok!"module":
+        case tok!"package":
             if (peekIsOneOf(tok!")", tok!","))
             {
                 node.token = advance();
