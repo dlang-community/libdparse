@@ -278,6 +278,7 @@ abstract class ASTVisitor
     /** */ void visit(const Module module_) { module_.accept(this); }
     /** */ void visit(const ModuleDeclaration moduleDeclaration) { moduleDeclaration.accept(this); }
     /** */ void visit(const MulExpression mulExpression) { mulExpression.accept(this); }
+    /** */ void visit(const NamespaceList namespaceList) { namespaceList.accept(this); }
     /** */ void visit(const NewAnonClassExpression newAnonClassExpression) { newAnonClassExpression.accept(this); }
     /** */ void visit(const NewExpression newExpression) { newExpression.accept(this); }
     /** */ void visit(const NonVoidInitializer nonVoidInitializer) { nonVoidInitializer.accept(this); }
@@ -2140,12 +2141,13 @@ final class LinkageAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, typeIdentifierPart));
+        mixin (visitIfNotNull!(identifier, typeIdentifierPart, cppNamespaces));
     }
     /** */ Token identifier;
     /** */ bool hasPlusPlus;
     /** */ TypeIdentifierPart typeIdentifierPart;
     /** */ IdType classOrStruct;
+    /** */ NamespaceList cppNamespaces;
     mixin OpEquals;
 }
 
@@ -2258,6 +2260,17 @@ final class MulExpression : ExpressionNode
     /** */ IdType operator;
     mixin BinaryExpressionBody;
     mixin OpEquals;
+}
+
+///
+final class NamespaceList : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(items));
+    }
+    mixin OpEquals;
+    /** */ TernaryExpression[] items;
 }
 
 ///
@@ -3607,4 +3620,69 @@ unittest //#365 : used to segfault
     static void shut(string, size_t, size_t, string ,bool){}
 
     Module m1 = parseModule(getTokensForParser(src, cf, &ca), "", &ra , &shut);
+}
+
+unittest // issue #398: Support extern(C++, <string expressions...>)
+{
+    import dparse.lexer : LexerConfig;
+    import dparse.parser : ParserConfig, parseModule;
+    import dparse.rollback_allocator : RollbackAllocator;
+
+    RollbackAllocator ra;
+    StringCache ca = StringCache(16);
+
+    const(PrimaryExpression)[] getNamespaces(const string sourceCode)
+    {
+        final class Test398 : ASTVisitor
+        {
+            alias visit = ASTVisitor.visit;
+            const(PrimaryExpression)[] namespaces;
+
+            override void visit(const LinkageAttribute link)
+            {
+                assert(link.identifier.text == "C");
+                assert(link.hasPlusPlus);
+                assert(!link.typeIdentifierPart);
+                assert(!link.classOrStruct);
+                assert(link.cppNamespaces);
+                super.visit(link);
+            }
+
+            override void visit(const NamespaceList list)
+            {
+                assert(list.items.length);
+                assert(!namespaces);
+                foreach (const entry; list.items)
+                {
+                    const prim = cast(PrimaryExpression) entry.expression;
+                    assert(prim);
+                    namespaces ~= prim;
+                }
+            }
+        }
+
+        LexerConfig cf = LexerConfig("", StringBehavior.source);
+        Module m = ParserConfig(getTokensForParser(sourceCode, cf, &ca), "", &ra).parseModule();
+        scope visitor = new Test398();
+        visitor.visit(m);
+        return visitor.namespaces;
+    }
+
+    void checkText(const PrimaryExpression pe, const string exp)
+    {
+        assert(pe);
+        const act = pe.primary.text;
+        assert(act == exp, '<' ~ act ~ '>');
+
+    }
+
+    auto ns = getNamespaces(`extern(C++, "foo") int i;`);
+    assert(ns.length == 1);
+    checkText(ns[0], `"foo"`);
+
+    ns = getNamespaces(`extern(C++, "foo", "bar", "baz") int i;`);
+    assert(ns.length == 3);
+    checkText(ns[0], `"foo"`);
+    checkText(ns[1], `"bar"`);
+    checkText(ns[2], `"baz"`);
 }

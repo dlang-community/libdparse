@@ -4397,7 +4397,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF linkageAttribute):
      *       $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)')
      *     | $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '-') $(LITERAL Identifier) $(LITERAL '$(RPAREN)')
-     *     | $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '++') ($(LITERAL ',') $(RULE typeIdentifierPart) | $(LITERAL 'struct') | $(LITERAL 'class'))? $(LITERAL '$(RPAREN)')
+     *     | $(LITERAL 'extern') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '++') ($(LITERAL ',') $(RULE typeIdentifierPart) | $(RULE namespaceList) | $(LITERAL 'struct') | $(LITERAL 'class'))? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     LinkageAttribute parseLinkageAttribute()
@@ -4419,8 +4419,10 @@ class Parser
                 advance();
                 if (currentIsOneOf(tok!"struct", tok!"class"))
                     node.classOrStruct = advance().type;
-                else
+                else if (currentIs(tok!"identifier"))
                     mixin(parseNodeQ!(`node.typeIdentifierPart`, `TypeIdentifierPart`));
+                else
+                    mixin(parseNodeQ!(`node.cppNamespaces`, `NamespaceList`));
             }
         }
         else if (currentIs(tok!"-"))
@@ -4686,6 +4688,20 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(MulExpression, PowExpression,
             tok!"*", tok!"/", tok!"%")();
+    }
+
+    /**
+     * Parses a NamespaceList.
+     *
+     * $(GRAMMAR $(RULEDEF namespaceList):
+     *       $(RULE ternaryExpression)
+     *     | $(RULE ternaryExpression), $(RULE namespaceList)
+     *     ;)
+     */
+    NamespaceList parseNamespaceList()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        return parseCommaSeparatedRule!(NamespaceList, TernaryExpression)();
     }
 
     /**
