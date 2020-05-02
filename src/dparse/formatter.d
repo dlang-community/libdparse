@@ -1878,7 +1878,7 @@ class Formatter(Sink)
     void format(const InContractExpression expression)
     {
         debug(verbose) writeln("InContractExpression");
-
+        newlineIndent();
         put("in (");
         format(expression.assertArguments);
         put(")");
@@ -1904,7 +1904,6 @@ class Formatter(Sink)
         {
             if (inContractExpression) format(inContractExpression);
             if (outContractExpression) format(outContractExpression);
-            newline();
         }
     }
 
@@ -1922,6 +1921,7 @@ class Formatter(Sink)
     void format(const InStatement inStatement)
     {
         debug(verbose) writeln("InStatement");
+        newlineIndent();
         put("in");
         format(inStatement.blockStatement);
     }
@@ -2346,7 +2346,7 @@ class Formatter(Sink)
     void format(const OutContractExpression expression)
     {
         debug(verbose) writeln("OutContractExpression");
-
+        newlineIndent();
         put("out (");
         if (expression.parameter != tok!"")
             format(expression.parameter);
@@ -2363,7 +2363,7 @@ class Formatter(Sink)
         Token parameter;
         BlockStatement blockStatement;
         **/
-
+        newlineIndent();
         put("out");
         if (stmnt.parameter != tok!"")
         {
@@ -2679,7 +2679,10 @@ class Formatter(Sink)
             foreach (contract; functionContracts)
                 format(contract);
             if (specifiedFunctionBody.hasDo)
+            {
+                newlineIndent();
                 put("do");
+            }
             if (blockStatement)
                 format(blockStatement);
         }
@@ -4150,5 +4153,90 @@ do{}
 `static assert (() @trusted
 { return bar()(3);
 }() == 4)`
+);
+    testFormatNode!(Module)("int foo() { return 2; }",
+`int foo()
+{
+    return 2;
+}`
+);
+
+    testFormatNode!(Module)("int foo() do { return 2; }",
+`int foo()
+do
+{
+    return 2;
+}`
+);
+
+    testFormatNode!(Module)("int foo(int i) in(i > 0) do { return 2; }",
+`int foo(int i)
+in (i > 0)
+do
+{
+    return 2;
+}`
+);
+
+    testFormatNode!(Module)("int foo(int i) in { assert(i > 0); } do { return 2; }",
+`int foo(int i)
+in
+{
+    assert (i > 0);
+}
+do
+{
+    return 2;
+}`
+);
+
+    testFormatNode!(Module)("int foo() out(j; j > 0) do { return 2; }",
+`int foo()
+out (j; j > 0)
+do
+{
+    return 2;
+}`
+);
+
+    testFormatNode!(Module)("int foo() out(j) { assert(j > 0); } do { return 2; }",
+`int foo()
+out (j)
+{
+    assert (j > 0);
+}
+do
+{
+    return 2;
+}`
+);
+
+    testFormatNode!(Module)("version(BAR) {
+        int foo(int i)
+        in(i > 0) in { assert(i > 0); }
+        out(j; j > 0) out(j) { assert(j>0); }
+        do { return 2; } int i; }
+    ",
+`version (BAR)
+{
+
+    int foo(int i)
+    in (i > 0)
+    in
+    {
+        assert (i > 0);
+    }
+    out (j; j > 0)
+    out (j)
+    {
+        assert (j > 0);
+    }
+    do
+    {
+        return 2;
+    }
+
+    int i;
+}`
 );
 }
