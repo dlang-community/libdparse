@@ -2678,7 +2678,8 @@ class Formatter(Sink)
         {
             foreach (contract; functionContracts)
                 format(contract);
-            put("do");
+            if (specifiedFunctionBody.hasDo)
+                put("do");
             if (blockStatement)
                 format(blockStatement);
         }
@@ -4144,4 +4145,10 @@ do{}
     testFormatNode!(AliasDeclaration)("alias f(T) = void(int, int, int) const pure nothrow;");
 
     testFormatNode!(AliasDeclaration)("alias MT = mixin (strEnum1, strEnum2);");
+
+    testFormatNode!(Module)("static assert(() @trusted { return bar()(3); }() == 4);",
+`static assert (() @trusted
+{ return bar()(3);
+}() == 4)`
+);
 }
