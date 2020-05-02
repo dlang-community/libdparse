@@ -34,6 +34,8 @@ CommentType determineCommentType(string comment) pure nothrow @safe
     switch (index)
     {
     case 1:
+        // Don't treat "////////...." comments as doc comments
+        isDoc = isDoc && (bytes.length == 3 || bytes[3..$].any!(c => c != '/'));
         return isDoc ? CommentType.docLine :  CommentType.normalLine;
     case 2:
     case 3:
@@ -54,6 +56,10 @@ unittest
     assert (determineCommentType("/* hello") == CommentType.normalBlock);
     assert (determineCommentType("/ hello") == CommentType.none);
     assert (determineCommentType("/") == CommentType.none);
+
+    assert (determineCommentType("////////////////////") == CommentType.normalLine);
+    assert (determineCommentType("///") == CommentType.docLine);
+    assert (determineCommentType("///   ") == CommentType.docLine);
 }
 
 bool isDocComment(CommentType type) @safe nothrow pure
