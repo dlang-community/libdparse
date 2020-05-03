@@ -735,6 +735,8 @@ class Parser
      *     | $(RULE register : AsmExp)
      *     | $(RULE identifierChain)
      *     | $(LITERAL '$')
+     *     | $(LITERAL 'this')
+     *     | $(LITERAL '__LOCAL_SIZE')
      *     ;)
      */
     AsmPrimaryExp parseAsmPrimaryExp()
@@ -748,6 +750,7 @@ class Parser
         foreach (NL; NumberLiterals) {case NL:}
         case tok!"stringLiteral":
         case tok!"$":
+        case tok!"this":
             node.token = advance();
             break;
         case tok!"identifier":
@@ -765,7 +768,7 @@ class Parser
                 mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
             break;
         default:
-            error("Float literal, integer literal, `$`, or identifier expected.");
+            error("Float literal, integer literal, `$`, `this` or identifier expected.");
             return null;
         }
         node.tokens = tokens[startIndex .. index];
