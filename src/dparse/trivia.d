@@ -518,18 +518,43 @@ unittest
 string extractDdocFromTrivia(Tokens)(Tokens tokens) pure nothrow @safe
     if (isInputRange!Tokens && is(ElementType!Tokens : Token))
 {
+    bool hasDoc;
     auto ret = appender!string;
     foreach (trivia; tokens)
     {
         if (trivia.type == tok!"comment"
             && trivia.text.determineCommentType.isDocComment)
         {
+            hasDoc = true;
             if (!ret.data.empty)
                 ret.put('\n');
             unDecorateComment(trivia.text, ret);
         }
     }
-    return ret.data;
+
+    if (ret.data.length)
+        return ret.data;
+    else
+        return hasDoc ? "" : null;
+}
+
+unittest
+{
+    Token[] tokens = [
+        Token(cast(ubyte) tok!"whitespace", "\n\n", 0, 0, 0),
+        Token(cast(ubyte) tok!"comment", "///", 0, 0, 0),
+        Token(cast(ubyte) tok!"whitespace", "\n", 0, 0, 0)
+    ];
+
+    // Empty comment is non-null
+    auto comment = extractDdocFromTrivia(tokens);
+    assert(comment !is null);
+    assert(comment == "");
+
+    // Missing comment is null
+    comment = extractDdocFromTrivia(tokens[0 .. 1]);
+    assert(comment is null);
+    assert(comment == "");
 }
 
 string extractLeadingDdoc(const Token token) pure nothrow @safe
