@@ -3686,3 +3686,65 @@ unittest // issue #398: Support extern(C++, <string expressions...>)
     checkText(ns[1], `"bar"`);
     checkText(ns[2], `"baz"`);
 }
+
+unittest // Differentiate between no and empty DDOC comments, e.g. for DDOC unittests
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+    auto src = q{
+        ///
+        unittest {}
+
+        ///
+        @safe pure unittest {}
+
+        /****/ unittest {}
+
+        /++++/ unittest {}
+
+        /// This is a comment!
+        unittest {}
+
+        unittest {}
+    };
+
+    RollbackAllocator ra;
+    LexerConfig cf = LexerConfig("", StringBehavior.source);
+    StringCache ca = StringCache(16);
+    Module m = parseModule(getTokensForParser(src, cf, &ca), "", &ra);
+
+    final class UnittestVisitor : ASTVisitor
+    {
+        alias visit = ASTVisitor.visit;
+        bool[size_t] found;
+
+        override void visit(const Unittest test)
+        {
+            assert(test.line !in found);
+            found[test.line] = true;
+
+            switch (test.line)
+            {
+                case 3, 6, 8, 10:
+                    assert(test.comment !is null);
+                    assert(test.comment == "");
+                    break;
+
+                case 13:
+                    assert(test.comment == "This is a comment!");
+                    break;
+
+                case 15:
+                    assert(test.comment is null);
+                    break;
+
+                default:
+                    assert(false, format("Unknown line: %d", test.line));
+            }
+        }
+    }
+
+    scope visitor = new UnittestVisitor();
+    visitor.visit(m);
+    assert(visitor.found.length == 6);
+}

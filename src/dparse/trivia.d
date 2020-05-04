@@ -518,18 +518,43 @@ unittest
 string extractDdocFromTrivia(Tokens)(Tokens tokens) pure nothrow @safe
     if (isInputRange!Tokens && is(ElementType!Tokens : Token))
 {
+    bool hasDoc;
     auto ret = appender!string;
     foreach (trivia; tokens)
     {
         if (trivia.type == tok!"comment"
             && trivia.text.determineCommentType.isDocComment)
         {
+            hasDoc = true;
             if (!ret.data.empty)
                 ret.put('\n');
             unDecorateComment(trivia.text, ret);
         }
     }
-    return ret.data;
+
+    if (ret.data.length)
+        return ret.data;
+    else
+        return hasDoc ? "" : null;
+}
+
+unittest
+{
+    Token[] tokens = [
+        Token(cast(ubyte) tok!"whitespace", "\n\n", 0, 0, 0),
+        Token(cast(ubyte) tok!"comment", "///", 0, 0, 0),
+        Token(cast(ubyte) tok!"whitespace", "\n", 0, 0, 0)
+    ];
+
+    // Empty comment is non-null
+    auto comment = extractDdocFromTrivia(tokens);
+    assert(comment !is null);
+    assert(comment == "");
+
+    // Missing comment is null
+    comment = extractDdocFromTrivia(tokens[0 .. 1]);
+    assert(comment is null);
+    assert(comment == "");
 }
 
 string extractLeadingDdoc(const Token token) pure nothrow @safe
@@ -568,6 +593,9 @@ void main() {
     writeln(":)");
 }
 
+///
+unittest {}
+
 /// end of file`;
 
     LexerConfig cf;
@@ -575,7 +603,7 @@ void main() {
 
     const tokens = getTokensForParser(src, cf, &ca);
 
-    assert(tokens.length == 19);
+    assert(tokens.length == 22);
 
     assert(tokens[0].type == tok!"module");
     assert(tokens[0].leadingTrivia.length == 6);
@@ -694,9 +722,30 @@ void main() {
 
     assert(tokens[18].type == tok!"}");
     assert(!tokens[18].leadingTrivia.length);
-    assert(tokens[18].trailingTrivia.length == 2);
+    assert(tokens[18].trailingTrivia.length == 1);
     assert(tokens[18].trailingTrivia[0].type == tok!"whitespace");
     assert(tokens[18].trailingTrivia[0].text == "\n\n");
-    assert(tokens[18].trailingTrivia[1].type == tok!"comment");
-    assert(tokens[18].trailingTrivia[1].text == "/// end of file");
+
+    assert(tokens[19].type == tok!"unittest");
+    assert(tokens[19].leadingTrivia.length == 2);
+    assert(tokens[19].leadingTrivia[0].type == tok!"comment");
+    assert(tokens[19].leadingTrivia[0].text == "///");
+    assert(tokens[19].leadingTrivia[1].type == tok!"whitespace");
+    assert(tokens[19].leadingTrivia[1].text == "\n");
+
+    assert(tokens[19].trailingTrivia.length == 1);
+    assert(tokens[19].trailingTrivia[0].type == tok!"whitespace");
+    assert(tokens[19].trailingTrivia[0].text == " ");
+
+    assert(tokens[20].type == tok!"{");
+    assert(!tokens[20].leadingTrivia.length);
+    assert(!tokens[20].trailingTrivia.length);
+
+    assert(tokens[21].type == tok!"}");
+    assert(!tokens[21].leadingTrivia.length);
+    assert(tokens[21].trailingTrivia.length == 2);
+    assert(tokens[21].trailingTrivia[0].type == tok!"whitespace");
+    assert(tokens[21].trailingTrivia[0].text == "\n\n");
+    assert(tokens[21].trailingTrivia[1].type == tok!"comment");
+    assert(tokens[21].trailingTrivia[1].text == "/// end of file");
 }
