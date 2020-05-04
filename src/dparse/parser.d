@@ -308,7 +308,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!AlignAttribute;
-        expect(tok!"align");
+        mixin(tokenCheck!"align");
         if (currentIs(tok!"("))
         {
             mixin(tokenCheck!"(");
@@ -915,7 +915,7 @@ class Parser
             }
         }
         ownArray(node.functionAttributes, functionAttributes);
-        expect(tok!"{");
+        mixin(tokenCheck!"{");
 
         // DMD-style and GCC-style assembly might look identical in the beginning.
         // Try DMD style first and restart with GCC if it fails because of GCC elements
@@ -937,7 +937,7 @@ class Parser
                 allocator.rollback(c);
             }
             else
-                expect(tok!";");
+                mixin(tokenCheck!";");
         }
 
         if (!maybeGccStyle)
@@ -957,13 +957,13 @@ class Parser
                 if (!instructions.put(parseGccAsmInstruction()))
                     allocator.rollback(c);
                 else
-                    expect(tok!";");
+                    mixin(tokenCheck!";");
             }
 
             ownArray(node.gccAsmInstructions, instructions);
         }
 
-        expect(tok!"}");
+        mixin(tokenCheck!"}");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -1256,14 +1256,14 @@ class Parser
                 node.useParen = true;
                 if (!currentIs(tok!")"))
                     mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
-                expect(tok!")");
+                mixin(tokenCheck!")");
             }
             break;
         case tok!"(":
             advance();
             node.useParen = true;
             mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
-            expect(tok!")");
+            mixin(tokenCheck!")");
             break;
         default:
             mixin(parseNodeQ!(`node.templateSingleArgument`, `TemplateSingleArgument`));
@@ -1330,9 +1330,9 @@ class Parser
             node.attribute = advance();
             if (currentIs(tok!"("))
             {
-                expect(tok!"(");
+                mixin(tokenCheck!"(");
                 mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
-                expect(tok!")");
+                mixin(tokenCheck!")");
             }
             break;
         case tok!"extern":
@@ -1385,7 +1385,7 @@ class Parser
         auto node = allocator.make!AttributeDeclaration;
         node.line = current.line;
         node.attribute = attribute is null ? parseAttribute() : attribute;
-        expect(tok!":");
+        mixin(tokenCheck!":");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -1492,7 +1492,7 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        expect(tok!"break");
+        mixin(tokenCheck!"break");
         if (!moreTokens)
             return null;
         auto node = allocator.make!BreakStatement;
@@ -1604,7 +1604,7 @@ class Parser
         node.low = low;
         mixin(tokenCheck!":");
         mixin(tokenCheck!"..");
-        expect(tok!"case");
+        mixin(tokenCheck!"case");
         mixin(parseNodeQ!(`node.high`, `AssignExpression`));
         const colon = expect(tok!":");
         if (colon is null)
@@ -1649,7 +1649,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!CastExpression;
-        expect(tok!"cast");
+        mixin(tokenCheck!"cast");
         mixin(tokenCheck!"(");
         if (!currentIs(tok!")"))
         {
@@ -1721,7 +1721,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!Catch;
-        expect(tok!"catch");
+        mixin(tokenCheck!"catch");
         mixin(tokenCheck!"(");
         mixin(parseNodeQ!(`node.type`, `Type`));
         if (currentIs(tok!"identifier"))
@@ -1782,7 +1782,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!ClassDeclaration;
-        expect(tok!"class");
+        mixin(tokenCheck!"class");
         return parseInterfaceOrClass(node, startIndex);
     }
 
@@ -3126,11 +3126,11 @@ class Parser
         mixin (nullCheck!`ident`);
         node.name = *ident;
         mixin(parseNodeQ!(`node.templateParameters`, `TemplateParameters`));
-        expect(tok!"=");
+        mixin(tokenCheck!"=");
         node.assignExpression = parseAssignExpression();
         if (node.assignExpression is null)
             mixin(parseNodeQ!(`node.type`, `Type`));
-        expect(tok!";");
+        mixin(tokenCheck!";");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -3254,7 +3254,7 @@ class Parser
         else
         {
             mixin(parseNodeQ!(`node.test`, `Expression`));
-            expect(tok!";");
+            mixin(tokenCheck!";");
         }
 
         if (!currentIs(tok!")"))
@@ -4026,7 +4026,7 @@ class Parser
             }
             // otherwise either the index of a type list or a dim
             abandonBookmark(b);
-            expect(tok!"]");
+            mixin(tokenCheck!"]");
             if (!currentIs(tok!"."))
             {
                 node.tokens = tokens[startIndex .. index];
@@ -4588,7 +4588,7 @@ class Parser
     {
         auto startIndex = index;
         auto node = allocator.make!InterfaceDeclaration;
-        expect(tok!"interface");
+        mixin(tokenCheck!"interface");
         return parseInterfaceOrClass(node, startIndex);
     }
 
@@ -4739,7 +4739,7 @@ class Parser
         const ident = expect(tok!"identifier");
         mixin (nullCheck!`ident`);
         node.identifier = *ident;
-        expect(tok!":");
+        mixin(tokenCheck!":");
         if (!currentIs(tok!"}"))
             mixin(parseNodeQ!(`node.declarationOrStatement`, `DeclarationOrStatement`));
         node.tokens = tokens[startIndex .. index];
@@ -4806,7 +4806,7 @@ class Parser
             advance();
             mixin(tokenCheck!"identifier");
         }
-        expect(tok!")");
+        mixin(tokenCheck!")");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -4908,7 +4908,7 @@ class Parser
             error("`(` or identifier expected");
             return null;
         }
-        expect(tok!";");
+        mixin(tokenCheck!";");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -4925,10 +4925,10 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!MixinExpression;
-        expect(tok!"mixin");
-        expect(tok!"(");
+        mixin(tokenCheck!"mixin");
+        mixin(tokenCheck!"(");
         mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
-        expect(tok!")");
+        mixin(tokenCheck!")");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -4967,7 +4967,7 @@ class Parser
         if (currentIs(tok!"typeof"))
         {
             mixin(parseNodeQ!(`node.typeofExpression`, `TypeofExpression`));
-            expect(tok!".");
+            mixin(tokenCheck!".");
             mixin(parseNodeQ!(`node.identifierOrTemplateChain`, `IdentifierOrTemplateChain`));
         }
         else
@@ -5102,10 +5102,10 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!NewAnonClassExpression;
-        expect(tok!"new");
+        mixin(tokenCheck!"new");
         if (currentIs(tok!"("))
             mixin(parseNodeQ!(`node.allocatorArguments`, `Arguments`));
-        expect(tok!"class");
+        mixin(tokenCheck!"class");
         if (currentIs(tok!"("))
             mixin(parseNodeQ!(`node.constructorArguments`, `Arguments`));
         if (!currentIs(tok!"{"))
@@ -5137,13 +5137,13 @@ class Parser
             mixin(parseNodeQ!(`node.newAnonClassExpression`, `NewAnonClassExpression`));
         else
         {
-            expect(tok!"new");
+            mixin(tokenCheck!"new");
             mixin(parseNodeQ!(`node.type`, `Type`));
             if (currentIs(tok!"["))
             {
                 advance();
                 mixin(parseNodeQ!(`node.assignExpression`, `AssignExpression`));
-                expect(tok!"]");
+                mixin(tokenCheck!"]");
             }
             else if (currentIs(tok!"("))
                 mixin(parseNodeQ!(`node.arguments`, `Arguments`));
@@ -5327,7 +5327,7 @@ class Parser
             const ident = expect(tok!"identifier");
             mixin (nullCheck!`ident`);
             node.parameter = *ident;
-            expect(tok!")");
+            mixin(tokenCheck!")");
         }
         mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
         node.tokens = tokens[startIndex .. index];
@@ -5665,8 +5665,8 @@ class Parser
         mixin (traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!PragmaExpression;
-        expect(tok!"pragma");
-        expect(tok!"(");
+        mixin(tokenCheck!"pragma");
+        mixin(tokenCheck!"(");
         const ident = expect(tok!"identifier");
         mixin(nullCheck!`ident`);
         node.identifier = *ident;
@@ -5675,7 +5675,7 @@ class Parser
             advance();
             mixin(parseNodeQ!(`node.argumentList`, `ArgumentList`));
         }
-        expect(tok!")");
+        mixin(tokenCheck!")");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -5781,10 +5781,10 @@ class Parser
         case tok!"shared":
             {
                 node.typeConstructor = advance();
-                expect(tok!"(");
+                mixin(tokenCheck!"(");
                 mixin(parseNodeQ!(`node.type`, `Type`));
-                expect(tok!")");
-                expect(tok!".");
+                mixin(tokenCheck!")");
+                mixin(tokenCheck!".");
                 const ident = expect(tok!"identifier");
                 if (ident !is null)
                     node.primary = *ident;
@@ -5921,7 +5921,7 @@ class Parser
             const intLit = expect(tok!"intLiteral");
             mixin(nullCheck!`intLit`);
             node.intLiteral = *intLit;
-            expect(tok!")");
+            mixin(tokenCheck!")");
         }
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -5995,12 +5995,12 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!ScopeGuardStatement;
-        expect(tok!"scope");
-        expect(tok!"(");
+        mixin(tokenCheck!"scope");
+        mixin(tokenCheck!"(");
         const ident = expect(tok!"identifier");
         mixin(nullCheck!`ident`);
         node.identifier = *ident;
-        expect(tok!")");
+        mixin(tokenCheck!")");
         mixin(parseNodeQ!(`node.statementNoCaseNoDefault`, `StatementNoCaseNoDefault`));
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -6701,8 +6701,8 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!SwitchStatement;
-        expect(tok!"switch");
-        expect(tok!"(");
+        mixin(tokenCheck!"switch");
+        mixin(tokenCheck!"(");
         // DCD #453
         // with just `switch(stuff` returns a non null node,
         // which allows DCD to gives completion on `stuff`.
@@ -6754,15 +6754,15 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        expect(tok!"synchronized");
+        mixin(tokenCheck!"synchronized");
         if (!moreTokens)
             return null;
         auto node = allocator.make!SynchronizedStatement;
         if (currentIs(tok!"("))
         {
-            expect(tok!"(");
+            mixin(tokenCheck!"(");
             mixin(parseNodeQ!(`node.expression`, `Expression`));
-            expect(tok!")");
+            mixin(tokenCheck!")");
         }
         mixin(parseNodeQ!(`node.statementNoCaseNoDefault`, `StatementNoCaseNoDefault`));
         node.tokens = tokens[startIndex .. index];
@@ -6781,7 +6781,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!TemplateAliasParameter;
-        expect(tok!"alias");
+        mixin(tokenCheck!"alias");
         if (currentIs(tok!"identifier") && !peekIs(tok!"."))
         {
             if (peekIsOneOf(tok!",", tok!")", tok!"=", tok!":"))
@@ -6931,7 +6931,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!TemplateArguments;
-        expect(tok!"!");
+        mixin(tokenCheck!"!");
         if (currentIs(tok!"("))
         {
             advance();
@@ -6959,7 +6959,7 @@ class Parser
         auto node = allocator.make!TemplateDeclaration;
         node.comment = comment;
         comment = null;
-        expect(tok!"template");
+        mixin(tokenCheck!"template");
         const ident = expect(tok!"identifier");
         mixin(nullCheck!`ident`);
         node.name = *ident;
@@ -7172,7 +7172,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!TemplateThisParameter;
-        expect(tok!"this");
+        mixin(tokenCheck!"this");
         mixin(parseNodeQ!(`node.templateTypeParameter`, `TemplateTypeParameter`));
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -7276,7 +7276,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!TemplateValueParameterDefault;
-        expect(tok!"=");
+        mixin(tokenCheck!"=");
         switch (current.type)
         {
         case tok!"__FILE__":
@@ -7340,7 +7340,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!ThrowExpression;
-        expect(tok!"throw");
+        mixin(tokenCheck!"throw");
         mixin(parseNodeQ!(`node.expression`, `AssignExpression`));
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -7385,7 +7385,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!TryStatement;
-        expect(tok!"try");
+        mixin(tokenCheck!"try");
         mixin(parseNodeQ!(`node.declarationOrStatement`, `DeclarationOrStatement`));
         if (currentIs(tok!"catch"))
             mixin(parseNodeQ!(`node.catches`, `Catches`));
@@ -7733,8 +7733,8 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!TypeidExpression;
-        expect(tok!"typeid");
-        expect(tok!"(");
+        mixin(tokenCheck!"typeid");
+        mixin(tokenCheck!"(");
         immutable b = setBookmark();
         auto t = parseType();
         if (t is null || !currentIs(tok!")"))
@@ -7748,7 +7748,7 @@ class Parser
             abandonBookmark(b);
             node.type = t;
         }
-        expect(tok!")");
+        mixin(tokenCheck!")");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -7765,13 +7765,13 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!TypeofExpression;
-        expect(tok!"typeof");
-        expect(tok!"(");
+        mixin(tokenCheck!"typeof");
+        mixin(tokenCheck!"(");
         if (currentIs(tok!"return"))
             node.return_ = advance();
         else
             mixin(parseNodeQ!(`node.expression`, `Expression`));
-        expect(tok!")");
+        mixin(tokenCheck!")");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -8135,7 +8135,7 @@ class Parser
             error("Expected an integer literal, an identifier, `assert`, or `unittest`");
             return null;
         }
-        expect(tok!")");
+        mixin(tokenCheck!")");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -8160,7 +8160,7 @@ class Parser
             return null;
         }
         node.token = advance();
-        expect(tok!";");
+        mixin(tokenCheck!";");
         node.tokens = tokens[startIndex .. index];
         return node;
     }
