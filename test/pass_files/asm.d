@@ -46,5 +46,8 @@ void doStuff()
 		align 4	;
 		LABEL:	;
 		;
+
+		mov EAX, this;
+		mov ECX, __LOCAL_SIZE;
 	}
 }
