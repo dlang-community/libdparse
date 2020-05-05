@@ -8200,6 +8200,15 @@ protected: final:
         }
     }
 
+    /// Skips token if present and returns whether token was skipped
+    bool skip(IdType token)
+    {
+        const found = currentIs(token);
+        if (found)
+            advance();
+        return found;
+    }
+
     void skip(alias O, alias C)()
     {
         assert (currentIs(O), current().text);
