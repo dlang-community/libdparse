@@ -242,6 +242,9 @@ abstract class ASTVisitor
     /** */ void visit(const FunctionContract functionContract) { functionContract.accept(this); }
     /** */ void visit(const FunctionDeclaration functionDeclaration) { functionDeclaration.accept(this); }
     /** */ void visit(const FunctionLiteralExpression functionLiteralExpression) { functionLiteralExpression.accept(this); }
+    /** */ void visit(const GccAsmInstruction gccAsmInstruction) { gccAsmInstruction.accept(this); }
+    /** */ void visit(const GccAsmOperandList gccAsmOperands) { gccAsmOperands.accept(this); }
+    /** */ void visit(const GccAsmOperand gccAsmOperand) { gccAsmOperand.accept(this); }
     /** */ void visit(const GotoStatement gotoStatement) { gotoStatement.accept(this); }
     /** */ void visit(const IdentifierChain identifierChain) { identifierChain.accept(this); }
     /** */ void visit(const DeclaratorIdentifierList identifierList) { identifierList.accept(this); }
@@ -314,6 +317,7 @@ abstract class ASTVisitor
     /** */ void visit(const StaticDestructor staticDestructor) { staticDestructor.accept(this); }
     /** */ void visit(const StaticIfCondition staticIfCondition) { staticIfCondition.accept(this); }
     /** */ void visit(const StorageClass storageClass) { storageClass.accept(this); }
+    /** */ void visit(const StringLiteralList stringLiteralList) { stringLiteralList.accept(this); }
     /** */ void visit(const StructBody structBody) { structBody.accept(this); }
     /** */ void visit(const StructDeclaration structDeclaration) { structDeclaration.accept(this); }
     /** */ void visit(const StructInitializer structInitializer) { structInitializer.accept(this); }
@@ -800,9 +804,10 @@ final class AsmStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!asmInstructions);
+        mixin (visitIfNotNull!(asmInstructions, gccAsmInstructions));
     }
     /** */ AsmInstruction[] asmInstructions;
+    /** */ GccAsmInstruction[] gccAsmInstructions;
     /** */ FunctionAttribute[] functionAttributes;
     mixin OpEquals;
 }
@@ -1786,6 +1791,48 @@ final class FunctionLiteralExpression : ExpressionNode
     /** */ bool isReturnRef;
     /** */ size_t line;
     /** */ size_t column;
+    mixin OpEquals;
+}
+
+///
+final class GccAsmInstruction : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(assemblerTemplate, inputOperands, outputOperands, registers, gotos));
+    }
+
+    /** */ Expression assemblerTemplate;
+    /** */ GccAsmOperandList inputOperands;
+    /** */ GccAsmOperandList outputOperands;
+    /** */ StringLiteralList registers;
+    /** */ DeclaratorIdentifierList gotos;
+    mixin OpEquals;
+}
+
+///
+final class GccAsmOperand : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(expression, constraint, symbolicName));
+    }
+
+    /** */ Token symbolicName;
+    /** */ Token constraint;
+    /** */ ExpressionNode expression;
+    mixin OpEquals;
+}
+
+///
+final class GccAsmOperandList : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(items));
+    }
+
+    /** */ GccAsmOperand[] items;
     mixin OpEquals;
 }
 
@@ -2774,6 +2821,18 @@ final class StorageClass : BaseNode
 }
 
 ///
+final class StringLiteralList : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(items));
+    }
+
+    /** */ Token[] items;
+    mixin OpEquals;
+}
+
+///
 final class StructBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
@@ -3748,3 +3807,130 @@ unittest // Differentiate between no and empty DDOC comments, e.g. for DDOC unit
     visitor.visit(m);
     assert(visitor.found.length == 6);
 }
+
+unittest // Support GCC-sytle asm statements
+{
+    static void verify(T)(const string code, void function(scope const T) handler)
+    {
+        import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+        RollbackAllocator ra;
+        LexerConfig cf = LexerConfig("", StringBehavior.source);
+        StringCache ca = StringCache(16);
+        Module m = parseModule(getTokensForParser("void main() { " ~ code ~ '}', cf, &ca), "", &ra);
+
+        final class AsmVisitor : ASTVisitor
+        {
+            alias visit = ASTVisitor.visit;
+            bool found;
+
+            override void visit(const T node)
+            {
+                assert(!found);
+                found = true;
+                handler(node);
+            }
+        }
+
+        scope visitor = new AsmVisitor();
+        visitor.visit(m);
+        assert(visitor.found);
+    }
+
+    static void first(scope const AsmStatement stmt)
+    {
+        assert(stmt.asmInstructions.length == 0);
+        assert(stmt.gccAsmInstructions.length == 1);
+        with (stmt.gccAsmInstructions[0])
+        {
+            assert(assemblerTemplate);
+            assert(assemblerTemplate.tokens.length == 1);
+            assert(assemblerTemplate.tokens[0].type == tok!"stringLiteral");
+            assert(assemblerTemplate.tokens[0].text == `"mov %0, EAX"`);
+
+            assert(outputOperands);
+            assert(outputOperands.items.length == 1);
+            with (outputOperands.items[0])
+            {
+                assert(constraint.type == tok!"stringLiteral");
+                assert(constraint.text == `"=r"`);
+
+                // assert(expression.type == tok!"identifier");
+                // assert(expression.text == "var1");
+            }
+        }
+    }
+
+    verify(q{ asm { "mov %0, EAX" : "=r" (var1) ; } }, &first);
+
+    static void second(scope const AsmStatement stmt)
+    {
+        first(stmt);
+
+        with (stmt.gccAsmInstructions[0])
+        {
+            assert(inputOperands);
+            assert(inputOperands.items.length == 2);
+            with (inputOperands.items[0])
+            {
+                assert(symbolicName.type == tok!"identifier");
+                assert(symbolicName.text == "xy");
+
+                assert(constraint.type == tok!"stringLiteral");
+                assert(constraint.text == `"=w"`);
+
+                // assert(expression.type == tok!"identifier");
+                // assert(expression.text == "var2");
+            }
+
+            with (inputOperands.items[1])
+            {
+                assert(constraint.type == tok!"stringLiteral");
+                assert(constraint.text == `"g"`);
+
+                // assert(expression.type == tok!"identifier");
+                // assert(expression.text == "var3");
+            }
+        }
+    }
+
+    verify(q{ asm { "mov %0, EAX" : "=r" (var1) : [xy] "=w" (var2), "g" (var3); } }, &second);
+
+    verify(q{ asm { "mov %0, EAX" : "=r" (var1) : [xy] "=w" (var2), "g" (var3) : "r0" ; } }, (scope const AsmStatement stmt)
+    {
+        second(stmt);
+
+        with (stmt.gccAsmInstructions[0])
+        {
+            assert(registers);
+            assert(registers.items.length == 1);
+            assert(registers.items[0].type == tok!"stringLiteral");
+            assert(registers.items[0].text == `"r0"`);
+        }
+    });
+
+    verify(q{ asm { "mov EBX, EAX" : : : "r0", "r1" ; } }, (scope const GccAsmInstruction instr)
+    {
+        with (instr)
+        {
+            assert(registers);
+            assert(registers.items.length == 2);
+            assert(registers.items[0].type == tok!"stringLiteral");
+            assert(registers.items[0].text == `"r0"`);
+            assert(registers.items[1].type == tok!"stringLiteral");
+            assert(registers.items[1].text == `"r1"`);
+        }
+    });
+
+    verify(q{ asm { "jmp LEnd" : : : : LEnd ; } }, (scope const GccAsmInstruction instr)
+    {
+        with (instr)
+        {
+            assert(gotos);
+            assert(gotos.identifiers.length == 1);
+            assert(gotos.identifiers[0].type == tok!"identifier");
+            assert(gotos.identifiers[0].text == `LEnd`);
+        }
+    });
+}
+

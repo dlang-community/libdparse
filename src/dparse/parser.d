@@ -809,7 +809,7 @@ class Parser
      * Parses an AsmStatement
      *
      * $(GRAMMAR $(RULEDEF asmStatement):
-     *     $(LITERAL 'asm') $(RULE functionAttributes)? $(LITERAL '{') $(RULE asmInstruction)+ $(LITERAL '}')
+     *     $(LITERAL 'asm') $(RULE functionAttributes)? $(LITERAL '{') ( $(RULE asmInstruction)+ | $(RULE gccAsmInstruction)+ ) $(LITERAL '}')
      *     ;)
      */
     AsmStatement parseAsmStatement()
@@ -829,16 +829,24 @@ class Parser
         }
         ownArray(node.functionAttributes, functionAttributes);
         expect(tok!"{");
+
+        // DMD-style assembly cannot start with a string literal
+        const gccStyle = currentIs(tok!"stringLiteral");
+
         StackBuffer instructions;
         while (moreTokens() && !currentIs(tok!"}"))
         {
             auto c = allocator.setCheckpoint();
-            if (!instructions.put(parseAsmInstruction()))
+            if (!instructions.put(gccStyle ? parseGccAsmInstruction() : parseAsmInstruction()))
                 allocator.rollback(c);
             else
                 expect(tok!";");
         }
-        ownArray(node.asmInstructions, instructions);
+        if (gccStyle)
+            ownArray(node.gccAsmInstructions, instructions);
+        else
+            ownArray(node.asmInstructions, instructions);
+
         expect(tok!"}");
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -3557,6 +3565,128 @@ class Parser
     }
 
     /**
+     * Parses an AsmInstruction using GCC Assembler
+     *
+     * $(GRAMMAR $(RULEDEF gccAsmInstruction):
+     *     | $(RULE expression) $(LITERAL ':') $(RULE gccAsmOperandList) ($(LITERAL ':') $(RULE gccAsmOperandList) ($(LITERAL ':') $(RULE stringLiteralList))? )? $(LITERAL ';')
+     *     | $(RULE expression) $(LITERAL ':') $(LITERAL ':') $(RULE gccAsmOperandList) $(LITERAL ':') $(RULE stringLiteralList) $(LITERAL ';') $(LITERAL ':') $(RULE declaratorIdentifierList) $(LITERAL ';')
+     *     ;)
+     */
+    /*
+     * References:
+     * - [1] https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html
+     * - [2] https://wiki.dlang.org/Using_GDC
+     * - [3] https://github.com/dlang/dmd/blob/master/src/dmd/iasmgcc.d
+     *
+     * Separated into a different method because one cannot interleave DMD & GCC asm
+     * <asm-qualifiers> (volatile, inline, goto) not supperted (yet?)
+     */
+    GccAsmInstruction parseGccAsmInstruction()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        const startIndex = index;
+        auto node = allocator.make!GccAsmInstruction();
+
+        // Allow empty asm instructions
+        if (currentIs(tok!";"))
+        {
+            warn("Empty asm instruction");
+            node.tokens = tokens[startIndex .. index];
+            return node;
+        }
+
+        mixin(parseNodeQ!("node.assemblerTemplate", "Expression"));
+
+        // GDC allows e.g. asm { mixin(<some asm instruction>); }
+        if (!currentIs(tok!";"))
+        {
+            mixin(tokenCheck!":");
+            mixin(parseNodeQ!(`node.outputOperands`, `GccAsmOperandList`));
+
+            if (skip(tok!":"))
+            {
+                mixin(parseNodeQ!(`node.inputOperands`, `GccAsmOperandList`));
+
+                if (skip(tok!":"))
+                {
+                    if (!currentIs(tok!":"))
+                        mixin(parseNodeQ!("node.registers", "StringLiteralList"));
+
+                    if (skip(tok!":"))
+                    {
+                        if (node.outputOperands.items.length)
+                            error("goto-labels only allowed without output operands!", false);
+
+                        mixin(parseNodeQ!("node.gotos", "DeclaratorIdentifierList"));
+                    }
+                }
+            }
+        }
+
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
+     * Parses a GccAsmOperandList
+     *
+     * $(GRAMMAR $(RULEDEF gccAsmOperandList)
+     *     ($(RULE gccAsmOperand) ($(LITERAL ',') $(RULE gccAsmOperand))* )?
+     * )
+     */
+    GccAsmOperandList parseGccAsmOperandList()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+
+        // Disambiguate between an empty and a missing list
+        if (currentIsOneOf(tok!":", tok!";"))
+            return allocator.make!GccAsmOperandList();
+
+        return parseCommaSeparatedRule!(GccAsmOperandList, GccAsmOperand)();
+    }
+
+    /**
+     * Parses a GccAsmOperand
+     *
+     * $(GRAMMAR $(RULEDEF gccAsmOperand)
+     *     ($(LITERAL '[') $(RULE identifier) $(LITERAL ']'))? $(RULE stringLiteral) $(LITERAL '(') $(RULE assignExpression) $(LITERAL ')')
+     * )
+     */
+    GccAsmOperand parseGccAsmOperand()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        if (currentIsOneOf(tok!":", tok!";"))
+            return null;
+
+        const startIndex = index;
+        auto node = allocator.make!GccAsmOperand();
+
+        if (currentIs(tok!"["))
+        {
+            advance();
+            if (auto t = expect(tok!"identifier"))
+                node.symbolicName = *t;
+            mixin(tokenCheck!"]");
+        }
+
+        mixin(tokenCheck!("node.constraint", "stringLiteral"));
+
+        // GCC actually requires braces but GDC didn't for quite some time,
+        // see https://github.com/dlang/dmd/pull/10820
+        const hasParens = skip(tok!"(");
+        if (!hasParens)
+            warn("Omitting parenthesis around operands is deprecated!");
+
+        mixin(parseNodeQ!("node.expression", "AssignExpression"));
+
+        if (hasParens)
+            expect(tok!")");
+
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
      * Parses a GotoStatement
      *
      * $(GRAMMAR $(RULEDEF gotoStatement):
@@ -5996,6 +6126,41 @@ class Parser
             return null;
         }
         node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
+     * Parses a StringLiteralList
+     *
+     * $(GRAMMAR $(RULEDEF stringLiteralList):
+     *     $(RULE stringLiteral) ($(LITERAL ',') $(RULE stringLiteral))*
+     *     ;)
+     */
+    private StringLiteralList parseStringLiteralList()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        const startIndex = index;
+        auto node = allocator.make!(StringLiteralList)();
+        StackBuffer sb;
+
+        while (true)
+        {
+            if (!currentIs(tok!"stringLiteral"))
+            {
+                error("Expected `stringLiteral` instead of `" ~ current.text ~ '`');
+                return null;
+            }
+
+            sb.put(advance());
+
+            if (currentIsOneOf(tok!":", tok!";"))
+                break;
+
+            mixin(tokenCheck!",");
+        }
+
+        node.tokens = tokens[startIndex .. index];
+        ownArray(node.items, sb);
         return node;
     }
 
