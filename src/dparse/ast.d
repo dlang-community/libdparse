@@ -3855,8 +3855,9 @@ unittest // Support GCC-sytle asm statements
                 assert(constraint.type == tok!"stringLiteral");
                 assert(constraint.text == `"=r"`);
 
-                // assert(expression.type == tok!"identifier");
-                // assert(expression.text == "var1");
+                auto una = cast(UnaryExpression) expression;
+                assert(una);
+                assert(una.primaryExpression.identifierOrTemplateInstance.identifier.text == "var1");
             }
         }
     }
@@ -3879,8 +3880,9 @@ unittest // Support GCC-sytle asm statements
                 assert(constraint.type == tok!"stringLiteral");
                 assert(constraint.text == `"=w"`);
 
-                // assert(expression.type == tok!"identifier");
-                // assert(expression.text == "var2");
+                auto una = cast(UnaryExpression) expression;
+                assert(una);
+                assert(una.primaryExpression.identifierOrTemplateInstance.identifier.text == "var2");
             }
 
             with (inputOperands.items[1])
@@ -3888,8 +3890,9 @@ unittest // Support GCC-sytle asm statements
                 assert(constraint.type == tok!"stringLiteral");
                 assert(constraint.text == `"g"`);
 
-                // assert(expression.type == tok!"identifier");
-                // assert(expression.text == "var3");
+                auto una = cast(UnaryExpression) expression;
+                assert(una);
+                assert(una.primaryExpression.identifierOrTemplateInstance.identifier.text == "var3");
             }
         }
     }
