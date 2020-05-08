@@ -610,7 +610,7 @@ class Parser
      *     | $(LITERAL ';')
      *     ;)
      */
-    AsmInstruction parseAsmInstruction()
+    AsmInstruction parseAsmInstruction(ref bool maybeGccASm)
     {
         mixin (traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
@@ -654,14 +654,15 @@ class Parser
                     node.tokens = tokens[startIndex .. index];
                     return node;
                 }
-                mixin(parseNodeQ!(`node.asmInstruction`, `AsmInstruction`));
+                node.asmInstruction = parseAsmInstruction(maybeGccASm);
+                if (node.asmInstruction is null) return null;
             }
             else if (!currentIs(tok!";"))
                 mixin(parseNodeQ!(`node.operands`, `Operands`));
         }
         else
         {
-            error("identifier or `align` expected");
+            maybeGccASm = true;
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -830,22 +831,50 @@ class Parser
         ownArray(node.functionAttributes, functionAttributes);
         expect(tok!"{");
 
-        // DMD-style assembly cannot start with a string literal
-        const gccStyle = currentIs(tok!"stringLiteral");
+        // DMD-style and GCC-style assembly might look identical in the beginning.
+        // Try DMD style first and restart with GCC if it fails because of GCC elements
+        bool maybeGccStyle;
+        const instrStart = allocator.setCheckpoint();
+        const instrStartIdx = index;
 
         StackBuffer instructions;
+
         while (moreTokens() && !currentIs(tok!"}"))
         {
             auto c = allocator.setCheckpoint();
-            if (!instructions.put(gccStyle ? parseGccAsmInstruction() : parseAsmInstruction()))
+            if (!instructions.put(parseAsmInstruction(maybeGccStyle)))
+            {
+                if (maybeGccStyle)
+                    break;
+
                 allocator.rollback(c);
+            }
             else
                 expect(tok!";");
         }
-        if (gccStyle)
-            ownArray(node.gccAsmInstructions, instructions);
-        else
+
+        if (!maybeGccStyle)
+        {
             ownArray(node.asmInstructions, instructions);
+        }
+        else
+        {
+            // Revert to the beginning of the first instruction
+            destroy(instructions);
+            allocator.rollback(instrStart);
+            index = instrStartIdx;
+
+            while (moreTokens() && !currentIs(tok!"}"))
+            {
+                auto c = allocator.setCheckpoint();
+                if (!instructions.put(parseGccAsmInstruction()))
+                    allocator.rollback(c);
+                else
+                    expect(tok!";");
+            }
+
+            ownArray(node.gccAsmInstructions, instructions);
+        }
 
         expect(tok!"}");
         node.tokens = tokens[startIndex .. index];

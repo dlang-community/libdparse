@@ -51,5 +51,9 @@ void main()
         ;
     }
 
-    asm { "jmp LCarry" : : : : LCarry ; }
+    asm {
+        ;
+        ;
+        "jmp LCarry" : : : : LCarry ;
+    }
 }
