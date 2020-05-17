@@ -3696,8 +3696,6 @@ class Parser
     GccAsmOperand parseGccAsmOperand()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        if (currentIsOneOf(tok!":", tok!";"))
-            return null;
 
         const startIndex = index;
         auto node = allocator.make!GccAsmOperand();
