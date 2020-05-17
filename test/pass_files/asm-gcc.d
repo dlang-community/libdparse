@@ -15,7 +15,7 @@ void main()
         // Some tests as found in dmd's iasmgcc.d
         "nop";
         asm1;
-        asm2();
+        asm2(1);
         mixin(`"repne"`, `~ "scasb"`);
 
         // GCC examples

@@ -804,7 +804,7 @@ final class AsmStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(asmInstructions, gccAsmInstructions));
+        mixin (visitIfNotNull!(functionAttributes, asmInstructions, gccAsmInstructions));
     }
     /** */ AsmInstruction[] asmInstructions;
     /** */ GccAsmInstruction[] gccAsmInstructions;

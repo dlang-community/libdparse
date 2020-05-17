@@ -3643,10 +3643,22 @@ class Parser
 
                     if (skip(tok!":"))
                     {
-                        if (node.outputOperands.items.length)
-                            error("goto-labels only allowed without output operands!", false);
+                        size_t cp;
 
+                        if (node.outputOperands.items.length)
+                        {
+                            error("goto-labels only allowed without output operands!", false);
+                            cp = allocator.setCheckpoint();
+                        }
+
+                        // Parse even with the error above for better error reporting
                         mixin(parseNodeQ!("node.gotos", "DeclaratorIdentifierList"));
+
+                        if (cp)
+                        {
+                            allocator.rollback(cp);
+                            return null;
+                        }
                     }
                 }
             }
@@ -3659,9 +3671,9 @@ class Parser
     /**
      * Parses a GccAsmOperandList
      *
-     * $(GRAMMAR $(RULEDEF gccAsmOperandList)
+     * $(GRAMMAR $(RULEDEF gccAsmOperandList):
      *     ($(RULE gccAsmOperand) ($(LITERAL ',') $(RULE gccAsmOperand))* )?
-     * )
+     *     ;)
      */
     GccAsmOperandList parseGccAsmOperandList()
     {
@@ -3677,9 +3689,9 @@ class Parser
     /**
      * Parses a GccAsmOperand
      *
-     * $(GRAMMAR $(RULEDEF gccAsmOperand)
+     * $(GRAMMAR $(RULEDEF gccAsmOperand):
      *     ($(LITERAL '[') $(RULE identifier) $(LITERAL ']'))? $(RULE stringLiteral) $(LITERAL '(') $(RULE assignExpression) $(LITERAL ')')
-     * )
+     *     ;)
      */
     GccAsmOperand parseGccAsmOperand()
     {
