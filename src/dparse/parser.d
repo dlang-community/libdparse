@@ -3597,8 +3597,8 @@ class Parser
      * Parses an AsmInstruction using GCC Assembler
      *
      * $(GRAMMAR $(RULEDEF gccAsmInstruction):
-     *     | $(RULE expression) $(LITERAL ':') $(RULE gccAsmOperandList) ($(LITERAL ':') $(RULE gccAsmOperandList) ($(LITERAL ':') $(RULE stringLiteralList))? )? $(LITERAL ';')
-     *     | $(RULE expression) $(LITERAL ':') $(LITERAL ':') $(RULE gccAsmOperandList) $(LITERAL ':') $(RULE stringLiteralList) $(LITERAL ';') $(LITERAL ':') $(RULE declaratorIdentifierList) $(LITERAL ';')
+     *     | $(RULE expression) $(LITERAL ':') $(RULE gccAsmOperandList)? ($(LITERAL ':') $(RULE gccAsmOperandList)? ($(LITERAL ':') $(RULE stringLiteralList))? )? $(LITERAL ';')
+     *     | $(RULE expression) $(LITERAL ':') $(LITERAL ':') $(RULE gccAsmOperandList)? $(LITERAL ':') $(RULE stringLiteralList) $(LITERAL ';') $(LITERAL ':') $(RULE declaratorIdentifierList) $(LITERAL ';')
      *     ;)
      */
     /*
@@ -3630,11 +3630,14 @@ class Parser
         if (!currentIs(tok!";"))
         {
             mixin(tokenCheck!":");
-            mixin(parseNodeQ!(`node.outputOperands`, `GccAsmOperandList`));
+
+            if (!currentIsOneOf(tok!":", tok!";"))
+                mixin(parseNodeQ!(`node.outputOperands`, `GccAsmOperandList`));
 
             if (skip(tok!":"))
             {
-                mixin(parseNodeQ!(`node.inputOperands`, `GccAsmOperandList`));
+                if (!currentIsOneOf(tok!":", tok!";"))
+                    mixin(parseNodeQ!(`node.inputOperands`, `GccAsmOperandList`));
 
                 if (skip(tok!":"))
                 {
@@ -3645,7 +3648,7 @@ class Parser
                     {
                         size_t cp;
 
-                        if (node.outputOperands.items.length)
+                        if (node.outputOperands)
                         {
                             error("goto-labels only allowed without output operands!", false);
                             cp = allocator.setCheckpoint();
@@ -3672,17 +3675,12 @@ class Parser
      * Parses a GccAsmOperandList
      *
      * $(GRAMMAR $(RULEDEF gccAsmOperandList):
-     *     ($(RULE gccAsmOperand) ($(LITERAL ',') $(RULE gccAsmOperand))* )?
+     *     $(RULE gccAsmOperand) ($(LITERAL ',') $(RULE gccAsmOperand))*
      *     ;)
      */
     GccAsmOperandList parseGccAsmOperandList()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-
-        // Disambiguate between an empty and a missing list
-        if (currentIsOneOf(tok!":", tok!";"))
-            return allocator.make!GccAsmOperandList();
-
         return parseCommaSeparatedRule!(GccAsmOperandList, GccAsmOperand)();
     }
 
