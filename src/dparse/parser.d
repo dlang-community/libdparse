@@ -3688,7 +3688,7 @@ class Parser
      * Parses a GccAsmOperand
      *
      * $(GRAMMAR $(RULEDEF gccAsmOperand):
-     *     ($(LITERAL '[') $(RULE identifier) $(LITERAL ']'))? $(RULE stringLiteral) $(LITERAL '(') $(RULE assignExpression) $(LITERAL ')')
+     *     ($(LITERAL '[') $(RULE identifier) $(LITERAL ']'))? $(RULE stringLiteral) $(LITERAL '$(LPAREN)') $(RULE assignExpression) $(LITERAL '$(RPAREN)')
      *     ;)
      */
     GccAsmOperand parseGccAsmOperand()
