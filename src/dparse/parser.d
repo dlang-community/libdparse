@@ -4864,8 +4864,7 @@ class Parser
      * Parses a NamespaceList.
      *
      * $(GRAMMAR $(RULEDEF namespaceList):
-     *       $(RULE ternaryExpression)
-     *     | $(RULE ternaryExpression), $(RULE namespaceList)
+     *     $(RULE ternaryExpression) ($(LITERAL ',') $(RULE ternaryExpression)?)*
      *     ;)
      */
     NamespaceList parseNamespaceList()
