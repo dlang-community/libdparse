@@ -2331,17 +2331,17 @@ void main() {
 // dlang-community/D-Scanner#805
 unittest
 {
-	final class SomeExpr
-	{
-		Token tok;
-	}
+    final class SomeExpr
+    {
+        Token tok;
+    }
 
-	auto e1 = new SomeExpr();
-	const e2 = new SomeExpr();
-	immutable e3 = new immutable SomeExpr();
+    auto e1 = new SomeExpr();
+    const e2 = new SomeExpr();
+    immutable e3 = new immutable SomeExpr();
 
-	immutable t1 = e1.tok;
-	immutable t2 = e2.tok;
-	immutable t3 = e3.tok;
+    immutable t1 = e1.tok;
+    immutable t2 = e2.tok;
+    immutable t3 = e3.tok;
 }
 

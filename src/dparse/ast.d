@@ -78,12 +78,12 @@ shared static this()
 /// Describes which syntax was used in a list of declarations in the containing AST node
 enum DeclarationListStyle : ubyte
 {
-	/// A declaration directly after the containing AST node making it the only child
-	single,
-	/// A colon (`:`) was used in the containing AST node meaning all following declarations are part here.
-	colon,
-	/// The declarations have been specified in a block denoted by starting `{` and ending `}` tokens.
-	block
+    /// A declaration directly after the containing AST node making it the only child
+    single,
+    /// A colon (`:`) was used in the containing AST node meaning all following declarations are part here.
+    colon,
+    /// The declarations have been specified in a block denoted by starting `{` and ending `}` tokens.
+    block
 }
 
 /**
