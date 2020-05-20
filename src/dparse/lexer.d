@@ -1537,6 +1537,22 @@ private pure nothrow @safe:
             index);
     }
 
+    bool lexNamedEntity()
+    in { assert (range.bytes[range.index] == '&'); }
+    do
+    {
+        Token t;
+        range.popFront();
+        lexIdentifier(t, true);
+        if (t.type != tok!"identifier" || range.empty || range.bytes[range.index] != ';')
+        {
+            error("Error: invalid named character entity");
+            return false;
+        }
+        range.popFront();
+        return true;
+    }
+
     bool lexEscapeSequence()
     {
         range.popFront();
@@ -1547,6 +1563,7 @@ private pure nothrow @safe:
         }
         switch (range.bytes[range.index])
         {
+        case '&': return lexNamedEntity();
         case '\'':
         case '"':
         case '?':
@@ -1699,11 +1716,14 @@ private pure nothrow @safe:
         }
     }
 
-    void lexIdentifier(ref Token token) @trusted
+    void lexIdentifier(ref Token token, const bool silent = false) @trusted
     {
         mixin (tokenStart);
+
         if (isSeparating(0))
         {
+            if (silent) return;
+
             error("Invalid identifier");
             range.popFront();
         }
@@ -2272,6 +2292,54 @@ unittest
     assert(!l.messages.empty);
 }
 
+unittest
+{
+    alias Msg = DLexer.Message;
+    LexerConfig cf;
+    StringCache ca = StringCache(16);
+
+    {
+        auto l = DLexer(`"\&copy;"`, cf, &ca);
+        assert(l.front().type == tok!"stringLiteral");
+        assert(l.messages == []);
+    }
+    {
+        auto l = DLexer(`"\&trade;\&urcorn;"`, cf, &ca);
+        assert(l.front().type == tok!"stringLiteral");
+        assert(l.messages == []);
+    }
+    {
+        auto l = DLexer(`"\&trade"`, cf, &ca);
+        assert(l.front().type == tok!"");
+        assert(l.messages == [ Msg(1, 9, "Error: invalid named character entity", true) ]);
+    }
+    {
+        auto l = DLexer(`"\&trade;\&urcorn"`, cf, &ca);
+        assert(l.front().type == tok!"");
+        assert(l.messages == [ Msg(1, 18, "Error: invalid named character entity", true) ]);
+    }
+    {
+        auto l = DLexer(`"\&"`, cf, &ca);
+        assert(l.front().type == tok!"");
+        assert(l.messages == [ Msg(1, 4, "Error: invalid named character entity", true) ]);
+    }
+    {
+        auto l = DLexer(`"\&0"`, cf, &ca);
+        assert(l.front().type == tok!"");
+        assert(l.messages == [ Msg(1, 5, "Error: invalid named character entity", true) ]);
+    }
+    {
+        auto l = DLexer(`"\&copy`, cf, &ca);
+        assert(l.front().type == tok!"");
+        assert(l.messages == [ Msg(1, 8, "Error: invalid named character entity", true) ]);
+    }
+    {
+        auto l = DLexer(`"\&copy;`, cf, &ca);
+        assert(l.front().type == tok!"");
+        assert(l.messages == [ Msg(1, 9, "Error: unterminated string literal", true) ]);
+    }
+}
+
 // legacy code using compatibility comment and trailingComment
 unittest
 {
@@ -2355,4 +2423,3 @@ unittest
     immutable t2 = e2.tok;
     immutable t3 = e3.tok;
 }
-
