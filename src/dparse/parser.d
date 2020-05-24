@@ -7989,6 +7989,7 @@ protected: final:
         case tok!"private":
         case tok!"protected":
         case tok!"public":
+        case tok!"export":
             beginIndex = size_t.max;
             advance();
             break;
@@ -8036,7 +8037,6 @@ protected: final:
             }
         case tok!"auto":
         case tok!"enum":
-        case tok!"export":
         case tok!"final":
         case tok!"__gshared":
         case tok!"nothrow":
