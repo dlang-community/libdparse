@@ -1,0 +1,1 @@
+@("") export auto a() { }
