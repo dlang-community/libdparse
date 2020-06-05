@@ -538,7 +538,10 @@ public struct DLexer
         this.haveSSE42 = haveSSE42;
         auto r = (range.length >= 3 && range[0] == 0xef && range[1] == 0xbb && range[2] == 0xbf)
             ? range[3 .. $] : range;
-        this.range = LexerRange(cast(const(ubyte)[]) r);
+        static if (is(ElementEncodingType!R == immutable))
+            this.range = LexerRange(cast(const(ubyte)[]) r);
+        else
+            this.range = LexerRange(cast(const(ubyte)[]) r.idup);
         this.config = config;
         this.cache = cache;
         popFront();
