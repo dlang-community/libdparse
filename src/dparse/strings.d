@@ -162,7 +162,11 @@ string unescapeString(
 )(
 	string input
 )
-in (isStringLiteral(input))
+in
+{
+	assert(isStringLiteral(input));
+}
+do
 {
 	char stringCloseChar;
 	bool hasPostfix, parseEscapes;
@@ -481,13 +485,13 @@ private string unescapeDoubleQuotedContent(
 			start = escape + 2;
 			break;
 
-			static foreach (escapeChar; "abfnrtv")
-			{
-		case escapeChar:
-				mixin("ret ~= '\\" ~ escapeChar ~ "';");
-				start = escape + 2;
-				break Switch;
-			}
+		case 'a': ret ~= '\a'; start = escape + 2; break;
+		case 'b': ret ~= '\b'; start = escape + 2; break;
+		case 'f': ret ~= '\f'; start = escape + 2; break;
+		case 'n': ret ~= '\n'; start = escape + 2; break;
+		case 'r': ret ~= '\r'; start = escape + 2; break;
+		case 't': ret ~= '\t'; start = escape + 2; break;
+		case 'v': ret ~= '\v'; start = escape + 2; break;
 
 		case 'x':
 			if (!requireMinLength(3))
@@ -623,8 +627,12 @@ private string parseHexStringContent(
 }
 
 private int parseHexChar(char c)
-in (c.isHexDigit)
-in ('a' > 'A' && 'A' > '0') // just checking that ASCII doesn't suddenly change
+in
+{
+	assert(c.isHexDigit);
+	assert('a' > 'A' && 'A' > '0'); // just checking that ASCII doesn't suddenly change
+}
+do
 {
 	// can omit range ends and digit check because of function preconditions
 	if (c >= 'a')
@@ -646,7 +654,7 @@ private string normalizeNewLines(string text)
 	import std.utf : codeLength;
 
 	enum exoticLineBreakLength = codeLength!char('\u2028');
-	static immutable nlCharacters = ['\r', '\u2028', '\u2029'];
+	static immutable dchar[] nlCharacters = ['\r', '\u2028', '\u2029'];
 
 	auto end = text.indexOfAny(nlCharacters);
 	if (end == -1)
