@@ -190,20 +190,24 @@ public enum WhitespaceBehavior : ubyte
     skip = 0b0000_0001,
 }
 
+private enum stringBehaviorNotWorking = "Automatic string parsing is not "
+    ~ "supported and was previously not working. To unescape strings use the "
+    ~ "`dparse.strings : unescapeString` function on the token texts instead.";
+
 /**
  * Configure string lexing behavior
  */
 public enum StringBehavior : ubyte
 {
     /// Do not include quote characters, process escape sequences
-    compiler = 0b0000_0000,
+    deprecated(stringBehaviorNotWorking) compiler = 0b0000_0000,
     /// Opening quotes, closing quotes, and string suffixes are included in the
     /// string token
-    includeQuoteChars = 0b0000_0001,
+    deprecated(stringBehaviorNotWorking) includeQuoteChars = 0b0000_0001,
     /// String escape sequences are not replaced
-    notEscaped = 0b0000_0010,
+    deprecated(stringBehaviorNotWorking) notEscaped = 0b0000_0010,
     /// Not modified at all. Useful for formatters or highlighters
-    source = includeQuoteChars | notEscaped
+    source = 0b0000_0011,
 }
 
 public enum CommentBehavior : bool
