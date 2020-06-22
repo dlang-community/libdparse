@@ -133,7 +133,7 @@ enum InvalidEscapeAction
 	keep = 0,
 	/// Ignore and skip offending characters, drop them from the output. Named
 	/// character entities are still being included like $(LREF keep) as they
-    /// are not currently implemented.
+	/// are not currently implemented.
 	skip,
 	/// Throw a ConvException on invalid escape sequences. Does not throw
 	/// anything on unknown named character entities as they are not currently
