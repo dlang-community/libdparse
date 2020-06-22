@@ -132,8 +132,8 @@ enum InvalidEscapeAction
 	/// string like in the input string.
 	keep = 0,
 	/// Ignore and skip offending characters, drop them from the output. Named
-	/// character entities are still being included like keep as they are not
-	/// currently implemented.
+	/// character entities are still being included like $(LREF keep) as they
+    /// are not currently implemented.
 	skip,
 	/// Throw a ConvException on invalid escape sequences. Does not throw
 	/// anything on unknown named character entities as they are not currently
