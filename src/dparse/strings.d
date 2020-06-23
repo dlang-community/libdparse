@@ -439,7 +439,8 @@ private string unescapeDoubleQuotedContent(
 		final switch (invalidEscapeAction)
 		{
 		case InvalidEscapeAction.keep:
-			ret ~= input[start .. start = continueAt];
+			ret ~= input[start .. continueAt];
+			start = continueAt;
 			break;
 		case InvalidEscapeAction.skip:
 			start = continueAt;
@@ -535,9 +536,14 @@ private string unescapeDoubleQuotedContent(
 		case '&':
 			auto end = input.indexOf(';', escape + 2);
 			if (end == -1)
+			{
 				errorInvalidCharacter(input.length);
+			}
 			else
-				ret ~= input[escape .. start = end + 1];
+			{
+				ret ~= input[escape .. end + 1];
+				start = end + 1;
+			}
 			break;
 		default:
 			errorInvalidCharacter(escape + 1);
@@ -671,9 +677,7 @@ private string normalizeNewLines(string text)
 		else if (text[end] != '\r')
 			end += exoticLineBreakLength - 1;
 		start = end + 1;
-		end = text[start .. $].indexOfAny(nlCharacters);
-		if (end != -1)
-			end += start;
+		end = text.indexOfAny(nlCharacters, start);
 	}
 	ret ~= text[start .. $];
 	return ret.data;
