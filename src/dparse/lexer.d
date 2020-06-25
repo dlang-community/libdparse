@@ -190,20 +190,28 @@ public enum WhitespaceBehavior : ubyte
     skip = 0b0000_0001,
 }
 
+private enum stringBehaviorNotWorking = "Automatic string parsing is not "
+    ~ "supported and was previously not working. To unescape strings use the "
+    ~ "`dparse.strings : unescapeString` function on the token texts instead.";
+
 /**
  * Configure string lexing behavior
  */
-public enum StringBehavior : ubyte
+// was enum, but struct now for deprecations and support with old compilers
+public struct StringBehavior
 {
     /// Do not include quote characters, process escape sequences
-    compiler = 0b0000_0000,
-    /// Opening quotes, closing quotes, and string suffixes are included in the
-    /// string token
-    includeQuoteChars = 0b0000_0001,
+    deprecated(stringBehaviorNotWorking) static immutable StringBehavior compiler = StringBehavior(0b0000_0000);
+    /// Opening quotes, closing quotes, and string suffixes are included in
+    /// the string token
+    deprecated(stringBehaviorNotWorking) static immutable StringBehavior includeQuoteChars = StringBehavior(0b0000_0001);
     /// String escape sequences are not replaced
-    notEscaped = 0b0000_0010,
+    deprecated(stringBehaviorNotWorking) static immutable StringBehavior notEscaped = StringBehavior(0b0000_0010);
     /// Not modified at all. Useful for formatters or highlighters
-    source = includeQuoteChars | notEscaped
+    static immutable StringBehavior source = StringBehavior(0b0000_0011);
+
+    ubyte behavior;
+    alias behavior this;
 }
 
 public enum CommentBehavior : bool
