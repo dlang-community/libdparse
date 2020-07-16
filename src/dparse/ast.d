@@ -3739,7 +3739,7 @@ unittest // issue #398: Support extern(C++, <string expressions...>)
     assert(ns.length == 1);
     checkText(ns[0], `"foo"`);
 
-    ns = getNamespaces(`extern(C++, "foo", "bar", "baz") int i;`);
+    ns = getNamespaces(`extern(C++, "foo", "bar", "baz",) int i;`);
     assert(ns.length == 3);
     checkText(ns[0], `"foo"`);
     checkText(ns[1], `"bar"`);

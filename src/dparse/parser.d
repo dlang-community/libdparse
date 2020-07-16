@@ -4864,13 +4864,13 @@ class Parser
      * Parses a NamespaceList.
      *
      * $(GRAMMAR $(RULEDEF namespaceList):
-     *     $(RULE ternaryExpression) ($(LITERAL ',') $(RULE ternaryExpression)?)*
+     *     $(RULE ternaryExpression) ($(LITERAL ',') $(RULE ternaryExpression)?)* $(LITERAL ',')?
      *     ;)
      */
     NamespaceList parseNamespaceList()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        return parseCommaSeparatedRule!(NamespaceList, TernaryExpression)();
+        return parseCommaSeparatedRule!(NamespaceList, TernaryExpression)(true);
     }
 
     /**
