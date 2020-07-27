@@ -1210,6 +1210,7 @@ class Parser
      *     | $(LITERAL 'nothrow')
      *     | $(LITERAL 'pure')
      *     | $(LITERAL 'ref')
+     *     | $(LITERAL 'throw')
      *     ;)
      */
     Attribute parseAttribute()
@@ -1267,6 +1268,7 @@ class Parser
         case tok!"nothrow":
         case tok!"pure":
         case tok!"ref":
+        case tok!"throw":
             node.attribute = advance();
             break;
         default:
@@ -4638,10 +4640,11 @@ class Parser
         case tok!"nothrow":
         case tok!"return":
         case tok!"scope":
+        case tok!"throw":
             node.tokenType = advance().type;
             break;
         default:
-            error(`Member funtion attribute expected`);
+            error(`Member function attribute expected`);
         }
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -6113,6 +6116,7 @@ class Parser
      *     | $(LITERAL 'scope')
      *     | $(LITERAL 'static')
      *     | $(LITERAL 'synchronized')
+     *     | $(LITERAL 'throw')
      *     ;)
      */
     StorageClass parseStorageClass()
@@ -6155,6 +6159,7 @@ class Parser
         case tok!"scope":
         case tok!"static":
         case tok!"synchronized":
+        case tok!"throw":
             node.token = advance();
             break;
         default:
@@ -8255,6 +8260,7 @@ protected: final:
         case tok!"ref":
         case tok!"extern":
         case tok!"align":
+        case tok!"throw":
             return true;
         default:
             return false;
@@ -8274,6 +8280,7 @@ protected: final:
         case tok!"nothrow":
         case tok!"return":
         case tok!"scope":
+        case tok!"throw":
             return true;
         default:
             return false;
