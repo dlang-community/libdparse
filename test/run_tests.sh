@@ -52,22 +52,6 @@ else
 	exit 1
 fi
 
-echo
-find . -name "*.lst" -exec rm -f {} \;
-echo -en "Generating coverage reports... "
-${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS || exit 1
-./tester "$PASS_FILES" "$FAIL_FILES" 2>/dev/null 1>/dev/null
-rm -rf coverage/
-mkdir coverage/
-find . -name "*.lst" | while read -r i; do
-	dest=$(echo "$i" | sed -e "s/\\.\\.\\-//")
-	mv "$i" "coverage/$dest";
-done
-echo -e "${GREEN}DONE${NORMAL}"
-for i in coverage/*.lst; do
-	tail "$i" -n1
-done
-
 PASS_COUNT=0
 FAIL_COUNT=0
 echo
@@ -107,4 +91,21 @@ else
 	exit 1
 fi
 
+echo
+find . -name "*.lst" -exec rm -f {} \;
+echo -en "Generating coverage reports... "
+${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS || exit 1
+./tester $PASS_FILES $FAIL_FILES 2>/dev/null 1>/dev/null
+rm -rf coverage/
+mkdir coverage/
+find . -name "*.lst" | while read -r i; do
+	dest=$(echo "$i" | sed -e "s/\\.\\.\\-//")
+	mv "$i" "coverage/$dest";
+done
+echo -e "${GREEN}DONE${NORMAL}"
+for i in coverage/*.lst; do
+	tail "$i" -n1
+done
+
 rm -f tester tester.o
+rm -f gen_ast_xml gen_ast_xml.o
