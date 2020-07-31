@@ -45,6 +45,32 @@ for i in $FAIL_FILES; do
 done
 
 echo
+if [ "$FAIL_COUNT" -eq 0 ]; then
+	echo -e "${GREEN}${PASS_COUNT} parse test(s) passed and ${FAIL_COUNT} failed.${NORMAL}"
+else
+	echo -e "${RED}${PASS_COUNT} parse test(s) passed and ${FAIL_COUNT} failed.${NORMAL}"
+	exit 1
+fi
+
+echo
+find . -name "*.lst" -exec rm -f {} \;
+echo -en "Generating coverage reports... "
+${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS || exit 1
+./tester "$PASS_FILES" "$FAIL_FILES" 2>/dev/null 1>/dev/null
+rm -rf coverage/
+mkdir coverage/
+find . -name "*.lst" | while read -r i; do
+	dest=$(echo "$i" | sed -e "s/\\.\\.\\-//")
+	mv "$i" "coverage/$dest";
+done
+echo -e "${GREEN}DONE${NORMAL}"
+for i in coverage/*.lst; do
+	tail "$i" -n1
+done
+
+PASS_COUNT=0
+FAIL_COUNT=0
+echo
 for file in ast_checks/*.d; do
 	echo -en "Running AST match tests on ${file}..."
 	# The query file has the same base name as its corresponding D file, but
@@ -75,25 +101,10 @@ done
 
 echo
 if [ "$FAIL_COUNT" -eq 0 ]; then
-	echo -e "${GREEN}${PASS_COUNT} tests passed and ${FAIL_COUNT} failed.${NORMAL}"
+	echo -e "${GREEN}${PASS_COUNT} AST test(s) passed and ${FAIL_COUNT} failed.${NORMAL}"
 else
-	echo -e "${RED}${PASS_COUNT} tests passed and ${FAIL_COUNT} failed.${NORMAL}"
+	echo -e "${RED}${PASS_COUNT} AST test(s) passed and ${FAIL_COUNT} failed.${NORMAL}"
 	exit 1
 fi
-
-find . -name "*.lst" -exec rm -f {} \;
-echo -en "Generating coverage reports... "
-${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS || exit 1
-./tester "$PASS_FILES" "$FAIL_FILES" 2>/dev/null 1>/dev/null
-rm -rf coverage/
-mkdir coverage/
-find . -name "*.lst" | while read -r i; do
-	dest=$(echo "$i" | sed -e "s/\\.\\.\\-//")
-	mv "$i" "coverage/$dest";
-done
-echo -e "${GREEN}DONE${NORMAL}"
-for i in coverage/*.lst; do
-	tail "$i" -n1
-done
 
 rm -f tester tester.o
