@@ -18,10 +18,6 @@ echo -en "Compiling parse tester... "
 ${DMD} tester.d $SOURCE_FILES -g "stdxalloc.a" $IMPORT_PATHS || exit 1
 echo -e "${GREEN}DONE${NORMAL}"
 
-echo -en "Compiling AST tester... "
-${DMD} gen_ast_xml.d $SOURCE_FILES -g "stdxalloc.a" $IMPORT_PATHS || exit 1
-echo -e "${GREEN}DONE${NORMAL}"
-
 for i in $PASS_FILES; do
 	echo -en "Parsing $i..."
 	if ./tester "$i" 2>/dev/null 1>/dev/null; then
@@ -65,7 +61,7 @@ for file in ast_checks/*.d; do
 	currentPasses=0
 	currentFailures=0
 	while read -r line; do
-		if ./gen_ast_xml "$file" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
+		if ./tester --ast "$file" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
 			((currentPasses=currentPasses+1))
 		else
 			echo
@@ -95,7 +91,7 @@ echo
 find . -name "*.lst" -exec rm -f {} \;
 echo -en "Generating coverage reports... "
 ${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS || exit 1
-./tester $PASS_FILES $FAIL_FILES 2>/dev/null 1>/dev/null
+./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES 2>/dev/null 1>/dev/null
 rm -rf coverage/
 mkdir coverage/
 find . -name "*.lst" | while read -r i; do
