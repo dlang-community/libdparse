@@ -8,7 +8,7 @@ d:
   - ldc
 branches:
   only:
-  - master  
+  - master
 matrix:
   include:
     d: dmd-2.078.2
@@ -19,6 +19,7 @@ matrix:
         packages:
           - pkg-config
           - libevent-dev
+          - libxml2-utils
 
 install:
   - sudo apt-get install python3-pip python3-setuptools

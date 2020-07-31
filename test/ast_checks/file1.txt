@@ -1,0 +1,3 @@
+./module//structBody//compileCondition
+./module//structBody//attributeDeclaration
+./module/declaration/variableDeclaration//type2[text()="int"]

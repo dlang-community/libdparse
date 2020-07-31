@@ -7,7 +7,6 @@ FAIL_COUNT=0
 NORMAL="\033[01;0m"
 GREEN="\033[32m"
 RED="\033[31m"
-CYAN="\033[36m"
 DMD=${DMD:=dmd}
 SOURCE_FILES="../src/std/experimental/*.d ../src/dparse/*.d "
 STDX_ALLOC_FILES=$(find ../stdx-allocator/source -name "*.d" )
@@ -15,55 +14,86 @@ IMPORT_PATHS="-I../src/ -I../stdx-allocator/source"
 
 ${DMD} $STDX_ALLOC_FILES $IMPORT_PATHS -of"stdxalloc" -lib
 
-echo -en "Compiling tester... "
+echo -en "Compiling parse tester... "
 ${DMD} tester.d $SOURCE_FILES -g "stdxalloc.a" $IMPORT_PATHS || exit 1
 echo -e "${GREEN}DONE${NORMAL}"
 
+echo -en "Compiling AST tester... "
+${DMD} gen_ast_xml.d $SOURCE_FILES -g "stdxalloc.a" $IMPORT_PATHS || exit 1
+echo -e "${GREEN}DONE${NORMAL}"
+
 for i in $PASS_FILES; do
-	echo -en "Parsing" $i
-	echo -en "... "
-	./tester $i 2>/dev/null 1>/dev/null;
-	if [ $? -eq 0 ]; then
+	echo -en "Parsing $i..."
+	if ./tester "$i" 2>/dev/null 1>/dev/null; then
 		echo -e "${GREEN}PASS${NORMAL}"
-		let PASS_COUNT=PASS_COUNT+1
+		((PASS_COUNT=PASS_COUNT+1))
 	else
 		echo -e "${RED}FAIL${NORMAL}"
-		let FAIL_COUNT=FAIL_COUNT+1
+		((FAIL_COUNT=FAIL_COUNT+1))
 	fi
 done
 
 for i in $FAIL_FILES; do
-	echo -en "Parsing" $i
-	echo -en "... "
-	./tester $i 2>/dev/null 1>/dev/null;
-	if [ $? -eq 0 ]; then
+	echo -en "Parsing $i..."
+	if ./tester "$i" 2>/dev/null 1>/dev/null; then
 		echo -e "${RED}FAIL${NORMAL}"
-		let FAIL_COUNT=FAIL_COUNT+1
+		((FAIL_COUNT=FAIL_COUNT+1))
 	else
 		echo -e "${GREEN}PASS${NORMAL}"
-		let PASS_COUNT=PASS_COUNT+1
+		((PASS_COUNT=PASS_COUNT+1))
 	fi
 done
 
-if [ $FAIL_COUNT -eq 0 ]; then
+echo
+for file in ast_checks/*.d; do
+	echo -en "Running AST match tests on ${file}..."
+	# The query file has the same base name as its corresponding D file, but
+	# with a txt extension. It contains XPath expressions, one per line, that
+	# must match nodes in the generated AST.
+	queryFile=ast_checks/$(basename "$file" .d).txt
+	checkCount=1
+	currentPasses=0
+	currentFailures=0
+	while read -r line; do
+		if ./gen_ast_xml "$file" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
+			((currentPasses=currentPasses+1))
+		else
+			echo
+			echo -e "    ${RED}Check on line $checkCount of $queryFile failed.${NORMAL}"
+			((currentFailures=currentFailures+1))
+		fi
+		((checkCount=checkCount+1))
+	done < "$queryFile"
+	if [[ $currentFailures -gt 0 ]]; then
+		echo -e "    ${RED}${currentPasses} check(s) passed and ${currentFailures} check(s) failed${NORMAL}"
+		((FAIL_COUNT=FAIL_COUNT+1))
+	else
+		echo -e " ${GREEN}${currentPasses} check(s) passed and ${currentFailures} check(s) failed${NORMAL}"
+		((PASS_COUNT=PASS_COUNT+1))
+	fi
+done
+
+echo
+if [ "$FAIL_COUNT" -eq 0 ]; then
 	echo -e "${GREEN}${PASS_COUNT} tests passed and ${FAIL_COUNT} failed.${NORMAL}"
 else
 	echo -e "${RED}${PASS_COUNT} tests passed and ${FAIL_COUNT} failed.${NORMAL}"
 	exit 1
 fi
 
-find . -name "*.lst" | xargs rm -f
+find . -name "*.lst" -exec rm -f {} \;
 echo -en "Generating coverage reports... "
 ${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS || exit 1
-./tester $PASS_FILES $FAIL_FILES 2>/dev/null 1>/dev/null
+./tester "$PASS_FILES" "$FAIL_FILES" 2>/dev/null 1>/dev/null
 rm -rf coverage/
 mkdir coverage/
-for i in $(find . -name "*.lst"); do
-	mv $i coverage/$(echo $i | sed -e "s/\\.\\.\\-//");
+find . -name "*.lst" | while read -r i; do
+	dest=$(echo "$i" | sed -e "s/\\.\\.\\-//")
+	mv "$i" "coverage/$dest";
 done
 echo -e "${GREEN}DONE${NORMAL}"
 for i in coverage/*.lst; do
-	echo $(tail $i -n1)
+	tail "$i" -n1
 done
 
 rm -f tester tester.o
