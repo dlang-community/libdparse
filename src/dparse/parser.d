@@ -5140,6 +5140,12 @@ class Parser
             else
                 break;
         }
+
+        // Parsed the attributes of the variadic attributes.
+        // Abort and defer to parseVariadicArgumentsAttributes
+        if (currentIs(tok!"..."))
+            return null;
+
         ownArray(node.parameterAttributes, parameterAttributes);
         mixin(parseNodeQ!(`node.type`, `Type`));
         if (currentIs(tok!"identifier"))
@@ -5251,8 +5257,8 @@ class Parser
      * Parses Parameters
      *
      * $(GRAMMAR $(RULEDEF parameters):
-     *       $(LITERAL '$(LPAREN)') $(RULE parameter) ($(LITERAL ',') $(RULE parameter))* ($(LITERAL ',') $(LITERAL '...'))? $(LITERAL '$(RPAREN)')
-     *     | $(LITERAL '$(LPAREN)') $(LITERAL '...') $(LITERAL '$(RPAREN)')
+     *       $(LITERAL '$(LPAREN)') $(RULE parameter) ($(LITERAL ',') $(RULE parameter))* ($(LITERAL ',') $(RULE variadicArgumentsAttributes)? $(LITERAL '...'))? $(LITERAL '$(RPAREN)')
+     *     | $(LITERAL '$(LPAREN)') $(RULE variadicArgumentsAttributes)? $(LITERAL '...') $(LITERAL '$(RPAREN)')
      *     | $(LITERAL '$(LPAREN)') $(LITERAL '$(RPAREN)')
      *     ;)
      */
@@ -5288,8 +5294,27 @@ class Parser
             }
             if (currentIs(tok!")"))
                 break;
+
+            // Save starting point to deal with attributed variadics, e.g.
+            // int printf(in char* format, scope const ...);
+            const startIdx = index;
+            auto cp = allocator.setCheckpoint();
+
             if (!parameters.put(parseParameter()))
-                return null;
+            {
+                // parseParameter fails for C-style variadics, they are parsed below
+                if (!currentIs(tok!"..."))
+                    return null;
+
+                // Reset to the beginning of the current parameters
+                index = startIdx;
+                allocator.rollback(cp);
+
+                node.hasVarargs = true;
+                mixin(parseNodeQ!(`node.varargsAttributes`, `VariadicArgumentsAttributes`));
+                mixin(tokenCheck!"...");
+                break;
+            }
             if (currentIs(tok!","))
                 advance();
             else
@@ -5297,6 +5322,58 @@ class Parser
         }
         ownArray(node.parameters, parameters);
         mixin(tokenCheck!")");
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
+     * Parses attributes of C-style variadic parameters.
+     *
+     * $(GRAMMAR $(RULEDEF variadicArgumentsAttributes):
+     *       $(RULE variadicArgumentsAttribute)+
+     *     ;)
+     */
+    ParameterAttribute[] parseVariadicArgumentsAttributes()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        StackBuffer attributes;
+
+        while (moreTokens() && !currentIs(tok!"..."))
+        {
+            if (!attributes.put(parseVariadicArgumentsAttribute()))
+                return null;
+        }
+
+        ParameterAttribute[] buffer;
+        ownArray(buffer, attributes);
+        return buffer;
+    }
+
+    /**
+     * Parses an attribute of C-style variadic parameters.
+     *
+     * $(GRAMMAR $(RULEDEF variadicArgumentsAttribute):
+     *       $(LITERAL 'const')
+     *     | $(LITERAL 'immutable')
+     *     | $(LITERAL 'scope')
+     *     | $(LITERAL 'shared')
+     *     | $(LITERAL 'return')
+     *     ;)
+     */
+    ParameterAttribute parseVariadicArgumentsAttribute()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto node = allocator.make!ParameterAttribute();
+        auto startIndex = index;
+
+        if (!currentIsOneOf(tok!"const", tok!"immutable", tok!"shared", tok!"scope", tok!"return"))
+        {
+            error("`const`, `immutable`, `shared`, `scope` or `return` expected");
+            return null;
+        }
+
+        node.idType = current.type;
+        advance();
         node.tokens = tokens[startIndex .. index];
         return node;
     }

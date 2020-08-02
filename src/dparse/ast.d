@@ -2508,6 +2508,7 @@ final class Parameters : BaseNode
 
     /** */ Parameter[] parameters;
     /** */ bool hasVarargs;
+    /** */ ParameterAttribute[] varargsAttributes;
     mixin OpEquals;
 }
 
