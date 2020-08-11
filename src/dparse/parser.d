@@ -1819,8 +1819,9 @@ class Parser
         StackBuffer trueDeclarations;
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
-            immutable bool brace = advance() == tok!"{";
-            node.trueStyle = currentIs(tok!":") ? DeclarationListStyle.colon : brace ? DeclarationListStyle.block : DeclarationListStyle.single;
+            immutable bool brace = currentIs(tok!"{");
+            node.trueStyle = brace ? DeclarationListStyle.block : DeclarationListStyle.colon;
+            advance();
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 immutable c = allocator.setCheckpoint();
@@ -1833,8 +1834,12 @@ class Parser
             if (brace)
                 mixin(tokenCheck!"}");
         }
-        else if (!trueDeclarations.put(parseDeclaration(strict, true)))
-            return null;
+        else
+        {
+            if (!trueDeclarations.put(parseDeclaration(strict, true)))
+                return null;
+            node.trueStyle = DeclarationListStyle.single;
+        }
 
         ownArray(node.trueDeclarations, trueDeclarations);
 
@@ -1853,7 +1858,7 @@ class Parser
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = currentIs(tok!"{");
-            node.falseStyle = currentIs(tok!":") ? DeclarationListStyle.colon : brace ? DeclarationListStyle.block : DeclarationListStyle.single;
+            node.falseStyle = brace ? DeclarationListStyle.block : DeclarationListStyle.colon;
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
                 if (!falseDeclarations.put(parseDeclaration(strict, true)))
@@ -1865,6 +1870,7 @@ class Parser
         {
             if (!falseDeclarations.put(parseDeclaration(strict, true)))
                 return null;
+            node.falseStyle = DeclarationListStyle.single;
         }
         ownArray(node.falseDeclarations, falseDeclarations);
         node.tokens = tokens[startIndex .. index];
