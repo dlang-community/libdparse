@@ -1,0 +1,1 @@
+//conditionalDeclaration//trueDeclarations[@style="colon"]
