@@ -218,13 +218,13 @@ class XMLPrinter : ASTVisitor
 	{
 		output.writeln("<conditionalDeclaration>");
 		visit(conditionalDeclaration.compileCondition);
-		output.writeln("<trueDeclarations>");
+		output.writeln("<trueDeclarations style=\"", conditionalDeclaration.trueStyle, "\">");
 		foreach (dec; conditionalDeclaration.trueDeclarations)
 			visit(dec);
 		output.writeln("</trueDeclarations>");
 		if (conditionalDeclaration.falseDeclarations.length > 0)
 		{
-			output.writeln("<falseDeclarations>");
+			output.writeln("<falseDeclarations style=\"", conditionalDeclaration.trueStyle, "\">");
 			foreach (dec; conditionalDeclaration.falseDeclarations)
 				visit(dec);
 			output.writeln("</falseDeclarations>");
@@ -1173,7 +1173,7 @@ class XMLPrinter : ASTVisitor
 
 	private void writeName(string name)
 	{
-		output.write("<name>", name, "</name>");
+		output.writeln("<name>", name, "</name>");
 	}
 
 	private void writeDdoc(string comment)
