@@ -1,10 +1,12 @@
 import std.array;
 import std.exception;
 import std.file;
+import std.getopt;
 import std.stdio;
 import dparse.ast;
 import dparse.lexer;
 import dparse.parser;
+import dparse.astprinter;
 
 int errorCount = 0;
 int warningCount = 0;
@@ -295,7 +297,13 @@ int main(string[] args)
     import dparse.rollback_allocator : RollbackAllocator;
 
     version (D_Coverage) testTokenChecks();
+
+    bool ast;
+    getopt(args, "ast", &ast);
+
     enforce(args.length > 1, "Must specifiy at least one D file");
+    auto printer = new XMLPrinter;
+    printer.output = stdout;
     foreach (arg; args[1 .. $])
     {
         auto f = File(arg);
@@ -308,9 +316,12 @@ int main(string[] args)
         config.fileName = arg;
         const(Token)[] tokens = getTokensForParser(fileBytes, config, &cache);
         RollbackAllocator rba;
-        parseModule(ParserConfig(tokens, arg, &rba, &messageFunction));
+        auto mod = parseModule(ParserConfig(tokens, arg, &rba, &messageFunction));
+        if (ast && mod !is null)
+            printer.visit(mod);
     }
-    writefln("Finished parsing with %d errors and %d warnings.",
-            errorCount, warningCount);
+    if (!ast)
+        writefln("Finished parsing with %d errors and %d warnings.",
+                errorCount, warningCount);
     return errorCount == 0 ? 0 : 1;
 }
