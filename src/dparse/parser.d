@@ -3437,11 +3437,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!FunctionContract;
-        if (peekIs(tok!"{") || (currentIs(tok!"out") &&
-                index < tokens.length - 3  &&
-                tokens[index + 1].type == tok!("(") &&
-                tokens[index + 2].type == tok!("identifier") &&
-                tokens[index + 3].type == tok!(")")))
+        if (peekIs(tok!"{") || (currentIs(tok!"out") && peekAre(tok!"(", tok!"identifier", tok!")")))
             mixin(parseNodeQ!(`node.inOutStatement`, `InOutStatement`));
         else if (peekIs(tok!"("))
             mixin(parseNodeQ!(`node.inOutContractExpression`, `InOutContractExpression`));
@@ -6414,7 +6410,7 @@ class Parser
         auto node = allocator.make!StructMemberInitializer;
         if (startsWith(tok!"identifier", tok!":"))
         {
-            node.identifier = tokens[index++];
+            node.identifier = advance();
             index++;
         }
         mixin(parseNodeQ!(`node.nonVoidInitializer`, `NonVoidInitializer`));
@@ -8549,6 +8545,10 @@ protected: final:
         skip!(tok!"[", tok!"]")();
     }
 
+    /**
+     * Returns: a pointer to the token after the current one, or `null` if
+     * there is none.
+     */
     const(Token)* peek() const pure nothrow @safe @nogc
     {
         return index + 1 < tokens.length ? &tokens[index + 1] : null;
@@ -8581,35 +8581,89 @@ protected: final:
         return i >= tokens.length ? null : depth == 0 ? &tokens[i] : null;
     }
 
+    /**
+     * Returns: a pointer to the token after a set of balanced parenthesis, or
+     * `null` in the case that the current token is not an opening parenthesis
+     * or an end of file is reached before a closing parenthesis is found, or
+     * the closing parenthesis is the last token.
+     */
     const(Token)* peekPastParens() const pure nothrow @safe @nogc
     {
         return peekPast!(tok!"(", tok!")")();
     }
 
+    /**
+     * See_also: peekPastParens
+     */
     const(Token)* peekPastBrackets() const pure nothrow @safe @nogc
     {
         return peekPast!(tok!"[", tok!"]")();
     }
 
+    /**
+     * See_also: peekPastParens
+     */
     const(Token)* peekPastBraces() const pure nothrow @safe @nogc
     {
         return peekPast!(tok!"{", tok!"}")();
     }
 
+    /**
+     * Returns: `true` if there is a next token and that token has the type `t`.
+     */
     bool peekIs(IdType t) const pure nothrow @safe @nogc
     {
-        return index + 1 < tokens.length && tokens[index + 1].type == t;
-    }
-
-    bool peekIsOneOf(IdType[] types...) const pure nothrow @safe @nogc
-    {
-        if (index + 1 >= tokens.length) return false;
-        return canFind(types, tokens[index + 1].type);
+        return peekNIs(t, 1);
     }
 
     /**
-     * Returns a token of the specified type if it was the next token, otherwise
-     * calls the error function and returns null. Advances the lexer by one token.
+     * Returns: `true` if the token `offset` tokens ahead exists and is of type
+     * `t`.
+     */
+    bool peekNIs(IdType t, size_t offset) const pure nothrow @safe @nogc
+    {
+        return index + offset < tokens.length && tokens[index + offset].type == t;
+    }
+
+    /**
+     * Returns: `true` if there are at least `types.length` tokens following the
+     * current one and they have types matching the corresponding elements of
+     * `types`.
+     */
+    bool peekAre(IdType[] types...) const pure nothrow @safe @nogc
+    {
+        foreach (i, t; types)
+            if (!peekNIs(t, i + 1))
+                return false;
+        return true;
+    }
+
+    /**
+     * Returns: `true` if there is a next token and its type is one of the given
+     * `types`.
+     */
+    bool peekIsOneOf(IdType[] types...) const pure nothrow @safe @nogc
+    {
+        return peekNIsOneOf(1, types);
+    }
+
+    /**
+     * Returns: `true` if there is a token `offset` tokens after the current one
+     * and its type is one of the given `types`.
+     */
+    bool peekNIsOneOf(size_t offset, IdType[] types...) const pure nothrow @safe @nogc
+    {
+        if (index + offset >= tokens.length) return false;
+        return canFind(types, tokens[index + offset].type);
+    }
+
+    /**
+     * Returns: a pointer to a token of the specified type if it was the next
+     * token, otherwise calls the error function and returns null.
+     *
+     * Advances the lexer by one token in the case that the token was the one
+     * that was expected. Otherwise, only advances if the current token is not a
+     * semicolon, right parenthesis, or closing curly brace.
      */
     const(Token)* expect(IdType type)
     {
@@ -8674,6 +8728,11 @@ protected: final:
         return canFind(types, current.type);
     }
 
+    /**
+     * Returns: `true` if there are at least `types.length` tokens starting at
+     * the current token, and the tokens have types corresponding to the
+     * elements of `types`.
+     */
     bool startsWith(IdType[] types...) const pure nothrow @safe @nogc
     {
         if (index + types.length >= tokens.length)
