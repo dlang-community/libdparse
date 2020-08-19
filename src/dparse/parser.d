@@ -4797,17 +4797,19 @@ class Parser
         Module m = allocator.make!Module;
         if (currentIs(tok!"scriptLine"))
             m.scriptLine = advance();
-        bool isDeprecatedModule;
-        if (currentIs(tok!"deprecated"))
+        bool isModule;
         {
             immutable b = setBookmark();
-            advance();
-            if (currentIs(tok!"("))
-                skipParens();
-            isDeprecatedModule = currentIs(tok!"module");
+            immutable c = allocator.setCheckpoint();
+            while (currentIs(tok!"@") || currentIs(tok!"deprecated"))
+            {
+                parseAttribute();
+            }
+            isModule = currentIs(tok!"module");
             goToBookmark(b);
+            allocator.rollback(c);
         }
-        if (currentIs(tok!"module") || isDeprecatedModule)
+        if (isModule)
         {
             immutable c = allocator.setCheckpoint();
             m.moduleDeclaration = parseModuleDeclaration();
@@ -4830,15 +4832,21 @@ class Parser
      * Parses a ModuleDeclaration
      *
      * $(GRAMMAR $(RULEDEF moduleDeclaration):
-     *     $(RULE deprecated)? $(LITERAL 'module') $(RULE identifierChain) $(LITERAL ';')
+     *     $(RULE atAttribute)* $(RULE deprecated)? $(RULE atAttribute)* $(LITERAL 'module') $(RULE identifierChain) $(LITERAL ';')
      *     ;)
      */
     ModuleDeclaration parseModuleDeclaration()
     {
         auto startIndex = index;
-        auto node = allocator.make!ModuleDeclaration;
+        ModuleDeclaration node = allocator.make!ModuleDeclaration;
+        StackBuffer attributeBuffer;
+        while (currentIs(tok!"@"))
+            attributeBuffer.put(parseAtAttribute());
         if (currentIs(tok!"deprecated"))
             mixin(parseNodeQ!(`node.deprecated_`, `Deprecated`));
+        while (currentIs(tok!"@"))
+            attributeBuffer.put(parseAtAttribute());
+        ownArray(node.atAttributes, attributeBuffer);
         const start = expect(tok!"module");
         mixin(nullCheck!`start`);
         mixin(parseNodeQ!(`node.moduleName`, `IdentifierChain`));

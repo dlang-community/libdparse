@@ -108,5 +108,4 @@ for i in coverage/*.lst; do
 	tail "$i" -n1
 done
 
-rm -f tester tester.o
-rm -f gen_ast_xml gen_ast_xml.o
+rm -f tester.o

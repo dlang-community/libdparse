@@ -2286,8 +2286,9 @@ final class ModuleDeclaration : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(moduleName, deprecated_));
+        mixin (visitIfNotNull!(atAttributes, deprecated_, moduleName));
     }
+    /** */ AtAttribute[] atAttributes;
     /** */ Deprecated deprecated_;
     /** */ IdentifierChain moduleName;
     /** */ size_t startLocation;
