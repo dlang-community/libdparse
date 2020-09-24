@@ -1134,16 +1134,20 @@ class XMLPrinter : ASTVisitor
 	override void visit(const ImportBindings importBindings) { mixin (tagAndAccept!"importBindings"); }
 	override void visit(const ImportDeclaration importDeclaration) { mixin (tagAndAccept!"importDeclaration"); }
 	override void visit(const ImportExpression importExpression) { mixin (tagAndAccept!"importExpression"); }
-	override void visit(const IndexExpression indexExpression) { mixin (tagAndAccept!"indexExpression"); }
-	override void visit(const InStatement inStatement) { mixin (tagAndAccept!"inStatement"); }
 	override void visit(const InContractExpression inContractExpression) { mixin (tagAndAccept!"inContractExpression"); }
+	override void visit(const IndexExpression indexExpression) { mixin (tagAndAccept!"indexExpression"); }
 	override void visit(const InOutContractExpression inOutContractExpression) { mixin (tagAndAccept!"inOutContractExpression"); }
+	override void visit(const InStatement inStatement) { mixin (tagAndAccept!"inStatement"); }
 	override void visit(const KeyValuePairs keyValuePairs) { mixin (tagAndAccept!"keyValuePairs"); }
+	override void visit(const LastCatch lastCatch) { mixin (tagAndAccept!"lastCatch"); }
 	override void visit(const MixinExpression mixinExpression) { mixin (tagAndAccept!"mixinExpression"); }
 	override void visit(const MixinTemplateDeclaration mixinTemplateDeclaration) { mixin (tagAndAccept!"mixinTemplateDeclaration"); }
 	override void visit(const MixinTemplateName mixinTemplateName) { mixin (tagAndAccept!"mixinTemplateName"); }
 	override void visit(const ModuleDeclaration moduleDeclaration) { mixin (tagAndAccept!"moduleDeclaration"); }
-	override void visit(const LastCatch lastCatch) { mixin (tagAndAccept!"lastCatch"); }
+	override void visit(const NamedArgumentList namedArgumentList) { mixin (tagAndAccept!"namedArgumentList"); }
+	override void visit(const NamedArgument namedArgument) { mixin (tagAndAccept!"namedArgument"); }
+	override void visit(const NamedTemplateArgumentList namedTemplateArgumentList) { mixin (tagAndAccept!"namedTemplateArgumentList"); }
+	override void visit(const NamedTemplateArgument namedTemplateArgument) { mixin (tagAndAccept!"namedTemplateArgument"); }
 	override void visit(const NewExpression newExpression) { mixin (tagAndAccept!"newExpression"); }
 	override void visit(const NonVoidInitializer nonVoidInitializer) { mixin (tagAndAccept!"nonVoidInitializer"); }
 	override void visit(const Operands operands) { mixin (tagAndAccept!"operands"); }
