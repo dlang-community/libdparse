@@ -1,0 +1,5 @@
+//functionCallExpression[unaryExpression//identifier='b']//namedArgument[identifier='x']
+//functionCallExpression[unaryExpression//identifier='c']//namedArgument[identifier='x']
+//functionCallExpression[unaryExpression//identifier='c']//namedArgument[identifier='y']
+//functionCallExpression[unaryExpression//identifier='d']//namedTemplateArgument[identifier='a']
+//functionCallExpression[unaryExpression//identifier='d']//namedTemplateArgument[identifier='b']

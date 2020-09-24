@@ -347,6 +347,58 @@ class Parser
     }
 
     /**
+     * Parses a NamedArgument.
+     *
+     * $(GRAMMAR $(RULEDEF namedArgument):
+     *     ($(RULE identifer) $(LITERAL ':'))? $(RULE assignExpression)
+     *     ;)
+     */
+    NamedArgument parseNamedArgument()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        const startIndex = index;
+        auto node = allocator.make!NamedArgument;
+        const c = current();
+        node.startLocation = c.index;
+        if (startsWith(tok!"identifier", tok!":"))
+        {
+            // named argument
+            node.name = c;
+            advance(); // identifier
+            advance(); // :
+        }
+        mixin(parseNodeQ!("node.assignExpression", "AssignExpression"));
+        if (moreTokens) node.endLocation = current().index;
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
+     * Parses a NamedArgumentList.
+     *
+     * $(GRAMMAR $(RULEDEF namedArgumentList):
+     *     $(RULE namedArgument) ($(LITERAL ',') $(RULE namedArgument)?)*
+     *     ;)
+     */
+    NamedArgumentList parseNamedArgumentList()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto startIndex = index;
+        if (!moreTokens)
+        {
+            error("argument list expected instead of EOF");
+            return null;
+        }
+        size_t startLocation = current().index;
+        auto node = parseCommaSeparatedRule!(NamedArgumentList, NamedArgument)(true);
+        mixin (nullCheck!`node`);
+        node.startLocation = startLocation;
+        if (moreTokens) node.endLocation = current().index;
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
      * Parses an ArgumentList.
      *
      * $(GRAMMAR $(RULEDEF argumentList):
@@ -375,7 +427,7 @@ class Parser
      * Parses Arguments.
      *
      * $(GRAMMAR $(RULEDEF arguments):
-     *     $(LITERAL '$(LPAREN)') $(RULE argumentList)? $(LITERAL '$(RPAREN)')
+     *     $(LITERAL '$(LPAREN)') $(RULE namedArgumentList)? $(LITERAL '$(RPAREN)')
      *     ;)
      */
     Arguments parseArguments()
@@ -385,7 +437,7 @@ class Parser
         auto node = allocator.make!Arguments;
         mixin(tokenCheck!"(");
         if (!currentIs(tok!")"))
-            mixin (parseNodeQ!(`node.argumentList`, `ArgumentList`));
+            mixin (parseNodeQ!(`node.namedArgumentList`, `NamedArgumentList`));
         mixin(tokenCheck!")");
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -6732,20 +6784,11 @@ class Parser
         return node;
     }
 
-    /**
-     * Parses a TemplateArgument
-     *
-     * $(GRAMMAR $(RULEDEF templateArgument):
-     *       $(RULE type)
-     *     | $(RULE assignExpression)
-     *     ;)
-     */
-    TemplateArgument parseTemplateArgument()
-    {
-        mixin(traceEnterAndExit!(__FUNCTION__));
-        auto startIndex = index;
+    // Automatic copy-paste for the NamedTemlpateArgument and
+    // TemplateArgument parse functions.
+    private enum TemplateArgumentParse = q{
         auto p = index in cachedTypeChecks;
-        auto node = allocator.make!TemplateArgument;
+
         if (p !is null)
         {
             if (*p)
@@ -6772,6 +6815,47 @@ class Parser
         }
         node.tokens = tokens[startIndex .. index];
         return node;
+    };
+
+    /**
+     * Parses a NamedTemplateArgument
+     *
+     * $(GRAMMAR $(RULEDEF namedTemplateArgument):
+     *       ($(LITERAL Identifier) $(LITERAL ":"))? $(RULE type)
+     *     | ($(LITERAL Identifier) $(LITERAL ":"))? $(RULE assignExpression)
+     *     ;)
+     */
+    NamedTemplateArgument parseNamedTemplateArgument()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto startIndex = index;
+        auto node = allocator.make!NamedTemplateArgument;
+
+        if (startsWith(tok!"identifier", tok!":"))
+        {
+            // named argument
+            node.name = current();
+            advance(); // identifier
+            advance(); // :
+        }
+
+        mixin(TemplateArgumentParse);
+    }
+
+    /**
+     * Parses a TemplateArgument
+     *
+     * $(GRAMMAR $(RULEDEF templateArgument):
+     *       $(RULE type)
+     *     | $(RULE assignExpression)
+     *     ;)
+     */
+    TemplateArgument parseTemplateArgument()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto startIndex = index;
+        auto node = allocator.make!TemplateArgument;
+        mixin(TemplateArgumentParse);
     }
 
     /**
@@ -6785,6 +6869,19 @@ class Parser
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseCommaSeparatedRule!(TemplateArgumentList, TemplateArgument)(true);
+    }
+
+    /**
+     * Parses a NamedTemplateArgumentList
+     *
+     * $(GRAMMAR $(RULEDEF templateArgumentList):
+     *     $(RULE namedTemplateArgument) ($(LITERAL ',') $(RULE namedTemplateArgument)?)*
+     *     ;)
+     */
+    NamedTemplateArgumentList parseNamedTemplateArgumentList()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        return parseCommaSeparatedRule!(NamedTemplateArgumentList, NamedTemplateArgument)(true);
     }
 
     /**
@@ -6804,7 +6901,7 @@ class Parser
         {
             advance();
             if (!currentIs(tok!")"))
-                mixin(parseNodeQ!(`node.templateArgumentList`, `TemplateArgumentList`));
+                mixin(parseNodeQ!(`node.namedTemplateArgumentList`, `NamedTemplateArgumentList`));
              mixin(tokenCheck!")");
         }
         else

@@ -305,6 +305,10 @@ abstract class ASTVisitor
     /** */ void visit(const Module module_) { module_.accept(this); }
     /** */ void visit(const ModuleDeclaration moduleDeclaration) { moduleDeclaration.accept(this); }
     /** */ void visit(const MulExpression mulExpression) { mulExpression.accept(this); }
+    /** */ void visit(const NamedArgument argument) { argument.accept(this); }
+    /** */ void visit(const NamedArgumentList argument) { argument.accept(this); }
+    /** */ void visit(const NamedTemplateArgumentList templateArgumentList) { templateArgumentList.accept(this); }
+    /** */ void visit(const NamedTemplateArgument templateArgument) { templateArgument.accept(this); }
     /** */ void visit(const NamespaceList namespaceList) { namespaceList.accept(this); }
     /** */ void visit(const NewAnonClassExpression newAnonClassExpression) { newAnonClassExpression.accept(this); }
     /** */ void visit(const NewExpression newExpression) { newExpression.accept(this); }
@@ -627,6 +631,33 @@ final class AnonymousEnumMember : BaseNode
 }
 
 ///
+final class NamedArgument : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(name, assignExpression));
+    }
+    mixin OpEquals;
+    /** */ Token name;
+    /** */ ExpressionNode assignExpression;
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
+}
+
+///
+final class NamedArgumentList : BaseNode
+{
+	override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(items));
+    }
+    mixin OpEquals;
+    /** */ NamedArgument[] items;
+    /** */ size_t startLocation;
+    /** */ size_t endLocation;
+}
+
+///
 final class ArgumentList : BaseNode
 {
     override void accept(ASTVisitor visitor) const
@@ -644,10 +675,10 @@ final class Arguments : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(argumentList));
+        mixin (visitIfNotNull!(namedArgumentList));
     }
     mixin OpEquals;
-    /** */ ArgumentList argumentList;
+    /** */ NamedArgumentList namedArgumentList;
 }
 
 ///
@@ -3123,6 +3154,30 @@ final class TemplateAliasParameter : BaseNode
 }
 
 ///
+final class NamedTemplateArgument : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(name, type, assignExpression));
+    }
+    /** */ Token name;
+    /** */ Type type;
+    /** */ ExpressionNode assignExpression;
+    mixin OpEquals;
+}
+
+///
+final class NamedTemplateArgumentList : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(items));
+    }
+    /** */ NamedTemplateArgument[] items;
+    mixin OpEquals;
+}
+
+///
 final class TemplateArgument : BaseNode
 {
     override void accept(ASTVisitor visitor) const
@@ -3141,7 +3196,7 @@ final class TemplateArgumentList : BaseNode
     {
         mixin (visitIfNotNull!(items));
     }
-    /** */ TemplateArgument[] items;
+    /** */ NamedTemplateArgument[] items;
     mixin OpEquals;
 }
 
@@ -3150,9 +3205,9 @@ final class TemplateArguments : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(templateArgumentList, templateSingleArgument));
+        mixin (visitIfNotNull!(namedTemplateArgumentList, templateSingleArgument));
     }
-    /** */ TemplateArgumentList templateArgumentList;
+    /** */ NamedTemplateArgumentList namedTemplateArgumentList;
     /** */ TemplateSingleArgument templateSingleArgument;
     mixin OpEquals;
 }
@@ -3472,7 +3527,7 @@ final class UnaryExpression : ExpressionNode
     {
         // TODO prefix, postfix, unary
         mixin (visitIfNotNull!(primaryExpression, newExpression, deleteExpression,
-            castExpression, functionCallExpression, argumentList, unaryExpression,
+            castExpression, functionCallExpression, unaryExpression,
             type, identifierOrTemplateInstance, assertExpression, throwExpression,
             indexExpression));
     }
@@ -3486,7 +3541,6 @@ final class UnaryExpression : ExpressionNode
     /** */ DeleteExpression deleteExpression;
     /** */ CastExpression castExpression;
     /** */ FunctionCallExpression functionCallExpression;
-    /** */ ArgumentList argumentList;
     /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
     /** */ AssertExpression assertExpression;
     /** */ ThrowExpression throwExpression;

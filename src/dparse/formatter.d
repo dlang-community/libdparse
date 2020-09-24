@@ -244,6 +244,29 @@ class Formatter(Sink)
         }
     }
 
+    void format(const NamedArgument argument)
+    {
+        debug(verbose) writeln("NamedArgument");
+
+        if (argument.name != tok!"")
+        {
+            format(argument.name);
+            put(": ");
+        }
+        format(argument.assignExpression);
+    }
+
+    void format(const NamedArgumentList argumentList)
+    {
+        debug(verbose) writeln("NamedArgumentList");
+
+        foreach(count, arg; argumentList.items)
+        {
+            if (count) put(", ");
+            format(arg);
+        }
+    }
+
     void format(const ArgumentList argumentList)
     {
         debug(verbose) writeln("ArgumentList");
@@ -260,7 +283,7 @@ class Formatter(Sink)
         debug(verbose) writeln("Arguments");
 
         put("(");
-        if (arguments.argumentList) format(arguments.argumentList);
+        if (arguments.namedArgumentList) format(arguments.namedArgumentList);
         put(")");
     }
 
@@ -3029,6 +3052,21 @@ class Formatter(Sink)
         }
     }
 
+    void format(const NamedTemplateArgument namedTemplateArgument)
+    {
+        debug(verbose) writeln("NamedTemplateArgument");
+        with(namedTemplateArgument)
+        {
+            if (name != tok!"")
+            {
+                put(name.text);
+                put(": ");
+            }
+            if (type) format(type);
+            if (assignExpression) format(assignExpression);
+        }
+    }
+
     void format(const TemplateArgument templateArgument)
     {
         debug(verbose) writeln("TemplateArgument");
@@ -3043,6 +3081,19 @@ class Formatter(Sink)
             if (type) format(type);
             if (assignExpression) format(assignExpression);
         }
+    }
+
+    void format(const NamedTemplateArgumentList namedTemplateArgumentList, bool parens = true)
+    {
+        debug(verbose) writeln("NamedTemplateArgumentList");
+
+        if (parens) put("!(");
+        foreach(count, arg; namedTemplateArgumentList.items)
+        {
+            if (count) put(", ");
+            format(arg);
+        }
+        if (parens) put(")");
     }
 
     void format(const TemplateArgumentList templateArgumentList, bool parens = true)
@@ -3069,7 +3120,7 @@ class Formatter(Sink)
 
         with(templateArguments)
         {
-            if (templateArgumentList) format(templateArgumentList);
+            if (namedTemplateArgumentList) format(namedTemplateArgumentList);
             else if (templateSingleArgument) format(templateSingleArgument);
             else put("!()");
         }
@@ -3580,23 +3631,12 @@ class Formatter(Sink)
         {
             if (prefix != tok!"") format(prefix);
 
-            if (type)
+            if (type && identifierOrTemplateInstance)
             {
                 // handle things like (void*).sizeof
-                if (identifierOrTemplateInstance)
-                {
-                    put("(");
-                    format(type);
-                    put(")");
-                }
-                else
-                {
-                    format(type);
-                    put("(");
-                    if (argumentList)
-                        format(argumentList);
-                    put(")");
-                }
+                put("(");
+                format(type);
+                put(")");
             }
 
             if (primaryExpression) format(primaryExpression);
