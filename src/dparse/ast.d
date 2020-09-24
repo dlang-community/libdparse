@@ -307,8 +307,8 @@ abstract class ASTVisitor
     /** */ void visit(const MulExpression mulExpression) { mulExpression.accept(this); }
     /** */ void visit(const NamedArgument argument) { argument.accept(this); }
     /** */ void visit(const NamedArgumentList argument) { argument.accept(this); }
-    /** */ void visit(const NamedTemplateArgumentList templateArgumentList) { templateArgumentList.accept(this); }
-    /** */ void visit(const NamedTemplateArgument templateArgument) { templateArgument.accept(this); }
+    /** */ void visit(const NamedTemplateArgumentList namedTemplateArgumentList) { namedTemplateArgumentList.accept(this); }
+    /** */ void visit(const NamedTemplateArgument namedTemplateArgument) { namedTemplateArgument.accept(this); }
     /** */ void visit(const NamespaceList namespaceList) { namespaceList.accept(this); }
     /** */ void visit(const NewAnonClassExpression newAnonClassExpression) { newAnonClassExpression.accept(this); }
     /** */ void visit(const NewExpression newExpression) { newExpression.accept(this); }
@@ -3196,7 +3196,7 @@ final class TemplateArgumentList : BaseNode
     {
         mixin (visitIfNotNull!(items));
     }
-    /** */ NamedTemplateArgument[] items;
+    /** */ TemplateArgument[] items;
     mixin OpEquals;
 }
 
