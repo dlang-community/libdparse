@@ -3520,6 +3520,10 @@ class Parser
             mixin(parseNodeQ!(`node.constraint`, `Constraint`));
 
         mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
+        if (node.functionBody &&
+            node.functionBody.specifiedFunctionBody &&
+            node.functionBody.specifiedFunctionBody.blockStatement)
+            attachComment(node, node.functionBody.specifiedFunctionBody.blockStatement.tokens[$ - 1].trailingComment);
         ownArray(node.memberFunctionAttributes, memberFunctionAttributes);
         node.tokens = tokens[startIndex .. index];
         return node;
