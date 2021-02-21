@@ -8859,21 +8859,26 @@ protected: final:
             ~ `else {` ~ Exp ~ ` = *t; }}`;
     }
 
+    void attachComment(T)(T node, string comment)
+    {
+        if (comment !is null)
+        {
+            if (node.comment is null)
+                node.comment = comment;
+            else
+            {
+                node.comment ~= "\n";
+                node.comment ~= comment;
+            }
+        }
+    }
+
     T attachCommentFromSemicolon(T)(T node, size_t startIndex)
     {
         auto semicolon = expect(tok!";");
         if (semicolon is null)
             return null;
-        if (semicolon.trailingComment !is null)
-        {
-            if (node.comment is null)
-                node.comment = semicolon.trailingComment;
-            else
-            {
-                node.comment ~= "\n";
-                node.comment ~= semicolon.trailingComment;
-            }
-        }
+        attachComment(node, semicolon.trailingComment);
         if (node) node.tokens = tokens[startIndex .. index];
         return node;
     }
