@@ -3367,17 +3367,22 @@ class Parser
         auto node = allocator.make!FunctionBody;
         immutable b = setBookmark();
         immutable c = allocator.setCheckpoint();
-        auto missingFunctionBody = parseMissingFunctionBody();
-        if (missingFunctionBody !is null)
-        {
-            abandonBookmark(b);
-            node.missingFunctionBody = missingFunctionBody;
-        }
+        if (currentIs(tok!"=>"))
+            mixin(parseNodeQ!(`node.shortenedFunctionBody`, `ShortenedFunctionBody`));
         else
         {
-            allocator.rollback(c);
-            goToBookmark(b);
-            mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
+            auto missingFunctionBody = parseMissingFunctionBody();
+            if (missingFunctionBody !is null)
+            {
+                abandonBookmark(b);
+                node.missingFunctionBody = missingFunctionBody;
+            }
+            else
+            {
+                allocator.rollback(c);
+                goToBookmark(b);
+                mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
+            }
         }
         node.endLocation =  previous.index;
         node.tokens = tokens[startIndex .. index];
@@ -5860,6 +5865,25 @@ class Parser
             advance(); // =
         }
         mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
+     * Parses a ShortenedFunctionBody
+     *
+     * $(GRAMMAR $(RULEDEF shortenedFunctionBody):
+     *      $(LITERAL '=>') $(RULE expression) $(LITERAL ';')
+     *     ;)
+     */
+    ShortenedFunctionBody parseShortenedFunctionBody()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        immutable startIndex = index;
+        auto node = allocator.make!ShortenedFunctionBody;
+        mixin(tokenCheck!"=>");
+        mixin(parseNodeQ!("node.expression", "Expression"));
+        mixin(tokenCheck!";");
         node.tokens = tokens[startIndex .. index];
         return node;
     }

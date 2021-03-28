@@ -1,0 +1,3 @@
+./module/declaration/functionDeclaration/name[text()="abcdef"]
+./module/declaration/functionDeclaration//functionBody/shortenedFunctionBody
+./module/declaration/functionDeclaration//functionBody/shortenedFunctionBody//mulExpression
