@@ -1,7 +1,6 @@
 module dparse.lexer;
 
 import std.typecons;
-import std.typetuple;
 import std.array;
 import std.algorithm;
 import std.range;

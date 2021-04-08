@@ -1277,9 +1277,9 @@ final class Declaration : BaseNode
     }
 
     private import std.variant:Algebraic;
-    private import std.typetuple:TypeTuple;
+    private import std.meta:AliasSeq;
 
-    alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasThisDeclaration,
+    alias DeclarationTypes = AliasSeq!(AliasDeclaration, AliasThisDeclaration,
         AnonymousEnumDeclaration, AttributeDeclaration,
         ClassDeclaration, ConditionalDeclaration, Constructor, DebugSpecification,
         Destructor, EnumDeclaration, EponymousTemplateDeclaration,

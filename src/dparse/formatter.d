@@ -4,7 +4,7 @@ module dparse.formatter;
 import std.algorithm;
 import std.range;
 import std.stdio;
-import std.typetuple:TypeTuple;
+import std.meta:AliasSeq;
 
 import dparse.ast;
 import dparse.lexer;
@@ -2724,7 +2724,7 @@ class Formatter(Sink)
         {
             if (!blockStatement) newlineIndent();
 
-            enum stmnts = TypeTuple!(
+            enum stmnts = AliasSeq!(
                 "labeledStatement",
                 "blockStatement",
                 "ifStatement",
