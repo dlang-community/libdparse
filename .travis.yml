@@ -32,8 +32,8 @@ before_script:
 
 script:
   # note: for dlang project tester, which doesn't clone automatically
-  - meson build && ninja -j8 -C build
-  - ninja -j8 -C build test -v
+  #- meson build && ninja -j8 -C build
+  #- ninja -j8 -C build test -v
   - git submodule update --init --recursive
   #
   - cd test && ./run_tests.sh && cd ..

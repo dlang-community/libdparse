@@ -152,6 +152,7 @@ abstract class ASTVisitor
 
     /** */ void visit(const AddExpression addExpression) { addExpression.accept(this); }
     /** */ void visit(const AliasDeclaration aliasDeclaration) { aliasDeclaration.accept(this); }
+    /** */ void visit(const AliasAssign aliasAssign) { aliasAssign.accept(this); }
     /** */ void visit(const AliasInitializer aliasInitializer) { aliasInitializer.accept(this); }
     /** */ void visit(const AliasThisDeclaration aliasThisDeclaration) { aliasThisDeclaration.accept(this); }
     /** */ void visit(const AlignAttribute alignAttribute) { alignAttribute.accept(this); }
@@ -485,6 +486,19 @@ final class AliasDeclaration : BaseNode
     /** */ string comment;
     /** */ Parameters parameters;
     /** */ MemberFunctionAttribute[] memberFunctionAttributes;
+}
+
+///
+final class AliasAssign : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(identifier, type));
+    }
+    mixin OpEquals;
+    /** */ Token identifier;
+    /** */ Type type;
+    /** */ string comment;
 }
 
 ///
@@ -1279,7 +1293,7 @@ final class Declaration : BaseNode
     private import std.variant:Algebraic;
     private import std.typetuple:TypeTuple;
 
-    alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasThisDeclaration,
+    alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasAssign, AliasThisDeclaration,
         AnonymousEnumDeclaration, AttributeDeclaration,
         ClassDeclaration, ConditionalDeclaration, Constructor, DebugSpecification,
         Destructor, EnumDeclaration, EponymousTemplateDeclaration,
@@ -1302,6 +1316,7 @@ final class Declaration : BaseNode
     /** */ Declaration[] declarations;
 
     mixin(generateProperty("AliasDeclaration", "aliasDeclaration"));
+    mixin(generateProperty("AliasAssign", "aliasAssign"));
     mixin(generateProperty("AliasThisDeclaration", "aliasThisDeclaration"));
     mixin(generateProperty("AnonymousEnumDeclaration", "anonymousEnumDeclaration"));
     mixin(generateProperty("AttributeDeclaration", "attributeDeclaration"));
