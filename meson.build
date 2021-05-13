@@ -7,7 +7,7 @@
 project_soversion = '0'
 
 pkgc = import('pkgconfig')
-allocator_dep = dependency('stdx-allocator', version: '>= 2.77', fallback: ['stdx-allocator', 'allocator_dep'])
+allocator_dep = dependency('stdx-allocator', version: '== 2.77.5', fallback: ['stdx-allocator', 'allocator_dep'])
 
 #
 # Sources
