@@ -1,4 +1,4 @@
 [wrap-git]
 directory = stdx-allocator
 url       = https://github.com/dlang-community/stdx-allocator.git
-revision  = v2.77.5
+revision  = 17025b8a884102901f0ee5a8e09215d6621b6e7c
