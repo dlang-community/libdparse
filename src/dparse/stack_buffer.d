@@ -84,11 +84,6 @@ struct StackBuffer
 
     alias opDollar = length;
 
-    auto opIndex(size_t i)
-    {
-        return arr[i];
-    }
-
 private:
 
     void[8 * 16] stackSpace;
