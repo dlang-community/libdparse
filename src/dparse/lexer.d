@@ -12,7 +12,7 @@ import core.cpuid : sse42;
 public import dparse.trivia;
 
 /// Operators
-private enum operators = [
+private immutable operators = [
     ",", ".", "..", "...", "/", "/=", "!", "!<", "!<=", "!<>", "!<>=", "!=",
     "!>", "!>=", "$", "%", "%=", "&", "&&", "&=", "(", ")", "*", "*=", "+", "++",
     "+=", "-", "--", "-=", ":", ";", "<", "<<", "<<=", "<=", "<>", "<>=", "=",
@@ -21,7 +21,7 @@ private enum operators = [
 ];
 
 /// Kewords
-private enum keywords = [
+private immutable keywords = [
     "abstract", "alias", "align", "asm", "assert", "auto", "bool",
     "break", "byte", "case", "cast", "catch", "cdouble", "cent", "cfloat",
     "char", "class", "const", "continue", "creal", "dchar", "debug", "default",
@@ -42,7 +42,7 @@ private enum keywords = [
 ];
 
 /// Other tokens
-private enum dynamicTokens = [
+private immutable dynamicTokens = [
     "specialTokenSequence", "comment", "identifier", "scriptLine",
     "whitespace", "doubleLiteral", "floatLiteral", "idoubleLiteral",
     "ifloatLiteral", "intLiteral", "longLiteral", "realLiteral",
@@ -50,7 +50,7 @@ private enum dynamicTokens = [
     "dstringLiteral", "stringLiteral", "wstringLiteral"
 ];
 
-private enum pseudoTokenHandlers = [
+private immutable pseudoTokenHandlers = [
     "\"", "lexStringLiteral",
     "`", "lexWysiwygString",
     "//", "lexSlashSlashComment",
@@ -171,8 +171,8 @@ mixin template TokenTriviaFields()
 
 // mixin in from dparse.lexer to make error messages more managable size as the
 // entire string is dumped when there is a type mismatch.
-private enum extraFields = "import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;";
-private enum extraFieldsBare = "
+private immutable extraFields = "import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;";
+private immutable extraFieldsBare = "
     import dparse.lexer : Token;
 
     this(Token token) pure nothrow @safe @nogc {
@@ -205,7 +205,7 @@ public enum WhitespaceBehavior : ubyte
     skip = 0b0000_0001,
 }
 
-private enum stringBehaviorNotWorking = "Automatic string parsing is not "
+private immutable stringBehaviorNotWorking = "Automatic string parsing is not "
     ~ "supported and was previously not working. To unescape strings use the "
     ~ "`dparse.strings : unescapeString` function on the token texts instead.";
 
