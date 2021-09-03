@@ -448,7 +448,7 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         return i;
     }
 
-    private static char[] getBeginningChars(string[] allTokens)
+    private static char[] getBeginningChars(immutable string[] allTokens)
     {
         char[] beginningChars;
         for (size_t i = 0; i < allTokens.length; i++)
@@ -469,8 +469,8 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         import std.algorithm : sort;
         import std.range : stride;
 
-        string[] pseudoTokens = array(tokenHandlers.stride(2));
-        string[] allTokens = array(sort(staticTokens ~ possibleDefaultTokens ~ pseudoTokens).uniq());
+        immutable string[] pseudoTokens = array(tokenHandlers.stride(2));
+        immutable string[] allTokens = array(sort((staticTokens ~ possibleDefaultTokens ~ pseudoTokens).dup).uniq());
         // Array consisting of a sorted list of the first characters of the
         // tokens.
         char[] beginningChars = getBeginningChars(allTokens);
@@ -478,8 +478,8 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         return generateStatementsStep(allTokens, pseudoTokens, beginningChars, i);
     }
 
-    private static string generateStatementsStep(string[] allTokens,
-        string[] pseudoTokens, char[] chars, size_t i, string indent = "")
+    private static string generateStatementsStep(immutable string[] allTokens,
+        immutable string[] pseudoTokens, char[] chars, size_t i, string indent = "")
     {
         import std.string : format;
         string code;
@@ -519,12 +519,12 @@ mixin template Lexer(Token, alias defaultTokenFunction,
         return code;
     }
 
-    private static string printCase(string[] tokens, string[] pseudoTokens, string indent)
+    private static string printCase(immutable string[] tokens, immutable string[] pseudoTokens, string indent)
     {
         import std.array : array;
         import std.algorithm : countUntil;
         import std.conv : text;
-        string[] sortedTokens = array(sort!"a.length > b.length"(tokens));
+        immutable string[] sortedTokens = array(sort!"a.length > b.length"(tokens.dup));
 
         if (tokens.length == 1 && tokens[0].length == 1)
         {
