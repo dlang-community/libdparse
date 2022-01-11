@@ -2741,7 +2741,6 @@ class Formatter(Sink)
                 "withStatement",
                 "synchronizedStatement",
                 "tryStatement",
-                "throwStatement",
                 "scopeGuardStatement",
                 "asmStatement",
                 "conditionalStatement",
@@ -3297,14 +3296,13 @@ class Formatter(Sink)
         }
     }
 
-    void format(const ThrowStatement throwStatement)
+    void format(const ThrowExpression throwExpression)
     {
-        debug(verbose) writeln("ThrowStatement");
+        debug(verbose) writeln("ThrowExpression");
 
         put("throw ");
-        assert(throwStatement.expression);
-        format(throwStatement.expression);
-        put(";");
+        assert(throwExpression.expression);
+        format(throwExpression.expression);
     }
 
     void format(const Token token)
@@ -3593,6 +3591,7 @@ class Formatter(Sink)
             if (castExpression) format(castExpression);
             if (functionCallExpression) format(functionCallExpression);
             if (assertExpression) format(assertExpression);
+            if (throwExpression) format(throwExpression);
             if (indexExpression) format(indexExpression);
 
             if (unaryExpression) format(unaryExpression);
@@ -4247,4 +4246,10 @@ do
     int i;
 }`
 );
+    testFormatNode!(Declaration)(q{int i = throw new Ex();});
+    testFormatNode!(FunctionDeclaration)(q{void someFunction()
+{
+    foo(a, throw b, c);
+    return throw new Exception("", "");
+}});
 }
