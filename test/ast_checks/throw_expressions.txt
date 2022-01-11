@@ -1,0 +1,8 @@
+//functionDeclaration[name = 'main']
+//functionCallExpression/unaryExpression/primaryExpression/identifierOrTemplateInstance[identifier='foo']
+//functionCallExpression/arguments/argumentList/unaryExpression[1]/throwExpression//*[identifier='someThrowable']
+//functionCallExpression/arguments/argumentList/unaryExpression[2]/primaryExpression/*[identifier='bar']
+//ternaryExpression/*[1]//*[identifier='foo']
+//ternaryExpression/*[2]//*[identifier='bar']
+//ternaryExpression/*[3]/throwExpression/unaryExpression/newExpression/type[@pretty='Exception']
+//ternaryExpression/*[3]/throwExpression/unaryExpression/newExpression/arguments//stringLiteral

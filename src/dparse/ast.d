@@ -344,7 +344,7 @@ abstract class ASTVisitor
     /** */ void visit(const TemplateValueParameter templateValueParameter) { templateValueParameter.accept(this); }
     /** */ void visit(const TemplateValueParameterDefault templateValueParameterDefault) { templateValueParameterDefault.accept(this); }
     /** */ void visit(const TernaryExpression ternaryExpression) { ternaryExpression.accept(this); }
-    /** */ void visit(const ThrowStatement throwStatement) { throwStatement.accept(this); }
+    /** */ void visit(const ThrowExpression throwExpression) { throwExpression.accept(this); }
     /** */ void visit(const Token) { }
     /** */ void visit(const TraitsExpression traitsExpression) { traitsExpression.accept(this); }
     /** */ void visit(const TryStatement tryStatement) { tryStatement.accept(this); }
@@ -2376,7 +2376,7 @@ final class StatementNoCaseNoDefault : BaseNode
             whileStatement, doStatement, forStatement, foreachStatement,
             switchStatement, finalSwitchStatement, continueStatement,
             breakStatement, returnStatement, gotoStatement, withStatement,
-            synchronizedStatement, tryStatement, throwStatement,
+            synchronizedStatement, tryStatement,
             scopeGuardStatement, asmStatement, pragmaStatement,
             conditionalStatement, staticAssertStatement, versionSpecification,
             debugSpecification, expressionStatement, staticForeachStatement));
@@ -2398,7 +2398,6 @@ final class StatementNoCaseNoDefault : BaseNode
     /** */ WithStatement withStatement;
     /** */ SynchronizedStatement synchronizedStatement;
     /** */ TryStatement tryStatement;
-    /** */ ThrowStatement throwStatement;
     /** */ ScopeGuardStatement scopeGuardStatement;
     /** */ AsmStatement asmStatement;
     /** */ PragmaStatement pragmaStatement;
@@ -3187,14 +3186,18 @@ final class TernaryExpression : ExpressionNode
     mixin OpEquals;
 }
 
+deprecated("Replaced by ExpressionStatement + ThrowExpression")
+alias ThrowStatement = ThrowExpression;
+
 ///
-final class ThrowStatement : BaseNode
+final class ThrowExpression: ExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(expression));
     }
-    /** */ Expression expression;
+
+    /** */ ExpressionNode expression;
     mixin OpEquals;
 }
 
@@ -3322,7 +3325,8 @@ final class UnaryExpression : ExpressionNode
         // TODO prefix, postfix, unary
         mixin (visitIfNotNull!(primaryExpression, newExpression, deleteExpression,
             castExpression, functionCallExpression, argumentList, unaryExpression,
-            type, identifierOrTemplateInstance, assertExpression, indexExpression));
+            type, identifierOrTemplateInstance, assertExpression, throwExpression,
+            indexExpression));
     }
 
     /** */ Type type;
@@ -3337,6 +3341,7 @@ final class UnaryExpression : ExpressionNode
     /** */ ArgumentList argumentList;
     /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
     /** */ AssertExpression assertExpression;
+    /** */ ThrowExpression throwExpression;
     /** */ IndexExpression indexExpression;
     /** */ size_t dotLocation;
     mixin OpEquals;
@@ -3953,4 +3958,3 @@ unittest // Support GCC-sytle asm statements
         }
     });
 }
-

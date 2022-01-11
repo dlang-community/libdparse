@@ -6001,7 +6001,6 @@ class Parser
      *     | $(RULE withStatement)
      *     | $(RULE synchronizedStatement)
      *     | $(RULE tryStatement)
-     *     | $(RULE throwStatement)
      *     | $(RULE scopeGuardStatement)
      *     | $(RULE pragmaStatement)
      *     | $(RULE asmStatement)
@@ -6064,9 +6063,6 @@ class Parser
             break;
         case tok!"try":
             mixin(parseNodeQ!(`node.tryStatement`, `TryStatement`));
-            break;
-        case tok!"throw":
-            mixin(parseNodeQ!(`node.throwStatement`, `ThrowStatement`));
             break;
         case tok!"scope":
             mixin(parseNodeQ!(`node.scopeGuardStatement`, `ScopeGuardStatement`));
@@ -7061,20 +7057,19 @@ class Parser
     }
 
     /**
-     * Parses a ThrowStatement
+     * Parses a ThrowExpression
      *
-     * $(GRAMMAR $(RULEDEF throwStatement):
-     *     $(LITERAL 'throw') $(RULE expression) $(LITERAL ';')
+     * $(GRAMMAR $(RULEDEF throwExpression):
+     *     $(LITERAL 'throw') $(RULE assignExpression)
      *     ;)
      */
-    ThrowStatement parseThrowStatement()
+    ThrowExpression parseThrowExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        auto node = allocator.make!ThrowStatement;
+        auto node = allocator.make!ThrowExpression;
         expect(tok!"throw");
-        mixin(parseNodeQ!(`node.expression`, `Expression`));
-        expect(tok!";");
+        mixin(parseNodeQ!(`node.expression`, `AssignExpression`));
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -7526,6 +7521,7 @@ class Parser
      *     | $(RULE deleteExpression)
      *     | $(RULE castExpression)
      *     | $(RULE assertExpression)
+     *     | $(RULE throwExpression)
      *     | $(RULE functionCallExpression)
      *     | $(RULE indexExpression)
      *     | $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)') $(LITERAL '.') $(RULE identifierOrTemplateInstance)
@@ -7588,6 +7584,9 @@ class Parser
             break;
         case tok!"assert":
             mixin(parseNodeQ!(`node.assertExpression`, `AssertExpression`));
+            break;
+        case tok!"throw":
+            mixin(parseNodeQ!(`node.throwExpression`, `ThrowExpression`));
             break;
         case tok!"(":
             // handle (type).identifier
