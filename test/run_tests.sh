@@ -15,7 +15,7 @@ SOURCE_FILES="../src/std/experimental/*.d ../src/dparse/*.d "
 STDX_ALLOC_FILES=$(find ../stdx-allocator/source -name "*.d" )
 IMPORT_PATHS="-I../src/ -I../stdx-allocator/source"
 
-${DMD} $STDX_ALLOC_FILES $IMPORT_PATHS -of"stdxalloc" -lib
+${DMD} $STDX_ALLOC_FILES $IMPORT_PATHS -of"stdxalloc.a" -lib
 
 echo -en "Compiling parse tester... "
 ${DMD} tester.d $SOURCE_FILES -g "stdxalloc.a" $IMPORT_PATHS
@@ -92,6 +92,12 @@ if [[ ${BUILDKITE:-} != "true" ]]; then
 else
 	echo
 	echo -e "${YELLOW}Skipping AST checks in Buildkite CI${NORMAL}"
+fi
+
+if [[ ${DMD} == "gdmd" ]]
+then
+	echo "GDC / GDMD does not support -cov"
+	exit 0;
 fi
 
 echo
