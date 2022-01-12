@@ -1,0 +1,67 @@
+name: run-tests
+
+on:
+  pull_request:
+
+  push:
+    branches:
+      - master
+
+jobs:
+  main:
+    name: Run all tests
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: dmd-latest
+            dmd: dmd
+
+          - compiler: ldc-latest
+            dmd: ldmd2
+
+          - compiler: gdc-latest
+            dmd: gdmd
+
+    runs-on: ubuntu-latest
+
+    steps:
+        # Clone repo + submodules
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+           submodules: 'recursive'
+
+        # Update packages and install test dependencies
+      - name: Install required dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libxml2-utils -y
+
+        # Install the host compiler (DMD or LDC)
+      - name: Install ${{ matrix.compiler }}
+        if: ${{ matrix.compiler != 'gdc-latest' }}
+        uses: dlang-community/setup-dlang@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+
+        # GDC not yet supported by setup-dlang
+      - name: Install GDC
+        if: ${{ matrix.compiler == 'gdc-latest' }}
+        run: |
+          sudo apt-get install gdc gdmd -y
+          gdc --version
+
+      # Execute all other tests (parsing, XPath, ...)
+      - name: Run run_tests.sh
+        env:
+          DMD: ${{ matrix.dmd }}
+        shell: bash
+        working-directory: test
+        run: source run_tests.sh
+
+      # Upload coverage reports to CodeCov
+      - uses: codecov/codecov-action@v2
+        if: ${{ matrix.compiler == 'ldc-latest' }}
+        with:
+          directory: test/coverage
