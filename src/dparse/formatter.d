@@ -4088,10 +4088,18 @@ void testFormatNode(Node)(string sourceCode, string expected = "")
         {
             stuff.accept(this);
             format(&fmt, stuff);
-            if (expected.length)
-                assert(fmt.data.canFind(expected), "\n" ~ fmt.data);
-            else
-                assert(fmt.data.canFind(sourceCode), "\n" ~ fmt.data);
+            const exp = expected.length ? expected : sourceCode;
+            const act = fmt.data();
+            if (!act.canFind(exp))
+            {
+                string msg = "Formatted code didn't contain the expected output!";
+                msg ~= "\n=============== Expected ===================\n";
+                msg ~= exp;
+                msg ~= "\n=============== Actual ===================\n";
+                msg ~= act;
+                msg ~= "\n==========================================";
+                assert(false, msg);
+            }
         }
     }
 
