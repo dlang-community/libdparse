@@ -2737,8 +2737,6 @@ final class ShortenedFunctionBody : BaseNode
     }
 
     /** */ Expression expression;
-    /** */ size_t startLocation;
-    /** */ size_t endLocation;
     mixin OpEquals;
 }
 
