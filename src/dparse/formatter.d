@@ -2653,6 +2653,14 @@ class Formatter(Sink)
         mixin(binary("shiftExpression"));
     }
 
+    void format(const ShortenedFunctionBody shortenedFunctionBody)
+    {
+        debug(verbose) writeln("ShortenedFunctionBody");
+        put("=> ");
+        format(shortenedFunctionBody.expression);
+        put(";");
+    }
+
     void format(const SingleImport singleImport)
     {
         debug(verbose) writeln("SingleImport");

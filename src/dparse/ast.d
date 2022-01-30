@@ -307,6 +307,7 @@ abstract class ASTVisitor
     /** */ void visit(const SharedStaticConstructor sharedStaticConstructor) { sharedStaticConstructor.accept(this); }
     /** */ void visit(const SharedStaticDestructor sharedStaticDestructor) { sharedStaticDestructor.accept(this); }
     /** */ void visit(const ShiftExpression shiftExpression) { shiftExpression.accept(this); }
+    /** */ void visit(const ShortenedFunctionBody shortenedFunctionBody) { shortenedFunctionBody.accept(this); }
     /** */ void visit(const SingleImport singleImport) { singleImport.accept(this); }
     /** */ void visit(const Index index) { index.accept(this); }
     /** */ void visit(const SpecifiedFunctionBody specifiedFunctionBody) { specifiedFunctionBody.accept(this); }
@@ -1728,12 +1729,13 @@ final class FunctionBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(specifiedFunctionBody, missingFunctionBody));
+        mixin (visitIfNotNull!(specifiedFunctionBody, missingFunctionBody, shortenedFunctionBody));
     }
 
     /** */ size_t endLocation;
     /** */ SpecifiedFunctionBody specifiedFunctionBody;
     /** */ MissingFunctionBody missingFunctionBody;
+    /** */ ShortenedFunctionBody shortenedFunctionBody;
     mixin OpEquals;
 }
 
@@ -2737,6 +2739,18 @@ final class SpecifiedFunctionBody : BaseNode
     /** */ FunctionContract[] functionContracts;
     /** */ BlockStatement blockStatement;
     /** */ bool hasDo;
+    mixin OpEquals;
+}
+
+///
+final class ShortenedFunctionBody : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin(visitIfNotNull!(expression));
+    }
+
+    /** */ Expression expression;
     mixin OpEquals;
 }
 

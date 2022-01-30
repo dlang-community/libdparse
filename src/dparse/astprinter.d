@@ -1119,6 +1119,7 @@ class XMLPrinter : ASTVisitor
 	override void visit(const ScopeGuardStatement scopeGuardStatement) { mixin (tagAndAccept!"scopeGuardStatement"); }
 	override void visit(const SharedStaticConstructor sharedStaticConstructor) { mixin (tagAndAccept!"sharedStaticConstructor"); }
 	override void visit(const SharedStaticDestructor sharedStaticDestructor) { mixin (tagAndAccept!"sharedStaticDestructor"); }
+	override void visit(const ShortenedFunctionBody shortenedFunctionBody) { mixin (tagAndAccept!"shortenedFunctionBody"); }
 	override void visit(const StatementNoCaseNoDefault statementNoCaseNoDefault) { mixin (tagAndAccept!"statementNoCaseNoDefault"); }
 	override void visit(const StaticAssertDeclaration staticAssertDeclaration) { mixin (tagAndAccept!"staticAssertDeclaration"); }
 	override void visit(const StaticAssertStatement staticAssertStatement) { mixin (tagAndAccept!"staticAssertStatement"); }
