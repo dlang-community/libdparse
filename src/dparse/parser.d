@@ -3395,15 +3395,21 @@ class Parser
         auto node = allocator.make!FunctionBody;
         immutable b = setBookmark();
         immutable c = allocator.setCheckpoint();
-        if (currentIs(tok!"=>"))
-            mixin(parseNodeQ!(`node.shortenedFunctionBody`, `ShortenedFunctionBody`));
+        auto missingFunctionBody = parseMissingFunctionBody();
+        if (missingFunctionBody !is null)
+        {
+            abandonBookmark(b);
+            node.missingFunctionBody = missingFunctionBody;
+        }
         else
         {
-            auto missingFunctionBody = parseMissingFunctionBody();
-            if (missingFunctionBody !is null)
+            allocator.rollback(c);
+            goToBookmark(b, false);
+            auto shortenedFunctionBody = parseShortenedFunctionBody();
+            if (shortenedFunctionBody !is null)
             {
                 abandonBookmark(b);
-                node.missingFunctionBody = missingFunctionBody;
+                node.shortenedFunctionBody = shortenedFunctionBody;
             }
             else
             {
@@ -3465,18 +3471,20 @@ class Parser
      *     | $(RULE inOutStatement)
      *     ;)
      */
-    FunctionContract parseFunctionContract()
+    FunctionContract parseFunctionContract(bool allowStatement = true)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!FunctionContract;
-        if (peekIs(tok!"{") || (currentIs(tok!"out") && peekAre(tok!"(", tok!"identifier", tok!")")))
+        if (allowStatement && (peekIs(tok!"{") || (currentIs(tok!"out") && peekAre(tok!"(", tok!"identifier", tok!")"))))
             mixin(parseNodeQ!(`node.inOutStatement`, `InOutStatement`));
         else if (peekIs(tok!"("))
             mixin(parseNodeQ!(`node.inOutContractExpression`, `InOutContractExpression`));
         else
         {
-            error("`{` or `(` expected");
+            error(allowStatement
+                ? "`{` or `(` expected"
+                : "`(` expected");
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -5901,7 +5909,7 @@ class Parser
      * Parses a ShortenedFunctionBody
      *
      * $(GRAMMAR $(RULEDEF shortenedFunctionBody):
-     *      $(LITERAL '=>') $(RULE expression) $(LITERAL ';')
+     *      $(RULE inOutContractExpression)* $(LITERAL '=>') $(RULE expression) $(LITERAL ';')
      *     ;)
      */
     ShortenedFunctionBody parseShortenedFunctionBody()
@@ -5909,6 +5917,15 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         immutable startIndex = index;
         auto node = allocator.make!ShortenedFunctionBody;
+
+        StackBuffer contracts;
+        while (currentIsOneOf(tok!"in", tok!"out"))
+        {
+            if (auto c = parseFunctionContract(false))
+                contracts.put(c);
+        }
+        ownArray(node.functionContracts, contracts);
+
         mixin(tokenCheck!"=>");
         mixin(parseNodeQ!("node.expression", "Expression"));
         mixin(tokenCheck!";");
@@ -8810,9 +8827,15 @@ protected: final:
         suppressMessages.popBack();
     }
 
-    void goToBookmark(Bookmark bookmark) pure nothrow @safe @nogc
+    /// Goes back to a parser bookmark and optionally invalidates it.
+    /// Params:
+    ///   bookmark = bookmark to revert to
+    ///   popStack = if set to true, the bookmark is cleared, otherwise it must
+    ///     be manually cleared using $(LREF abandonBookmark).
+    void goToBookmark(Bookmark bookmark, bool popStack = true) pure nothrow @safe @nogc
     {
-        suppressMessages.popBack();
+        if (popStack)
+            suppressMessages.popBack();
         index = bookmark;
     }
 

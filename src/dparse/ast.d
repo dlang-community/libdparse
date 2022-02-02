@@ -2747,9 +2747,10 @@ final class ShortenedFunctionBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin(visitIfNotNull!(expression));
+        mixin(visitIfNotNull!(functionContracts, expression));
     }
 
+    /** */ FunctionContract[] functionContracts;
     /** */ Expression expression;
     mixin OpEquals;
 }
