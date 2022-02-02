@@ -2653,6 +2653,14 @@ class Formatter(Sink)
         mixin(binary("shiftExpression"));
     }
 
+    void format(const ShortenedFunctionBody shortenedFunctionBody)
+    {
+        debug(verbose) writeln("ShortenedFunctionBody");
+        put("=> ");
+        format(shortenedFunctionBody.expression);
+        put(";");
+    }
+
     void format(const SingleImport singleImport)
     {
         debug(verbose) writeln("SingleImport");
@@ -2741,7 +2749,6 @@ class Formatter(Sink)
                 "withStatement",
                 "synchronizedStatement",
                 "tryStatement",
-                "throwStatement",
                 "scopeGuardStatement",
                 "asmStatement",
                 "conditionalStatement",
@@ -3297,14 +3304,13 @@ class Formatter(Sink)
         }
     }
 
-    void format(const ThrowStatement throwStatement)
+    void format(const ThrowExpression throwExpression)
     {
-        debug(verbose) writeln("ThrowStatement");
+        debug(verbose) writeln("ThrowExpression");
 
         put("throw ");
-        assert(throwStatement.expression);
-        format(throwStatement.expression);
-        put(";");
+        assert(throwExpression.expression);
+        format(throwExpression.expression);
     }
 
     void format(const Token token)
@@ -3593,6 +3599,7 @@ class Formatter(Sink)
             if (castExpression) format(castExpression);
             if (functionCallExpression) format(functionCallExpression);
             if (assertExpression) format(assertExpression);
+            if (throwExpression) format(throwExpression);
             if (indexExpression) format(indexExpression);
 
             if (unaryExpression) format(unaryExpression);
@@ -4088,10 +4095,18 @@ void testFormatNode(Node)(string sourceCode, string expected = "")
         {
             stuff.accept(this);
             format(&fmt, stuff);
-            if (expected.length)
-                assert(fmt.data.canFind(expected), "\n" ~ fmt.data);
-            else
-                assert(fmt.data.canFind(sourceCode), "\n" ~ fmt.data);
+            const exp = expected.length ? expected : sourceCode;
+            const act = fmt.data();
+            if (!act.canFind(exp))
+            {
+                string msg = "Formatted code didn't contain the expected output!";
+                msg ~= "\n=============== Expected ===================\n";
+                msg ~= exp;
+                msg ~= "\n=============== Actual ===================\n";
+                msg ~= act;
+                msg ~= "\n==========================================";
+                assert(false, msg);
+            }
         }
     }
 
@@ -4239,4 +4254,10 @@ do
     int i;
 }`
 );
+    testFormatNode!(Declaration)(q{int i = throw new Ex();});
+    testFormatNode!(FunctionDeclaration)(q{void someFunction()
+{
+    foo(a, throw b, c);
+    return throw new Exception("", "");
+}});
 }

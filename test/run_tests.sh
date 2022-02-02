@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 PASS_FILES=$(find pass_files -name "*.d")
 FAIL_FILES=$(find fail_files -name "*.d")
 PASS_COUNT=0
@@ -13,10 +15,10 @@ SOURCE_FILES="../src/std/experimental/*.d ../src/dparse/*.d "
 STDX_ALLOC_FILES=$(find ../stdx-allocator/source -name "*.d" )
 IMPORT_PATHS="-I../src/ -I../stdx-allocator/source"
 
-${DMD} $STDX_ALLOC_FILES $IMPORT_PATHS -of"stdxalloc" -lib
+${DMD} $STDX_ALLOC_FILES $IMPORT_PATHS -of"stdxalloc.a" -lib
 
 echo -en "Compiling parse tester... "
-${DMD} tester.d $SOURCE_FILES -g "stdxalloc.a" $IMPORT_PATHS || exit 1
+${DMD} tester.d $SOURCE_FILES -g "stdxalloc.a" $IMPORT_PATHS
 echo -e "${GREEN}DONE${NORMAL}"
 
 for i in $PASS_FILES; do
@@ -49,7 +51,7 @@ else
 	exit 1
 fi
 
-if [[ $BUILDKITE != "true" ]]; then
+if [[ ${BUILDKITE:-} != "true" ]]; then
 	PASS_COUNT=0
 	FAIL_COUNT=0
 	echo
@@ -92,11 +94,17 @@ else
 	echo -e "${YELLOW}Skipping AST checks in Buildkite CI${NORMAL}"
 fi
 
+if [[ ${DMD} == "gdmd" ]]
+then
+	echo "GDC / GDMD does not support -cov"
+	exit 0;
+fi
+
 echo
 find . -name "*.lst" -exec rm -f {} \;
 echo -en "Generating coverage reports... "
-${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS || exit 1
-./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES 2>/dev/null 1>/dev/null
+${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS
+./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES &> /dev/null || true
 rm -rf coverage/
 mkdir coverage/
 find . -name "*.lst" | while read -r i; do

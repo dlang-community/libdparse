@@ -189,6 +189,25 @@ class Parser
     }
 
     /**
+     * Parses an AliasAssign.
+     *
+     * $(GRAMMAR $(RULEDEF aliasAssign):
+     *       $(LITERAL Identifier) $(LITERAL '=') $(RULE type)
+     */
+    AliasAssign parseAliasAssign()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto startIndex = index;
+        auto node = allocator.make!AliasAssign;
+        node.comment = comment;
+        comment = null;
+        mixin(tokenCheck!(`node.identifier`, "identifier"));
+        mixin(tokenCheck!"=");
+        mixin(parseNodeQ!(`node.type`, `Type`));
+        return attachCommentFromSemicolon(node, startIndex);
+    }
+
+    /**
      * Parses an AliasInitializer.
      *
      * $(GRAMMAR $(RULEDEF aliasInitializer):
@@ -1809,7 +1828,7 @@ class Parser
      *     | $(RULE compileCondition) $(LITERAL ':') $(RULE declaration)+ $(LITERAL 'else') $(LITERAL ':') $(RULE declaration)*
      *     ;)
      */
-    ConditionalDeclaration parseConditionalDeclaration(bool strict)
+    ConditionalDeclaration parseConditionalDeclaration(bool strict, bool inTemplateDeclaration = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
@@ -1825,7 +1844,7 @@ class Parser
             while (moreTokens() && !currentIs(tok!"}") && !currentIs(tok!"else"))
             {
                 immutable c = allocator.setCheckpoint();
-                if (!trueDeclarations.put(parseDeclaration(strict, true)))
+                if (!trueDeclarations.put(parseDeclaration(strict, true, inTemplateDeclaration)))
                 {
                     allocator.rollback(c);
                     return null;
@@ -1836,7 +1855,7 @@ class Parser
         }
         else
         {
-            if (!trueDeclarations.put(parseDeclaration(strict, true)))
+            if (!trueDeclarations.put(parseDeclaration(strict, true, inTemplateDeclaration)))
                 return null;
             node.trueStyle = DeclarationListStyle.single;
         }
@@ -1861,14 +1880,14 @@ class Parser
             node.falseStyle = brace ? DeclarationListStyle.block : DeclarationListStyle.colon;
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
-                if (!falseDeclarations.put(parseDeclaration(strict, true)))
+                if (!falseDeclarations.put(parseDeclaration(strict, true, inTemplateDeclaration)))
                     return null;
             if (brace)
                 mixin(tokenCheck!"}");
         }
         else
         {
-            if (!falseDeclarations.put(parseDeclaration(strict, true)))
+            if (!falseDeclarations.put(parseDeclaration(strict, true, inTemplateDeclaration)))
                 return null;
             node.falseStyle = DeclarationListStyle.single;
         }
@@ -2063,6 +2082,7 @@ class Parser
      * Params:
      *   strict = if true, do not return partial AST nodes on errors.
      *   mustBeDeclaration = do not parse as a declaration if it could be parsed as a function call
+     *   inTemplateDeclaration = if this function is called from a templated context
      *
      * $(GRAMMAR $(RULEDEF declaration):
      *       $(RULE attribute)* $(RULE declaration2)
@@ -2070,6 +2090,7 @@ class Parser
      *     ;
      * $(RULEDEF declaration2):
      *       $(RULE aliasDeclaration)
+     *     | $(RULR aliasAssign)
      *     | $(RULE aliasThisDeclaration)
      *     | $(RULE anonymousEnumDeclaration)
      *     | $(RULE attributeDeclaration)
@@ -2100,7 +2121,7 @@ class Parser
      *     | $(RULE versionSpecification)
      *     ;)
      */
-    Declaration parseDeclaration(bool strict = false, bool mustBeDeclaration = false)
+    Declaration parseDeclaration(bool strict = false, bool mustBeDeclaration = false, bool inTemplateDeclaration = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
@@ -2200,7 +2221,7 @@ class Parser
             while (moreTokens() && !currentIs(tok!"}"))
             {
                 auto c = allocator.setCheckpoint();
-                if (!declarations.put(parseDeclaration(strict)))
+                if (!declarations.put(parseDeclaration(strict, false, inTemplateDeclaration)))
                 {
                     allocator.rollback(c);
                     return null;
@@ -2335,11 +2356,11 @@ class Parser
             else if (peekIs(tok!"~"))
                 mixin(parseNodeQ!(`node.staticDestructor`, `StaticDestructor`));
             else if (peekIs(tok!"if"))
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
             else if (peekIs(tok!"assert"))
                 mixin(parseNodeQ!(`node.staticAssertDeclaration`, `StaticAssertDeclaration`));
             else if (peekIs(tok!"foreach") || peekIs(tok!"foreach_reverse"))
-                mixin(parseNodeQ!(`node.staticForeachDeclaration`, `StaticForeachDeclaration`));
+                mixin(nullCheck!(`node.staticForeachDeclaration = parseStaticForeachDeclaration(inTemplateDeclaration)`));
             else
                 goto type;
             break;
@@ -2359,6 +2380,13 @@ class Parser
             mixin(parseNodeQ!(`node.unittest_`, `Unittest`));
             break;
         case tok!"identifier":
+            if (inTemplateDeclaration && peekIs(tok!"="))
+            {
+                mixin(parseNodeQ!(`node.aliasAssign`, `AliasAssign`));
+                break;
+            }
+            else
+                goto type;
         case tok!".":
         case tok!"const":
         case tok!"immutable":
@@ -2395,7 +2423,7 @@ class Parser
             break;
         case tok!"version":
             if (peekIs(tok!"("))
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
             else if (peekIs(tok!"="))
                 mixin(parseNodeQ!(`node.versionSpecification`, `VersionSpecification`));
             else
@@ -2408,7 +2436,7 @@ class Parser
             if (peekIs(tok!"="))
                 mixin(parseNodeQ!(`node.debugSpecification`, `DebugSpecification`));
             else
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict)`);
+                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
             break;
         default:
             error("Declaration expected");
@@ -3139,12 +3167,12 @@ class Parser
      *     | $(LITERAL 'static') ($(LITERAL 'foreach') | $(LITERAL 'foreach_reverse')) $(LITERAL '$(LPAREN)') $(RULE foreachType) $(LITERAL ';') $(RULE expression) $(LITERAL '..') $(RULE expression) $(LITERAL '$(RPAREN)') ($(RULE declaration) | $(LITERAL '{') $(RULE declaration)* $(LITERAL '}'))
      *     ;)
      */
-    StaticForeachDeclaration parseStaticForeachDeclaration()
+    StaticForeachDeclaration parseStaticForeachDeclaration(bool inTemplateDeclaration = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         mixin(tokenCheck!"static");
-        auto decl = parseForeach!true();
+        auto decl = parseForeach!true(inTemplateDeclaration);
         if (decl) decl.tokens = tokens[startIndex .. index];
         return decl;
     }
@@ -3177,7 +3205,7 @@ class Parser
         return parseForeach!false();
     }
 
-    Foreach!declOnly parseForeach(bool declOnly = false)()
+    Foreach!declOnly parseForeach(bool declOnly = false)(bool inTemplateDeclaration = false)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
@@ -3233,7 +3261,7 @@ class Parser
                 {
                     immutable b = setBookmark();
                     immutable c = allocator.setCheckpoint();
-                    if (declarations.put(parseDeclaration(true, true)))
+                    if (declarations.put(parseDeclaration(true, true, inTemplateDeclaration)))
                         abandonBookmark(b);
                     else
                     {
@@ -3244,7 +3272,7 @@ class Parser
                 }
                 mixin(tokenCheck!"}");
             }
-            else if (!declarations.put(parseDeclaration(true, true)))
+            else if (!declarations.put(parseDeclaration(true, true, inTemplateDeclaration)))
                 return null;
             ownArray(node.declarations, declarations);
         }
@@ -3376,8 +3404,19 @@ class Parser
         else
         {
             allocator.rollback(c);
-            goToBookmark(b);
-            mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
+            goToBookmark(b, false);
+            auto shortenedFunctionBody = parseShortenedFunctionBody();
+            if (shortenedFunctionBody !is null)
+            {
+                abandonBookmark(b);
+                node.shortenedFunctionBody = shortenedFunctionBody;
+            }
+            else
+            {
+                allocator.rollback(c);
+                goToBookmark(b);
+                mixin(parseNodeQ!(`node.specifiedFunctionBody`, `SpecifiedFunctionBody`));
+            }
         }
         node.endLocation =  previous.index;
         node.tokens = tokens[startIndex .. index];
@@ -3432,18 +3471,20 @@ class Parser
      *     | $(RULE inOutStatement)
      *     ;)
      */
-    FunctionContract parseFunctionContract()
+    FunctionContract parseFunctionContract(bool allowStatement = true)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!FunctionContract;
-        if (peekIs(tok!"{") || (currentIs(tok!"out") && peekAre(tok!"(", tok!"identifier", tok!")")))
+        if (allowStatement && (peekIs(tok!"{") || (currentIs(tok!"out") && peekAre(tok!"(", tok!"identifier", tok!")"))))
             mixin(parseNodeQ!(`node.inOutStatement`, `InOutStatement`));
         else if (peekIs(tok!"("))
             mixin(parseNodeQ!(`node.inOutContractExpression`, `InOutContractExpression`));
         else
         {
-            error("`{` or `(` expected");
+            error(allowStatement
+                ? "`{` or `(` expected"
+                : "`(` expected");
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -5869,6 +5910,34 @@ class Parser
     }
 
     /**
+     * Parses a ShortenedFunctionBody
+     *
+     * $(GRAMMAR $(RULEDEF shortenedFunctionBody):
+     *      $(RULE inOutContractExpression)* $(LITERAL '=>') $(RULE expression) $(LITERAL ';')
+     *     ;)
+     */
+    ShortenedFunctionBody parseShortenedFunctionBody()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        immutable startIndex = index;
+        auto node = allocator.make!ShortenedFunctionBody;
+
+        StackBuffer contracts;
+        while (currentIsOneOf(tok!"in", tok!"out"))
+        {
+            if (auto c = parseFunctionContract(false))
+                contracts.put(c);
+        }
+        ownArray(node.functionContracts, contracts);
+
+        mixin(tokenCheck!"=>");
+        mixin(parseNodeQ!("node.expression", "Expression"));
+        mixin(tokenCheck!";");
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
      * Parses a SpecifiedFunctionBody
      *
      * $(GRAMMAR $(RULEDEF specifiedFunctionBody):
@@ -5977,7 +6046,6 @@ class Parser
      *     | $(RULE withStatement)
      *     | $(RULE synchronizedStatement)
      *     | $(RULE tryStatement)
-     *     | $(RULE throwStatement)
      *     | $(RULE scopeGuardStatement)
      *     | $(RULE pragmaStatement)
      *     | $(RULE asmStatement)
@@ -6040,9 +6108,6 @@ class Parser
             break;
         case tok!"try":
             mixin(parseNodeQ!(`node.tryStatement`, `TryStatement`));
-            break;
-        case tok!"throw":
-            mixin(parseNodeQ!(`node.throwStatement`, `ThrowStatement`));
             break;
         case tok!"scope":
             mixin(parseNodeQ!(`node.scopeGuardStatement`, `ScopeGuardStatement`));
@@ -6688,7 +6753,7 @@ class Parser
         while (moreTokens() && !currentIs(tok!"}"))
         {
             immutable c = allocator.setCheckpoint();
-            if (!declarations.put(parseDeclaration(true, true)))
+            if (!declarations.put(parseDeclaration(true, true, true)))
                 allocator.rollback(c);
         }
         ownArray(node.declarations, declarations);
@@ -7037,20 +7102,19 @@ class Parser
     }
 
     /**
-     * Parses a ThrowStatement
+     * Parses a ThrowExpression
      *
-     * $(GRAMMAR $(RULEDEF throwStatement):
-     *     $(LITERAL 'throw') $(RULE expression) $(LITERAL ';')
+     * $(GRAMMAR $(RULEDEF throwExpression):
+     *     $(LITERAL 'throw') $(RULE assignExpression)
      *     ;)
      */
-    ThrowStatement parseThrowStatement()
+    ThrowExpression parseThrowExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
-        auto node = allocator.make!ThrowStatement;
+        auto node = allocator.make!ThrowExpression;
         expect(tok!"throw");
-        mixin(parseNodeQ!(`node.expression`, `Expression`));
-        expect(tok!";");
+        mixin(parseNodeQ!(`node.expression`, `AssignExpression`));
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -7502,6 +7566,7 @@ class Parser
      *     | $(RULE deleteExpression)
      *     | $(RULE castExpression)
      *     | $(RULE assertExpression)
+     *     | $(RULE throwExpression)
      *     | $(RULE functionCallExpression)
      *     | $(RULE indexExpression)
      *     | $(LITERAL '$(LPAREN)') $(RULE type) $(LITERAL '$(RPAREN)') $(LITERAL '.') $(RULE identifierOrTemplateInstance)
@@ -7564,6 +7629,9 @@ class Parser
             break;
         case tok!"assert":
             mixin(parseNodeQ!(`node.assertExpression`, `AssertExpression`));
+            break;
+        case tok!"throw":
+            mixin(parseNodeQ!(`node.throwExpression`, `ThrowExpression`));
             break;
         case tok!"(":
             // handle (type).identifier
@@ -8763,9 +8831,15 @@ protected: final:
         suppressMessages.popBack();
     }
 
-    void goToBookmark(Bookmark bookmark) pure nothrow @safe @nogc
+    /// Goes back to a parser bookmark and optionally invalidates it.
+    /// Params:
+    ///   bookmark = bookmark to revert to
+    ///   popStack = if set to true, the bookmark is cleared, otherwise it must
+    ///     be manually cleared using $(LREF abandonBookmark).
+    void goToBookmark(Bookmark bookmark, bool popStack = true) pure nothrow @safe @nogc
     {
-        suppressMessages.popBack();
+        if (popStack)
+            suppressMessages.popBack();
         index = bookmark;
     }
 

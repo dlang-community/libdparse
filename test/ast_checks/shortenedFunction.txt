@@ -1,0 +1,8 @@
+./module/declaration[1]/functionDeclaration/name[text()="abcdef"]
+./module/declaration[1]/functionDeclaration//functionBody/shortenedFunctionBody
+./module/declaration[1]/functionDeclaration//functionBody/shortenedFunctionBody//mulExpression
+./module/declaration[2]/functionDeclaration/name[text()="propy"]
+./module/declaration[2]/functionDeclaration/storageClass/atAttribute/identifier[text()="property"]
+./module/declaration[2]/functionDeclaration//functionBody/shortenedFunctionBody
+./module/declaration[2]/functionDeclaration//inOutContractExpression[1]//inContractExpression
+./module/declaration[2]/functionDeclaration//inOutContractExpression[2]//outContractExpression

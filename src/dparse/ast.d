@@ -152,6 +152,7 @@ abstract class ASTVisitor
 
     /** */ void visit(const AddExpression addExpression) { addExpression.accept(this); }
     /** */ void visit(const AliasDeclaration aliasDeclaration) { aliasDeclaration.accept(this); }
+    /** */ void visit(const AliasAssign aliasAssign) { aliasAssign.accept(this); }
     /** */ void visit(const AliasInitializer aliasInitializer) { aliasInitializer.accept(this); }
     /** */ void visit(const AliasThisDeclaration aliasThisDeclaration) { aliasThisDeclaration.accept(this); }
     /** */ void visit(const AlignAttribute alignAttribute) { alignAttribute.accept(this); }
@@ -306,6 +307,7 @@ abstract class ASTVisitor
     /** */ void visit(const SharedStaticConstructor sharedStaticConstructor) { sharedStaticConstructor.accept(this); }
     /** */ void visit(const SharedStaticDestructor sharedStaticDestructor) { sharedStaticDestructor.accept(this); }
     /** */ void visit(const ShiftExpression shiftExpression) { shiftExpression.accept(this); }
+    /** */ void visit(const ShortenedFunctionBody shortenedFunctionBody) { shortenedFunctionBody.accept(this); }
     /** */ void visit(const SingleImport singleImport) { singleImport.accept(this); }
     /** */ void visit(const Index index) { index.accept(this); }
     /** */ void visit(const SpecifiedFunctionBody specifiedFunctionBody) { specifiedFunctionBody.accept(this); }
@@ -343,7 +345,7 @@ abstract class ASTVisitor
     /** */ void visit(const TemplateValueParameter templateValueParameter) { templateValueParameter.accept(this); }
     /** */ void visit(const TemplateValueParameterDefault templateValueParameterDefault) { templateValueParameterDefault.accept(this); }
     /** */ void visit(const TernaryExpression ternaryExpression) { ternaryExpression.accept(this); }
-    /** */ void visit(const ThrowStatement throwStatement) { throwStatement.accept(this); }
+    /** */ void visit(const ThrowExpression throwExpression) { throwExpression.accept(this); }
     /** */ void visit(const Token) { }
     /** */ void visit(const TraitsExpression traitsExpression) { traitsExpression.accept(this); }
     /** */ void visit(const TryStatement tryStatement) { tryStatement.accept(this); }
@@ -485,6 +487,19 @@ final class AliasDeclaration : BaseNode
     /** */ string comment;
     /** */ Parameters parameters;
     /** */ MemberFunctionAttribute[] memberFunctionAttributes;
+}
+
+///
+final class AliasAssign : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(identifier, type));
+    }
+    mixin OpEquals;
+    /** */ Token identifier;
+    /** */ Type type;
+    /** */ string comment;
 }
 
 ///
@@ -1279,7 +1294,7 @@ final class Declaration : BaseNode
     private import std.variant:Algebraic;
     private import std.typetuple:TypeTuple;
 
-    alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasThisDeclaration,
+    alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasAssign, AliasThisDeclaration,
         AnonymousEnumDeclaration, AttributeDeclaration,
         ClassDeclaration, ConditionalDeclaration, Constructor, DebugSpecification,
         Destructor, EnumDeclaration, EponymousTemplateDeclaration,
@@ -1302,6 +1317,7 @@ final class Declaration : BaseNode
     /** */ Declaration[] declarations;
 
     mixin(generateProperty("AliasDeclaration", "aliasDeclaration"));
+    mixin(generateProperty("AliasAssign", "aliasAssign"));
     mixin(generateProperty("AliasThisDeclaration", "aliasThisDeclaration"));
     mixin(generateProperty("AnonymousEnumDeclaration", "anonymousEnumDeclaration"));
     mixin(generateProperty("AttributeDeclaration", "attributeDeclaration"));
@@ -1713,12 +1729,13 @@ final class FunctionBody : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(specifiedFunctionBody, missingFunctionBody));
+        mixin (visitIfNotNull!(specifiedFunctionBody, missingFunctionBody, shortenedFunctionBody));
     }
 
     /** */ size_t endLocation;
     /** */ SpecifiedFunctionBody specifiedFunctionBody;
     /** */ MissingFunctionBody missingFunctionBody;
+    /** */ ShortenedFunctionBody shortenedFunctionBody;
     mixin OpEquals;
 }
 
@@ -2361,7 +2378,7 @@ final class StatementNoCaseNoDefault : BaseNode
             whileStatement, doStatement, forStatement, foreachStatement,
             switchStatement, finalSwitchStatement, continueStatement,
             breakStatement, returnStatement, gotoStatement, withStatement,
-            synchronizedStatement, tryStatement, throwStatement,
+            synchronizedStatement, tryStatement,
             scopeGuardStatement, asmStatement, pragmaStatement,
             conditionalStatement, staticAssertStatement, versionSpecification,
             debugSpecification, expressionStatement, staticForeachStatement));
@@ -2383,7 +2400,6 @@ final class StatementNoCaseNoDefault : BaseNode
     /** */ WithStatement withStatement;
     /** */ SynchronizedStatement synchronizedStatement;
     /** */ TryStatement tryStatement;
-    /** */ ThrowStatement throwStatement;
     /** */ ScopeGuardStatement scopeGuardStatement;
     /** */ AsmStatement asmStatement;
     /** */ PragmaStatement pragmaStatement;
@@ -2723,6 +2739,19 @@ final class SpecifiedFunctionBody : BaseNode
     /** */ FunctionContract[] functionContracts;
     /** */ BlockStatement blockStatement;
     /** */ bool hasDo;
+    mixin OpEquals;
+}
+
+///
+final class ShortenedFunctionBody : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin(visitIfNotNull!(functionContracts, expression));
+    }
+
+    /** */ FunctionContract[] functionContracts;
+    /** */ Expression expression;
     mixin OpEquals;
 }
 
@@ -3172,14 +3201,18 @@ final class TernaryExpression : ExpressionNode
     mixin OpEquals;
 }
 
+deprecated("Replaced by ExpressionStatement + ThrowExpression")
+alias ThrowStatement = ThrowExpression;
+
 ///
-final class ThrowStatement : BaseNode
+final class ThrowExpression: ExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(expression));
     }
-    /** */ Expression expression;
+
+    /** */ ExpressionNode expression;
     mixin OpEquals;
 }
 
@@ -3307,7 +3340,8 @@ final class UnaryExpression : ExpressionNode
         // TODO prefix, postfix, unary
         mixin (visitIfNotNull!(primaryExpression, newExpression, deleteExpression,
             castExpression, functionCallExpression, argumentList, unaryExpression,
-            type, identifierOrTemplateInstance, assertExpression, indexExpression));
+            type, identifierOrTemplateInstance, assertExpression, throwExpression,
+            indexExpression));
     }
 
     /** */ Type type;
@@ -3322,6 +3356,7 @@ final class UnaryExpression : ExpressionNode
     /** */ ArgumentList argumentList;
     /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
     /** */ AssertExpression assertExpression;
+    /** */ ThrowExpression throwExpression;
     /** */ IndexExpression indexExpression;
     /** */ size_t dotLocation;
     mixin OpEquals;
@@ -3938,4 +3973,3 @@ unittest // Support GCC-sytle asm statements
         }
     });
 }
-

@@ -1,5 +1,7 @@
 module dparse.rollback_allocator;
 
+import core.memory : GC;
+
 //version = debug_rollback_allocator;
 
 /**
@@ -147,6 +149,7 @@ private:
         ubyte[] m = cast(ubyte[]) AlignedMallocator.instance.alignedAllocate(max(size + Node.sizeof, ALLOC_SIZE), memoryAlignment);
         if (m is null)
             onOutOfMemoryError();
+        GC.addRange(m.ptr, m.length);
 
         version (debug_rollback_allocator)
             m[] = 0;
@@ -164,6 +167,7 @@ private:
         ubyte[] mem = (cast(ubyte*) first)[0 .. Node.sizeof + first.mem.length];
         version (debug_rollback_allocator)
             mem[] = 0;
+        GC.removeRange(mem.ptr);
         AlignedMallocator.instance.deallocate(mem);
         first = next;
     }

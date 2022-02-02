@@ -1,5 +1,7 @@
 module dparse.stack_buffer;
 
+import core.memory : GC;
+
 import std.traits;
 
 //version = debug_stack_allocator;
@@ -20,6 +22,10 @@ struct StackBuffer
         static if (is(T == class))
             static assert(T.sizeof == size_t.sizeof);
 
+        static if (hasIndirections!T)
+            while (_length % size_t.sizeof != 0)
+                put(ubyte(1));
+
         if (arr.ptr != stackSpace.ptr)
         {
             if (_length + T.sizeof > arr.length)
@@ -27,7 +33,10 @@ struct StackBuffer
                 size_t newLength = arr.length << 1;
                 while (_length + T.sizeof > newLength)
                     newLength <<= 1;
+                auto oldPtr = arr.ptr;
                 Mallocator.instance.reallocate(arr, newLength);
+                GC.removeRange(oldPtr);
+                GC.addRange(arr.ptr, arr.length);
                 version (debug_stack_allocator)
                     (cast(ubyte[]) arr)[_length .. $] = 0;
             }
@@ -38,6 +47,7 @@ struct StackBuffer
             while (_length + T.sizeof > newLength)
                 newLength <<= 1;
             arr = Mallocator.instance.allocate(newLength);
+            GC.addRange(arr.ptr, arr.length);
             version (debug_stack_allocator)
                 (cast(ubyte[]) arr)[] = 0;
             arr[0 .. stackSpace.length] = stackSpace[];
@@ -54,7 +64,10 @@ struct StackBuffer
         version (debug_stack_allocator)
             (cast(ubyte[]) arr)[] = 0;
         if (arr.ptr !is stackSpace.ptr)
+        {
+            GC.removeRange(arr.ptr);
             Mallocator.instance.deallocate(arr);
+        }
     }
 
     void[] opSlice()
@@ -70,11 +83,6 @@ struct StackBuffer
     }
 
     alias opDollar = length;
-
-    auto opIndex(size_t i)
-    {
-        return arr[i];
-    }
 
 private:
 
