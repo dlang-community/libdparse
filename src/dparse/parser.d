@@ -6422,6 +6422,7 @@ class Parser
         if (currentIs(tok!"{"))
         {
             mixin(parseNodeQ!(`node.structBody`, `StructBody`));
+            attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
         }
         else if (currentIs(tok!";"))
             advance();
@@ -6758,7 +6759,11 @@ class Parser
         }
         ownArray(node.declarations, declarations);
         const end = expect(tok!"}");
-        if (end !is null) node.endLocation = end.index;
+        if (end !is null)
+        {
+            node.endLocation = end.index;
+            attachComment(node, end.trailingComment);
+        }
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -7762,9 +7767,14 @@ class Parser
             node.name.column = t.column;
     semiOrStructBody:
             if (currentIs(tok!";"))
+            {
                 advance();
+            }
             else
+            {
                 mixin(parseNodeQ!(`node.structBody`, `StructBody`));
+                attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
+            }
         }
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -9047,6 +9057,7 @@ protected: final:
         }
     structBody:
         mixin(parseNodeQ!(`node.structBody`, `StructBody`));
+        attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
         node.tokens = tokens[startIndex .. index];
         return node;
     emptyBody:
