@@ -3561,6 +3561,10 @@ class Parser
             mixin(parseNodeQ!(`node.constraint`, `Constraint`));
 
         mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
+        if (node.functionBody &&
+            node.functionBody.specifiedFunctionBody &&
+            node.functionBody.specifiedFunctionBody.blockStatement)
+            attachComment(node, node.functionBody.specifiedFunctionBody.blockStatement.tokens[$ - 1].trailingComment);
         ownArray(node.memberFunctionAttributes, memberFunctionAttributes);
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -8933,21 +8937,26 @@ protected: final:
             ~ `else {` ~ Exp ~ ` = *t; }}`;
     }
 
+    void attachComment(T)(T node, string comment)
+    {
+        if (comment !is null)
+        {
+            if (node.comment is null)
+                node.comment = comment;
+            else
+            {
+                node.comment ~= "\n";
+                node.comment ~= comment;
+            }
+        }
+    }
+
     T attachCommentFromSemicolon(T)(T node, size_t startIndex)
     {
         auto semicolon = expect(tok!";");
         if (semicolon is null)
             return null;
-        if (semicolon.trailingComment !is null)
-        {
-            if (node.comment is null)
-                node.comment = semicolon.trailingComment;
-            else
-            {
-                node.comment ~= "\n";
-                node.comment ~= semicolon.trailingComment;
-            }
-        }
+        attachComment(node, semicolon.trailingComment);
         if (node) node.tokens = tokens[startIndex .. index];
         return node;
     }
