@@ -3563,7 +3563,8 @@ class Parser
         mixin(parseNodeQ!(`node.functionBody`, `FunctionBody`));
         if (node.functionBody &&
             node.functionBody.specifiedFunctionBody &&
-            node.functionBody.specifiedFunctionBody.blockStatement)
+            node.functionBody.specifiedFunctionBody.blockStatement &&
+            node.functionBody.specifiedFunctionBody.blockStatement.tokens.length)
             attachComment(node, node.functionBody.specifiedFunctionBody.blockStatement.tokens[$ - 1].trailingComment);
         ownArray(node.memberFunctionAttributes, memberFunctionAttributes);
         node.tokens = tokens[startIndex .. index];
@@ -6422,7 +6423,8 @@ class Parser
         if (currentIs(tok!"{"))
         {
             mixin(parseNodeQ!(`node.structBody`, `StructBody`));
-            attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
+            if (node.structBody.tokens.length)
+                attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
         }
         else if (currentIs(tok!";"))
             advance();
@@ -7773,7 +7775,8 @@ class Parser
             else
             {
                 mixin(parseNodeQ!(`node.structBody`, `StructBody`));
-                attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
+                if (node.structBody.tokens.length)
+                    attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
             }
         }
         node.tokens = tokens[startIndex .. index];
@@ -9057,7 +9060,8 @@ protected: final:
         }
     structBody:
         mixin(parseNodeQ!(`node.structBody`, `StructBody`));
-        attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
+        if (node.structBody.tokens.length)
+            attachComment(node, node.structBody.tokens[$ - 1].trailingComment);
         node.tokens = tokens[startIndex .. index];
         return node;
     emptyBody:
