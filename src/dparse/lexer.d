@@ -8,11 +8,6 @@ import std.range;
 import std.experimental.lexer;
 import std.traits;
 import core.cpuid : sse42;
-version (D_InlineAsm_X86_64)
-{
-    version (Windows) {}
-    else version = iasm64NotWindows;
-}
 
 public import dparse.trivia;
 
@@ -656,7 +651,7 @@ private pure nothrow @safe:
         mixin (tokenStart);
         loop: do
         {
-            version (iasm64NotWindows)
+            version (X86_64)
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
@@ -757,7 +752,7 @@ private pure nothrow @safe:
             case 'A': .. case 'F':
             case '0': .. case '9':
             case '_':
-                version (iasm64NotWindows)
+                version (X86_64)
                 {
                     if (haveSSE42 && range.index + 16 < range.bytes.length)
                     {
@@ -844,7 +839,7 @@ private pure nothrow @safe:
             case '0':
             case '1':
             case '_':
-                version (iasm64NotWindows)
+                version (X86_64)
                 {
                     if (haveSSE42 && range.index + 16 < range.bytes.length)
                     {
@@ -895,7 +890,7 @@ private pure nothrow @safe:
             {
             case '0': .. case '9':
             case '_':
-                version (iasm64NotWindows)
+                version (X86_64)
                 {
                     if (haveSSE42 && range.index + 16 < range.bytes.length)
                     {
@@ -1112,7 +1107,7 @@ private pure nothrow @safe:
         range.popFrontN(2);
         while (range.index < range.bytes.length)
         {
-            version (iasm64NotWindows)
+            version (X86_64)
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                     skip!(false, '\r', '\n', '/', '*', 0xe2)(range.bytes.ptr + range.index,
@@ -1143,7 +1138,7 @@ private pure nothrow @safe:
         range.popFrontN(2);
         while (range.index < range.bytes.length)
         {
-            version (iasm64NotWindows)
+            version (X86_64)
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
@@ -1170,7 +1165,7 @@ private pure nothrow @safe:
         int depth = 1;
         while (depth > 0 && !(range.index >= range.bytes.length))
         {
-            version (iasm64NotWindows)
+            version (X86_64)
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
@@ -1217,7 +1212,7 @@ private pure nothrow @safe:
                 token = Token(tok!"");
                 return;
             }
-            version (iasm64NotWindows)
+            version (X86_64)
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
@@ -1263,7 +1258,7 @@ private pure nothrow @safe:
                     token = Token(tok!"");
                     return;
                 }
-                version (iasm64NotWindows)
+                version (X86_64)
                 {
                     if (haveSSE42 && range.index + 16 < range.bytes.length)
                     {
@@ -1729,7 +1724,7 @@ private pure nothrow @safe:
         }
         while (true)
         {
-            version (iasm64NotWindows)
+            version (X86_64)
             {
                 if (haveSSE42 && range.index + 16 < range.bytes.length)
                 {
@@ -2198,61 +2193,85 @@ unittest
     assert (toks(`'\xXX'`).messages[0] == DLexer.Message(1,4,"Error: 2 hex digits expected.",true));
 }
 
-version (iasm64NotWindows)
+version (X86_64)
 {
-    /**
-     * Skips between 0 and 16 bytes that match (or do not match) one of the
-     * given $(B chars).
-     */
-    void skip(bool matching, chars...)(const ubyte*, ulong*, ulong*) pure nothrow
+    private ulong pcmpestri(ubyte flags, chars...)(const ubyte* bytes) pure nothrow
         @trusted @nogc if (chars.length <= 8)
     {
         enum constant = ByteCombine!chars;
         enum charsLength = chars.length;
+
+        version (DigitalMars)
+        {
+            asm pure nothrow @nogc
+            {
+                naked;
+            }
+            version (Windows) // `bytes` in RCX
+                asm pure nothrow @nogc { movdqu XMM1, [RCX]; }
+            else // `bytes` in RDI
+                asm pure nothrow @nogc { movdqu XMM1, [RDI]; }
+            asm pure nothrow @nogc
+            {
+                mov R10, constant;
+                movq XMM2, R10;
+                mov RAX, charsLength;
+                mov RDX, 16;
+                pcmpestri XMM2, XMM1, flags;
+                mov RAX, RCX;
+                ret;
+            }
+        }
+        else // LDC/GDC
+        {
+            ulong result;
+            asm pure nothrow @nogc
+            {
+                `movdqu    %1, %%xmm1
+                 movq      %3, %%xmm2
+                 pcmpestri %5, %%xmm1, %%xmm2`
+                : "=c" (result)   // %0: pcmpestri result in RCX, to be stored into `result`
+                : "m" (*bytes),   // %1: address of `bytes` string
+                  "d" (16),       // %2: length of `bytes` head in XMM1, as pcmpestri input in EDX
+                  "r" (constant), // %3: max 8 `chars` to load into GP register, then XMM2
+                  "a" (charsLength), // %4: length in XMM2, as pcmpestri input in EAX
+                  "i" (flags)     // %5: `flags` immediate
+                : "xmm1", "xmm2"; // clobbered registers
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Skips between 0 and 16 bytes that match (or do not match) one of the
+     * given $(B chars).
+     */
+    void skip(bool matching, chars...)(const ubyte* bytes, ulong* pindex, ulong* pcolumn) pure nothrow
+        @trusted @nogc if (chars.length <= 8)
+    {
         static if (matching)
             enum flags = 0b0001_0000;
         else
             enum flags = 0b0000_0000;
-        asm pure nothrow @nogc
-        {
-            naked;
-            movdqu XMM1, [RDX];
-            mov R10, constant;
-            movq XMM2, R10;
-            mov RAX, charsLength;
-            mov RDX, 16;
-            pcmpestri XMM2, XMM1, flags;
-            add [RSI], RCX;
-            add [RDI], RCX;
-            ret;
-        }
+
+        const r = pcmpestri!(flags, chars)(bytes);
+        *pindex += r;
+        *pcolumn += r;
     }
 
     /**
      * Returns: the number of bytes starting at the given location that match
      *     (or do not match if $(B invert) is true) the byte ranges in $(B chars).
      */
-    ulong rangeMatch(bool invert, chars...)(const ubyte*) pure nothrow @trusted @nogc
+    ulong rangeMatch(bool invert, chars...)(const ubyte* bytes) pure nothrow @trusted @nogc
     {
-        static assert (chars.length % 2 == 0);
-        enum constant = ByteCombine!chars;
+        static assert(chars.length % 2 == 0);
         static if (invert)
             enum rangeMatchFlags = 0b0000_0100;
         else
             enum rangeMatchFlags = 0b0001_0100;
-        enum charsLength = chars.length;
-        asm pure nothrow @nogc
-        {
-            naked;
-            movdqu XMM1, [RDI];
-            mov R10, constant;
-            movq XMM2, R10;
-            mov RAX, charsLength;
-            mov RDX, 16;
-            pcmpestri XMM2, XMM1, rangeMatchFlags;
-            mov RAX, RCX;
-            ret;
-        }
+
+        return pcmpestri!(rangeMatchFlags, chars)(bytes);
     }
 
     template ByteCombine(c...)
