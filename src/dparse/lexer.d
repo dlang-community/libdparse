@@ -2195,13 +2195,20 @@ unittest
 
 version (X86_64)
 {
+    version (DigitalMars)
+        private enum useDMDStyle = true;
+    else version (LDC)
+        private enum useDMDStyle = (__VERSION__ < 2092); // GDC-style supported since v1.22
+    else
+        private enum useDMDStyle = false; // not supported by GDC
+
     private ulong pcmpestri(ubyte flags, chars...)(const ubyte* bytes) pure nothrow
         @trusted @nogc if (chars.length <= 8)
     {
         enum constant = ByteCombine!chars;
         enum charsLength = chars.length;
 
-        version (DigitalMars)
+        static if (useDMDStyle)
         {
             asm pure nothrow @nogc
             {
@@ -2222,7 +2229,7 @@ version (X86_64)
                 ret;
             }
         }
-        else // LDC/GDC
+        else // GDC-style inline asm (GCC basically)
         {
             ulong result;
             asm pure nothrow @nogc
