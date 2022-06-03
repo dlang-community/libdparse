@@ -1708,29 +1708,8 @@ class Formatter(Sink)
 
         with(ifStatement)
         {
-            bool isAuto = identifier != tok!"" && !type;
-            bool isAssign = isAuto || type || typeCtors.length;
-
             put("if (");
-
-            if (isAuto) put("auto ");
-            foreach(tct; typeCtors)
-            {
-                put(str(tct));
-                space();
-            }
-            if (type)
-            {
-                format(type);
-                space();
-            }
-            if (identifier != tok!"")
-            {
-                format(identifier);
-                space();
-            }
-            if (isAssign) put("= ");
-            if (expression) format(expression);
+            format(condition);
             put(")");
 
             if (thenStatement)
@@ -1752,6 +1731,36 @@ class Formatter(Sink)
                     maybeIndent(elseStatement);
             }
 
+        }
+    }
+
+    void format(const IfCondition ifCondition)
+    {
+        debug(verbose) writeln("IfCondition");
+
+        with(ifCondition)
+        {
+            bool isAuto = identifier != tok!"" && !type;
+            bool isAssign = isAuto || type || typeCtors.length;
+
+            if (isAuto) put("auto ");
+            foreach(tct; typeCtors)
+            {
+                put(str(tct));
+                space();
+            }
+            if (type)
+            {
+                format(type);
+                space();
+            }
+            if (identifier != tok!"")
+            {
+                format(identifier);
+                space();
+            }
+            if (isAssign) put("= ");
+            if (expression) format(expression);
         }
     }
 
@@ -3738,7 +3747,7 @@ class Formatter(Sink)
 
         newThing(What.other);
         put("while (");
-        format(stmt.expression);
+        format(stmt.condition);
         put(")");
         maybeIndent(stmt.declarationOrStatement);
     }

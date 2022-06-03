@@ -253,6 +253,7 @@ abstract class ASTVisitor
     /** */ void visit(const IdentifierOrTemplateInstance identifierOrTemplateInstance) { identifierOrTemplateInstance.accept(this); }
     /** */ void visit(const IdentityExpression identityExpression) { identityExpression.accept(this); }
     /** */ void visit(const IfStatement ifStatement) { ifStatement.accept(this); }
+    /** */ void visit(const IfCondition ifCondition) { ifCondition.accept(this); }
     /** */ void visit(const ImportBind importBind) { importBind.accept(this); }
     /** */ void visit(const ImportBindings importBindings) { importBindings.accept(this); }
     /** */ void visit(const ImportDeclaration importDeclaration) { importDeclaration.accept(this); }
@@ -1933,18 +1934,29 @@ final class IfStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, type, expression, thenStatement,
-            elseStatement));
+        mixin (visitIfNotNull!(condition, thenStatement, elseStatement));
     }
-    /** */ IdType[] typeCtors;
-    /** */ Type type;
-    /** */ Token identifier;
-    /** */ Expression expression;
+    /** */ IfCondition condition;
     /** */ DeclarationOrStatement thenStatement;
     /** */ DeclarationOrStatement elseStatement;
     /** */ size_t startIndex;
     /** */ size_t line;
     /** */ size_t column;
+    mixin OpEquals;
+}
+
+///
+final class IfCondition : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(type, identifier, expression));
+    }
+    /** */ IdType[] typeCtors;
+    /** */ Type type;
+    /// in an assignment-condition, in `if (auto x = ...)` this is the `x`
+    Token identifier;
+    /** */ Expression expression;
     mixin OpEquals;
 }
 
@@ -3447,10 +3459,10 @@ final class WhileStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(expression, declarationOrStatement));
+        mixin (visitIfNotNull!(condition, declarationOrStatement));
     }
 
-    /** */ Expression expression;
+    /** */ IfCondition condition;
     /** */ DeclarationOrStatement declarationOrStatement;
     /** */ size_t startIndex;
     mixin OpEquals;
