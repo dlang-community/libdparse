@@ -7,7 +7,6 @@
 project_soversion = '0'
 
 pkgc = import('pkgconfig')
-allocator_dep = dependency('stdx-allocator', version: '>= 2.77', fallback: ['stdx-allocator', 'allocator_dep'])
 
 #
 # Sources
@@ -34,14 +33,12 @@ dparse_lib = library('dparse',
         include_directories: [src_dir],
         install: true,
         version: meson.project_version(),
-        soversion: project_soversion,
-        dependencies: [allocator_dep]
+        soversion: project_soversion
 )
 
 pkgc.generate(name: 'dparse',
               libraries: [dparse_lib],
               subdirs: 'd/dparse',
-              requires: ['stdx-allocator'],
               version: meson.project_version(),
               description: 'Library for lexing and parsing D source code.'
 )
@@ -49,8 +46,7 @@ pkgc.generate(name: 'dparse',
 # for use by others which embed this as subproject
 dparse_dep = declare_dependency(
     link_with: [dparse_lib],
-    include_directories: [src_dir],
-    dependencies: [allocator_dep]
+    include_directories: [src_dir]
 )
 
 #
@@ -65,7 +61,6 @@ endif
 dparse_test_exe = executable('test_dparse',
     [dparse_src],
     include_directories: [src_dir],
-    dependencies: [allocator_dep],
     d_unittest: true,
     link_args: extra_args,
 )
