@@ -12,13 +12,10 @@ RED="\033[31m"
 YELLOW="\033[33m"
 DMD=${DMD:=dmd}
 SOURCE_FILES="../src/std/experimental/*.d ../src/dparse/*.d "
-STDX_ALLOC_FILES=$(find ../stdx-allocator/source -name "*.d" )
-IMPORT_PATHS="-I../src/ -I../stdx-allocator/source"
-
-${DMD} $STDX_ALLOC_FILES $IMPORT_PATHS -of"stdxalloc.a" -lib
+IMPORT_PATHS="-I../src/"
 
 echo -en "Compiling parse tester... "
-${DMD} tester.d $SOURCE_FILES -g "stdxalloc.a" $IMPORT_PATHS
+${DMD} tester.d $SOURCE_FILES -g $IMPORT_PATHS
 echo -e "${GREEN}DONE${NORMAL}"
 
 for i in $PASS_FILES; do
@@ -103,7 +100,7 @@ fi
 echo
 find . -name "*.lst" -exec rm -f {} \;
 echo -en "Generating coverage reports... "
-${DMD} tester.d -cov -unittest $SOURCE_FILES "stdxalloc.a" $IMPORT_PATHS
+${DMD} tester.d -cov -unittest $SOURCE_FILES $IMPORT_PATHS
 ./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES &> /dev/null || true
 rm -rf coverage/
 mkdir coverage/
