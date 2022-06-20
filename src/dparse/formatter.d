@@ -4285,7 +4285,7 @@ do
     {
     }
 }}, `const inout string x = readln()`);
-    testFormatNode!(IfCondition)(q{void foo()
+    testFormatNode!(IfStatement)(q{void foo()
 {
     if (a == b && c == d)
     {
