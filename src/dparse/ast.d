@@ -253,6 +253,7 @@ abstract class ASTVisitor
     /** */ void visit(const IdentifierOrTemplateInstance identifierOrTemplateInstance) { identifierOrTemplateInstance.accept(this); }
     /** */ void visit(const IdentityExpression identityExpression) { identityExpression.accept(this); }
     /** */ void visit(const IfStatement ifStatement) { ifStatement.accept(this); }
+    /** */ void visit(const IfCondition ifCondition) { ifCondition.accept(this); }
     /** */ void visit(const ImportBind importBind) { importBind.accept(this); }
     /** */ void visit(const ImportBindings importBindings) { importBindings.accept(this); }
     /** */ void visit(const ImportDeclaration importDeclaration) { importDeclaration.accept(this); }
@@ -1933,18 +1934,50 @@ final class IfStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, type, expression, thenStatement,
-            elseStatement));
+        mixin (visitIfNotNull!(condition, thenStatement, elseStatement));
     }
-    /** */ IdType[] typeCtors;
-    /** */ Type type;
-    /** */ Token identifier;
-    /** */ Expression expression;
+    /** */ IfCondition condition;
     /** */ DeclarationOrStatement thenStatement;
     /** */ DeclarationOrStatement elseStatement;
     /** */ size_t startIndex;
     /** */ size_t line;
     /** */ size_t column;
+    mixin OpEquals;
+}
+
+/**
+In an if (or while) condition this represents:
+```
+if (auto x = readln)
+    ^^^^^^^^^^^^^^^
+
+if (a == b || c == d)
+    ^^^^^^^^^^^^^^^^
+```
+*/
+final class IfCondition : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(type, identifier, expression));
+    }
+    /// In an assignment-condition, these are the optional type constructors
+    IdType[] typeCtors;
+    /// In an assignment-condition, this is the optional explicit type
+    Type type;
+    /// In an assignment-condition, in `if (auto x = ...)` this is the `x`
+    Token identifier;
+    /**
+    In an assignment-condition, this is true if `scope` is used to construct
+    the variable.
+    */
+    bool scope_;
+    /**
+    In an assignment-condition, this is the part after the equals sign.
+    Otherwise this is any other expression that is evaluated to be a boolean.
+    (e.g. UnaryExpression, AndAndExpression, CmpExpression, etc.)
+    */
+    Expression expression;
     mixin OpEquals;
 }
 
@@ -3447,10 +3480,10 @@ final class WhileStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(expression, declarationOrStatement));
+        mixin (visitIfNotNull!(condition, declarationOrStatement));
     }
 
-    /** */ Expression expression;
+    /** */ IfCondition condition;
     /** */ DeclarationOrStatement declarationOrStatement;
     /** */ size_t startIndex;
     mixin OpEquals;

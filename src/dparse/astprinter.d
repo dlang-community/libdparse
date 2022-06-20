@@ -461,17 +461,7 @@ class XMLPrinter : ASTVisitor
 	{
 		output.writeln("<ifStatement>");
 
-		output.writeln("<condition>");
-		if (ifStatement.identifier.type != tok!"")
-		{
-			if (ifStatement.type is null)
-				output.writeln("<auto/>");
-			else
-				visit(ifStatement.type);
-			visit(ifStatement.identifier);
-		}
-		ifStatement.expression.accept(this);
-		output.writeln("</condition>");
+		ifStatement.condition.accept(this);
 
 		output.writeln("<then>");
 		ifStatement.thenStatement.accept(this);
@@ -484,6 +474,29 @@ class XMLPrinter : ASTVisitor
 			output.writeln("</else>");
 		}
 		output.writeln("</ifStatement>");
+	}
+
+	override void visit(const IfCondition ifCondition)
+	{
+		output.writeln("<condition>");
+		foreach (constructor; ifCondition.typeCtors)
+		{
+			output.writeln("<typeConstructor>", str(constructor), "</typeConstructor>");
+		}
+		if (ifCondition.identifier.type != tok!"")
+		{
+			if (ifCondition.scope_)
+				output.writeln("<scope/>");
+			else if (ifCondition.type is null)
+				output.writeln("<auto/>");
+
+			// in case `scope T` is possible eventually, check type separately
+			if (ifCondition.type)
+				visit(ifCondition.type);
+			visit(ifCondition.identifier);
+		}
+		ifCondition.expression.accept(this);
+		output.writeln("</condition>");
 	}
 
 	override void visit(const ImportBind importBind)

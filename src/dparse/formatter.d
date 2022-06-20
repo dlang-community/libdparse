@@ -1708,29 +1708,8 @@ class Formatter(Sink)
 
         with(ifStatement)
         {
-            bool isAuto = identifier != tok!"" && !type;
-            bool isAssign = isAuto || type || typeCtors.length;
-
             put("if (");
-
-            if (isAuto) put("auto ");
-            foreach(tct; typeCtors)
-            {
-                put(str(tct));
-                space();
-            }
-            if (type)
-            {
-                format(type);
-                space();
-            }
-            if (identifier != tok!"")
-            {
-                format(identifier);
-                space();
-            }
-            if (isAssign) put("= ");
-            if (expression) format(expression);
+            format(condition);
             put(")");
 
             if (thenStatement)
@@ -1752,6 +1731,38 @@ class Formatter(Sink)
                     maybeIndent(elseStatement);
             }
 
+        }
+    }
+
+    void format(const IfCondition ifCondition)
+    {
+        debug(verbose) writeln("IfCondition");
+
+        with(ifCondition)
+        {
+            bool isAuto = identifier != tok!"" && !type && !scope_;
+            bool isScope = identifier != tok!"" && scope_;
+            bool isAssign = isAuto || isScope || type || typeCtors.length;
+
+            if (isAuto) put("auto ");
+            if (isScope) put("scope ");
+            foreach(tct; typeCtors)
+            {
+                put(str(tct));
+                space();
+            }
+            if (type)
+            {
+                format(type);
+                space();
+            }
+            if (identifier != tok!"")
+            {
+                format(identifier);
+                space();
+            }
+            if (isAssign) put("= ");
+            if (expression) format(expression);
         }
     }
 
@@ -3731,14 +3742,9 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("WhileStatement");
 
-        /**
-        Expression expression;
-        DeclarationOrStatement declarationOrStatement;
-        **/
-
         newThing(What.other);
         put("while (");
-        format(stmt.expression);
+        format(stmt.condition);
         put(")");
         maybeIndent(stmt.declarationOrStatement);
     }
@@ -4260,4 +4266,29 @@ do
     foo(a, throw b, c);
     return throw new Exception("", "");
 }});
+
+    testFormatNode!(IfCondition)(q{void foo()
+{
+    if (scope x = readln())
+    {
+    }
+}}, `scope x = readln()`);
+    testFormatNode!(IfCondition)(q{void foo()
+{
+    if (auto x = readln())
+    {
+    }
+}}, `auto x = readln()`);
+    testFormatNode!(IfCondition)(q{void foo()
+{
+    while (const inout string x = readln())
+    {
+    }
+}}, `const inout string x = readln()`);
+    testFormatNode!(IfStatement)(q{void foo()
+{
+    if (a == b && c == d)
+    {
+    }
+}}, `a == b && c == d`);
 }

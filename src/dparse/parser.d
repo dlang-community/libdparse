@@ -3993,11 +3993,6 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF ifStatement):
      *     $(LITERAL 'if') $(LITERAL '$(LPAREN)') $(RULE ifCondition) $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement) ($(LITERAL 'else') $(RULE declarationOrStatement))?
-     *$(RULEDEF ifCondition):
-     *       $(LITERAL 'auto') $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
-     *     | $(RULE typeConstructors) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
-     *     | $(RULE typeConstructors)? $(RULE type) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
-     *     | $(RULE expression)
      *     ;)
      */
     IfStatement parseIfStatement()
@@ -4011,12 +4006,46 @@ class Parser
         if (moreTokens)
             node.startIndex = current().index;
         mixin(tokenCheck!"(");
+        mixin(parseNodeQ!(`node.condition`, `IfCondition`));
+        mixin(tokenCheck!")");
+        if (currentIs(tok!"}"))
+        {
+            error("Statement expected", false);
+            node.tokens = tokens[startIndex .. index];
+            return node; // this line makes DCD better
+        }
+        mixin(parseNodeQ!(`node.thenStatement`, `DeclarationOrStatement`));
+        if (currentIs(tok!"else"))
+        {
+            advance();
+            mixin(parseNodeQ!(`node.elseStatement`, `DeclarationOrStatement`));
+        }
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
+     * Parses an IfCondition
+     *
+     * $(GRAMMAR $(RULEDEF ifCondition):
+     *       $(LITERAL 'auto') $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
+     *     | $(LITERAL 'scope') $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
+     *     | $(RULE typeConstructors) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
+     *     | $(RULE typeConstructors)? $(RULE type) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
+     *     | $(RULE expression)
+     *     ;)
+     */
+    IfCondition parseIfCondition()
+    {
+        IfCondition node = allocator.make!IfCondition;
         const b = setBookmark();
 
         // ex. case:
         //      `if (auto identifier = exp)`
-        if (currentIs(tok!"auto") && peekIs(tok!"identifier"))
+        //      `if (scope identifier = exp)`
+        if (currentIsOneOf(tok!"auto", tok!"scope") && peekIs(tok!"identifier"))
         {
+            node.scope_ = currentIs(tok!"scope");
             abandonBookmark(b);
             advance();
             node.identifier = advance();
@@ -4080,21 +4109,6 @@ class Parser
         {
             error("expression or declaration expected");
         }
-
-        mixin(tokenCheck!")");
-        if (currentIs(tok!"}"))
-        {
-            error("Statement expected", false);
-            node.tokens = tokens[startIndex .. index];
-            return node; // this line makes DCD better
-        }
-        mixin(parseNodeQ!(`node.thenStatement`, `DeclarationOrStatement`));
-        if (currentIs(tok!"else"))
-        {
-            advance();
-            mixin(parseNodeQ!(`node.elseStatement`, `DeclarationOrStatement`));
-        }
-        node.tokens = tokens[startIndex .. index];
         return node;
     }
 
@@ -7960,7 +7974,7 @@ class Parser
         if (moreTokens)
             node.startIndex = current().index;
         mixin(tokenCheck!"(");
-        mixin(parseNodeQ!(`node.expression`, `Expression`));
+        mixin(parseNodeQ!(`node.condition`, `IfCondition`));
         mixin(tokenCheck!")");
         if (currentIs(tok!"}"))
         {
