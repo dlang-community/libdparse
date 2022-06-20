@@ -485,9 +485,13 @@ class XMLPrinter : ASTVisitor
 		}
 		if (ifCondition.identifier.type != tok!"")
 		{
-			if (ifCondition.type is null)
+			if (ifCondition.scope_)
+				output.writeln("<scope/>");
+			else if (ifCondition.type is null)
 				output.writeln("<auto/>");
-			else
+
+			// in case `scope T` is possible eventually, check type separately
+			if (ifCondition.type)
 				visit(ifCondition.type);
 			visit(ifCondition.identifier);
 		}

@@ -4029,6 +4029,7 @@ class Parser
      *
      * $(GRAMMAR $(RULEDEF ifCondition):
      *       $(LITERAL 'auto') $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
+     *     | $(LITERAL 'scope') $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE typeConstructors) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE typeConstructors)? $(RULE type) $(LITERAL Identifier) $(LITERAL '=') $(RULE expression)
      *     | $(RULE expression)
@@ -4041,8 +4042,10 @@ class Parser
 
         // ex. case:
         //      `if (auto identifier = exp)`
-        if (currentIs(tok!"auto") && peekIs(tok!"identifier"))
+        //      `if (scope identifier = exp)`
+        if (currentIsOneOf(tok!"auto", tok!"scope") && peekIs(tok!"identifier"))
         {
+            node.scope_ = currentIs(tok!"scope");
             abandonBookmark(b);
             advance();
             node.identifier = advance();

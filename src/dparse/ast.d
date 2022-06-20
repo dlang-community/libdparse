@@ -1945,18 +1945,39 @@ final class IfStatement : BaseNode
     mixin OpEquals;
 }
 
-///
+/**
+In an if (or while) condition this represents:
+```
+if (auto x = readln)
+    ^^^^^^^^^^^^^^^
+
+if (a == b || c == d)
+    ^^^^^^^^^^^^^^^^
+```
+*/
 final class IfCondition : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(type, identifier, expression));
     }
-    /** */ IdType[] typeCtors;
-    /** */ Type type;
-    /// in an assignment-condition, in `if (auto x = ...)` this is the `x`
+    /// In an assignment-condition, these are the optional type constructors
+    IdType[] typeCtors;
+    /// In an assignment-condition, this is the optional explicit type
+    Type type;
+    /// In an assignment-condition, in `if (auto x = ...)` this is the `x`
     Token identifier;
-    /** */ Expression expression;
+    /**
+    In an assignment-condition, this is true if `scope` is used to construct
+    the variable.
+    */
+    bool scope_;
+    /**
+    In an assignment-condition, this is the part after the equals sign.
+    Otherwise this is any other expression that is evaluated to be a boolean.
+    (e.g. UnaryExpression, AndAndExpression, CmpExpression, etc.)
+    */
+    Expression expression;
     mixin OpEquals;
 }
 
