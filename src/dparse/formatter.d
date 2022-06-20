@@ -1740,10 +1740,12 @@ class Formatter(Sink)
 
         with(ifCondition)
         {
-            bool isAuto = identifier != tok!"" && !type;
-            bool isAssign = isAuto || type || typeCtors.length;
+            bool isAuto = identifier != tok!"" && !type && !scope_;
+            bool isScope = identifier != tok!"" && scope_;
+            bool isAssign = isAuto || isScope || type || typeCtors.length;
 
             if (isAuto) put("auto ");
+            if (isScope) put("scope ");
             foreach(tct; typeCtors)
             {
                 put(str(tct));
@@ -3740,11 +3742,6 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("WhileStatement");
 
-        /**
-        Expression expression;
-        DeclarationOrStatement declarationOrStatement;
-        **/
-
         newThing(What.other);
         put("while (");
         format(stmt.condition);
@@ -4269,4 +4266,29 @@ do
     foo(a, throw b, c);
     return throw new Exception("", "");
 }});
+
+    testFormatNode!(IfCondition)(q{void foo()
+{
+    if (scope x = readln())
+    {
+    }
+}}, `scope x = readln()`);
+    testFormatNode!(IfCondition)(q{void foo()
+{
+    if (auto x = readln())
+    {
+    }
+}}, `auto x = readln()`);
+    testFormatNode!(IfCondition)(q{void foo()
+{
+    while (const inout string x = readln())
+    {
+    }
+}}, `const inout string x = readln()`);
+    testFormatNode!(IfCondition)(q{void foo()
+{
+    if (a == b && c == d)
+    {
+    }
+}}, `a == b && c == d`);
 }
