@@ -2179,7 +2179,7 @@ class Parser
             }
             else if (isAuto == DecType.autoFun)
             {
-                mixin(nullCheck!`node.functionDeclaration = parseFunctionDeclaration(null, true)`);
+                mixin(nullCheck!`node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes)`);
                 node.tokens = tokens[startIndex .. index];
                 return node;
             }
@@ -2412,7 +2412,7 @@ class Parser
                 goToBookmark(b2);
                 if (savedComment && comment is null)
                     comment = savedComment;
-                node.functionDeclaration = parseFunctionDeclaration(t, false);
+                node.functionDeclaration = parseFunctionDeclaration(t, false, node.attributes);
             }
             else abandonBookmark(b2);
             if (!node.variableDeclaration && !node.functionDeclaration)
@@ -3518,7 +3518,7 @@ class Parser
                     return null;
             ownArray(node.storageClasses, storageClasses);
 
-            foreach (a; node.attributes)
+            foreach (a; attributes)
             {
                 if (a.attribute == tok!"auto")
                     node.hasAuto = true;
