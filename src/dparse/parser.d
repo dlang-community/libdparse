@@ -192,7 +192,8 @@ class Parser
      * Parses an AliasAssign.
      *
      * $(GRAMMAR $(RULEDEF aliasAssign):
-     *       $(LITERAL Identifier) $(LITERAL '=') $(RULE type)
+     *     $(LITERAL Identifier) $(LITERAL '=') $(RULE type)
+     *     ;)
      */
     AliasAssign parseAliasAssign()
     {
