@@ -1696,6 +1696,7 @@ final class ForeachType : BaseNode
     /** */ bool isAlias;
     /** */ bool isEnum;
     /** */ bool isRef;
+    /** */ bool isScope;
     /** */ IdType[] typeConstructors;
     /** */ Type type;
     /** */ Token identifier;

@@ -1,0 +1,6 @@
+//functionDeclaration//foreachStatement//foreachType/alias
+//functionDeclaration//foreachStatement//foreachType/enum
+//functionDeclaration//foreachStatement//foreachType/ref
+//functionDeclaration//foreachStatement//foreachType/scope
+//functionDeclaration//foreachStatement//foreachType/typeConstructor[text()='const']
+//functionDeclaration//foreachStatement//foreachType/typeConstructor[text()='inout']

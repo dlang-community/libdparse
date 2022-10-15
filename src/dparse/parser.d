@@ -3287,7 +3287,7 @@ class Parser
      * Parses a ForeachType
      *
      * $(GRAMMAR $(RULEDEF foreachType):
-     *       ($(LITERAL 'ref') | $(LITERAL 'alias') | $(LITERAL 'enum') | $(RULE typeConstructor))* $(RULE type)? $(LITERAL Identifier)
+     *       ($(LITERAL 'ref') | $(LITERAL 'alias') | $(LITERAL 'enum') | $(LITERAL 'scope') | $(RULE typeConstructor))* $(RULE type)? $(LITERAL Identifier)
      *     ;)
      */
     ForeachType parseForeachType()
@@ -3311,6 +3311,11 @@ class Parser
             else if (currentIs(tok!"enum"))
             {
                 node.isEnum = true;
+                advance();
+            }
+            else if (currentIs(tok!"scope"))
+            {
+                node.isScope = true;
                 advance();
             }
             else if (tok!"" != (typeConstructor = parseTypeConstructor(false)))
