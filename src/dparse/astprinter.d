@@ -393,6 +393,10 @@ class XMLPrinter : ASTVisitor
 	override void visit(const ForeachType foreachType)
 	{
 		output.writeln("<foreachType>");
+		if (foreachType.isAlias) output.writeln("<alias/>");
+		if (foreachType.isEnum) output.writeln("<enum/>");
+		if (foreachType.isRef) output.writeln("<ref/>");
+		if (foreachType.isScope) output.writeln("<scope/>");
 		foreach (constructor; foreachType.typeConstructors)
 		{
 			output.writeln("<typeConstructor>", str(constructor), "</typeConstructor>");
