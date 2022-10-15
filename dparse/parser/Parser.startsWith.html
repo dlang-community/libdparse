@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Function Parser.startsWith</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -103,7 +118,13 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				
+				<section><h2>Returns</h2>
+<p><code class="lang-d"><span class="kwd">true</span></code> if there are at least <code class="lang-d"><span class="pln">types<wbr/></span><span class="pun">.</span><span class="pln">length</span></code> tokens starting at
+ the current token, and the tokens have types corresponding to the
+ elements of <code class="lang-d"><a href="../../dparse/parser/Parser.startsWith.html#types"><span class="pln">types</span></a></code>.
+</p>
+</section>
+
 			</div>
 			<footer>
 				<div id="license-info">

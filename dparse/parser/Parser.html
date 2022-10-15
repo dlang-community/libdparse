@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Class Parser</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -134,9 +149,18 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dparse/parser/Parser.messageDg.html" class="public"><code>messageDg</code></a>
+								<a href="../../dparse/parser/Parser.messageDelegate.html" class="public"><code>messageDelegate</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span></code></td><td>Function that is called when a warning or error is encountered.
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span></code></td><td>Function or delegate that is called when a warning or error is encountered.
+ The parameters are the file name, line number, column number,
+ and the error or warning message.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.messageFunction.html" class="public"><code>messageFunction</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">void</span> <span class="kwd">function</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span></code></td><td>Function or delegate that is called when a warning or error is encountered.
  The parameters are the file name, line number, column number,
  and the error or warning message.
 </td>
@@ -145,7 +169,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<a href="../../dparse/parser/Parser.tokens.html" class="public"><code>tokens</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")<span class="pun">)</span><span class="pun">[]</span></code></td><td>Tokens to parse
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")<span class="pun">)</span><span class="pun">[]</span></code></td><td>Tokens to parse
 </td>
 						</tr>
 						<tr>
@@ -157,7 +181,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
+								<a href="../../dparse/parser/Parser._traceDepth.html" class="protected"><code>_traceDepth</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">int</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
 								<a href="../../dparse/parser/Parser.cachedAAChecks.html" class="protected"><code>cachedAAChecks</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span><span class="pun">[</span><span class="typ">ulong</span><span class="pun">]</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.cachedTypeChecks.html" class="protected"><code>cachedTypeChecks</code></a>
 							</td>
 							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span><span class="pun">[</span><span class="typ">ulong</span><span class="pun">]</span></code></td><td></td>
 						</tr>
@@ -181,21 +217,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dparse/parser/Parser.suppressedErrorCount.html" class="protected"><code>suppressedErrorCount</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span></code></td><td></td>
-						</tr>
-						<tr>
-							<td>
 								<a href="../../dparse/parser/Parser.suppressMessages.html" class="protected"><code>suppressMessages</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">int</span></code></td><td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/parser/Parser._traceDepth.html" class="protected"><code>_traceDepth</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">int</span></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span><span class="pun">[]</span></code></td><td></td>
 						</tr>
 					</table>
 				</section>
@@ -209,13 +233,13 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<a href="../../dparse/parser/Parser.current.html" class="protected property"><code>current</code></a><span class="tableEntryAnnotation">[get]</span>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")</code></td><td></td>
 						</tr>
 						<tr>
 							<td>
 								<a href="../../dparse/parser/Parser.previous.html" class="protected property"><code>previous</code></a><span class="tableEntryAnnotation">[get]</span>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")</code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")</code></td><td></td>
 						</tr>
 					</table>
 				</section>
@@ -230,6 +254,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.moreTokens.html" class="public">
 									<code>moreTokens</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -238,8 +263,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAddExpression.html" class="public">
 									<code>parseAddExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AddExpression.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAliasAssign.html" class="public">
+									<code>parseAliasAssign</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an AliasAssign.
 </td>
 						</tr>
 						<tr>
@@ -247,6 +283,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAliasDeclaration.html" class="public">
 									<code>parseAliasDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AliasDeclaration.
 </td>
@@ -256,6 +293,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAliasInitializer.html" class="public">
 									<code>parseAliasInitializer</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AliasInitializer.
 </td>
@@ -265,6 +303,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAliasThisDeclaration.html" class="public">
 									<code>parseAliasThisDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AliasThisDeclaration.
 </td>
@@ -274,6 +313,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAlignAttribute.html" class="public">
 									<code>parseAlignAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AlignAttribute.
 </td>
@@ -283,6 +323,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAndAndExpression.html" class="public">
 									<code>parseAndAndExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AndAndExpression.
 </td>
@@ -292,6 +333,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAndExpression.html" class="public">
 									<code>parseAndExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AndExpression.
 </td>
@@ -301,6 +343,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAnonymousEnumDeclaration.html" class="public">
 									<code>parseAnonymousEnumDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>anonymousEnumDeclaration:
      'enum' (':' type)? '{' anonymousEnumMember+ '}'
@@ -312,6 +355,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAnonymousEnumMember.html" class="public">
 									<code>parseAnonymousEnumMember</code>
 								</a>
+								<span class="tableEntryAnnotation">(typeAllowed)</span>
 							</td>
 							<td>anonymousEnumMember:
        type identifier '=' assignExpression
@@ -325,6 +369,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseArgumentList.html" class="public">
 									<code>parseArgumentList</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an ArgumentList.
 </td>
@@ -334,6 +379,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseArguments.html" class="public">
 									<code>parseArguments</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses Arguments.
 </td>
@@ -343,6 +389,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseArrayInitializer.html" class="public">
 									<code>parseArrayInitializer</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an ArrayInitializer.
 </td>
@@ -352,6 +399,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseArrayLiteral.html" class="public">
 									<code>parseArrayLiteral</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an ArrayLiteral.
 </td>
@@ -361,6 +409,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseArrayMemberInitialization.html" class="public">
 									<code>parseArrayMemberInitialization</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an ArrayMemberInitialization.
 </td>
@@ -370,6 +419,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmAddExp.html" class="public">
 									<code>parseAsmAddExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmAddExp
 </td>
@@ -379,6 +429,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmAndExp.html" class="public">
 									<code>parseAsmAndExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmAndExp
 </td>
@@ -388,6 +439,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmBrExp.html" class="public">
 									<code>parseAsmBrExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmBrExp
 </td>
@@ -397,6 +449,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmEqualExp.html" class="public">
 									<code>parseAsmEqualExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmEqualExp
 </td>
@@ -406,6 +459,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmExp.html" class="public">
 									<code>parseAsmExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmExp
 </td>
@@ -415,6 +469,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmInstruction.html" class="public">
 									<code>parseAsmInstruction</code>
 								</a>
+								<span class="tableEntryAnnotation">(maybeGccASm)</span>
 							</td>
 							<td>Parses an AsmInstruction
 </td>
@@ -424,6 +479,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmLogAndExp.html" class="public">
 									<code>parseAsmLogAndExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmLogAndExp
 </td>
@@ -433,6 +489,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmLogOrExp.html" class="public">
 									<code>parseAsmLogOrExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmLogOrExp
 </td>
@@ -442,6 +499,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmMulExp.html" class="public">
 									<code>parseAsmMulExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmMulExp
 </td>
@@ -451,6 +509,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmOrExp.html" class="public">
 									<code>parseAsmOrExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmOrExp
 </td>
@@ -460,6 +519,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmPrimaryExp.html" class="public">
 									<code>parseAsmPrimaryExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmPrimaryExp
 </td>
@@ -469,6 +529,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmRelExp.html" class="public">
 									<code>parseAsmRelExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmRelExp
 </td>
@@ -478,6 +539,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmShiftExp.html" class="public">
 									<code>parseAsmShiftExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmShiftExp
 </td>
@@ -487,6 +549,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmStatement.html" class="public">
 									<code>parseAsmStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmStatement
 </td>
@@ -496,6 +559,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmTypePrefix.html" class="public">
 									<code>parseAsmTypePrefix</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmTypePrefix
 </td>
@@ -505,6 +569,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmUnaExp.html" class="public">
 									<code>parseAsmUnaExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmUnaExp
 </td>
@@ -514,8 +579,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAsmXorExp.html" class="public">
 									<code>parseAsmXorExp</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AsmXorExp
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseAssertArguments.html" class="public">
+									<code>parseAssertArguments</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an AssertArguments
 </td>
 						</tr>
 						<tr>
@@ -523,6 +599,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAssertExpression.html" class="public">
 									<code>parseAssertExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AssertExpression
 </td>
@@ -532,6 +609,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAssignExpression.html" class="public">
 									<code>parseAssignExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AssignExpression
 </td>
@@ -541,6 +619,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAssocArrayLiteral.html" class="public">
 									<code>parseAssocArrayLiteral</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AssocArrayLiteral
 </td>
@@ -550,6 +629,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAtAttribute.html" class="public">
 									<code>parseAtAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AtAttribute
 </td>
@@ -559,6 +639,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAttribute.html" class="public">
 									<code>parseAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an Attribute
 </td>
@@ -568,6 +649,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAttributeDeclaration.html" class="public">
 									<code>parseAttributeDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">(attribute)</span>
 							</td>
 							<td>Parses an AttributeDeclaration
 </td>
@@ -577,6 +659,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAutoDeclaration.html" class="public">
 									<code>parseAutoDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AutoDeclaration
 </td>
@@ -586,6 +669,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseAutoDeclarationPart.html" class="public">
 									<code>parseAutoDeclarationPart</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an AutoDeclarationPart
 </td>
@@ -595,6 +679,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseBaseClass.html" class="public">
 									<code>parseBaseClass</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a BaseClass
 </td>
@@ -604,6 +689,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseBaseClassList.html" class="public">
 									<code>parseBaseClassList</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a BaseClassList
 </td>
@@ -613,17 +699,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseBlockStatement.html" class="public">
 									<code>parseBlockStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a BlockStatement
-</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/parser/Parser.parseBodyStatement.html" class="public">
-									<code>parseBodyStatement</code>
-								</a>
-							</td>
-							<td>Parses a BodyStatement
 </td>
 						</tr>
 						<tr>
@@ -631,6 +709,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseBreakStatement.html" class="public">
 									<code>parseBreakStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a BreakStatement
 </td>
@@ -640,6 +719,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseBuiltinType.html" class="public">
 									<code>parseBuiltinType</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an BuiltinType
 </td>
@@ -649,6 +729,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCaseRangeStatement.html" class="public">
 									<code>parseCaseRangeStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">(low)</span>
 							</td>
 							<td>Parses a CaseRangeStatement
 </td>
@@ -658,6 +739,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCaseStatement.html" class="public">
 									<code>parseCaseStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">(argumentList)</span>
 							</td>
 							<td>Parses an CaseStatement
 </td>
@@ -667,6 +749,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCastExpression.html" class="public">
 									<code>parseCastExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a CastExpression
 </td>
@@ -676,6 +759,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCastQualifier.html" class="public">
 									<code>parseCastQualifier</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a CastQualifier
 </td>
@@ -685,6 +769,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCatch.html" class="public">
 									<code>parseCatch</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Catch
 </td>
@@ -694,6 +779,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCatches.html" class="public">
 									<code>parseCatches</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Catches
 </td>
@@ -703,6 +789,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseClassDeclaration.html" class="public">
 									<code>parseClassDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ClassDeclaration
 </td>
@@ -712,6 +799,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCmpExpression.html" class="public">
 									<code>parseCmpExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a CmpExpression
 </td>
@@ -721,6 +809,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCompileCondition.html" class="public">
 									<code>parseCompileCondition</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a CompileCondition
 </td>
@@ -730,6 +819,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseConditionalDeclaration.html" class="public">
 									<code>parseConditionalDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">(strict, inTemplateDeclaration)</span>
 							</td>
 							<td>Parses a ConditionalDeclaration
 </td>
@@ -739,6 +829,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseConditionalStatement.html" class="public">
 									<code>parseConditionalStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ConditionalStatement
 </td>
@@ -748,6 +839,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseConstraint.html" class="public">
 									<code>parseConstraint</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Constraint
 </td>
@@ -757,6 +849,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseConstructor.html" class="public">
 									<code>parseConstructor</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Constructor
 </td>
@@ -766,6 +859,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseContinueStatement.html" class="public">
 									<code>parseContinueStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an ContinueStatement
 </td>
@@ -775,6 +869,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDebugCondition.html" class="public">
 									<code>parseDebugCondition</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a DebugCondition
 </td>
@@ -784,6 +879,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDebugSpecification.html" class="public">
 									<code>parseDebugSpecification</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a DebugSpecification
 </td>
@@ -793,6 +889,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDeclaration.html" class="public">
 									<code>parseDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">(strict, mustBeDeclaration, inTemplateDeclaration)</span>
 							</td>
 							<td>Parses a Declaration
 </td>
@@ -802,6 +899,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDeclarationOrStatement.html" class="public">
 									<code>parseDeclarationOrStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a DeclarationOrStatement
 </td>
@@ -811,6 +909,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDeclarationsAndStatements.html" class="public">
 									<code>parseDeclarationsAndStatements</code>
 								</a>
+								<span class="tableEntryAnnotation">(includeCases)</span>
 							</td>
 							<td>Parses DeclarationsAndStatements
 </td>
@@ -820,6 +919,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDeclarator.html" class="public">
 									<code>parseDeclarator</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Declarator
 </td>
@@ -829,6 +929,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDeclaratorIdentifierList.html" class="public">
 									<code>parseDeclaratorIdentifierList</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a DeclaratorIdentifierList
 </td>
@@ -838,6 +939,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDefaultStatement.html" class="public">
 									<code>parseDefaultStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a DefaultStatement
 </td>
@@ -847,6 +949,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDeleteExpression.html" class="public">
 									<code>parseDeleteExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a DeleteExpression
 </td>
@@ -856,6 +959,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDeprecated.html" class="public">
 									<code>parseDeprecated</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Deprecated attribute
 </td>
@@ -865,6 +969,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDestructor.html" class="public">
 									<code>parseDestructor</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Destructor
 </td>
@@ -874,6 +979,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseDoStatement.html" class="public">
 									<code>parseDoStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a DoStatement
 </td>
@@ -883,6 +989,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseEnumBody.html" class="public">
 									<code>parseEnumBody</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an EnumBody
 </td>
@@ -892,6 +999,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseEnumDeclaration.html" class="public">
 									<code>parseEnumDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an EnumDeclaration
 </td>
@@ -901,6 +1009,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseEnumMember.html" class="public">
 									<code>parseEnumMember</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an EnumMember
 </td>
@@ -910,6 +1019,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseEnumMemberAttribute.html" class="public">
 									<code>parseEnumMemberAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an EnumMemberAttribute
 </td>
@@ -919,6 +1029,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseEponymousTemplateDeclaration.html" class="public">
 									<code>parseEponymousTemplateDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an EponymousTemplateDeclaration
 </td>
@@ -928,6 +1039,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseEqualExpression.html" class="public">
 									<code>parseEqualExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">(shift)</span>
 							</td>
 							<td>Parses an EqualExpression
 </td>
@@ -937,6 +1049,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseExpression.html" class="public">
 									<code>parseExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an Expression
 </td>
@@ -946,6 +1059,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseExpressionStatement.html" class="public">
 									<code>parseExpressionStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">(expression)</span>
 							</td>
 							<td>Parses an ExpressionStatement
 </td>
@@ -955,6 +1069,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseFinally.html" class="public">
 									<code>parseFinally</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Finally
 </td>
@@ -964,6 +1079,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseFinalSwitchStatement.html" class="public">
 									<code>parseFinalSwitchStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a FinalSwitchStatement
 </td>
@@ -973,6 +1089,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseForeach.html" class="public">
 									<code>parseForeach</code>
 								</a>
+								<span class="tableEntryAnnotation">(inTemplateDeclaration)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -981,6 +1098,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseForeachStatement.html" class="public">
 									<code>parseForeachStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ForeachStatement
 </td>
@@ -990,6 +1108,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseForeachType.html" class="public">
 									<code>parseForeachType</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ForeachType
 </td>
@@ -999,6 +1118,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseForeachTypeList.html" class="public">
 									<code>parseForeachTypeList</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ForeachTypeList
 </td>
@@ -1008,6 +1128,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseForStatement.html" class="public">
 									<code>parseForStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ForStatement
 </td>
@@ -1017,6 +1138,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseFunctionAttribute.html" class="public">
 									<code>parseFunctionAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">(validate)</span>
 							</td>
 							<td>Parses a FunctionAttribute
 </td>
@@ -1026,8 +1148,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseFunctionBody.html" class="public">
 									<code>parseFunctionBody</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
-							<td>Parses a FunctionBody
+							<td>Parses a FunctionBody.
+ Note that any change of this function must also be applied in dsymbol SimpleParser, which can be found
+ <a href="https://github.com/dlang-community/dsymbol/blob/master/src/dsymbol/conversion/package.d">here</a>.
 </td>
 						</tr>
 						<tr>
@@ -1035,8 +1160,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseFunctionCallExpression.html" class="public">
 									<code>parseFunctionCallExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">(unary)</span>
 							</td>
 							<td>Parses a FunctionCallExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseFunctionContract.html" class="public">
+									<code>parseFunctionContract</code>
+								</a>
+								<span class="tableEntryAnnotation">(allowStatement)</span>
+							</td>
+							<td>Parses a FunctionContract
 </td>
 						</tr>
 						<tr>
@@ -1044,6 +1180,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseFunctionDeclaration.html" class="public">
 									<code>parseFunctionDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">(type, isAuto, attributes)</span>
 							</td>
 							<td>Parses a FunctionDeclaration
 </td>
@@ -1053,8 +1190,39 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseFunctionLiteralExpression.html" class="public">
 									<code>parseFunctionLiteralExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a FunctionLiteralExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseGccAsmInstruction.html" class="public">
+									<code>parseGccAsmInstruction</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an AsmInstruction using GCC Assembler
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseGccAsmOperand.html" class="public">
+									<code>parseGccAsmOperand</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses a GccAsmOperand
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseGccAsmOperandList.html" class="public">
+									<code>parseGccAsmOperandList</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses a GccAsmOperandList
 </td>
 						</tr>
 						<tr>
@@ -1062,6 +1230,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseGotoStatement.html" class="public">
 									<code>parseGotoStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a GotoStatement
 </td>
@@ -1071,6 +1240,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseIdentifierChain.html" class="public">
 									<code>parseIdentifierChain</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an IdentifierChain
 </td>
@@ -1080,6 +1250,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseIdentifierOrTemplateChain.html" class="public">
 									<code>parseIdentifierOrTemplateChain</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an IdentifierOrTemplateChain
 </td>
@@ -1089,6 +1260,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseIdentifierOrTemplateInstance.html" class="public">
 									<code>parseIdentifierOrTemplateInstance</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an IdentifierOrTemplateInstance
 </td>
@@ -1098,8 +1270,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseIdentityExpression.html" class="public">
 									<code>parseIdentityExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">(shift)</span>
 							</td>
 							<td>Parses an IdentityExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseIfCondition.html" class="public">
+									<code>parseIfCondition</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an IfCondition
 </td>
 						</tr>
 						<tr>
@@ -1107,6 +1290,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseIfStatement.html" class="public">
 									<code>parseIfStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an IfStatement
 </td>
@@ -1116,6 +1300,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseImportBind.html" class="public">
 									<code>parseImportBind</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an ImportBind
 </td>
@@ -1125,6 +1310,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseImportBindings.html" class="public">
 									<code>parseImportBindings</code>
 								</a>
+								<span class="tableEntryAnnotation">(singleImport)</span>
 							</td>
 							<td>Parses ImportBindings
 </td>
@@ -1134,6 +1320,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseImportDeclaration.html" class="public">
 									<code>parseImportDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an ImportDeclaration
 </td>
@@ -1143,8 +1330,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseImportExpression.html" class="public">
 									<code>parseImportExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an ImportExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInContractExpression.html" class="public">
+									<code>parseInContractExpression</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an InContractExpression
 </td>
 						</tr>
 						<tr>
@@ -1152,6 +1350,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseIndex.html" class="public">
 									<code>parseIndex</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an Index
 </td>
@@ -1161,6 +1360,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseIndexExpression.html" class="public">
 									<code>parseIndexExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">(unaryExpression)</span>
 							</td>
 							<td>Parses an IndexExpression
 </td>
@@ -1170,6 +1370,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseInExpression.html" class="public">
 									<code>parseInExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">(shift)</span>
 							</td>
 							<td>Parses an InExpression
 </td>
@@ -1179,8 +1380,29 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseInitializer.html" class="public">
 									<code>parseInitializer</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an Initializer
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInOutContractExpression.html" class="public">
+									<code>parseInOutContractExpression</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an InOutContractExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseInOutStatement.html" class="public">
+									<code>parseInOutStatement</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an InOutStatement
 </td>
 						</tr>
 						<tr>
@@ -1188,6 +1410,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseInStatement.html" class="public">
 									<code>parseInStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an InStatement
 </td>
@@ -1197,6 +1420,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseInterfaceDeclaration.html" class="public">
 									<code>parseInterfaceDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an InterfaceDeclaration
 </td>
@@ -1206,6 +1430,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseInvariant.html" class="public">
 									<code>parseInvariant</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an Invariant
 </td>
@@ -1215,6 +1440,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseIsExpression.html" class="public">
 									<code>parseIsExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an IsExpression
 </td>
@@ -1224,6 +1450,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseKeyValuePair.html" class="public">
 									<code>parseKeyValuePair</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a KeyValuePair
 </td>
@@ -1233,6 +1460,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseKeyValuePairs.html" class="public">
 									<code>parseKeyValuePairs</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses KeyValuePairs
 </td>
@@ -1242,6 +1470,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseLabeledStatement.html" class="public">
 									<code>parseLabeledStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a LabeledStatement
 </td>
@@ -1251,6 +1480,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseLastCatch.html" class="public">
 									<code>parseLastCatch</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a LastCatch
 </td>
@@ -1260,6 +1490,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseLinkageAttribute.html" class="public">
 									<code>parseLinkageAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a LinkageAttribute
 </td>
@@ -1269,8 +1500,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseMemberFunctionAttribute.html" class="public">
 									<code>parseMemberFunctionAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a MemberFunctionAttribute
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseMissingFunctionBody.html" class="public">
+									<code>parseMissingFunctionBody</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses a MissingFunctionBody
 </td>
 						</tr>
 						<tr>
@@ -1278,6 +1520,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseMixinDeclaration.html" class="public">
 									<code>parseMixinDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a MixinDeclaration
 </td>
@@ -1287,6 +1530,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseMixinExpression.html" class="public">
 									<code>parseMixinExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a MixinExpression
 </td>
@@ -1296,6 +1540,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseMixinTemplateDeclaration.html" class="public">
 									<code>parseMixinTemplateDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a MixinTemplateDeclaration
 </td>
@@ -1305,6 +1550,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseMixinTemplateName.html" class="public">
 									<code>parseMixinTemplateName</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a MixinTemplateName
 </td>
@@ -1314,6 +1560,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseModule.html" class="public">
 									<code>parseModule</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Module
 </td>
@@ -1323,6 +1570,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseModuleDeclaration.html" class="public">
 									<code>parseModuleDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ModuleDeclaration
 </td>
@@ -1332,8 +1580,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseMulExpression.html" class="public">
 									<code>parseMulExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a MulExpression.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseNamespaceList.html" class="public">
+									<code>parseNamespaceList</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses a NamespaceList.
 </td>
 						</tr>
 						<tr>
@@ -1341,6 +1600,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseNewAnonClassExpression.html" class="public">
 									<code>parseNewAnonClassExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a NewAnonClassExpression
 </td>
@@ -1350,6 +1610,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseNewExpression.html" class="public">
 									<code>parseNewExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a NewExpression
 </td>
@@ -1359,6 +1620,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseNonVoidInitializer.html" class="public">
 									<code>parseNonVoidInitializer</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a NonVoidInitializer
 </td>
@@ -1368,6 +1630,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseOperands.html" class="public">
 									<code>parseOperands</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses Operands
 </td>
@@ -1377,6 +1640,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseOrExpression.html" class="public">
 									<code>parseOrExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an OrExpression
 </td>
@@ -1386,8 +1650,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseOrOrExpression.html" class="public">
 									<code>parseOrOrExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an OrOrExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseOutContractExpression.html" class="public">
+									<code>parseOutContractExpression</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an OutContractExpression
 </td>
 						</tr>
 						<tr>
@@ -1395,6 +1670,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseOutStatement.html" class="public">
 									<code>parseOutStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an OutStatement
 </td>
@@ -1404,6 +1680,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseParameter.html" class="public">
 									<code>parseParameter</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Parameter
 </td>
@@ -1413,6 +1690,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseParameterAttribute.html" class="public">
 									<code>parseParameterAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">(validate)</span>
 							</td>
 							<td>Parses a ParameterAttribute
 </td>
@@ -1422,6 +1700,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseParameters.html" class="public">
 									<code>parseParameters</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses Parameters
 </td>
@@ -1431,6 +1710,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parsePostblit.html" class="public">
 									<code>parsePostblit</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Postblit
 </td>
@@ -1440,6 +1720,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parsePowExpression.html" class="public">
 									<code>parsePowExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a PowExpression
 </td>
@@ -1449,6 +1730,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parsePragmaDeclaration.html" class="public">
 									<code>parsePragmaDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a PragmaDeclaration
 </td>
@@ -1458,6 +1740,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parsePragmaExpression.html" class="public">
 									<code>parsePragmaExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a PragmaExpression
 </td>
@@ -1467,6 +1750,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parsePragmaStatement.html" class="public">
 									<code>parsePragmaStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a PragmaStatement
 </td>
@@ -1476,6 +1760,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parsePrimaryExpression.html" class="public">
 									<code>parsePrimaryExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a PrimaryExpression
 </td>
@@ -1485,6 +1770,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseRegister.html" class="public">
 									<code>parseRegister</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Register
 </td>
@@ -1494,6 +1780,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseRelExpression.html" class="public">
 									<code>parseRelExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">(shift)</span>
 							</td>
 							<td>Parses a RelExpression
 </td>
@@ -1503,6 +1790,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseReturnStatement.html" class="public">
 									<code>parseReturnStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ReturnStatement
 </td>
@@ -1512,6 +1800,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseScopeGuardStatement.html" class="public">
 									<code>parseScopeGuardStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ScopeGuardStatement
 </td>
@@ -1521,6 +1810,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseSharedStaticConstructor.html" class="public">
 									<code>parseSharedStaticConstructor</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a SharedStaticConstructor
 </td>
@@ -1530,6 +1820,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseSharedStaticDestructor.html" class="public">
 									<code>parseSharedStaticDestructor</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a SharedStaticDestructor
 </td>
@@ -1539,8 +1830,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseShiftExpression.html" class="public">
 									<code>parseShiftExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a ShiftExpression
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseShortenedFunctionBody.html" class="public">
+									<code>parseShortenedFunctionBody</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses a ShortenedFunctionBody
 </td>
 						</tr>
 						<tr>
@@ -1548,8 +1850,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseSingleImport.html" class="public">
 									<code>parseSingleImport</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a SingleImport
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseSpecifiedFunctionBody.html" class="public">
+									<code>parseSpecifiedFunctionBody</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses a SpecifiedFunctionBody
 </td>
 						</tr>
 						<tr>
@@ -1557,6 +1870,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStatement.html" class="public">
 									<code>parseStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Statement
 </td>
@@ -1566,6 +1880,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStatementNoCaseNoDefault.html" class="public">
 									<code>parseStatementNoCaseNoDefault</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StatementNoCaseNoDefault
 </td>
@@ -1575,6 +1890,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStaticAssertDeclaration.html" class="public">
 									<code>parseStaticAssertDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StaticAssertDeclaration
 </td>
@@ -1584,6 +1900,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStaticAssertStatement.html" class="public">
 									<code>parseStaticAssertStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StaticAssertStatement
 </td>
@@ -1593,6 +1910,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStaticConstructor.html" class="public">
 									<code>parseStaticConstructor</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StaticConstructor
 </td>
@@ -1602,6 +1920,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStaticDestructor.html" class="public">
 									<code>parseStaticDestructor</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StaticDestructor
 </td>
@@ -1611,6 +1930,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStaticForeachDeclaration.html" class="public">
 									<code>parseStaticForeachDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">(inTemplateDeclaration)</span>
 							</td>
 							<td>Parses a StaticForeachDeclaration
 </td>
@@ -1620,6 +1940,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStaticForeachStatement.html" class="public">
 									<code>parseStaticForeachStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StaticForeachStatement
 </td>
@@ -1629,6 +1950,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStaticIfCondition.html" class="public">
 									<code>parseStaticIfCondition</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an StaticIfCondition
 </td>
@@ -1638,6 +1960,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStorageClass.html" class="public">
 									<code>parseStorageClass</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StorageClass
 </td>
@@ -1647,6 +1970,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStructBody.html" class="public">
 									<code>parseStructBody</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StructBody
 </td>
@@ -1656,6 +1980,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStructDeclaration.html" class="public">
 									<code>parseStructDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StructDeclaration
 </td>
@@ -1665,6 +1990,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStructInitializer.html" class="public">
 									<code>parseStructInitializer</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an StructInitializer
 </td>
@@ -1674,6 +2000,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStructMemberInitializer.html" class="public">
 									<code>parseStructMemberInitializer</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a StructMemberInitializer
 </td>
@@ -1683,6 +2010,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStructMemberInitializers.html" class="public">
 									<code>parseStructMemberInitializers</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses StructMemberInitializers
 </td>
@@ -1692,6 +2020,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseSwitchStatement.html" class="public">
 									<code>parseSwitchStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a SwitchStatement
 </td>
@@ -1701,6 +2030,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseSymbol.html" class="public">
 									<code>parseSymbol</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Symbol
 </td>
@@ -1710,6 +2040,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseSynchronizedStatement.html" class="public">
 									<code>parseSynchronizedStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a SynchronizedStatement
 </td>
@@ -1719,6 +2050,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateAliasParameter.html" class="public">
 									<code>parseTemplateAliasParameter</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateAliasParameter
 </td>
@@ -1728,6 +2060,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateArgument.html" class="public">
 									<code>parseTemplateArgument</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateArgument
 </td>
@@ -1737,6 +2070,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateArgumentList.html" class="public">
 									<code>parseTemplateArgumentList</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateArgumentList
 </td>
@@ -1746,6 +2080,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateArguments.html" class="public">
 									<code>parseTemplateArguments</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses TemplateArguments
 </td>
@@ -1755,6 +2090,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateDeclaration.html" class="public">
 									<code>parseTemplateDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateDeclaration
 </td>
@@ -1764,6 +2100,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateInstance.html" class="public">
 									<code>parseTemplateInstance</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateInstance
 </td>
@@ -1773,6 +2110,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateMixinExpression.html" class="public">
 									<code>parseTemplateMixinExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateMixinExpression
 </td>
@@ -1782,6 +2120,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateParameter.html" class="public">
 									<code>parseTemplateParameter</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateParameter
 </td>
@@ -1791,6 +2130,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateParameterList.html" class="public">
 									<code>parseTemplateParameterList</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateParameterList
 </td>
@@ -1800,6 +2140,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateParameters.html" class="public">
 									<code>parseTemplateParameters</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses TemplateParameters
 </td>
@@ -1809,6 +2150,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateSingleArgument.html" class="public">
 									<code>parseTemplateSingleArgument</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateSingleArgument
 </td>
@@ -1818,6 +2160,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateThisParameter.html" class="public">
 									<code>parseTemplateThisParameter</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateThisParameter
 </td>
@@ -1827,6 +2170,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateTupleParameter.html" class="public">
 									<code>parseTemplateTupleParameter</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an TemplateTupleParameter
 </td>
@@ -1836,6 +2180,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateTypeParameter.html" class="public">
 									<code>parseTemplateTypeParameter</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateTypeParameter
 </td>
@@ -1845,6 +2190,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateValueParameter.html" class="public">
 									<code>parseTemplateValueParameter</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateValueParameter
 </td>
@@ -1854,6 +2200,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTemplateValueParameterDefault.html" class="public">
 									<code>parseTemplateValueParameterDefault</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TemplateValueParameterDefault
 </td>
@@ -1863,17 +2210,19 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTernaryExpression.html" class="public">
 									<code>parseTernaryExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TernaryExpression
 </td>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dparse/parser/Parser.parseThrowStatement.html" class="public">
-									<code>parseThrowStatement</code>
+								<a href="../../dparse/parser/Parser.parseThrowExpression.html" class="public">
+									<code>parseThrowExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
-							<td>Parses a ThrowStatement
+							<td>Parses a ThrowExpression
 </td>
 						</tr>
 						<tr>
@@ -1881,6 +2230,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTraitsExpression.html" class="public">
 									<code>parseTraitsExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an TraitsExpression
 </td>
@@ -1890,6 +2240,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTryStatement.html" class="public">
 									<code>parseTryStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TryStatement
 </td>
@@ -1899,6 +2250,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseType.html" class="public">
 									<code>parseType</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Type
 </td>
@@ -1908,6 +2260,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseType2.html" class="public">
 									<code>parseType2</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Type2
 </td>
@@ -1917,6 +2270,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTypeConstructor.html" class="public">
 									<code>parseTypeConstructor</code>
 								</a>
+								<span class="tableEntryAnnotation">(validate)</span>
 							</td>
 							<td>Parses a TypeConstructor
 </td>
@@ -1926,6 +2280,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTypeConstructors.html" class="public">
 									<code>parseTypeConstructors</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses TypeConstructors
 </td>
@@ -1935,6 +2290,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTypeIdentifierPart.html" class="public">
 									<code>parseTypeIdentifierPart</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TypeIdentifierPart.
 </td>
@@ -1944,6 +2300,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTypeidExpression.html" class="public">
 									<code>parseTypeidExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TypeidExpression
 </td>
@@ -1953,6 +2310,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTypeofExpression.html" class="public">
 									<code>parseTypeofExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TypeofExpression
 </td>
@@ -1962,6 +2320,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTypeSpecialization.html" class="public">
 									<code>parseTypeSpecialization</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TypeSpecialization
 </td>
@@ -1971,6 +2330,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseTypeSuffix.html" class="public">
 									<code>parseTypeSuffix</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a TypeSuffix
 </td>
@@ -1980,6 +2340,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseUnaryExpression.html" class="public">
 									<code>parseUnaryExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a UnaryExpression
 </td>
@@ -1989,6 +2350,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseUnionDeclaration.html" class="public">
 									<code>parseUnionDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an UnionDeclaration
 </td>
@@ -1998,6 +2360,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseUnittest.html" class="public">
 									<code>parseUnittest</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Unittest
 </td>
@@ -2007,8 +2370,29 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseVariableDeclaration.html" class="public">
 									<code>parseVariableDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">(type, isAuto)</span>
 							</td>
 							<td>Parses a VariableDeclaration
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseVariadicArgumentsAttribute.html" class="public">
+									<code>parseVariadicArgumentsAttribute</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses an attribute of C-style variadic parameters.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.parseVariadicArgumentsAttributes.html" class="public">
+									<code>parseVariadicArgumentsAttributes</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Parses attributes of C-style variadic parameters.
 </td>
 						</tr>
 						<tr>
@@ -2016,6 +2400,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseVector.html" class="public">
 									<code>parseVector</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a Vector
 </td>
@@ -2025,6 +2410,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseVersionCondition.html" class="public">
 									<code>parseVersionCondition</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a VersionCondition
 </td>
@@ -2034,6 +2420,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseVersionSpecification.html" class="public">
 									<code>parseVersionSpecification</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a VersionSpecification
 </td>
@@ -2043,6 +2430,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseWhileStatement.html" class="public">
 									<code>parseWhileStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a WhileStatement
 </td>
@@ -2052,6 +2440,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseWithStatement.html" class="public">
 									<code>parseWithStatement</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses a WithStatement
 </td>
@@ -2061,6 +2450,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseXorExpression.html" class="public">
 									<code>parseXorExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Parses an XorExpression
 </td>
@@ -2070,14 +2460,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.setTokens.html" class="public">
 									<code>setTokens</code>
 								</a>
-							</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/parser/Parser.trace.html" class="public">
-									<code>trace</code>
-								</a>
+								<span class="tableEntryAnnotation">(tokens)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2086,6 +2469,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.abandonBookmark.html" class="protected">
 									<code>abandonBookmark</code>
 								</a>
+								<span class="tableEntryAnnotation">(_param_0)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2094,15 +2478,26 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.advance.html" class="protected">
 									<code>advance</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Advances to the next token and returns the current token
 </td>
 						</tr>
 						<tr>
 							<td>
+								<a href="../../dparse/parser/Parser.attachComment.html" class="protected">
+									<code>attachComment</code>
+								</a>
+								<span class="tableEntryAnnotation">(node, comment)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
 								<a href="../../dparse/parser/Parser.attachCommentFromSemicolon.html" class="protected">
 									<code>attachCommentFromSemicolon</code>
 								</a>
+								<span class="tableEntryAnnotation">(node, startIndex)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2111,6 +2506,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.currentIs.html" class="protected">
 									<code>currentIs</code>
 								</a>
+								<span class="tableEntryAnnotation">(type)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2119,6 +2515,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.currentIsMemberFunctionAttribute.html" class="protected">
 									<code>currentIsMemberFunctionAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2127,6 +2524,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.currentIsOneOf.html" class="protected">
 									<code>currentIsOneOf</code>
 								</a>
+								<span class="tableEntryAnnotation">(types)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2135,6 +2533,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.error.html" class="protected">
 									<code>error</code>
 								</a>
+								<span class="tableEntryAnnotation">(message, shouldAdvance)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2143,24 +2542,26 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.expect.html" class="protected">
 									<code>expect</code>
 								</a>
+								<span class="tableEntryAnnotation">(type)</span>
 							</td>
-							<td>Returns a token of the specified type if it was the next token, otherwise
- calls the error function and returns null. Advances the lexer by one token.
-</td>
+							<td></td>
 						</tr>
 						<tr>
 							<td>
 								<a href="../../dparse/parser/Parser.goToBookmark.html" class="protected">
 									<code>goToBookmark</code>
 								</a>
+								<span class="tableEntryAnnotation">(bookmark, popStack)</span>
 							</td>
-							<td></td>
+							<td>Goes back to a parser bookmark and optionally invalidates it.
+</td>
 						</tr>
 						<tr>
 							<td>
 								<a href="../../dparse/parser/Parser.hasMagicDelimiter.html" class="protected">
 									<code>hasMagicDelimiter</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2169,6 +2570,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isAssociativeArrayLiteral.html" class="protected">
 									<code>isAssociativeArrayLiteral</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2177,6 +2579,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isAttribute.html" class="protected">
 									<code>isAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2185,6 +2588,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isAutoDeclaration.html" class="protected">
 									<code>isAutoDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">(beginIndex)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2193,6 +2597,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isCastQualifier.html" class="protected">
 									<code>isCastQualifier</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2201,6 +2606,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isDeclaration.html" class="protected">
 									<code>isDeclaration</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2209,6 +2615,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isMemberFunctionAttribute.html" class="protected">
 									<code>isMemberFunctionAttribute</code>
 								</a>
+								<span class="tableEntryAnnotation">(t)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2217,6 +2624,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isStorageClass.html" class="protected">
 									<code>isStorageClass</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2225,6 +2633,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isType.html" class="protected">
 									<code>isType</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Only use this in template parameter parsing
 </td>
@@ -2234,6 +2643,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.isTypeCtor.html" class="protected">
 									<code>isTypeCtor</code>
 								</a>
+								<span class="tableEntryAnnotation">(t)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2242,14 +2652,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.ownArray.html" class="protected">
 									<code>ownArray</code>
 								</a>
-							</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/parser/Parser.parseAssertForContractExp.html" class="protected">
-									<code>parseAssertForContractExp</code>
-								</a>
+								<span class="tableEntryAnnotation">(arr, sb)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2258,14 +2661,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseCommaSeparatedRule.html" class="protected">
 									<code>parseCommaSeparatedRule</code>
 								</a>
-							</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/parser/Parser.parseContractExpression.html" class="protected">
-									<code>parseContractExpression</code>
-								</a>
+								<span class="tableEntryAnnotation">(allowTrailingComma)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2274,6 +2670,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseInterfaceOrClass.html" class="protected">
 									<code>parseInterfaceOrClass</code>
 								</a>
+								<span class="tableEntryAnnotation">(node, startIndex)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2282,6 +2679,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseLeftAssocBinaryExpression.html" class="protected">
 									<code>parseLeftAssocBinaryExpression</code>
 								</a>
+								<span class="tableEntryAnnotation">(part)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2290,6 +2688,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.parseStaticCtorDtorCommon.html" class="protected">
 									<code>parseStaticCtorDtorCommon</code>
 								</a>
+								<span class="tableEntryAnnotation">(node, startIndex)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2298,6 +2697,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.peek.html" class="protected">
 									<code>peek</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekAre.html" class="protected">
+									<code>peekAre</code>
+								</a>
+								<span class="tableEntryAnnotation">(types)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2306,6 +2715,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.peekIs.html" class="protected">
 									<code>peekIs</code>
 								</a>
+								<span class="tableEntryAnnotation">(t)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2314,6 +2724,25 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.peekIsOneOf.html" class="protected">
 									<code>peekIsOneOf</code>
 								</a>
+								<span class="tableEntryAnnotation">(types)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekNIs.html" class="protected">
+									<code>peekNIs</code>
+								</a>
+								<span class="tableEntryAnnotation">(t, offset)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.peekNIsOneOf.html" class="protected">
+									<code>peekNIsOneOf</code>
+								</a>
+								<span class="tableEntryAnnotation">(offset, types)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2322,6 +2751,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.peekPast.html" class="protected">
 									<code>peekPast</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2330,6 +2760,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.peekPastBraces.html" class="protected">
 									<code>peekPastBraces</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2338,6 +2769,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.peekPastBrackets.html" class="protected">
 									<code>peekPastBrackets</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2346,6 +2778,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.peekPastParens.html" class="protected">
 									<code>peekPastParens</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2354,6 +2787,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.setBookmark.html" class="protected">
 									<code>setBookmark</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2362,6 +2796,17 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.skip.html" class="protected">
 									<code>skip</code>
 								</a>
+								<span class="tableEntryAnnotation">(token)</span>
+							</td>
+							<td>Skips token if present and returns whether token was skipped
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.skip.html" class="protected">
+									<code>skip</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2370,6 +2815,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.skipBraces.html" class="protected">
 									<code>skipBraces</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2378,6 +2824,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.skipBrackets.html" class="protected">
 									<code>skipBrackets</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2386,6 +2833,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.skipParens.html" class="protected">
 									<code>skipParens</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2394,6 +2842,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.startsWith.html" class="protected">
 									<code>startsWith</code>
 								</a>
+								<span class="tableEntryAnnotation">(types)</span>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/parser/Parser.suppressedErrorCount.html" class="protected">
+									<code>suppressedErrorCount</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2402,6 +2860,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.trace.html" class="protected">
 									<code>trace</code>
 								</a>
+								<span class="tableEntryAnnotation">(_param_0)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2410,6 +2869,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/parser/Parser.warn.html" class="protected">
 									<code>warn</code>
 								</a>
+								<span class="tableEntryAnnotation">(message)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -2439,14 +2899,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dparse/parser/Parser.messageFunction.html" class="public">
-									<code>messageFunction</code>
+								<a href="../../dparse/parser/Parser.messageDg.html" class="public">
+									<code>messageDg</code>
 								</a>
 							</td>
-							<td>Function that is called when a warning or error is encountered.
- The parameters are the file name, line number, column number,
- and the error or warning message.
-</td>
+							<td></td>
 						</tr>
 						<tr>
 							<td>

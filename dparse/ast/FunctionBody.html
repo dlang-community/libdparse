@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Class FunctionBody</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -94,7 +109,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<code class="lang-d">
 						<div class="single-prototype">
 				<span class="kwd">class</span> <span class="typ">FunctionBody</span>
-				<br>&nbsp;&nbsp;: <a href="../../dparse/ast/ASTNode.html"><span class="typ">ASTNode</span></a>
+				<br>&nbsp;&nbsp;: <a href="../../dparse/ast/BaseNode.html"><span class="typ">BaseNode</span></a>
 				<span class="pun">;</span>
 						</div>
 					</code>
@@ -108,27 +123,34 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dparse/ast/FunctionBody.blockStatement.html" class="public"><code>blockStatement</code></a>
+								<a href="../../dparse/ast/FunctionBody.endLocation.html" class="public"><code>endLocation</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/BlockStatement.html"><span class="typ">BlockStatement</span></a></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ulong</span></code></td><td></td>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dparse/ast/FunctionBody.bodyStatement.html" class="public"><code>bodyStatement</code></a>
+								<a href="../../dparse/ast/FunctionBody.missingFunctionBody.html" class="public"><code>missingFunctionBody</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/BodyStatement.html"><span class="typ">BodyStatement</span></a></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/MissingFunctionBody.html"><span class="typ">MissingFunctionBody</span></a></code></td><td></td>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dparse/ast/FunctionBody.inStatements.html" class="public"><code>inStatements</code></a>
+								<a href="../../dparse/ast/FunctionBody.shortenedFunctionBody.html" class="public"><code>shortenedFunctionBody</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/InStatement.html"><span class="typ">InStatement</span></a><span class="pun">[]</span></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/ShortenedFunctionBody.html"><span class="typ">ShortenedFunctionBody</span></a></code></td><td></td>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../dparse/ast/FunctionBody.outStatements.html" class="public"><code>outStatements</code></a>
+								<a href="../../dparse/ast/FunctionBody.specifiedFunctionBody.html" class="public"><code>specifiedFunctionBody</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/OutStatement.html"><span class="typ">OutStatement</span></a><span class="pun">[]</span></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/SpecifiedFunctionBody.html"><span class="typ">SpecifiedFunctionBody</span></a></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/BaseNode.tokens.html" class="public inherited"><code>tokens</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")<span class="pun">)</span><span class="pun">[]</span></code></td><td>List of tokens consumed by this AST node
+</td>
 						</tr>
 					</table>
 				</section>
@@ -143,6 +165,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/ast/FunctionBody.accept.html" class="public">
 									<code>accept</code>
 								</a>
+								<span class="tableEntryAnnotation">(visitor)</span>
 							</td>
 							<td></td>
 						</tr>

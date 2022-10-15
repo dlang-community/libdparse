@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Template Lexer</title>
 		<link rel="stylesheet" href="../../../css/style.min.css"/>
 		<script type="text/javascript" src="../../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -131,16 +146,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../../std/experimental/lexer/Lexer.range.html">range</a>
+								<a href="../../../std/experimental/lexer/Lexer._front.html">_front</a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../../std/experimental/lexer/LexerRange.html"><span class="typ">LexerRange</span></a></code></td><td>The lexer input.
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">Token</span></code></td><td>The token that is currently at the front of the range.
 </td>
 						</tr>
 						<tr>
 							<td>
-								<a href="../../../std/experimental/lexer/Lexer._front.html">_front</a>
+								<a href="../../../std/experimental/lexer/Lexer.range.html">range</a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">Token</span></code></td><td>The token that is currently at the front of the range.
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../../std/experimental/lexer/LexerRange.html"><span class="typ">LexerRange</span></a></code></td><td>The lexer input.
 </td>
 						</tr>
 					</table>
@@ -150,6 +165,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<col class="caption"/>
 						<tr>
 							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../../std/experimental/lexer/Lexer._popFront.html">_popFront</a>
+							</td>
+							<td>Advances the lexer to the next token and stores the new current token in
+ the front variable.
+</td>
 						</tr>
 						<tr>
 							<td>
@@ -224,14 +247,6 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/Lexer.printCase.html">printCase</a>
 							</td>
 							<td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../../std/experimental/lexer/Lexer._popFront.html">_popFront</a>
-							</td>
-							<td>Advances the lexer to the next token and stores the new current token in
- the front variable.
-</td>
 						</tr>
 					</table>
 				</section>

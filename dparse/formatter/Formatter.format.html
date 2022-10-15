@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Formatter.format - multiple declarations</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -1067,6 +1082,56 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								Function <code>Formatter.format</code>
 							</a>
 						</li>
+						<li>
+							<a href="#195">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#196">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#197">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#198">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#199">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#200">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#201">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#202">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#203">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
+						<li>
+							<a href="#204">
+								Function <code>Formatter.format</code>
+							</a>
+						</li>
 					</ul>
 				</nav><h2 id="0">Function Formatter.format</h2><p></p>
 				<div class="prototype">
@@ -1075,7 +1140,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/MixinExpression.html"><span class="typ">MixinExpression</span></a> <span class="pln">mixinExpression</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/MixinDeclaration.html"><span class="typ">MixinDeclaration</span></a> <span class="pln">mixinDeclaration</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a><span class="pun">[]</span> <span class="pln">attrs</span> <span class="pun">=</span> <span class="kwd">null</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -1493,7 +1560,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AssertExpression.html"><span class="typ">AssertExpression</span></a> <span class="pln">assertExpression</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AssertArguments.html"><span class="typ">AssertArguments</span></a> <span class="pln">assertArguments</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -1507,7 +1574,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AssignExpression.html"><span class="typ">AssignExpression</span></a> <span class="pln">assignExpression</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AssertExpression.html"><span class="typ">AssertExpression</span></a> <span class="pln">assertExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -1521,7 +1588,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AssocArrayLiteral.html"><span class="typ">AssocArrayLiteral</span></a> <span class="pln">assocArrayLiteral</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AssignExpression.html"><span class="typ">AssignExpression</span></a> <span class="pln">assignExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -1535,7 +1602,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AtAttribute.html"><span class="typ">AtAttribute</span></a> <span class="pln">atAttribute</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AssocArrayLiteral.html"><span class="typ">AssocArrayLiteral</span></a> <span class="pln">assocArrayLiteral</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -1549,7 +1616,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a> <span class="pln">att</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/AtAttribute.html"><span class="typ">AtAttribute</span></a> <span class="pln">atAttribute</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -1557,6 +1624,20 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</div>
 				
 				<h2 id="34">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a> <span class="pln">att</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="35">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -1572,7 +1653,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="35">Function Formatter.format</h2><p></p>
+				<h2 id="36">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -1586,20 +1667,6 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="36">Function Formatter.format</h2><p></p>
-				<div class="prototype">
-					<code class="lang-d">
-						<div class="single-prototype">
-				<span class="typ">void</span> <span class="pln">format</span>
-				<span class="pun">(</span>
-				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/BlockStatement.html"><span class="typ">BlockStatement</span></a> <span class="pln">blockStatement</span>
-				<br/>
-				<span class="pun">)</span><span class="pun">;</span>
-						</div>
-					</code>
-				</div>
-				
 				<h2 id="37">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
@@ -1607,7 +1674,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/BodyStatement.html"><span class="typ">BodyStatement</span></a> <span class="pln">bodyStatement</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/BlockStatement.html"><span class="typ">BlockStatement</span></a> <span class="pln">blockStatement</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2289,9 +2356,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/FunctionDeclaration.html"><span class="typ">FunctionDeclaration</span></a> <span class="pln">decl</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a><span class="pun">[]</span> <span class="pln">attrs</span> <span class="pun">=</span> <span class="kwd">null</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/FunctionContract.html"><span class="typ">FunctionContract</span></a> <span class="pln">functionContract</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2305,7 +2370,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/FunctionLiteralExpression.html"><span class="typ">FunctionLiteralExpression</span></a> <span class="pln">functionLiteralExpression</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/FunctionDeclaration.html"><span class="typ">FunctionDeclaration</span></a> <span class="pln">decl</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a><span class="pun">[]</span> <span class="pln">attrs</span> <span class="pun">=</span> <span class="kwd">null</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2319,7 +2386,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/GotoStatement.html"><span class="typ">GotoStatement</span></a> <span class="pln">gotoStatement</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/FunctionLiteralExpression.html"><span class="typ">FunctionLiteralExpression</span></a> <span class="pln">functionLiteralExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2333,7 +2400,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IdentifierChain.html"><span class="typ">IdentifierChain</span></a> <span class="pln">identifierChain</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/GotoStatement.html"><span class="typ">GotoStatement</span></a> <span class="pln">gotoStatement</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2347,7 +2414,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/DeclaratorIdentifierList.html"><span class="typ">DeclaratorIdentifierList</span></a> <span class="pln">declaratorIdentifierList</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IdentifierChain.html"><span class="typ">IdentifierChain</span></a> <span class="pln">identifierChain</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2361,7 +2428,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/TypeIdentifierPart.html"><span class="typ">TypeIdentifierPart</span></a> <span class="pln">typeIdentifierPart</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/DeclaratorIdentifierList.html"><span class="typ">DeclaratorIdentifierList</span></a> <span class="pln">declaratorIdentifierList</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2375,7 +2442,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IdentifierOrTemplateChain.html"><span class="typ">IdentifierOrTemplateChain</span></a> <span class="pln">identifierOrTemplateChain</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/TypeIdentifierPart.html"><span class="typ">TypeIdentifierPart</span></a> <span class="pln">typeIdentifierPart</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2389,7 +2456,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IdentifierOrTemplateInstance.html"><span class="typ">IdentifierOrTemplateInstance</span></a> <span class="pln">identifierOrTemplateInstance</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IdentifierOrTemplateChain.html"><span class="typ">IdentifierOrTemplateChain</span></a> <span class="pln">identifierOrTemplateChain</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2403,7 +2470,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IdentityExpression.html"><span class="typ">IdentityExpression</span></a> <span class="pln">identityExpression</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IdentifierOrTemplateInstance.html"><span class="typ">IdentifierOrTemplateInstance</span></a> <span class="pln">identifierOrTemplateInstance</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2417,7 +2484,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IfStatement.html"><span class="typ">IfStatement</span></a> <span class="pln">ifStatement</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IdentityExpression.html"><span class="typ">IdentityExpression</span></a> <span class="pln">identityExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2431,7 +2498,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ImportBind.html"><span class="typ">ImportBind</span></a> <span class="pln">importBind</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IfStatement.html"><span class="typ">IfStatement</span></a> <span class="pln">ifStatement</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2445,7 +2512,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ImportExpression.html"><span class="typ">ImportExpression</span></a> <span class="pln">importExpression</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IfCondition.html"><span class="typ">IfCondition</span></a> <span class="pln">ifCondition</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2459,7 +2526,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ImportBindings.html"><span class="typ">ImportBindings</span></a> <span class="pln">importBindings</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ImportBind.html"><span class="typ">ImportBind</span></a> <span class="pln">importBind</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2473,7 +2540,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/KeyValuePair.html"><span class="typ">KeyValuePair</span></a> <span class="pln">keyValuePair</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ImportBindings.html"><span class="typ">ImportBindings</span></a> <span class="pln">importBindings</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2487,7 +2554,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Index.html"><span class="typ">Index</span></a> <span class="pln">index</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ImportDeclaration.html"><span class="typ">ImportDeclaration</span></a> <span class="pln">importDeclaration</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a><span class="pun">[]</span> <span class="pln">attrs</span> <span class="pun">=</span> <span class="kwd">null</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2501,7 +2570,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IndexExpression.html"><span class="typ">IndexExpression</span></a> <span class="pln">indexExpression</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ImportExpression.html"><span class="typ">ImportExpression</span></a> <span class="pln">importExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2515,7 +2584,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/InExpression.html"><span class="typ">InExpression</span></a> <span class="pln">inExpression</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/InContractExpression.html"><span class="typ">InContractExpression</span></a> <span class="pln">expression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2529,7 +2598,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/InStatement.html"><span class="typ">InStatement</span></a> <span class="pln">inStatement</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Index.html"><span class="typ">Index</span></a> <span class="pln">index</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2543,7 +2612,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Initialize.html"><span class="typ">Initialize</span></a> <span class="pln">initialize</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/KeyValuePair.html"><span class="typ">KeyValuePair</span></a> <span class="pln">keyValuePair</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2557,7 +2626,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Initializer.html"><span class="typ">Initializer</span></a> <span class="pln">initializer</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/InExpression.html"><span class="typ">InExpression</span></a> <span class="pln">inExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -2565,6 +2634,76 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</div>
 				
 				<h2 id="105">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/InOutContractExpression.html"><span class="typ">InOutContractExpression</span></a> <span class="pln">inOutContractExpression</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="106">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/InOutStatement.html"><span class="typ">InOutStatement</span></a> <span class="pln">inOutStatement</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="107">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/InStatement.html"><span class="typ">InStatement</span></a> <span class="pln">inStatement</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="108">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Initialize.html"><span class="typ">Initialize</span></a> <span class="pln">initialize</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="109">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Initializer.html"><span class="typ">Initializer</span></a> <span class="pln">initializer</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="110">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2580,7 +2719,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="106">Function Formatter.format</h2><p></p>
+				<h2 id="111">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2596,7 +2735,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="107">Function Formatter.format</h2><p></p>
+				<h2 id="112">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2610,7 +2749,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="108">Function Formatter.format</h2><p></p>
+				<h2 id="113">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2624,7 +2763,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="109">Function Formatter.format</h2><p></p>
+				<h2 id="114">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2638,7 +2777,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="110">Function Formatter.format</h2><p></p>
+				<h2 id="115">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2652,7 +2791,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="111">Function Formatter.format</h2><p></p>
+				<h2 id="116">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2666,7 +2805,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="112">Function Formatter.format</h2><p></p>
+				<h2 id="117">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2680,23 +2819,35 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="113">Function Formatter.format</h2><p></p>
+				<h2 id="118">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/MixinDeclaration.html"><span class="typ">MixinDeclaration</span></a> <span class="pln">mixinDeclaration</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a><span class="pun">[]</span> <span class="pln">attrs</span> <span class="pun">=</span> <span class="kwd">null</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/MissingFunctionBody.html"><span class="typ">MissingFunctionBody</span></a> <span class="pln">missingFunctionBody</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
 				
-				<h2 id="114">Function Formatter.format</h2><p></p>
+				<h2 id="119">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/MixinExpression.html"><span class="typ">MixinExpression</span></a> <span class="pln">mixinExpression</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="120">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2712,7 +2863,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="115">Function Formatter.format</h2><p></p>
+				<h2 id="121">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2726,7 +2877,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="116">Function Formatter.format</h2><p></p>
+				<h2 id="122">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2740,7 +2891,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="117">Function Formatter.format</h2><p></p>
+				<h2 id="123">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2754,7 +2905,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="118">Function Formatter.format</h2><p></p>
+				<h2 id="124">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2768,7 +2919,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="119">Function Formatter.format</h2><p></p>
+				<h2 id="125">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2782,7 +2933,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="120">Function Formatter.format</h2><p></p>
+				<h2 id="126">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2796,7 +2947,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="121">Function Formatter.format</h2><p></p>
+				<h2 id="127">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2810,7 +2961,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="122">Function Formatter.format</h2><p></p>
+				<h2 id="128">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2824,7 +2975,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="123">Function Formatter.format</h2><p></p>
+				<h2 id="129">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2838,7 +2989,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="124">Function Formatter.format</h2><p></p>
+				<h2 id="130">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2852,7 +3003,21 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="125">Function Formatter.format</h2><p></p>
+				<h2 id="131">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/OutContractExpression.html"><span class="typ">OutContractExpression</span></a> <span class="pln">expression</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="132">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2866,7 +3031,21 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="126">Function Formatter.format</h2><p></p>
+				<h2 id="133">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ParameterAttribute.html"><span class="typ">ParameterAttribute</span></a> <span class="pln">pa</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="134">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2880,7 +3059,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="127">Function Formatter.format</h2><p></p>
+				<h2 id="135">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2894,7 +3073,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="128">Function Formatter.format</h2><p></p>
+				<h2 id="136">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2910,7 +3089,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="129">Function Formatter.format</h2><p></p>
+				<h2 id="137">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2924,7 +3103,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="130">Function Formatter.format</h2><p></p>
+				<h2 id="138">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2940,7 +3119,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="131">Function Formatter.format</h2><p></p>
+				<h2 id="139">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2954,7 +3133,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="132">Function Formatter.format</h2><p></p>
+				<h2 id="140">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2968,7 +3147,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="133">Function Formatter.format</h2><p></p>
+				<h2 id="141">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2982,7 +3161,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="134">Function Formatter.format</h2><p></p>
+				<h2 id="142">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -2996,7 +3175,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="135">Function Formatter.format</h2><p></p>
+				<h2 id="143">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3010,7 +3189,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="136">Function Formatter.format</h2><p></p>
+				<h2 id="144">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3024,7 +3203,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="137">Function Formatter.format</h2><p></p>
+				<h2 id="145">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3040,7 +3219,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="138">Function Formatter.format</h2><p></p>
+				<h2 id="146">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3056,7 +3235,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="139">Function Formatter.format</h2><p></p>
+				<h2 id="147">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3070,7 +3249,21 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="140">Function Formatter.format</h2><p></p>
+				<h2 id="148">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ShortenedFunctionBody.html"><span class="typ">ShortenedFunctionBody</span></a> <span class="pln">shortenedFunctionBody</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="149">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3084,7 +3277,21 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="141">Function Formatter.format</h2><p></p>
+				<h2 id="150">Function Formatter.format</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">format</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/SpecifiedFunctionBody.html"><span class="typ">SpecifiedFunctionBody</span></a> <span class="pln">specifiedFunctionBody</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
+				<h2 id="151">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3098,7 +3305,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="142">Function Formatter.format</h2><p></p>
+				<h2 id="152">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3112,7 +3319,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="143">Function Formatter.format</h2><p></p>
+				<h2 id="153">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3128,7 +3335,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="144">Function Formatter.format</h2><p></p>
+				<h2 id="154">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3142,7 +3349,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="145">Function Formatter.format</h2><p></p>
+				<h2 id="155">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3158,7 +3365,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="146">Function Formatter.format</h2><p></p>
+				<h2 id="156">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3174,7 +3381,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="147">Function Formatter.format</h2><p></p>
+				<h2 id="157">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3188,7 +3395,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="148">Function Formatter.format</h2><p></p>
+				<h2 id="158">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3202,7 +3409,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="149">Function Formatter.format</h2><p></p>
+				<h2 id="159">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3216,7 +3423,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="150">Function Formatter.format</h2><p></p>
+				<h2 id="160">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3232,7 +3439,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="151">Function Formatter.format</h2><p></p>
+				<h2 id="161">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3246,7 +3453,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="152">Function Formatter.format</h2><p></p>
+				<h2 id="162">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3260,7 +3467,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="153">Function Formatter.format</h2><p></p>
+				<h2 id="163">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3274,7 +3481,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="154">Function Formatter.format</h2><p></p>
+				<h2 id="164">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3290,7 +3497,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="155">Function Formatter.format</h2><p></p>
+				<h2 id="165">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3304,7 +3511,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="156">Function Formatter.format</h2><p></p>
+				<h2 id="166">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3318,7 +3525,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="157">Function Formatter.format</h2><p></p>
+				<h2 id="167">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3332,7 +3539,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="158">Function Formatter.format</h2><p></p>
+				<h2 id="168">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3346,7 +3553,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="159">Function Formatter.format</h2><p></p>
+				<h2 id="169">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3362,7 +3569,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="160">Function Formatter.format</h2><p></p>
+				<h2 id="170">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3376,7 +3583,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="161">Function Formatter.format</h2><p></p>
+				<h2 id="171">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3392,7 +3599,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="162">Function Formatter.format</h2><p></p>
+				<h2 id="172">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3406,7 +3613,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="163">Function Formatter.format</h2><p></p>
+				<h2 id="173">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3420,7 +3627,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="164">Function Formatter.format</h2><p></p>
+				<h2 id="174">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3434,7 +3641,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="165">Function Formatter.format</h2><p></p>
+				<h2 id="175">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3448,7 +3655,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="166">Function Formatter.format</h2><p></p>
+				<h2 id="176">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3462,7 +3669,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="167">Function Formatter.format</h2><p></p>
+				<h2 id="177">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3476,7 +3683,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="168">Function Formatter.format</h2><p></p>
+				<h2 id="178">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3490,7 +3697,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="169">Function Formatter.format</h2><p></p>
+				<h2 id="179">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3504,7 +3711,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="170">Function Formatter.format</h2><p></p>
+				<h2 id="180">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3518,7 +3725,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="171">Function Formatter.format</h2><p></p>
+				<h2 id="181">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3532,7 +3739,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="172">Function Formatter.format</h2><p></p>
+				<h2 id="182">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3546,7 +3753,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="173">Function Formatter.format</h2><p></p>
+				<h2 id="183">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3560,21 +3767,21 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="174">Function Formatter.format</h2><p></p>
+				<h2 id="184">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ThrowStatement.html"><span class="typ">ThrowStatement</span></a> <span class="pln">throwStatement</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ThrowExpression.html"><span class="typ">ThrowExpression</span></a> <span class="pln">throwExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
 				
-				<h2 id="175">Function Formatter.format</h2><p></p>
+				<h2 id="185">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3588,7 +3795,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="176">Function Formatter.format</h2><p></p>
+				<h2 id="186">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3602,7 +3809,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="177">Function Formatter.format</h2><p></p>
+				<h2 id="187">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3616,7 +3823,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="178">Function Formatter.format</h2><p></p>
+				<h2 id="188">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3630,7 +3837,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="179">Function Formatter.format</h2><p></p>
+				<h2 id="189">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3644,7 +3851,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="180">Function Formatter.format</h2><p></p>
+				<h2 id="190">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3658,7 +3865,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="181">Function Formatter.format</h2><p></p>
+				<h2 id="191">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3672,7 +3879,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="182">Function Formatter.format</h2><p></p>
+				<h2 id="192">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3686,7 +3893,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="183">Function Formatter.format</h2><p></p>
+				<h2 id="193">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3700,7 +3907,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="184">Function Formatter.format</h2><p></p>
+				<h2 id="194">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3714,7 +3921,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="185">Function Formatter.format</h2><p></p>
+				<h2 id="195">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3730,7 +3937,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="186">Function Formatter.format</h2><p></p>
+				<h2 id="196">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3746,7 +3953,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="187">Function Formatter.format</h2><p></p>
+				<h2 id="197">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3762,7 +3969,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="188">Function Formatter.format</h2><p></p>
+				<h2 id="198">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3776,7 +3983,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="189">Function Formatter.format</h2><p></p>
+				<h2 id="199">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3790,7 +3997,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="190">Function Formatter.format</h2><p></p>
+				<h2 id="200">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3806,7 +4013,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="191">Function Formatter.format</h2><p></p>
+				<h2 id="201">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3820,7 +4027,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="192">Function Formatter.format</h2><p></p>
+				<h2 id="202">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3834,7 +4041,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="193">Function Formatter.format</h2><p></p>
+				<h2 id="203">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -3848,16 +4055,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<h2 id="194">Function Formatter.format</h2><p></p>
+				<h2 id="204">Function Formatter.format</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
 				<span class="typ">void</span> <span class="pln">format</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/ImportDeclaration.html"><span class="typ">ImportDeclaration</span></a> <span class="pln">importDeclaration</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/Attribute.html"><span class="typ">Attribute</span></a><span class="pun">[]</span> <span class="pln">attrs</span> <span class="pun">=</span> <span class="kwd">null</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><a href="../../dparse/ast/IndexExpression.html"><span class="typ">IndexExpression</span></a> <span class="pln">indexExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>

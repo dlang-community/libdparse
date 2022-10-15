@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Function getTokensForParser</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -110,9 +125,15 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</div>
 				
 				<section><h2>Returns</h2>
-<p>an array of tokens lexed from the given source code to the output range. All
- whitespace tokens are skipped and comments are attached to the token nearest
- to them.
+<p>an array of tokens lexed from the given source code to the output
+ range. All whitespace, comment and specialTokenSequence tokens (trivia) are
+ attached to the token nearest to them.
+</p>
+
+<p> Trivia is put on the last token as <code class="lang-d"><span class="pln">trailingTrivia</span></code> if it is on the same
+ line as the trivia, otherwise it will be attached to the next token in the
+ <code class="lang-d"><span class="pln">leadingTrivia</span></code> until there is the EOF, where it will be attached as
+ <code class="lang-d"><span class="pln">trailingTrivia</span></code> again.
 </p>
 </section>
 

@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Function Parser.parseDeclaration</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -99,7 +114,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<br/>
 				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">strict</span> <span class="pun">=</span> <span class="kwd">false</span><span class="pun">,</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">mustBeDeclaration</span> <span class="pun">=</span> <span class="kwd">false</span>
+				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">mustBeDeclaration</span> <span class="pun">=</span> <span class="kwd">false</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">inTemplateDeclaration</span> <span class="pun">=</span> <span class="kwd">false</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 						</div>
@@ -110,7 +127,8 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<section><h2>Parameters</h2>
 <table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
 <tr><td id="strict">strict</td><td> if true, do not return partial AST nodes on errors.</td></tr>
-<tr><td id="mustBeDeclaration">mustBeDeclaration</td><td> do not parse as a declaration if it could be parsed as a function call
+<tr><td id="mustBeDeclaration">mustBeDeclaration</td><td> do not parse as a declaration if it could be parsed as a function call</td></tr>
+<tr><td id="inTemplateDeclaration">inTemplateDeclaration</td><td> if this function is called from a templated context
 
  declaration:
        attribute* declaration2
@@ -118,6 +136,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
      ;
  declaration2:
        aliasDeclaration
+     | aliasAssign
      | aliasThisDeclaration
      | anonymousEnumDeclaration
      | attributeDeclaration

@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Function ASTVisitor.visit</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -113,6 +128,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="pun">(</span>
 				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AliasDeclaration.html"><span class="typ">AliasDeclaration</span></a><span class="pun">)</span> <span class="pln">aliasDeclaration</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AliasAssign.html"><span class="typ">AliasAssign</span></a><span class="pun">)</span> <span class="pln">aliasAssign</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>
@@ -352,6 +375,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AssertArguments.html"><span class="typ">AssertArguments</span></a><span class="pun">)</span> <span class="pln">assertArguments</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/AssertExpression.html"><span class="typ">AssertExpression</span></a><span class="pun">)</span> <span class="pln">assertExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
@@ -417,14 +448,6 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="pun">(</span>
 				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/BlockStatement.html"><span class="typ">BlockStatement</span></a><span class="pun">)</span> <span class="pln">blockStatement</span>
-				<br/>
-				<span class="pun">)</span><span class="pun">;</span>
-				<br/>
-				<br/>
-				<span class="typ">void</span> <span class="pln">visit</span>
-				<span class="pun">(</span>
-				<br/>
-				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/BodyStatement.html"><span class="typ">BodyStatement</span></a><span class="pun">)</span> <span class="pln">bodyStatement</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>
@@ -816,6 +839,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/FunctionContract.html"><span class="typ">FunctionContract</span></a><span class="pun">)</span> <span class="pln">functionContract</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/FunctionDeclaration.html"><span class="typ">FunctionDeclaration</span></a><span class="pun">)</span> <span class="pln">functionDeclaration</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
@@ -825,6 +856,30 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="pun">(</span>
 				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/FunctionLiteralExpression.html"><span class="typ">FunctionLiteralExpression</span></a><span class="pun">)</span> <span class="pln">functionLiteralExpression</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/GccAsmInstruction.html"><span class="typ">GccAsmInstruction</span></a><span class="pun">)</span> <span class="pln">gccAsmInstruction</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/GccAsmOperandList.html"><span class="typ">GccAsmOperandList</span></a><span class="pun">)</span> <span class="pln">gccAsmOperands</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/GccAsmOperand.html"><span class="typ">GccAsmOperand</span></a><span class="pun">)</span> <span class="pln">gccAsmOperand</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>
@@ -888,6 +943,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/IfCondition.html"><span class="typ">IfCondition</span></a><span class="pun">)</span> <span class="pln">ifCondition</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ImportBind.html"><span class="typ">ImportBind</span></a><span class="pun">)</span> <span class="pln">importBind</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
@@ -928,7 +991,31 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/InContractExpression.html"><span class="typ">InContractExpression</span></a><span class="pun">)</span> <span class="pln">inContractExpression</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/InExpression.html"><span class="typ">InExpression</span></a><span class="pun">)</span> <span class="pln">inExpression</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/InOutContractExpression.html"><span class="typ">InOutContractExpression</span></a><span class="pun">)</span> <span class="pln">inOutContractExpression</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/InOutStatement.html"><span class="typ">InOutStatement</span></a><span class="pun">)</span> <span class="pln">inOutStatement</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>
@@ -1032,6 +1119,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/MissingFunctionBody.html"><span class="typ">MissingFunctionBody</span></a><span class="pun">)</span> <span class="pln">missingFunctionBody</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/MixinDeclaration.html"><span class="typ">MixinDeclaration</span></a><span class="pun">)</span> <span class="pln">mixinDeclaration</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
@@ -1088,6 +1183,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/NamespaceList.html"><span class="typ">NamespaceList</span></a><span class="pun">)</span> <span class="pln">namespaceList</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/NewAnonClassExpression.html"><span class="typ">NewAnonClassExpression</span></a><span class="pun">)</span> <span class="pln">newAnonClassExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
@@ -1136,7 +1239,23 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/OutContractExpression.html"><span class="typ">OutContractExpression</span></a><span class="pun">)</span> <span class="pln">outContractExpression</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/OutStatement.html"><span class="typ">OutStatement</span></a><span class="pun">)</span> <span class="pln">outStatement</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ParameterAttribute.html"><span class="typ">ParameterAttribute</span></a><span class="pun">)</span> <span class="pln">parameterAttribute</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>
@@ -1264,6 +1383,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ShortenedFunctionBody.html"><span class="typ">ShortenedFunctionBody</span></a><span class="pun">)</span> <span class="pln">shortenedFunctionBody</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/SingleImport.html"><span class="typ">SingleImport</span></a><span class="pun">)</span> <span class="pln">singleImport</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
@@ -1273,6 +1400,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="pun">(</span>
 				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Index.html"><span class="typ">Index</span></a><span class="pun">)</span> <span class="pln">index</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/SpecifiedFunctionBody.html"><span class="typ">SpecifiedFunctionBody</span></a><span class="pun">)</span> <span class="pln">specifiedFunctionBody</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>
@@ -1337,6 +1472,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="pun">(</span>
 				<br/>
 				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StorageClass.html"><span class="typ">StorageClass</span></a><span class="pun">)</span> <span class="pln">storageClass</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">void</span> <span class="pln">visit</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/StringLiteralList.html"><span class="typ">StringLiteralList</span></a><span class="pun">)</span> <span class="pln">stringLiteralList</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>
@@ -1544,7 +1687,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ThrowStatement.html"><span class="typ">ThrowStatement</span></a><span class="pun">)</span> <span class="pln">throwStatement</span>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ThrowExpression.html"><span class="typ">ThrowExpression</span></a><span class="pun">)</span> <span class="pln">throwExpression</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>
@@ -1552,7 +1695,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">visit</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")<span class="pun">)</span> <span class="pln">_param_0</span>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")<span class="pun">)</span> <span class="pln">_param_0</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
 				<br/>

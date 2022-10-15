@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Function parseModule</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>parseModule - multiple declarations</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -29,6 +29,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
 						</div>
 					</li>
 					<li>
@@ -61,6 +66,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
 						</div>
 					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
 				</ul>
 					</li>
 					<li class="tree-view collapsed">
@@ -89,38 +104,57 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function parseModule</h1><p></p>
+				<h1>parseModule - multiple declarations</h1>
+				<nav class="page-nav">
+					<ul>
+						<li>
+							<a href="#0">
+								Function <code>parseModule</code>
+							</a>
+						</li>
+						<li>
+							<a href="#1">
+								Function <code>parseModule</code>
+							</a>
+						</li>
+					</ul>
+				</nav><h2 id="0">Function parseModule</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
 				<a href="../../dparse/ast/Module.html"><span class="typ">Module</span></a> <span class="pln">parseModule</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")<span class="pun">)</span><span class="pun">[]</span> <span class="pln">tokens</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="typ">string</span> <span class="pln">fileName</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<a href="../../dparse/rollback_allocator/RollbackAllocator.html"><span class="typ">RollbackAllocator</span></a><span class="pun">*</span> <span class="pln">allocator</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span> <span class="pln">messageFunction</span> <span class="pun">=</span> <span class="kwd">cast</span><span class="pun">(</span><span class="typ">void </span><span class="kwd">delegate</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">))</span><span class="kwd">null</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="typ">uint</span><span class="pun">*</span> <span class="pln">errorCount</span> <span class="pun">=</span> <span class="kwd">null</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="typ">uint</span><span class="pun">*</span> <span class="pln">warningCount</span> <span class="pun">=</span> <span class="kwd">null</span>
+				&nbsp;&nbsp;<span class="kwd">auto ref </span><a href="../../dparse/parser/ParserConfig.html"><span class="typ">ParserConfig</span></a> <span class="pln">parserConfig</span>
 				<br/>
 				<span class="pun">)</span><span class="pun">;</span>
-				<br/>
-				<br/>
-				<span class="kwd">deprecated </span><a href="../../dparse/ast/Module.html"><span class="typ">Module</span></a> <span class="pln">parseModule</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h3>Parameters</h3>
+<table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
+<tr><td id="parserConfig">parserConfig</td><td> a parser configuration.</td></tr>
+</table>
+</section>
+<section><h3>Returns</h3>
+<p>The parsed module.
+</p>
+</section>
+<h2 id="1">Function parseModule</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<a href="../../dparse/ast/Module.html"><span class="typ">Module</span></a> <span class="pln">parseModule</span>(F)
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")<span class="pun">)</span><span class="pun">[]</span> <span class="pln">tokens</span><span class="pun">,</span>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/lexer/Token.html"><span class="typ">Token</span></a><span class="pun">)</span><span class="pun">[]</span> <span class="pln">tokens</span><span class="pun">,</span>
 				<br/>
 				&nbsp;&nbsp;<span class="typ">string</span> <span class="pln">fileName</span><span class="pun">,</span>
 				<br/>
 				&nbsp;&nbsp;<a href="../../dparse/rollback_allocator/RollbackAllocator.html"><span class="typ">RollbackAllocator</span></a><span class="pun">*</span> <span class="pln">allocator</span><span class="pun">,</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">void</span> <span class="kwd">function</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span> <span class="pln">messageFunction</span><span class="pun">,</span>
+				&nbsp;&nbsp;<span class="pln">F</span> <span class="pln">messageFuncOrDg</span> <span class="pun">=</span> <span class="kwd">null</span><span class="pun">,</span>
 				<br/>
 				&nbsp;&nbsp;<span class="typ">uint</span><span class="pun">*</span> <span class="pln">errorCount</span> <span class="pun">=</span> <span class="kwd">null</span><span class="pun">,</span>
 				<br/>
@@ -131,18 +165,18 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				<section><h2>Parameters</h2>
+				<section><h3>Parameters</h3>
 <table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
-<tr><td id="tokens">tokens</td><td> the tokens parsed by dparse.lexer</td></tr>
-<tr><td id="fileName">fileName</td><td> the name of the file being parsed</td></tr>
-<tr><td id="messageFunction">messageFunction</td><td> a function to call on error or warning messages.
-         The parameters are the file name, line number, column number,
-         the error or warning message, and a boolean (true means error, false
-         means warning).</td></tr>
+<tr><td id="tokens">tokens</td><td> The tokens parsed by dparse.lexer.</td></tr>
+<tr><td id="fileName">fileName</td><td> The name of the file being parsed.</td></tr>
+<tr><td id="allocator">allocator</td><td> A pointer to a rollback allocator.</td></tr>
+<tr><td id="messageFuncOrDg">messageFuncOrDg</td><td> Either a function or a delegate that receives the parser messages.</td></tr>
+<tr><td id="errorCount">errorCount</td><td> An optional pointer to a variable receiving the error count.</td></tr>
+<tr><td id="warningCount">warningCount</td><td> An optional pointer to a variable receiving the warning count.</td></tr>
 </table>
 </section>
-<section><h2>Returns</h2>
-<p>the parsed module
+<section><h3>Returns</h3>
+<p>The parsed module.
 </p>
 </section>
 

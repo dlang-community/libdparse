@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Variable TypeSuffix.delegateOrFunction</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -101,7 +116,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</span>
 				&nbsp;&nbsp;<span class="com">// ...</span>
 				<br/>
-				&nbsp;&nbsp;<a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a") <span class="pln">delegateOrFunction</span>
+				&nbsp;&nbsp;<a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;") <span class="pln">delegateOrFunction</span>
 				<span class="pun">;</span>
 				<br/>
 				&nbsp;&nbsp;<span class="com">// ...</span>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Variable TokenTriviaFields.trailingTrivia</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Variable TokenTriviaFields.trailingTrivia</h1><p>Whitespace and comment tokens attached to this token.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">template</span> <a href="../../dparse/lexer/TokenTriviaFields.html"><span class="typ">TokenTriviaFields</span></a>
+				<br/>
+				<span class="pun">
+					{
+					<br/>
+				</span>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">immutable</span><span class="pun">(</span><span class="kwd">typeof</span><span class="pun">(</span><span class="kwd">this</span><span class="pun">)</span><span class="pun">)</span><span class="pun">[]</span> <span class="pln">trailingTrivia</span>
+				<span class="pun">;</span>
+				<br/>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				<span class="pun">}</span>
+						</div>
+					</code>
+				</div>
+				<section><p>All trivia tokens must have the text property set to the text with
+ which they identify with. This means you can map all trivia tokens to
+ their .text property and join them together to get the source code back
+ without any loss of information.
+</p>
+
+<p> Trivia is only included when calling getTokensForParser. When iterating
+ over DLexer all tokens will be in their raw form and none will be
+ converted to trivia.
+</p>
+</section>
+
+				<section><h2>Note</h2>
+<p>in the future you might need to explicitly pass
+ WhitespaceBehavior.include (or keep the default) as getTokensForParser
+ currently overrides it to include.
+</p>
+</section>
+<section><h2>Contains</h2>
+<p><code class="lang-d"><a href="../../dparse/lexer/TokenTriviaFields.comment.html"><span class="pln">comment</span></a></code>, <code class="lang-d"><span class="pln">whitespace</span></code>, <code class="lang-d"><span class="pln">specialTokenSequence</span></code>
+</p>
+</section>
+
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

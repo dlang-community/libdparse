@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Struct DLexer</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -111,6 +126,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/lexer/DLexer.this.html" class="public">
 									<code>this</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -119,8 +135,23 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/lexer/DLexer.this.html" class="public">
 									<code>this</code>
 								</a>
+								<span class="tableEntryAnnotation">(range, config, cache, haveSSE42)</span>
 							</td>
 							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Properties</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/lexer/DLexer.messages.html" class="public property"><code>messages</code></a><span class="tableEntryAnnotation">[get]</span>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/lexer/DLexer.Message.html"><span class="typ">DLexer<wbr/></span><span class="pun">.<wbr/></span><span class="typ">Message</span></a><span class="pun">[]</span><span class="pun">)</span></code></td><td></td>
 						</tr>
 					</table>
 				</section>
@@ -135,8 +166,26 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/lexer/DLexer.popFront.html" class="public">
 									<code>popFront</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
+						</tr>
+					</table>
+				</section>
+				<section><h2>Inner structs</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/lexer/DLexer.Message.html" class="public">
+									<code>Message</code>
+								</a>
+							</td>
+							<td>Lexer error/warning message.
+</td>
 						</tr>
 					</table>
 				</section>

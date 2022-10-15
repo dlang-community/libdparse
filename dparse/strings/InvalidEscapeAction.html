@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Enum InvalidEscapeAction</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Enum InvalidEscapeAction</h1><p>Defines different handler types what to do when invalid escape sequences are
+found inside unescapeString.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="kwd">enum</span> <span class="typ">InvalidEscapeAction</span>
+				 <span class="pun">:</span> <span class="typ">int</span> <span class="pun">{ ... }</span>
+						</div>
+					</code>
+				</div>
+				
+				<section><h2>Enum members</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td id="error">
+								<code>error</code>
+							</td>
+							<td>Throw a ConvException on invalid escape sequences. Does not throw
+anything on unknown named character entities as they are not currently
+implemented but instead treats them like keep.
+</td>
+						</tr>
+						<tr>
+							<td id="keep">
+								<code>keep</code>
+							</td>
+							<td>keep the backslash character as well as the escape characters in the
+string like in the input string.
+</td>
+						</tr>
+						<tr>
+							<td id="skip">
+								<code>skip</code>
+							</td>
+							<td>Ignore and skip offending characters, drop them from the output. Named
+character entities are still being included like keep as they
+are not currently implemented.
+</td>
+						</tr>
+					</table>
+				</section>
+				
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

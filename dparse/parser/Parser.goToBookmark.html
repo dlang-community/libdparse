@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Function Parser.goToBookmark</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -29,6 +29,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
 						</div>
 					</li>
 					<li>
@@ -61,6 +66,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
 						</div>
 					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
 				</ul>
 					</li>
 					<li class="tree-view collapsed">
@@ -89,21 +104,31 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.goToBookmark</h1><p></p>
+				<h1>Function Parser.goToBookmark</h1><p>Goes back to a parser bookmark and optionally invalidates it.
+</p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
 				<span class="kwd">final </span><span class="typ">void</span> <span class="pln">goToBookmark</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">ulong</span> <span class="pln">bookmark</span>
+				&nbsp;&nbsp;<span class="typ">ulong</span> <span class="pln">bookmark</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">popStack</span> <span class="pun">=</span> <span class="kwd">true</span>
 				<br/>
 				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc @safe</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
 				
-				
+				<section><h2>Parameters</h2>
+<table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
+<tr><td id="bookmark">bookmark</td><td> bookmark to revert to</td></tr>
+<tr><td id="popStack">popStack</td><td> if set to true, the bookmark is cleared, otherwise it must
+be manually cleared using abandonBookmark.</td></tr>
+</table>
+</section>
+
 			</div>
 			<footer>
 				<div id="license-info">

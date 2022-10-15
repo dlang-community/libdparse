@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Struct LexerRange</title>
 		<link rel="stylesheet" href="../../../css/style.min.css"/>
 		<script type="text/javascript" src="../../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -111,6 +126,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.this.html" class="public">
 									<code>this</code>
 								</a>
+								<span class="tableEntryAnnotation">(bytes, index, column, line)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -163,6 +179,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.canPeek.html" class="public">
 									<code>canPeek</code>
 								</a>
+								<span class="tableEntryAnnotation">(p)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -171,6 +188,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.empty.html" class="public">
 									<code>empty</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Implements the range primitive empty.
 </td>
@@ -180,6 +198,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.front.html" class="public">
 									<code>front</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Implements the range primitive front.
 </td>
@@ -189,6 +208,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.incrementLine.html" class="public">
 									<code>incrementLine</code>
 								</a>
+								<span class="tableEntryAnnotation">(i)</span>
 							</td>
 							<td>Increments the range's line number and resets the column counter.
 </td>
@@ -198,6 +218,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.mark.html" class="public">
 									<code>mark</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -206,6 +227,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.peek.html" class="public">
 									<code>peek</code>
 								</a>
+								<span class="tableEntryAnnotation">(p)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -214,6 +236,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.peekAt.html" class="public">
 									<code>peekAt</code>
 								</a>
+								<span class="tableEntryAnnotation">(offset)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -222,6 +245,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.popFront.html" class="public">
 									<code>popFront</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td>Implements the range primitive popFront.
 </td>
@@ -231,6 +255,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.popFrontN.html" class="public">
 									<code>popFrontN</code>
 								</a>
+								<span class="tableEntryAnnotation">(n)</span>
 							</td>
 							<td>Implements the algorithm popFrontN more efficiently. This function does
  not detect or handle newlines.
@@ -241,6 +266,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.seek.html" class="public">
 									<code>seek</code>
 								</a>
+								<span class="tableEntryAnnotation">(m)</span>
 							</td>
 							<td>Sets the range to the given position.
 </td>
@@ -250,6 +276,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.slice.html" class="public">
 									<code>slice</code>
 								</a>
+								<span class="tableEntryAnnotation">(m)</span>
 							</td>
 							<td>Returns a slice of the input byte array between the given mark and the
  current position.
@@ -261,6 +288,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../../std/experimental/lexer/LexerRange.startsWith.html" class="public">
 									<code>startsWith</code>
 								</a>
+								<span class="tableEntryAnnotation">(needle)</span>
 							</td>
 							<td></td>
 						</tr>

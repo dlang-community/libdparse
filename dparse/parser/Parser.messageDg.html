@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Variable Parser.messageDg</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Alias Parser.messageDg</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -29,6 +29,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
 						</div>
 					</li>
 					<li>
@@ -61,6 +66,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
 						</div>
 					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
 				</ul>
 					</li>
 					<li class="tree-view collapsed">
@@ -89,10 +104,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Variable Parser.messageDg</h1><p>Function that is called when a warning or error is encountered.
- The parameters are the file name, line number, column number,
- and the error or warning message.
-</p>
+				<h1>Alias Parser.messageDg</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -104,8 +116,8 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</span>
 				&nbsp;&nbsp;<span class="com">// ...</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span> <span class="pln">messageDg</span>
-				<span class="pun">;</span>
+				&nbsp;&nbsp;<span class="kwd">alias</span> <span class="kwd">deprecated </span><span class="pln">messageDg</span>
+				 <span class="pun">=</span> <span class="pln">messageDelegate</span><span class="pun">;</span>
 				<br/>
 				&nbsp;&nbsp;<span class="com">// ...</span>
 				<br/>

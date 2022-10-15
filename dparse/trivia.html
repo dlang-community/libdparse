@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Module dparse.trivia</title>
+		<link rel="stylesheet" href="../css/style.min.css"/>
+		<script type="text/javascript" src="../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Module dparse.trivia</h1><p>Module to work with trivia tokens (<code class="lang-d"><span class="pln">comment</span></code>, <code class="lang-d"><span class="pln">whitespace</span></code>,
+ <code class="lang-d"><span class="pln">specialTokenSequence</span></code>) which are attached to tokens near them when source
+ code gets tokenized.
+</p>
+				<section></section>
+				<section>
+					<h2>Functions</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="determineCommentType" class="public" href="../dparse/trivia/determineCommentType.html">determineCommentType</a><span class="tableEntryAnnotation">(comment)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="extractDdocFromTrivia" class="public" href="../dparse/trivia/extractDdocFromTrivia.html">extractDdocFromTrivia</a><span class="tableEntryAnnotation">(tokens)</span>
+								</code>
+							</td>
+							<td>Extracts and combines ddoc comments from trivia comments.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="extractLeadingDdoc" class="public" href="../dparse/trivia/extractLeadingDdoc.html">extractLeadingDdoc</a><span class="tableEntryAnnotation">(token)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="extractTrailingDdoc" class="public" href="../dparse/trivia/extractTrailingDdoc.html">extractTrailingDdoc</a><span class="tableEntryAnnotation">(token)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="isDocComment" class="public" href="../dparse/trivia/isDocComment.html">isDocComment</a><span class="tableEntryAnnotation">(type)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="unDecorateComment" class="public" href="../dparse/trivia/unDecorateComment.html">unDecorateComment</a><span class="tableEntryAnnotation">(comment, outputRange)</span>
+								</code>
+							</td>
+							<td>Removes "decoration" such as leading whitespace, leading + and * characters,
+ and places the result into the given output range
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Enums</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="CommentType" class="public" href="../dparse/trivia/CommentType.html">CommentType</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</section>
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

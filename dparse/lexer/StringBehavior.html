@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>Enum StringBehavior</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Struct StringBehavior</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -29,6 +29,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
 						</div>
 					</li>
 					<li>
@@ -61,6 +66,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
 						</div>
 					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
 				</ul>
 					</li>
 					<li class="tree-view collapsed">
@@ -89,50 +104,56 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Enum StringBehavior</h1><p>Configure string lexing behavior
+				<h1>Struct StringBehavior</h1><p>Configure string lexing behavior
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">enum</span> <span class="typ">StringBehavior</span>
-				 <span class="pun">:</span> <span class="typ">ubyte</span> <span class="pun">{ ... }</span>
+				<span class="kwd">struct</span> <span class="typ">StringBehavior</span>
+				<span class="pun">;</span>
 						</div>
 					</code>
 				</div>
 				
-				<section><h2>Enum members</h2>
+				<section><h2>Fields</h2>
 					<table>
 						<col class="caption"/>
 						<tr>
-							<th>Name</th><th>Description</th>
+							<th>Name</th><th>Type</th><th>Description</th>
 						</tr>
 						<tr>
-							<td id="compiler">
-								<code>compiler</code>
+							<td>
+								<a href="../../dparse/lexer/StringBehavior.behavior.html" class="public"><code>behavior</code></a>
 							</td>
-							<td>Do not include quote characters, process escape sequences
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ubyte</span></code></td><td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/lexer/StringBehavior.compiler.html" class="public"><code>compiler</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">immutable</span><span class="pun">(</span><a href="../../dparse/lexer/StringBehavior.html"><span class="typ">StringBehavior</span></a><span class="pun">)</span></code></td><td>Do not include quote characters, process escape sequences
 </td>
 						</tr>
 						<tr>
-							<td id="includeQuoteChars">
-								<code>includeQuoteChars</code>
+							<td>
+								<a href="../../dparse/lexer/StringBehavior.includeQuoteChars.html" class="public"><code>includeQuoteChars</code></a>
 							</td>
-							<td>Opening quotes, closing quotes, and string suffixes are included in the
-string token
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">immutable</span><span class="pun">(</span><a href="../../dparse/lexer/StringBehavior.html"><span class="typ">StringBehavior</span></a><span class="pun">)</span></code></td><td>Opening quotes, closing quotes, and string suffixes are included in
+the string token
 </td>
 						</tr>
 						<tr>
-							<td id="notEscaped">
-								<code>notEscaped</code>
+							<td>
+								<a href="../../dparse/lexer/StringBehavior.notEscaped.html" class="public"><code>notEscaped</code></a>
 							</td>
-							<td>String escape sequences are not replaced
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">immutable</span><span class="pun">(</span><a href="../../dparse/lexer/StringBehavior.html"><span class="typ">StringBehavior</span></a><span class="pun">)</span></code></td><td>String escape sequences are not replaced
 </td>
 						</tr>
 						<tr>
-							<td id="source">
-								<code>source</code>
+							<td>
+								<a href="../../dparse/lexer/StringBehavior.source.html" class="public"><code>source</code></a>
 							</td>
-							<td>Not modified at all. Useful for formatters or highlighters
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">immutable</span><span class="pun">(</span><a href="../../dparse/lexer/StringBehavior.html"><span class="typ">StringBehavior</span></a><span class="pun">)</span></code></td><td>Not modified at all. Useful for formatters or highlighters
 </td>
 						</tr>
 					</table>

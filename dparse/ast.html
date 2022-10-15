@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Module dparse.ast</title>
 		<link rel="stylesheet" href="../css/style.min.css"/>
 		<script type="text/javascript" src="../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -124,6 +139,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<code>
 									<a id="AddExpression" class="public" href="../dparse/ast/AddExpression.html">AddExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="AliasAssign" class="public" href="../dparse/ast/AliasAssign.html">AliasAssign</a>
 								</code>
 							</td>
 							<td></td>
@@ -371,6 +394,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
+									<a id="AssertArguments" class="public" href="../dparse/ast/AssertArguments.html">AssertArguments</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
 									<a id="AssertExpression" class="public" href="../dparse/ast/AssertExpression.html">AssertExpression</a>
 								</code>
 							</td>
@@ -461,7 +492,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
-									<a id="BlockStatement" class="public" href="../dparse/ast/BlockStatement.html">BlockStatement</a>
+									<a id="BaseNode" class="public" href="../dparse/ast/BaseNode.html">BaseNode</a>
 								</code>
 							</td>
 							<td></td>
@@ -469,7 +500,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
-									<a id="BodyStatement" class="public" href="../dparse/ast/BodyStatement.html">BodyStatement</a>
+									<a id="BlockStatement" class="public" href="../dparse/ast/BlockStatement.html">BlockStatement</a>
 								</code>
 							</td>
 							<td></td>
@@ -845,6 +876,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
+									<a id="FunctionContract" class="public" href="../dparse/ast/FunctionContract.html">FunctionContract</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
 									<a id="FunctionDeclaration" class="public" href="../dparse/ast/FunctionDeclaration.html">FunctionDeclaration</a>
 								</code>
 							</td>
@@ -854,6 +893,30 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<code>
 									<a id="FunctionLiteralExpression" class="public" href="../dparse/ast/FunctionLiteralExpression.html">FunctionLiteralExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="GccAsmInstruction" class="public" href="../dparse/ast/GccAsmInstruction.html">GccAsmInstruction</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="GccAsmOperand" class="public" href="../dparse/ast/GccAsmOperand.html">GccAsmOperand</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="GccAsmOperandList" class="public" href="../dparse/ast/GccAsmOperandList.html">GccAsmOperandList</a>
 								</code>
 							</td>
 							<td></td>
@@ -901,6 +964,18 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
+									<a id="IfCondition" class="public" href="../dparse/ast/IfCondition.html">IfCondition</a>
+								</code>
+							</td>
+							<td>In an if (or while) condition this represents:
+<code class="lang-d"></code>`
+if (auto x = readln)
+    ^^^^^^^^^^^^^^^
+</td>
+						</tr>
+						<tr>
+							<td>
+								<code>
 									<a id="IfStatement" class="public" href="../dparse/ast/IfStatement.html">IfStatement</a>
 								</code>
 							</td>
@@ -941,6 +1016,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
+									<a id="InContractExpression" class="public" href="../dparse/ast/InContractExpression.html">InContractExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
 									<a id="Index" class="public" href="../dparse/ast/Index.html">Index</a>
 								</code>
 							</td>
@@ -974,6 +1057,22 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<code>
 									<a id="Initializer" class="public" href="../dparse/ast/Initializer.html">Initializer</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="InOutContractExpression" class="public" href="../dparse/ast/InOutContractExpression.html">InOutContractExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="InOutStatement" class="public" href="../dparse/ast/InOutStatement.html">InOutStatement</a>
 								</code>
 							</td>
 							<td></td>
@@ -1061,6 +1160,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
+									<a id="MissingFunctionBody" class="public" href="../dparse/ast/MissingFunctionBody.html">MissingFunctionBody</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
 									<a id="MixinDeclaration" class="public" href="../dparse/ast/MixinDeclaration.html">MixinDeclaration</a>
 								</code>
 							</td>
@@ -1117,6 +1224,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
+									<a id="NamespaceList" class="public" href="../dparse/ast/NamespaceList.html">NamespaceList</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
 									<a id="NewAnonClassExpression" class="public" href="../dparse/ast/NewAnonClassExpression.html">NewAnonClassExpression</a>
 								</code>
 							</td>
@@ -1165,6 +1280,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
+									<a id="OutContractExpression" class="public" href="../dparse/ast/OutContractExpression.html">OutContractExpression</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
 									<a id="OutStatement" class="public" href="../dparse/ast/OutStatement.html">OutStatement</a>
 								</code>
 							</td>
@@ -1174,6 +1297,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<code>
 									<a id="Parameter" class="public" href="../dparse/ast/Parameter.html">Parameter</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ParameterAttribute" class="public" href="../dparse/ast/ParameterAttribute.html">ParameterAttribute</a>
 								</code>
 							</td>
 							<td></td>
@@ -1293,7 +1424,23 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
+									<a id="ShortenedFunctionBody" class="public" href="../dparse/ast/ShortenedFunctionBody.html">ShortenedFunctionBody</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
 									<a id="SingleImport" class="public" href="../dparse/ast/SingleImport.html">SingleImport</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="SpecifiedFunctionBody" class="public" href="../dparse/ast/SpecifiedFunctionBody.html">SpecifiedFunctionBody</a>
 								</code>
 							</td>
 							<td></td>
@@ -1366,6 +1513,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<code>
 									<a id="StorageClass" class="public" href="../dparse/ast/StorageClass.html">StorageClass</a>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="StringLiteralList" class="public" href="../dparse/ast/StringLiteralList.html">StringLiteralList</a>
 								</code>
 							</td>
 							<td></td>
@@ -1573,7 +1728,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
-									<a id="ThrowStatement" class="public" href="../dparse/ast/ThrowStatement.html">ThrowStatement</a>
+									<a id="ThrowExpression" class="public" href="../dparse/ast/ThrowExpression.html">ThrowExpression</a>
 								</code>
 							</td>
 							<td></td>
@@ -1733,6 +1888,24 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</table>
 				</section>
 				<section>
+					<h2>Enums</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="DeclarationListStyle" class="public" href="../dparse/ast/DeclarationListStyle.html">DeclarationListStyle</a>
+								</code>
+							</td>
+							<td>Describes which syntax was used in a list of declarations in the containing AST node
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
 					<h2>Templates</h2>
 					<table>
 						<col class="caption"/>
@@ -1822,6 +1995,17 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							</td>
 							<td>
 								<code class="prettyprint lang-d"><a href="../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true)</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a id="ThrowStatement" class="public" href="../dparse/ast/ThrowStatement.html">
+									<code>ThrowStatement</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../dparse/ast/ThrowExpression.html"><span class="typ">ThrowExpression</span></a></code>
 							</td>
 							<td></td>
 						</tr>

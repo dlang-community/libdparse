@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Declaration.staticForeachDeclaration - multiple declarations</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -107,7 +122,12 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true)<span class="pun">)</span> <span class="pln">staticForeachDeclaration</span><span class="pun">(</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">@property const</span><span class="pun">;</span>
+				<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true)<span class="pun">)</span> <span class="pln">staticForeachDeclaration</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<a href="../../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true) <span class="pln">node</span>
+				<br/>
+				<span class="pun">)</span><span class="pln"> </span><span class="kwd">@property</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
@@ -116,12 +136,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true)<span class="pun">)</span> <span class="pln">staticForeachDeclaration</span>
-				<span class="pun">(</span>
-				<br/>
-				&nbsp;&nbsp;<a href="../../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true) <span class="pln">node</span>
-				<br/>
-				<span class="pun">)</span><span class="pln"> </span><span class="kwd">@property</span><span class="pun">;</span>
+				<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/Foreach.html"><span class="typ">Foreach</span></a>!(true)<span class="pun">)</span> <span class="pln">staticForeachDeclaration</span><span class="pun">(</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">@property const</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>

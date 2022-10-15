@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>API documentation</title>
 		<link rel="stylesheet" href="./css/style.min.css"/>
 		<script type="text/javascript" src="./js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="./dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="./dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="./dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="./dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="./dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -102,6 +117,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<td>
 						This module defines an Abstract Syntax Tree for the D language
 
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="./dparse/astprinter.html">dparse.astprinter</a>
+					</td>
+					<td>
+						
 					</td>
 				</tr>
 				<tr>
@@ -151,6 +174,26 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</td>
 					<td>
 						
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="./dparse/strings.html">dparse.strings</a>
+					</td>
+					<td>
+						Utility for unescaping D string literals of any kind
+
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a href="./dparse/trivia.html">dparse.trivia</a>
+					</td>
+					<td>
+						Module to work with trivia tokens (<code class="lang-d"><span class="pln">comment</span></code>, <code class="lang-d"><span class="pln">whitespace</span></code>,
+ <code class="lang-d"><span class="pln">specialTokenSequence</span></code>) which are attached to tokens near them when source
+ code gets tokenized.
+
 					</td>
 				</tr>
 				<tr>

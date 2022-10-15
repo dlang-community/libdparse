@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>skip - multiple declarations</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Function skip</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -29,6 +29,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
 						</div>
 					</li>
 					<li>
@@ -61,6 +66,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
 						</div>
 					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
 				</ul>
 					</li>
 					<li class="tree-view collapsed">
@@ -89,21 +104,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>skip - multiple declarations</h1>
-				<nav class="page-nav">
-					<ul>
-						<li>
-							<a href="#0">
-								Function <code>skip</code>
-							</a>
-						</li>
-						<li>
-							<a href="#1">
-								Function <code>skip</code>
-							</a>
-						</li>
-					</ul>
-				</nav><h2 id="0">Function skip</h2><p>Skips between 0 and 16 bytes that match (or do not match) one of the
+				<h1>Function skip</h1><p>Skips between 0 and 16 bytes that match (or do not match) one of the
  given <b>chars</b>.
 </p>
 				<div class="prototype">
@@ -112,33 +113,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<span class="typ">void</span> <span class="pln">skip</span>(<span class="typ">bool</span> matching, chars...)
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><span class="typ">ubyte</span><span class="pun">*</span> <span class="pln"></span><span class="pun">,</span>
+				&nbsp;&nbsp;<span class="kwd">const </span><span class="typ">ubyte</span><span class="pun">*</span> <span class="pln">bytes</span><span class="pun">,</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">ulong</span><span class="pun">*</span> <span class="pln"></span><span class="pun">,</span>
+				&nbsp;&nbsp;<span class="typ">ulong</span><span class="pun">*</span> <span class="pln">pindex</span><span class="pun">,</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">ulong</span><span class="pun">*</span> <span class="pln"></span>
-				<br/>
-				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc @trusted</span>
-				<br/>
-				<span class="kwd">if</span> <span class="pun">(</span><span class="pln">chars<wbr/></span><span class="pun">.</span><span class="pln">length </span><span class="pun">&lt;= </span><span class="lit">8</span><span class="pun">);</span>
-						</div>
-					</code>
-				</div>
-				
-				<h2 id="1">Function skip</h2><p>Skips between 0 and 16 bytes that match (or do not match) one of the
- given <b>chars</b>.
-</p>
-				<div class="prototype">
-					<code class="lang-d">
-						<div class="single-prototype">
-				<span class="typ">void</span> <span class="pln">skip</span>(<span class="typ">bool</span> matching, chars...)
-				<span class="pun">(</span>
-				<br/>
-				&nbsp;&nbsp;<span class="kwd">const </span><span class="typ">ubyte</span><span class="pun">*</span> <span class="pln"></span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="typ">ulong</span><span class="pun">*</span> <span class="pln"></span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="typ">ulong</span><span class="pun">*</span> <span class="pln"></span>
+				&nbsp;&nbsp;<span class="typ">ulong</span><span class="pun">*</span> <span class="pln">pcolumn</span>
 				<br/>
 				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc @trusted</span>
 				<br/>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Function isStringLiteral</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Function isStringLiteral</h1><p>Checks if a string literal input has correct start/end sequences (quotes) to
+ be any kind of D string literal.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">bool</span> <span class="pln">isStringLiteral</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><span class="typ">char</span><span class="pun">)</span><span class="pun">[]</span> <span class="pln">literal</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">out </span><span class="typ">char</span> <span class="pln">stringCloseChar</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">out </span><span class="typ">bool</span> <span class="pln">hasPostfix</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">out </span><span class="typ">bool</span> <span class="pln">parseEscapes</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">out </span><span class="typ">int</span> <span class="pln">prefixLength</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+				<br/>
+				<br/>
+				<span class="typ">bool</span> <span class="pln">isStringLiteral</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><span class="typ">char</span><span class="pun">)</span><span class="pun">[]</span> <span class="pln">literal</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				<section></section>
+
+				<section><h2>Bugs</h2>
+<p>doesn't check for validity of token strings.
+</p>
+</section>
+<section><h2>Standards</h2>
+<p><a href="https://dlang.org/spec/lex.html#string_literals">https://dlang.org/spec/lex.html#string_literals</a>
+</p>
+</section>
+<section><h2>Example</h2>
+
+<pre class="code"><code class="lang-d"><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"hello"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"hello world!"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`r"hello world!"c`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`r"hello world!"d`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`q{cool}`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`q{cool\}`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"\\"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"\\\"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"\\\\"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"a\\\\"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`""`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`q""`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`x""`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">``</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`w""`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`hello"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"hello`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"hello world`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`hello world`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`r"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`rr"ok"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`x"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`x" `</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`qqqq`</span><span class="pun">));
+</span></code></pre>
+</section>
+
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

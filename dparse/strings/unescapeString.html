@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<title>Function unescapeString</title>
+		<link rel="stylesheet" href="../../css/style.min.css"/>
+		<script type="text/javascript" src="../../js/script.min.js"></script>
+	</head>
+	<body onload="setupDdox();">
+		<header></header>
+		<nav id="main-nav">
+			<div>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<form action="#" method="GET">
+						<input id="symbolSearch" type="text" name="q" placeholder="Search for symbols" autocomplete="off" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();" autofocus/>
+					</form>
+					<ul id="symbolSearchResults" class="symbolList" style="display: none"></ul><script type="application/javascript" src="../../symbols.js"></script><script type="application/javascript">var symbolSearchRootDir = "../../";
+document.getElementById('symbolSearchPane').style.display = 'block';</script>
+				</div>
+				<ul class="tree-view">
+					<li class="tree-view ">
+						<div class="package ">dparse
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/entities.html">entities</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/formatter.html">formatter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/lexer.html">lexer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/parser.html">parser</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/rollback_allocator.html">rollback_allocator</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module selected">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+					<li class="tree-view collapsed">
+						<div class="package ">std
+						</div>
+				<ul class="tree-view">
+					<li class="tree-view collapsed">
+						<div class="package ">experimental
+						</div>
+				<ul class="tree-view">
+					<li>
+						<div class="module ">
+							<a href="../../std/experimental/lexer.html">lexer</a>
+						</div>
+					</li>
+				</ul>
+					</li>
+				</ul>
+					</li>
+				</ul>
+			</div>
+			<p id="main-nav-footer">
+				Built with
+				<a href="https://github.com/MartinNowak/scod">scod</a>
+			</p>
+		</nav>
+		<div id="main-contents">
+			<div>
+				<h1>Function unescapeString</h1><p>Unescapes a D string, effectively being the same as mixing in the string into
+ some function call, but only for single string literals.
+</p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">string</span> <span class="pln">unescapeString</span>(<a href="../../dparse/strings/InvalidEscapeAction.html"><span class="typ">InvalidEscapeAction</span></a> invalidEscapeAction<span class="pln"> </span><span class="pun">= </span><span class="typ">InvalidEscapeAction<wbr/></span><span class="pun">.</span><span class="pln">error</span>)
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">string</span> <span class="pln">input</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				<section><p>Strips quotes, prefixes and suffixes, interprets escape sequences in normal
+ double quoted strings and interprets hex strings. Returns simple slices for
+ non-escaped strings.
+</p>
+
+<p> It's undefined how invalid/malformed strings are evaluated.
+</p>
+</section>
+
+				<section><h2>Bugs</h2>
+<p>doesn't check for validity of token strings, doesn't interpret named
+ character entity escape sequences, (HTML-kind escape sequences) doesn't check
+ nesting level of delimited strings.
+</p>
+</section>
+<section><h2>Standards</h2>
+<p><a href="https://dlang.org/spec/lex.html#string_literals">https://dlang.org/spec/lex.html#string_literals</a>
+</p>
+</section>
+<section><h2>Example</h2>
+
+<pre class="code"><code class="lang-d"><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{r"I am Oz"}</span><span class="pun">) == </span><span class="str">r"I am Oz"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{r"c:\games\Sudoku.exe"}</span><span class="pun">) == </span><span class="str">r"c:\games\Sudoku.exe"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{r"ab\n"}</span><span class="pun">) == </span><span class="str">r"ab\n"</span><span class="pun">);
+
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{`the Great and Powerful.`}</span><span class="pun">) == </span><span class="str">`the Great and Powerful.`</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{`c:\games\Empire.exe`}</span><span class="pun">) == </span><span class="str">`c:\games\Empire.exe`</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{`The "lazy" dog`}</span><span class="pun">) == </span><span class="str">`The "lazy" dog`</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{`a"b\n`}</span><span class="pun">) == </span><span class="str">`a"b\n`</span><span class="pun">);
+
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{"Who are you?"}</span><span class="pun">) == </span><span class="str">"Who are you?"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{"c:\\games\\Doom.exe"}</span><span class="pun">) == </span><span class="str">"c:\\games\\Doom.exe"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{"ab\n"}</span><span class="pun">) == </span><span class="str">"ab\n"</span><span class="pun">);
+
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`x"0A"`</span><span class="pun">) == </span><span class="pln">hexString</span><span class="pun">!</span><span class="str">"0A"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`x"00 FBCD 32FD 0A"`</span><span class="pun">) == </span><span class="pln">hexString</span><span class="pun">!</span><span class="str">"00 FBCD 32FD 0A"</span><span class="pun">);
+
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q"(foo(xxx))"`</span><span class="pun">) == </span><span class="str">q"(foo(xxx))"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q"[foo{]"`</span><span class="pun">) == </span><span class="str">q"[foo{]"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q"&lt;foo{&gt;"`</span><span class="pun">) == </span><span class="str">q"&lt;foo{&gt;"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q"{foo(}"`</span><span class="pun">) == </span><span class="str">q"{foo(}"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q"EOS
+This
+is a multi-line
+heredoc string
+EOS"`</span><span class="pun">) == </span><span class="str">q"EOS
+This
+is a multi-line
+heredoc string
+EOS"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q"/foo]/"`</span><span class="pun">) == </span><span class="str">`foo]`</span><span class="pun">);
+
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q{this is the voice of}`</span><span class="pun">) == </span><span class="str">q{this is the voice of}</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q{/*}*/ }`</span><span class="pun">) == </span><span class="str">q{/*}*/ }</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q{ world(q{control}); }`</span><span class="pun">) == </span><span class="str">q{ world(q{control}); }</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`q{ __TIME__ }`</span><span class="pun">) == </span><span class="str">q{ __TIME__ }</span><span class="pun">);
+
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{"hello"c}</span><span class="pun">) == </span><span class="str">"hello"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{"hello"w}</span><span class="pun">) == </span><span class="str">"hello"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">q{"hello"d}</span><span class="pun">) == </span><span class="str">"hello"</span><span class="pun">);
+
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`""`</span><span class="pun">) == </span><span class="str">""</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"hello\'world\"cool\""`</span><span class="pun">) == </span><span class="str">"hello\'world\"cool\""</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\x0A"`</span><span class="pun">) == </span><span class="str">"\x0A"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\u200b"`</span><span class="pun">) == </span><span class="str">"\u200b"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\U0001F4A9"`</span><span class="pun">) == </span><span class="str">"\U0001F4A9"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\0"`</span><span class="pun">) == </span><span class="str">"\0"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\1"`</span><span class="pun">) == </span><span class="str">"\1"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\12"`</span><span class="pun">) == </span><span class="str">"\12"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\127"`</span><span class="pun">) == </span><span class="str">"\127"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\1278"`</span><span class="pun">) == </span><span class="str">"\1278"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\12a8"`</span><span class="pun">) == </span><span class="str">"\12a8"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`"\1a28"`</span><span class="pun">) == </span><span class="str">"\1a28"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">`x"afDE"`</span><span class="pun">) == </span><span class="str">"\xaf\xDE"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">unescapeString</span><span class="pun">(</span><span class="str">"\"hello\nworld\rfoo\r\nbar\u2028ok\u2029\""</span><span class="pun">)
+		== </span><span class="str">"hello\nworld\nfoo\nbar\nok\n"</span><span class="pun">);
+</span></code></pre>
+</section>
+<section><h2>Example</h2>
+
+<pre class="code"><code class="lang-d"><span class="typ">string </span><span class="pln">testNoChange </span><span class="pun">= </span><span class="str">"hello\nworld!"</span><span class="pun">;
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">normalizeNewLines</span><span class="pun">(</span><span class="pln">testNoChange</span><span class="pun">)<wbr/>.</span><span class="pln">ptr </span><span class="kwd">is </span><span class="pln">testNoChange<wbr/></span><span class="pun">.</span><span class="pln">ptr</span><span class="pun">);
+
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">normalizeNewLines</span><span class="pun">(</span><span class="str">"hello\rworld"</span><span class="pun">) == </span><span class="str">"hello\nworld"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">normalizeNewLines</span><span class="pun">(</span><span class="str">"hello\r\nworld"</span><span class="pun">) == </span><span class="str">"hello\nworld"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">normalizeNewLines</span><span class="pun">(</span><span class="str">"hello\r\n\nworld"</span><span class="pun">) == </span><span class="str">"hello\n\nworld"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">normalizeNewLines</span><span class="pun">(</span><span class="str">"hello\u2028\nworld"</span><span class="pun">) == </span><span class="str">"hello\n\nworld"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">normalizeNewLines</span><span class="pun">(</span><span class="str">"hello\u2029\nworld"</span><span class="pun">) == </span><span class="str">"hello\n\nworld"</span><span class="pun">);
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">normalizeNewLines</span><span class="pun">(</span><span class="str">"hello\r"</span><span class="pun">) == </span><span class="str">"hello\n"</span><span class="pun">);
+</span></code></pre>
+</section>
+
+			</div>
+			<footer>
+				<div id="license-info">
+					
+					
+					
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>

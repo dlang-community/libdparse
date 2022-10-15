@@ -21,8 +21,12 @@
      | <span class="string_literal"><i>&#39;alias&#39;</i></span> <a href="#storageClass"><b>storageClass</b></a>* <a href="#type"><b>type</b></a> <a href="#declaratorIdentifierList"><b>declaratorIdentifierList</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
      | <span class="string_literal"><i>&#39;alias&#39;</i></span> <a href="#storageClass"><b>storageClass</b></a>* <a href="#type"><b>type</b></a> <a href="#identifier"><b>identifier</b></a> <span class="string_literal"><i>&#39;(&#39;) <a href="#parameters"><b>parameters</b></a> <span class="string_literal"><i>&#39;</i></span>&#39;</i></span> * <span class="string_literal"><i>&#39;;&#39;</i></span>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="aliasAssign"></span> aliasAssign</b>:
+     <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#type"><b>type</b></a>
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="aliasInitializer"></span> aliasInitializer</b>:
        <span class="string_literal"><i>Identifier</i></span> <a href="#templateParameters"><b>templateParameters</b></a>? <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#storageClass"><b>storageClass</b></a>* <a href="#type"><b>type</b></a>
+     | <span class="string_literal"><i>Identifier</i></span> <a href="#templateParameters"><b>templateParameters</b></a>? <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#storageClass"><b>storageClass</b></a>* <a href="#type"><b>type</b></a> <a href="#parameters"><b>parameters</b></a> <a href="#memberFunctionAttribute"><b>memberFunctionAttribute</b></a>*
      | <span class="string_literal"><i>Identifier</i></span> <a href="#templateParameters"><b>templateParameters</b></a>? <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#functionLiteralExpression"><b>functionLiteralExpression</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="aliasThisDeclaration"></span> aliasThisDeclaration</b>:
@@ -83,6 +87,7 @@
      | <span class="string_literal"><i>&#39;in&#39;</i></span> <a href="#operands"><b>operands</b></a>
      | <span class="string_literal"><i>&#39;out&#39;</i></span> <a href="#operands"><b>operands</b></a>
      | <span class="string_literal"><i>&#39;int&#39;</i></span> <a href="#operands"><b>operands</b></a>
+     | <span class="string_literal"><i>&#39;;&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="asmLogAndExp"></span> asmLogAndExp</b>:
      <a href="#asmOrExp"><b>asmOrExp</b></a>
@@ -108,6 +113,8 @@
      | <a href="#register : AsmExp"><b>register : AsmExp</b></a>
      | <a href="#identifierChain"><b>identifierChain</b></a>
      | <span class="string_literal"><i>&#39;$&#39;</i></span>
+     | <span class="string_literal"><i>&#39;this&#39;</i></span>
+     | <span class="string_literal"><i>&#39;__LOCAL_SIZE&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="asmRelExp"></span> asmRelExp</b>:
        <a href="#asmShiftExp"><b>asmShiftExp</b></a>
@@ -118,7 +125,7 @@
      <a href="#asmShiftExp"><b>asmShiftExp</b></a> (<span class="string_literal"><i>&#39;&lt;&lt;&#39;</i></span> | <span class="string_literal"><i>&#39;&gt;&gt;&#39;</i></span> | <span class="string_literal"><i>&#39;&gt;&gt;&gt;&#39;</i></span>) <a href="#asmAddExp"><b>asmAddExp</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="asmStatement"></span> asmStatement</b>:
-     <span class="string_literal"><i>&#39;asm&#39;</i></span> <a href="#functionAttributes"><b>functionAttributes</b></a>? <span class="string_literal"><i>&#39;{&#39;</i></span> <a href="#asmInstruction"><b>asmInstruction</b></a>+ <span class="string_literal"><i>&#39;}&#39;</i></span>
+     <span class="string_literal"><i>&#39;asm&#39;</i></span> <a href="#functionAttributes"><b>functionAttributes</b></a>? <span class="string_literal"><i>&#39;{&#39;</i></span> ( <a href="#asmInstruction"><b>asmInstruction</b></a>+ | <a href="#gccAsmInstruction"><b>gccAsmInstruction</b></a>+ ) <span class="string_literal"><i>&#39;}&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="asmTypePrefix"></span> asmTypePrefix</b>:
        <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>Identifier</i></span>?
@@ -142,8 +149,11 @@
        <a href="#asmAndExp"><b>asmAndExp</b></a>
      | <a href="#asmXorExp"><b>asmXorExp</b></a> <span class="string_literal"><i>&#39;^&#39;</i></span> <a href="#asmAndExp"><b>asmAndExp</b></a>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="assertArguments"></span> assertArguments</b>:
+     <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>)? <span class="string_literal"><i>&#39;,&#39;</i></span>?
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="assertExpression"></span> assertExpression</b>:
-     <span class="string_literal"><i>&#39;assert&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>)? <span class="string_literal"><i>&#39;,&#39;</i></span>? <span class="string_literal"><i>&#39;)&#39;</i></span>
+     <span class="string_literal"><i>&#39;assert&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assertArguments"><b>assertArguments</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="assignExpression"></span> assignExpression</b>:
      <a href="#ternaryExpression"><b>ternaryExpression</b></a> (<a href="#assignOperator"><b>assignOperator</b></a> <a href="#assignExpression"><b>assignExpression</b></a>)?
@@ -200,6 +210,7 @@
      | <span class="string_literal"><i>&#39;nothrow&#39;</i></span>
      | <span class="string_literal"><i>&#39;pure&#39;</i></span>
      | <span class="string_literal"><i>&#39;ref&#39;</i></span>
+     | <span class="string_literal"><i>&#39;throw&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="attributeDeclaration"></span> attributeDeclaration</b>:
      <a href="#attribute"><b>attribute</b></a> <span class="string_literal"><i>&#39;:&#39;</i></span>
@@ -212,9 +223,6 @@
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="blockStatement"></span> blockStatement</b>:
      <span class="string_literal"><i>&#39;{&#39;</i></span> <a href="#declarationsAndStatements"><b>declarationsAndStatements</b></a>? <span class="string_literal"><i>&#39;}&#39;</i></span>
-     ;</pre>
-<pre class="grammar"><b><span class="ddoc_anchor" id="bodyStatement"></span> bodyStatement</b>:
-     (<span class="string_literal"><i>&#39;body&#39;</i></span> | <span class="string_literal"><i>&#39;do&#39;</i></span>) <a href="#blockStatement"><b>blockStatement</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="breakStatement"></span> breakStatement</b>:
      <span class="string_literal"><i>&#39;break&#39;</i></span> <span class="string_literal"><i>Identifier</i></span>? <span class="string_literal"><i>&#39;;&#39;</i></span>
@@ -332,6 +340,7 @@
      ;
  <b><span class="ddoc_anchor" id="declaration2"></span> declaration2</b>:
        <a href="#aliasDeclaration"><b>aliasDeclaration</b></a>
+     | 
      | <a href="#aliasThisDeclaration"><b>aliasThisDeclaration</b></a>
      | <a href="#anonymousEnumDeclaration"><b>anonymousEnumDeclaration</b></a>
      | <a href="#attributeDeclaration"><b>attributeDeclaration</b></a>
@@ -457,27 +466,41 @@
      | <span class="string_literal"><i>&#39;nothrow&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="functionBody"></span> functionBody</b>:
-       <a href="#blockStatement"><b>blockStatement</b></a>
-     | (<a href="#inStatement"><b>inStatement</b></a> | <a href="#outStatement"><b>outStatement</b></a>)* <a href="#bodyStatement"><b>bodyStatement</b></a>?
+       <a href="#specifiedFunctionBody"><b>specifiedFunctionBody</b></a>
+     | <a href="#missingFunctionBody"><b>missingFunctionBody</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="functionCallExpression"></span> functionCallExpression</b>:
        <a href="#symbol"><b>symbol</b></a> <a href="#arguments"><b>arguments</b></a>
      | <a href="#unaryExpression"><b>unaryExpression</b></a> <a href="#arguments"><b>arguments</b></a>
      | <a href="#type"><b>type</b></a> <a href="#arguments"><b>arguments</b></a>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="functionContract"></span> functionContract</b>:
+       <a href="#inOutContractExpression"><b>inOutContractExpression</b></a>
+     | <a href="#inOutStatement"><b>inOutStatement</b></a>
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="functionDeclaration"></span> functionDeclaration</b>:
        (<a href="#storageClass"><b>storageClass</b></a>+ | <a href="#type"><b>type</b></a>) <span class="string_literal"><i>Identifier</i></span> <a href="#parameters"><b>parameters</b></a> <a href="#memberFunctionAttribute"><b>memberFunctionAttribute</b></a>* (<a href="#functionBody"><b>functionBody</b></a> | <span class="string_literal"><i>&#39;;&#39;</i></span>)
      | (<a href="#storageClass"><b>storageClass</b></a>+ | <a href="#type"><b>type</b></a>) <span class="string_literal"><i>Identifier</i></span> <a href="#templateParameters"><b>templateParameters</b></a> <a href="#parameters"><b>parameters</b></a> <a href="#memberFunctionAttribute"><b>memberFunctionAttribute</b></a>* <a href="#constraint"><b>constraint</b></a>? (<a href="#functionBody"><b>functionBody</b></a> | <span class="string_literal"><i>&#39;;&#39;</i></span>)
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="functionLiteralExpression"></span> functionLiteralExpression</b>:
-     | <span class="string_literal"><i>&#39;delegate&#39;</i></span> <a href="#type"><b>type</b></a>? (<a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>*)? <a href="#functionBody"><b>functionBody</b></a>
-     | <span class="string_literal"><i>&#39;function&#39;</i></span> <a href="#type"><b>type</b></a>? (<a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>*)? <a href="#functionBody"><b>functionBody</b></a>
-     | <a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>* <a href="#functionBody"><b>functionBody</b></a>
-     | <a href="#functionBody"><b>functionBody</b></a>
+     | <span class="string_literal"><i>&#39;delegate&#39;</i></span> <span class="string_literal"><i>&#39;ref&#39;</i></span>? <a href="#type"><b>type</b></a>? (<a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>*)? <a href="#specifiedFunctionBody"><b>specifiedFunctionBody</b></a>
+     | <span class="string_literal"><i>&#39;function&#39;</i></span> <span class="string_literal"><i>&#39;ref&#39;</i></span>? <a href="#type"><b>type</b></a>? (<a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>*)? <a href="#specifiedFunctionBody"><b>specifiedFunctionBody</b></a>
+     | <span class="string_literal"><i>&#39;ref&#39;</i></span>? <a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>* <a href="#specifiedFunctionBody"><b>specifiedFunctionBody</b></a>
+     | <a href="#specifiedFunctionBody"><b>specifiedFunctionBody</b></a>
      | <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&gt;&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>
-     | <span class="string_literal"><i>&#39;function&#39;</i></span> <a href="#type"><b>type</b></a>? <a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>* <span class="string_literal"><i>&#39;=&gt;&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>
-     | <span class="string_literal"><i>&#39;delegate&#39;</i></span> <a href="#type"><b>type</b></a>? <a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>* <span class="string_literal"><i>&#39;=&gt;&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>
-     | <a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>* <span class="string_literal"><i>&#39;=&gt;&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>
+     | <span class="string_literal"><i>&#39;function&#39;</i></span> <span class="string_literal"><i>&#39;ref&#39;</i></span>? <a href="#type"><b>type</b></a>? <a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>* <span class="string_literal"><i>&#39;=&gt;&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>
+     | <span class="string_literal"><i>&#39;delegate&#39;</i></span> <span class="string_literal"><i>&#39;ref&#39;</i></span>? <a href="#type"><b>type</b></a>? <a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>* <span class="string_literal"><i>&#39;=&gt;&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>
+     | <span class="string_literal"><i>&#39;ref&#39;</i></span>? <a href="#parameters"><b>parameters</b></a> <a href="#functionAttribute"><b>functionAttribute</b></a>* <span class="string_literal"><i>&#39;=&gt;&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="gccAsmInstruction"></span> gccAsmInstruction</b>:
+     | <a href="#expression"><b>expression</b></a> <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#gccAsmOperandList"><b>gccAsmOperandList</b></a>? (<span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#gccAsmOperandList"><b>gccAsmOperandList</b></a>? (<span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#stringLiteralList"><b>stringLiteralList</b></a>)? )? <span class="string_literal"><i>&#39;;&#39;</i></span>
+     | <a href="#expression"><b>expression</b></a> <span class="string_literal"><i>&#39;:&#39;</i></span> <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#gccAsmOperandList"><b>gccAsmOperandList</b></a>? <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#stringLiteralList"><b>stringLiteralList</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span> <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#declaratorIdentifierList"><b>declaratorIdentifierList</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="gccAsmOperandList"></span> gccAsmOperandList</b>:
+     <a href="#gccAsmOperand"><b>gccAsmOperand</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#gccAsmOperand"><b>gccAsmOperand</b></a>)*
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="gccAsmOperand"></span> gccAsmOperand</b>:
+     (<span class="string_literal"><i>&#39;[&#39;</i></span> <a href="#identifier"><b>identifier</b></a> <span class="string_literal"><i>&#39;]&#39;</i></span>)? <a href="#stringLiteral"><b>stringLiteral</b></a> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="gotoStatement"></span> gotoStatement</b>:
      <span class="string_literal"><i>&#39;goto&#39;</i></span> (<span class="string_literal"><i>Identifier</i></span> | <span class="string_literal"><i>&#39;default&#39;</i></span> | <span class="string_literal"><i>&#39;case&#39;</i></span> <a href="#expression"><b>expression</b></a>?) <span class="string_literal"><i>&#39;;&#39;</i></span>
@@ -488,6 +511,7 @@
 <pre class="grammar"><b><span class="ddoc_anchor" id="typeIdentifierPart"></span> typeIdentifierPart</b>:
        <a href="#identifierOrTemplateInstance"><b>identifierOrTemplateInstance</b></a>
      | <a href="#identifierOrTemplateInstance"><b>identifierOrTemplateInstance</b></a> <span class="string_literal"><i>&#39;.&#39;</i></span> <a href="#typeIdentifierPart"><b>typeIdentifierPart</b></a>
+     | <a href="#identifierOrTemplateInstance"><b>identifierOrTemplateInstance</b></a> <span class="string_literal"><i>&#39;[&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a> <span class="string_literal"><i>&#39;]&#39;</i></span>
      | <a href="#identifierOrTemplateInstance"><b>identifierOrTemplateInstance</b></a> <span class="string_literal"><i>&#39;[&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a> <span class="string_literal"><i>&#39;]&#39;</i></span> <span class="string_literal"><i>&#39;.&#39;</i></span> <a href="#typeIdentifierPart"><b>typeIdentifierPart</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="identifierOrTemplateChain"></span> identifierOrTemplateChain</b>:
@@ -502,10 +526,12 @@
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="ifStatement"></span> ifStatement</b>:
      <span class="string_literal"><i>&#39;if&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#ifCondition"><b>ifCondition</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <a href="#declarationOrStatement"><b>declarationOrStatement</b></a> (<span class="string_literal"><i>&#39;else&#39;</i></span> <a href="#declarationOrStatement"><b>declarationOrStatement</b></a>)?
-<b><span class="ddoc_anchor" id="ifCondition"></span> ifCondition</b>:
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="ifCondition"></span> ifCondition</b>:
        <span class="string_literal"><i>&#39;auto&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#expression"><b>expression</b></a>
+     | <span class="string_literal"><i>&#39;scope&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#expression"><b>expression</b></a>
      | <a href="#typeConstructors"><b>typeConstructors</b></a> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#expression"><b>expression</b></a>
-     | <a href="#type"><b>type</b></a> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#expression"><b>expression</b></a>
+     | <a href="#typeConstructors"><b>typeConstructors</b></a>? <a href="#type"><b>type</b></a> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#expression"><b>expression</b></a>
      | <a href="#expression"><b>expression</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="importBind"></span> importBind</b>:
@@ -530,12 +556,22 @@
      | <a href="#unaryExpression"><b>unaryExpression</b></a> <span class="string_literal"><i>&#39;[&#39;</i></span> <a href="#index"><b>index</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#index"><b>index</b></a>)* <span class="string_literal"><i>&#39;]&#39;</i></span>
      ;
  </pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="inContractExpression"></span> inContractExpression</b>:
+     <span class="string_literal"><i>&#39;in&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assertArguments"><b>assertArguments</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="inExpression"></span> inExpression</b>:
      <a href="#shiftExpression"><b>shiftExpression</b></a> (<span class="string_literal"><i>&#39;in&#39;</i></span> | (<span class="string_literal"><i>&#39;!&#39;</i></span> <span class="string_literal"><i>&#39;in&#39;</i></span>)) <a href="#shiftExpression"><b>shiftExpression</b></a>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="inOutContractExpression"></span> inOutContractExpression</b>:
+       <a href="#inContractExpression"><b>inContractExpression</b></a>
+     | <a href="#outContractExpression"><b>outContractExpression</b></a>
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="inOutStatement"></span> inOutStatement</b>:
+       <a href="#inStatement"><b>inStatement</b></a>
+     | <a href="#outStatement"><b>outStatement</b></a>
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="inStatement"></span> inStatement</b>:
-       <span class="string_literal"><i>&#39;in&#39;</i></span> <a href="#blockStatement"><b>blockStatement</b></a>
-     | <span class="string_literal"><i>&#39;in&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>)? <span class="string_literal"><i>&#39;,&#39;</i></span>? <span class="string_literal"><i>&#39;)&#39;</i></span>
+     <span class="string_literal"><i>&#39;in&#39;</i></span> <a href="#blockStatement"><b>blockStatement</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="initializer"></span> initializer</b>:
        <span class="string_literal"><i>&#39;void&#39;</i></span>
@@ -548,8 +584,8 @@
      | <span class="string_literal"><i>&#39;interface&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <a href="#templateParameters"><b>templateParameters</b></a> (<span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#baseClassList"><b>baseClassList</b></a>)? <a href="#constraint"><b>constraint</b></a>? <a href="#structBody"><b>structBody</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="invariant"></span> invariant</b>:
-       <span class="string_literal"><i>&#39;invariant&#39;</i></span> <a href="#blockStatement"><b>blockStatement</b></a>
-     | <span class="string_literal"><i>&#39;invariant&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>)? <span class="string_literal"><i>&#39;,&#39;</i></span>? <span class="string_literal"><i>&#39;)&#39;</i></span>
+       <span class="string_literal"><i>&#39;invariant&#39;</i></span> (<span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span>)? <a href="#blockStatement"><b>blockStatement</b></a>
+     | <span class="string_literal"><i>&#39;invariant&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assertArguments"><b>assertArguments</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <span class="string_literal"><i>&#39;;&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="isExpression"></span> isExpression</b>:
        <span class="string_literal"><i>&#39;is&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#type"><b>type</b></a> <span class="string_literal"><i>identifier</i></span>? <span class="string_literal"><i>&#39;)&#39;</i></span>
@@ -573,7 +609,7 @@
 <pre class="grammar"><b><span class="ddoc_anchor" id="linkageAttribute"></span> linkageAttribute</b>:
        <span class="string_literal"><i>&#39;extern&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;)&#39;</i></span>
      | <span class="string_literal"><i>&#39;extern&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;-&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;)&#39;</i></span>
-     | <span class="string_literal"><i>&#39;extern&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;++&#39;</i></span> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#typeIdentifierPart"><b>typeIdentifierPart</b></a> | <span class="string_literal"><i>&#39;struct&#39;</i></span> | <span class="string_literal"><i>&#39;class&#39;</i></span>)? <span class="string_literal"><i>&#39;)&#39;</i></span>
+     | <span class="string_literal"><i>&#39;extern&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;++&#39;</i></span> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#typeIdentifierPart"><b>typeIdentifierPart</b></a> | <a href="#namespaceList"><b>namespaceList</b></a> | <span class="string_literal"><i>&#39;struct&#39;</i></span> | <span class="string_literal"><i>&#39;class&#39;</i></span>)? <span class="string_literal"><i>&#39;)&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="memberFunctionAttribute"></span> memberFunctionAttribute</b>:
        <a href="#functionAttribute"><b>functionAttribute</b></a>
@@ -584,12 +620,16 @@
      | <span class="string_literal"><i>&#39;return&#39;</i></span>
      | <span class="string_literal"><i>&#39;scope&#39;</i></span>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="missingFunctionBody"></span> missingFunctionBody</b>:
+       <span class="string_literal"><i>&#39;;&#39;</i></span>
+     | <a href="#functionContract"><b>functionContract</b></a>* <span class="string_literal"><i>&#39;;&#39;</i></span>
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="mixinDeclaration"></span> mixinDeclaration</b>:
        <a href="#mixinExpression"><b>mixinExpression</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
      | <a href="#templateMixinExpression"><b>templateMixinExpression</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="mixinExpression"></span> mixinExpression</b>:
-     <span class="string_literal"><i>&#39;mixin&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
+     <span class="string_literal"><i>&#39;mixin&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#argumentList"><b>argumentList</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="mixinTemplateDeclaration"></span> mixinTemplateDeclaration</b>:
      <span class="string_literal"><i>&#39;mixin&#39;</i></span> <a href="#templateDeclaration"><b>templateDeclaration</b></a>
@@ -602,11 +642,14 @@
      <a href="#moduleDeclaration"><b>moduleDeclaration</b></a>? <a href="#declaration"><b>declaration</b></a>*
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="moduleDeclaration"></span> moduleDeclaration</b>:
-     <a href="#deprecated"><b>deprecated</b></a>? <span class="string_literal"><i>&#39;module&#39;</i></span> <a href="#identifierChain"><b>identifierChain</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
+     <a href="#atAttribute"><b>atAttribute</b></a>* <a href="#deprecated"><b>deprecated</b></a>? <a href="#atAttribute"><b>atAttribute</b></a>* <span class="string_literal"><i>&#39;module&#39;</i></span> <a href="#identifierChain"><b>identifierChain</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="mulExpression"></span> mulExpression</b>:
        <a href="#powExpression"><b>powExpression</b></a>
      | <a href="#mulExpression"><b>mulExpression</b></a> (<span class="string_literal"><i>&#39;*&#39;</i></span> | <span class="string_literal"><i>&#39;/&#39;</i></span> | <span class="string_literal"><i>&#39;%&#39;</i></span>) <a href="#powExpression"><b>powExpression</b></a>
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="namespaceList"></span> namespaceList</b>:
+     <a href="#ternaryExpression"><b>ternaryExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#ternaryExpression"><b>ternaryExpression</b></a>?)* <span class="string_literal"><i>&#39;,&#39;</i></span>?
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="newAnonClassExpression"></span> newAnonClassExpression</b>:
      <span class="string_literal"><i>&#39;new&#39;</i></span> <a href="#arguments"><b>arguments</b></a>? <span class="string_literal"><i>&#39;class&#39;</i></span> <a href="#arguments"><b>arguments</b></a>? <a href="#baseClassList"><b>baseClassList</b></a>? <a href="#structBody"><b>structBody</b></a>
@@ -632,9 +675,11 @@
        <a href="#andAndExpression"><b>andAndExpression</b></a>
      | <a href="#orOrExpression"><b>orOrExpression</b></a> <span class="string_literal"><i>&#39;||&#39;</i></span> <a href="#andAndExpression"><b>andAndExpression</b></a>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="outContractExpression"></span> outContractExpression</b>:
+     <span class="string_literal"><i>&#39;out&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span>? <span class="string_literal"><i>&#39;;&#39;</i></span> <a href="#assertArguments"><b>assertArguments</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="outStatement"></span> outStatement</b>:
-       <span class="string_literal"><i>&#39;out&#39;</i></span> (<span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;)&#39;</i></span>)? <a href="#blockStatement"><b>blockStatement</b></a>
-     | <span class="string_literal"><i>&#39;out&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span>? <span class="string_literal"><i>&#39;;&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>)? <span class="string_literal"><i>&#39;,&#39;</i></span>? <span class="string_literal"><i>&#39;)&#39;</i></span>
+     <span class="string_literal"><i>&#39;out&#39;</i></span> (<span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;)&#39;</i></span>)? <a href="#blockStatement"><b>blockStatement</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="parameter"></span> parameter</b>:
        <a href="#parameterAttribute"><b>parameterAttribute</b></a>* <a href="#type"><b>type</b></a>
@@ -642,7 +687,8 @@
      | <a href="#parameterAttribute"><b>parameterAttribute</b></a>* <a href="#type"><b>type</b></a> <span class="string_literal"><i>Identifier</i></span>? (<span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>)?
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="parameterAttribute"></span> parameterAttribute</b>:
-       <a href="#typeConstructor"><b>typeConstructor</b></a>
+       <a href="#atAttribute"><b>atAttribute</b></a>
+     | <a href="#typeConstructor"><b>typeConstructor</b></a>
      | <span class="string_literal"><i>&#39;final&#39;</i></span>
      | <span class="string_literal"><i>&#39;in&#39;</i></span>
      | <span class="string_literal"><i>&#39;lazy&#39;</i></span>
@@ -653,9 +699,19 @@
      | <span class="string_literal"><i>&#39;return&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="parameters"></span> parameters</b>:
-       <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#parameter"><b>parameter</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#parameter"><b>parameter</b></a>)* (<span class="string_literal"><i>&#39;,&#39;</i></span> <span class="string_literal"><i>&#39;...&#39;</i></span>)? <span class="string_literal"><i>&#39;)&#39;</i></span>
-     | <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>&#39;...&#39;</i></span> <span class="string_literal"><i>&#39;)&#39;</i></span>
+       <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#parameter"><b>parameter</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#parameter"><b>parameter</b></a>)* (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#variadicArgumentsAttributes"><b>variadicArgumentsAttributes</b></a>? <span class="string_literal"><i>&#39;...&#39;</i></span>)? <span class="string_literal"><i>&#39;)&#39;</i></span>
+     | <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#variadicArgumentsAttributes"><b>variadicArgumentsAttributes</b></a>? <span class="string_literal"><i>&#39;...&#39;</i></span> <span class="string_literal"><i>&#39;)&#39;</i></span>
      | <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>&#39;)&#39;</i></span>
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="variadicArgumentsAttributes"></span> variadicArgumentsAttributes</b>:
+       <a href="#variadicArgumentsAttribute"><b>variadicArgumentsAttribute</b></a>+
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="variadicArgumentsAttribute"></span> variadicArgumentsAttribute</b>:
+       <span class="string_literal"><i>&#39;const&#39;</i></span>
+     | <span class="string_literal"><i>&#39;immutable&#39;</i></span>
+     | <span class="string_literal"><i>&#39;scope&#39;</i></span>
+     | <span class="string_literal"><i>&#39;shared&#39;</i></span>
+     | <span class="string_literal"><i>&#39;return&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="postblit"></span> postblit</b>:
      <span class="string_literal"><i>&#39;this&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>&#39;this&#39;</i></span> <span class="string_literal"><i>&#39;)&#39;</i></span> <a href="#memberFunctionAttribute"><b>memberFunctionAttribute</b></a>* (<a href="#functionBody"><b>functionBody</b></a> | <span class="string_literal"><i>&#39;;&#39;</i></span>)
@@ -755,6 +811,14 @@
 <pre class="grammar"><b><span class="ddoc_anchor" id="singleImport"></span> singleImport</b>:
      (<span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span>)? <a href="#identifierChain"><b>identifierChain</b></a>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="shortenedFunctionBody"></span> shortenedFunctionBody</b>:
+      <a href="#inOutContractExpression"><b>inOutContractExpression</b></a>* <span class="string_literal"><i>&#39;=&gt;&#39;</i></span> <a href="#expression"><b>expression</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="specifiedFunctionBody"></span> specifiedFunctionBody</b>:
+       <span class="string_literal"><i>&#39;do&#39;</i></span>? <a href="#blockStatement"><b>blockStatement</b></a>
+     | <a href="#functionContract"><b>functionContract</b></a>* <a href="#inOutContractExpression"><b>inOutContractExpression</b></a> <span class="string_literal"><i>&#39;do&#39;</i></span>? <a href="#blockStatement"><b>blockStatement</b></a>
+     | <a href="#functionContract"><b>functionContract</b></a>* <a href="#inOutStatement"><b>inOutStatement</b></a> <span class="string_literal"><i>&#39;do&#39;</i></span> <a href="#blockStatement"><b>blockStatement</b></a>
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="statement"></span> statement</b>:
        <a href="#statementNoCaseNoDefault"><b>statementNoCaseNoDefault</b></a>
      | <a href="#caseStatement"><b>caseStatement</b></a>
@@ -778,7 +842,6 @@
      | <a href="#withStatement"><b>withStatement</b></a>
      | <a href="#synchronizedStatement"><b>synchronizedStatement</b></a>
      | <a href="#tryStatement"><b>tryStatement</b></a>
-     | <a href="#throwStatement"><b>throwStatement</b></a>
      | <a href="#scopeGuardStatement"><b>scopeGuardStatement</b></a>
      | <a href="#pragmaStatement"><b>pragmaStatement</b></a>
      | <a href="#asmStatement"><b>asmStatement</b></a>
@@ -822,6 +885,7 @@
      | <span class="string_literal"><i>&#39;scope&#39;</i></span>
      | <span class="string_literal"><i>&#39;static&#39;</i></span>
      | <span class="string_literal"><i>&#39;synchronized&#39;</i></span>
+     | <span class="string_literal"><i>&#39;throw&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="structBody"></span> structBody</b>:
      <span class="string_literal"><i>&#39;{&#39;</i></span> <a href="#declaration"><b>declaration</b></a>* <span class="string_literal"><i>&#39;}&#39;</i></span>
@@ -935,8 +999,8 @@
 <pre class="grammar"><b><span class="ddoc_anchor" id="ternaryExpression"></span> ternaryExpression</b>:
      <a href="#orOrExpression"><b>orOrExpression</b></a> (<span class="string_literal"><i>&#39;?&#39;</i></span> <a href="#expression"><b>expression</b></a> <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#ternaryExpression"><b>ternaryExpression</b></a>)?
      ;</pre>
-<pre class="grammar"><b><span class="ddoc_anchor" id="throwStatement"></span> throwStatement</b>:
-     <span class="string_literal"><i>&#39;throw&#39;</i></span> <a href="#expression"><b>expression</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
+<pre class="grammar"><b><span class="ddoc_anchor" id="throwExpression"></span> throwExpression</b>:
+     <span class="string_literal"><i>&#39;throw&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="traitsExpression"></span> traitsExpression</b>:
      <span class="string_literal"><i>&#39;__traits&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#templateArgumentList"><b>templateArgumentList</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
@@ -954,7 +1018,9 @@
      | <span class="string_literal"><i>&#39;this&#39;</i></span> <span class="string_literal"><i>&#39;.&#39;</i></span> <a href="#typeIdentifierPart"><b>typeIdentifierPart</b></a>
      | <a href="#typeofExpression"><b>typeofExpression</b></a> (<span class="string_literal"><i>&#39;.&#39;</i></span> <a href="#typeIdentifierPart"><b>typeIdentifierPart</b></a>)?
      | <a href="#typeConstructor"><b>typeConstructor</b></a> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#type"><b>type</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
+     | <a href="#traitsExpression"><b>traitsExpression</b></a>
      | <a href="#vector"><b>vector</b></a>
+     | <a href="#mixinExpression"><b>mixinExpression</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="typeConstructor"></span> typeConstructor</b>:
        <span class="string_literal"><i>&#39;const&#39;</i></span>
@@ -972,6 +1038,7 @@
      | <span class="string_literal"><i>&#39;class&#39;</i></span>
      | <span class="string_literal"><i>&#39;interface&#39;</i></span>
      | <span class="string_literal"><i>&#39;enum&#39;</i></span>
+     | <span class="string_literal"><i>&#39;_vector&#39;</i></span>
      | <span class="string_literal"><i>&#39;function&#39;</i></span>
      | <span class="string_literal"><i>&#39;delegate&#39;</i></span>
      | <span class="string_literal"><i>&#39;super&#39;</i></span>
@@ -980,8 +1047,9 @@
      | <span class="string_literal"><i>&#39;inout&#39;</i></span>
      | <span class="string_literal"><i>&#39;shared&#39;</i></span>
      | <span class="string_literal"><i>&#39;return&#39;</i></span>
-     | <span class="string_literal"><i>&#39;typedef&#39;</i></span>
-     | <span class="string_literal"><i>&#39;__parameters&#39;</i></span>
+     | <span class="string_literal"><i>&#39;_parameters&#39;</i></span>
+     | <span class="string_literal"><i>&#39;module&#39;</i></span>
+     | <span class="string_literal"><i>&#39;package&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="typeSuffix"></span> typeSuffix</b>:
        <span class="string_literal"><i>&#39;*&#39;</i></span>
@@ -1010,6 +1078,7 @@
      | <a href="#deleteExpression"><b>deleteExpression</b></a>
      | <a href="#castExpression"><b>castExpression</b></a>
      | <a href="#assertExpression"><b>assertExpression</b></a>
+     | <a href="#throwExpression"><b>throwExpression</b></a>
      | <a href="#functionCallExpression"><b>functionCallExpression</b></a>
      | <a href="#indexExpression"><b>indexExpression</b></a>
      | <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#type"><b>type</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <span class="string_literal"><i>&#39;.&#39;</i></span> <a href="#identifierOrTemplateInstance"><b>identifierOrTemplateInstance</b></a>
@@ -1027,11 +1096,10 @@
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="variableDeclaration"></span> variableDeclaration</b>:
        <a href="#storageClass"><b>storageClass</b></a>* <a href="#type"><b>type</b></a> <a href="#declarator"><b>declarator</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#declarator"><b>declarator</b></a>)* <span class="string_literal"><i>&#39;;&#39;</i></span>
-     | <a href="#storageClass"><b>storageClass</b></a>* <a href="#type"><b>type</b></a> <span class="string_literal"><i>identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#functionBody"><b>functionBody</b></a> <span class="string_literal"><i>&#39;;&#39;</i></span>
      | <a href="#autoDeclaration"><b>autoDeclaration</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="vector"></span> vector</b>:
-     <span class="string_literal"><i>&#39;__vector&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#type"><b>type</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
+     <span class="string_literal"><i>&#39;__vector&#39;</i></span> (<span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#type"><b>type</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>)?
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="versionCondition"></span> versionCondition</b>:
      <span class="string_literal"><i>&#39;version&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> (<span class="string_literal"><i>IntegerLiteral</i></span> | <span class="string_literal"><i>Identifier</i></span> | <span class="string_literal"><i>&#39;unittest&#39;</i></span> | <span class="string_literal"><i>&#39;assert&#39;</i></span>) <span class="string_literal"><i>&#39;)&#39;</i></span>

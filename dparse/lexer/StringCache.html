@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Struct StringCache</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -120,6 +135,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/lexer/StringCache.this.html" class="public">
 									<code>this</code>
 								</a>
+								<span class="tableEntryAnnotation">()</span>
 							</td>
 							<td></td>
 						</tr>
@@ -128,6 +144,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/lexer/StringCache.this.html" class="public">
 									<code>this</code>
 								</a>
+								<span class="tableEntryAnnotation">(bucketCount)</span>
 							</td>
 							<td></td>
 						</tr>
@@ -144,6 +161,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<a href="../../dparse/lexer/StringCache.intern.html" class="public">
 									<code>intern</code>
 								</a>
+								<span class="tableEntryAnnotation">(str)</span>
 							</td>
 							<td>Caches a string.
 </td>
@@ -168,11 +186,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 </span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="pln">source</span><span class="pun">)<wbr/>.</span><span class="pln">filter</span><span class="pun">!(</span><span class="pln">t </span><span class="pun">=&gt; </span><span class="pln">t<wbr/></span><span class="pun">.</span><span class="pln">type </span><span class="pun">!= <a href="../../dparse/lexer/tok.html"></span><span class="pln">tok</span></a><span class="pun">!</span><span class="str">"characterLiteral"</span><span class="pun">)<wbr/>.</span><span class="pln">empty</span><span class="pun">);
 
 </span><span class="com">// invalid
-</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\x'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
-</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\x_'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
-</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xA'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">5</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
-</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xAY'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">5</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
-</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xXX'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == </span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\x'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == <a href="../../dparse/lexer/DLexer.Message.html"></span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span></a><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\x_'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == <a href="../../dparse/lexer/DLexer.Message.html"></span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span></a><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xA'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == <a href="../../dparse/lexer/DLexer.Message.html"></span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span></a><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">5</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xAY'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == <a href="../../dparse/lexer/DLexer.Message.html"></span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span></a><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">5</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
+</span><span class="kwd">assert </span><span class="pun">(</span><span class="pln">toks</span><span class="pun">(</span><span class="str">`'\xXX'`</span><span class="pun">)<wbr/>.</span><span class="pln">messages</span><span class="pun">[</span><span class="lit">0</span><span class="pun">] == <a href="../../dparse/lexer/DLexer.Message.html"></span><span class="typ">DLexer<wbr/></span><span class="pun">.</span><span class="typ">Message</span></a><span class="pun">(</span><span class="lit">1</span><span class="pun">,</span><span class="lit">4</span><span class="pun">,</span><span class="str">"Error: 2 hex digits expected."</span><span class="pun">,</span><span class="kwd">true</span><span class="pun">));
 </span></code></pre>
 </section>
 

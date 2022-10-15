@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Function Parser.expect</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
@@ -29,6 +29,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../../dparse/ast.html">ast</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/astprinter.html">astprinter</a>
 						</div>
 					</li>
 					<li>
@@ -61,6 +66,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<a href="../../dparse/stack_buffer.html">stack_buffer</a>
 						</div>
 					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../../dparse/trivia.html">trivia</a>
+						</div>
+					</li>
 				</ul>
 					</li>
 					<li class="tree-view collapsed">
@@ -89,13 +104,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.expect</h1><p>Returns a token of the specified type if it was the next token, otherwise
- calls the error function and returns null. Advances the lexer by one token.
-</p>
+				<h1>Function Parser.expect</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">final </span><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    string comment;\x0a    string trailingComment;\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe {\x0a        return opCmp(other.index);\x0a    }\x0a")<span class="pun">)</span><span class="pun">*</span> <span class="pln">expect</span>
+				<span class="kwd">final </span><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")<span class="pun">)</span><span class="pun">*</span> <span class="pln">expect</span>
 				<span class="pun">(</span>
 				<br/>
 				&nbsp;&nbsp;<span class="typ">ubyte</span> <span class="pln">type</span>
@@ -105,7 +118,17 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				
-				
+				<section><h2>Returns</h2>
+<p>a pointer to a token of the specified type if it was the next
+ token, otherwise calls the error function and returns null.
+</p>
+
+<p> Advances the lexer by one token in the case that the token was the one
+ that was expected. Otherwise, only advances if the current token is not a
+ semicolon, right parenthesis, or closing curly brace.
+</p>
+</section>
+
 			</div>
 			<footer>
 				<div id="license-info">

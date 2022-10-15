@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
 		<title>Module dparse.parser</title>
 		<link rel="stylesheet" href="../css/style.min.css"/>
 		<script type="text/javascript" src="../js/script.min.js"></script>
@@ -33,6 +33,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</li>
 					<li>
 						<div class="module ">
+							<a href="../dparse/astprinter.html">astprinter</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
 							<a href="../dparse/entities.html">entities</a>
 						</div>
 					</li>
@@ -59,6 +64,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					<li>
 						<div class="module ">
 							<a href="../dparse/stack_buffer.html">stack_buffer</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/strings.html">strings</a>
+						</div>
+					</li>
+					<li>
+						<div class="module ">
+							<a href="../dparse/trivia.html">trivia</a>
 						</div>
 					</li>
 				</ul>
@@ -101,7 +116,15 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						<tr>
 							<td>
 								<code>
-									<a id="parseModule" class="public" href="../dparse/parser/parseModule.html">parseModule</a><span class="decoration">(tokens, fileName, allocator, messageFunction, errorCount, warningCount)</span>
+									<a id="parseModule" class="public" href="../dparse/parser/parseModule.html">parseModule</a><span class="tableEntryAnnotation">(parserConfig)</span>
+								</code>
+							</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="parseModule" class="public" href="../dparse/parser/parseModule.html">parseModule</a><span class="tableEntryAnnotation">(tokens, fileName, allocator, messageFuncOrDg, errorCount, warningCount)</span>
 								</code>
 							</td>
 							<td></td>
@@ -122,6 +145,61 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								</code>
 							</td>
 							<td>D Parser.
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Structs</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<code>
+									<a id="ParserConfig" class="public" href="../dparse/parser/ParserConfig.html">ParserConfig</a>
+								</code>
+							</td>
+							<td>Parser configuration struct
+</td>
+						</tr>
+					</table>
+				</section>
+				<section>
+					<h2>Aliases</h2>
+					<table>
+						<col class="caption"/>
+						<tr>
+							<th>Name</th><th>Type</th><th>Description</th>
+						</tr>
+						<tr>
+							<td>
+								<a id="MessageDelegate" class="public" href="../dparse/parser/MessageDelegate.html">
+									<code>MessageDelegate</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span></code>
+							</td>
+							<td>Prototype for a custom parser message function or delegate.
+ Parameters passed are a file name, a line, a column, a message and a <code class="lang-d"><span class="typ">bool</span></code>
+ that indicates if the message is a warning (<code class="lang-d"><span class="kwd">false</span></code>) or a if it's an error (<code class="lang-d"><span class="kwd">true</span></code>).
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="MessageFunction" class="public" href="../dparse/parser/MessageFunction.html">
+									<code>MessageFunction</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><span class="typ">void</span> <span class="kwd">function</span><span class="pun">(</span><span class="typ">string</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">ulong</span><span class="pun">, </span><span class="typ">string</span><span class="pun">, </span><span class="typ">bool</span><span class="pun">)</span></code>
+							</td>
+							<td>Prototype for a custom parser message function or delegate.
+ Parameters passed are a file name, a line, a column, a message and a <code class="lang-d"><span class="typ">bool</span></code>
+ that indicates if the message is a warning (<code class="lang-d"><span class="kwd">false</span></code>) or a if it's an error (<code class="lang-d"><span class="kwd">true</span></code>).
 </td>
 						</tr>
 					</table>
