@@ -101,7 +101,7 @@ echo
 find . -name "*.lst" -exec rm -f {} \;
 echo -en "Generating coverage reports... "
 ${DMD} tester.d -cov -unittest $SOURCE_FILES $IMPORT_PATHS
-./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES &> /dev/null || true
+./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES ast_checks/*.d &> /dev/null || true
 rm -rf coverage/
 mkdir coverage/
 find . -name "*.lst" | while read -r i; do
