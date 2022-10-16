@@ -1,0 +1,10 @@
+//variableDeclaration//autoDeclarationPart//name[text()="bar1"]/../initializer//functionLiteralExpression
+not(//variableDeclaration//autoDeclarationPart//name[text()="bar1"]/../initializer//functionLiteralExpression[@ref])
+//variableDeclaration//autoDeclarationPart//name[text()="bar2"]/../initializer//functionLiteralExpression[@ref]
+//variableDeclaration//autoDeclarationPart//name[text()="bar2"]/../initializer//functionLiteralExpression[@ref="ref"]
+//variableDeclaration//autoDeclarationPart//name[text()="bar3"]/../initializer//functionLiteralExpression[@ref="auto ref"]
+//variableDeclaration//autoDeclarationPart//name[text()="bar4"]/../initializer//functionLiteralExpression
+not(//variableDeclaration//autoDeclarationPart//name[text()="bar4"]/../initializer//functionLiteralExpression[@ref])
+//variableDeclaration//autoDeclarationPart//name[text()="bar5"]/../initializer//functionLiteralExpression[@ref]
+//variableDeclaration//autoDeclarationPart//name[text()="bar5"]/../initializer//functionLiteralExpression[@ref="ref"]
+//variableDeclaration//autoDeclarationPart//name[text()="bar6"]/../initializer//functionLiteralExpression[@ref="auto ref"]
