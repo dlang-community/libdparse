@@ -61,7 +61,7 @@ if [[ ${BUILDKITE:-} != "true" ]]; then
 		checkCount=1
 		currentPasses=0
 		currentFailures=0
-		while read -r line; do
+		while read -r line || [ -n "$line" ]; do
 			if ./tester --ast "$file" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
 				((currentPasses=currentPasses+1))
 			else
