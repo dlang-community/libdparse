@@ -1554,23 +1554,17 @@ class Formatter(Sink)
     void format(const FunctionLiteralExpression functionLiteralExpression)
     {
         debug(verbose) writeln("FunctionLiteralExpression");
-        /**
-        ExpressionNode assignExpression;
-        FunctionAttribute[] functionAttributes;
-        SpecifiedFunctionBody specifiedFunctionBody;
-        IdType functionOrDelegate;
-        MemberFunctionAttribute[] memberFunctionAttributes;
-        Parameters parameters;
-        Token identifier;
-        Type returnType;
-        bool isReturnRef;
-        **/
 
         with(functionLiteralExpression)
         {
             put(tokenRep(functionOrDelegate));
 
-            if (isReturnRef) put("ref ");
+            final switch (returnRefType)
+            {
+                case ReturnRefType.noRef: break;
+                case ReturnRefType.ref_: put("ref "); break;
+                case ReturnRefType.autoRef: put("auto ref "); break;
+            }
             //if (returnType || parameters)
               //  space();
 

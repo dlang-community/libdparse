@@ -423,10 +423,25 @@ class XMLPrinter : ASTVisitor
 
 	override void visit(const FunctionLiteralExpression functionLiteralExpression)
 	{
-		output.writeln("<functionLiteralExpression type=\"", functionLiteralExpression.functionOrDelegate != tok!""
-				? str(functionLiteralExpression.functionOrDelegate) : "auto", "\">");
-		functionLiteralExpression.accept(this);
-		output.writeln("</functionLiteralExpression>");
+		with (functionLiteralExpression)
+		{
+			output.write("<functionLiteralExpression type=\"",
+				functionOrDelegate != tok!"" ? str(functionOrDelegate) : "auto",
+				"\"");
+			if (identifier.type != tok!"")
+				output.write(" identifier=\"", identifier, "\"");
+			output.write(" line=\"", line, "\"");
+			output.write(" column=\"", column, "\"");
+			final switch (returnRefType) with (ReturnRefType)
+			{
+			case noRef: break;
+			case ref_: output.write(" ref=\"ref\""); break;
+			case autoRef: output.write(" ref=\"auto ref\""); break;
+			}
+			output.writeln(">");
+			accept(this);
+			output.writeln("</functionLiteralExpression>");
+		}
 	}
 
 	override void visit(const GotoStatement gotoStatement)

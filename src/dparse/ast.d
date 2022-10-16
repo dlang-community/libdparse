@@ -1807,10 +1807,24 @@ final class FunctionLiteralExpression : ExpressionNode
     /** */ Parameters parameters;
     /** */ Token identifier;
     /** */ Type returnType;
-    /** */ bool isReturnRef;
+    /** */ ReturnRefType returnRefType;
     /** */ size_t line;
     /** */ size_t column;
     mixin OpEquals;
+
+    deprecated("Use returnRefType") bool isReturnRef() const
+    {
+        return returnRefType == ReturnRefType.ref_
+            || returnRefType == ReturnRefType.autoRef;
+    }
+}
+
+///
+enum ReturnRefType : ubyte
+{
+    noRef = 0,
+    ref_ = 1,
+    autoRef = 2
 }
 
 ///
