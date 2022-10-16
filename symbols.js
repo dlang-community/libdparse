@@ -451,6 +451,7 @@ var symbols = [
 {name: 'dparse.ast.ForeachType.isAlias', kind: "variabledeclaration", path: './dparse/ast/ForeachType.isAlias.html', attributes: []},
 {name: 'dparse.ast.ForeachType.isEnum', kind: "variabledeclaration", path: './dparse/ast/ForeachType.isEnum.html', attributes: []},
 {name: 'dparse.ast.ForeachType.isRef', kind: "variabledeclaration", path: './dparse/ast/ForeachType.isRef.html', attributes: []},
+{name: 'dparse.ast.ForeachType.isScope', kind: "variabledeclaration", path: './dparse/ast/ForeachType.isScope.html', attributes: []},
 {name: 'dparse.ast.ForeachType.type', kind: "variabledeclaration", path: './dparse/ast/ForeachType.type.html', attributes: []},
 {name: 'dparse.ast.ForeachType.typeConstructors', kind: "variabledeclaration", path: './dparse/ast/ForeachType.typeConstructors.html', attributes: []},
 {name: 'dparse.ast.ForeachTypeList', kind: "classdeclaration", path: './dparse/ast/ForeachTypeList.html', attributes: []},

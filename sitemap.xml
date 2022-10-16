@@ -781,6 +781,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/ForeachType.isAlias.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ForeachType.isEnum.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ForeachType.isRef.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/ForeachType.isScope.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ForeachType.type.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ForeachType.typeConstructors.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>

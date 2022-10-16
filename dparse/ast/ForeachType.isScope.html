@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Parser.parseForeachType</title>
+		<title>Variable ForeachType.isScope</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -27,7 +27,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 				<ul class="tree-view">
 					<li>
-						<div class="module ">
+						<div class="module selected">
 							<a href="../../dparse/ast.html">ast</a>
 						</div>
 					</li>
@@ -52,7 +52,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../dparse/parser.html">parser</a>
 						</div>
 					</li>
@@ -104,28 +104,41 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.parseForeachType</h1><p>Parses a ForeachType
-</p>
+				<h1>Variable ForeachType.isScope</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<a href="../../dparse/ast/ForeachType.html"><span class="typ">ForeachType</span></a> <span class="pln">parseForeachType</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
+				<span class="kwd">class</span> <a href="../../dparse/ast/ForeachType.html"><span class="typ">ForeachType</span></a>
+				<br/>
+				<span class="pun">
+					{
+					<br/>
+				</span>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">isScope</span>
+				<span class="pun">;</span>
+				<br/>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				<span class="pun">}</span>
 						</div>
 					</code>
 				</div>
-				<section><p>foreachType:
-       ('ref' | 'alias' | 'enum' | 'scope' | typeConstructor)* type? Identifier
-     ;
-</p>
-</section>
-
+				
 				
 			</div>
 			<footer>
 				<div id="license-info">
-					
-					
-					
+					<p>Brian Schott
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
 				</div>
 			</footer>
 		</div>
