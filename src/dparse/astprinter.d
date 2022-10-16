@@ -1126,9 +1126,12 @@ class XMLPrinter : ASTVisitor
 	override void visit(const NonVoidInitializer nonVoidInitializer) { mixin (tagAndAccept!"nonVoidInitializer"); }
 	override void visit(const Operands operands) { mixin (tagAndAccept!"operands"); }
 	override void visit(const OrExpression orExpression) { mixin (tagAndAccept!"orExpression"); }
-	override void visit(const OutStatement outStatement) { mixin (tagAndAccept!"outStatement"); } override void visit(const MixinDeclaration mixinDeclaration) { mixin (tagAndAccept!"mixinDeclaration"); }
+	override void visit(const OutStatement outStatement) { mixin (tagAndAccept!"outStatement"); }
+	override void visit(const MixinDeclaration mixinDeclaration) { mixin (tagAndAccept!"mixinDeclaration"); }
+	override void visit(const OutContractExpression outContractExpression) { mixin (tagAndAccept!"outContractExpression"); }
 	override void visit(const Parameters parameters) { mixin (tagAndAccept!"parameters"); }
-	override void visit(const Postblit postblit) { mixin (tagAndAccept!"postblit"); } override void visit(const NewAnonClassExpression newAnonClassExpression) { mixin (tagAndAccept!"newAnonClassExpression"); }
+	override void visit(const Postblit postblit) { mixin (tagAndAccept!"postblit"); }
+	override void visit(const NewAnonClassExpression newAnonClassExpression) { mixin (tagAndAccept!"newAnonClassExpression"); }
 	override void visit(const PragmaDeclaration pragmaDeclaration) { mixin (tagAndAccept!"pragmaDeclaration"); }
 	override void visit(const PragmaExpression pragmaExpression) { mixin (tagAndAccept!"pragmaExpression"); }
 	override void visit(const PrimaryExpression primaryExpression) { mixin (tagAndAccept!"primaryExpression"); }
@@ -1150,7 +1153,8 @@ class XMLPrinter : ASTVisitor
 	override void visit(const StructMemberInitializer structMemberInitializer) { mixin (tagAndAccept!"structMemberInitializer"); }
 	override void visit(const SwitchStatement switchStatement) { mixin (tagAndAccept!"switchStatement"); }
 	override void visit(const Symbol symbol) { mixin (tagAndAccept!"symbol"); }
-	override void visit(const SynchronizedStatement synchronizedStatement) { mixin (tagAndAccept!"synchronizedStatement"); } override void visit(const Statement statement) { mixin (tagAndAccept!"statement"); }
+	override void visit(const SynchronizedStatement synchronizedStatement) { mixin (tagAndAccept!"synchronizedStatement"); }
+	override void visit(const Statement statement) { mixin (tagAndAccept!"statement"); }
 	override void visit(const TemplateArgumentList templateArgumentList) { mixin (tagAndAccept!"templateArgumentList"); }
 	override void visit(const TemplateArguments templateArguments) { mixin (tagAndAccept!"templateArguments"); }
 	override void visit(const TemplateArgument templateArgument) { mixin (tagAndAccept!"templateArgument"); }
@@ -1167,13 +1171,17 @@ class XMLPrinter : ASTVisitor
 	override void visit(const TernaryExpression ternaryExpression) { mixin (tagAndAccept!"ternaryExpression"); }
 	override void visit(const TypeIdentifierPart typeIdentifierPart) { mixin (tagAndAccept!"typeIdentifierPart"); }
 	override void visit(const ThrowExpression throwExpression) { mixin (tagAndAccept!"throwExpression"); }
-	override void visit(const TryStatement tryStatement) { mixin (tagAndAccept!"tryStatement"); } override void visit(const TemplateInstance templateInstance) { mixin (tagAndAccept!"templateInstance"); }
-	override void visit(const TypeofExpression typeofExpression) { mixin (tagAndAccept!"typeofExpression"); } override void visit(const TypeSpecialization typeSpecialization) { mixin (tagAndAccept!"typeSpecialization"); } override void visit(const TraitsExpression traitsExpression) { mixin (tagAndAccept!"traitsExpression"); }
+	override void visit(const TryStatement tryStatement) { mixin (tagAndAccept!"tryStatement"); }
+	override void visit(const TemplateInstance templateInstance) { mixin (tagAndAccept!"templateInstance"); }
+	override void visit(const TypeofExpression typeofExpression) { mixin (tagAndAccept!"typeofExpression"); }
+	override void visit(const TypeSpecialization typeSpecialization) { mixin (tagAndAccept!"typeSpecialization"); }
+	override void visit(const TraitsExpression traitsExpression) { mixin (tagAndAccept!"traitsExpression"); }
 	override void visit(const Vector vector) { mixin (tagAndAccept!"vector"); }
 	override void visit(const VersionCondition versionCondition) { mixin (tagAndAccept!"versionCondition"); }
 	override void visit(const VersionSpecification versionSpecification) { mixin (tagAndAccept!"versionSpecification"); }
 	override void visit(const WhileStatement whileStatement) { mixin (tagAndAccept!"whileStatement"); }
-	override void visit(const WithStatement withStatement) { mixin (tagAndAccept!"withStatement"); } override void visit(const TypeidExpression typeidExpression) { mixin (tagAndAccept!"typeidExpression"); }
+	override void visit(const WithStatement withStatement) { mixin (tagAndAccept!"withStatement"); }
+	override void visit(const TypeidExpression typeidExpression) { mixin (tagAndAccept!"typeidExpression"); }
 	// dfmt on
 
 	alias visit = ASTVisitor.visit;
