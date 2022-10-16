@@ -69,16 +69,17 @@ bool isStringLiteral(const(char)[] literal, out char stringCloseChar,
 
 	if (parseEscapes)
 	{
-		// check if end escapes the quote, making this an invalid string
-		auto end = literal[0 .. $ - 1].lastIndexOfNeither("\\");
-		if (end != -1)
+		size_t countBackslashes = 0;
+		foreach_reverse (dchar c; literal[0 .. $ - 1])
 		{
-			// don't need to subtract 1
-			size_t countBackslashes = literal.length - end;
-
-			if ((countBackslashes % 2) != 0)
-				return false; // uneven backslash count -> invalid end
+			if (c != '\\')
+				break;
+			countBackslashes++;
 		}
+
+		// check if end escapes the quote, making this an invalid string
+		if ((countBackslashes % 2) != 0)
+			return false; // uneven backslash count -> invalid end
 	}
 
 	return true;
@@ -98,6 +99,7 @@ bool isStringLiteral(const(char)[] literal)
 unittest
 {
 	assert(isStringLiteral(`"hello"`));
+	assert(isStringLiteral(`"ñ"`));
 	assert(isStringLiteral(`"hello world!"`));
 	assert(isStringLiteral(`r"hello world!"c`));
 	assert(isStringLiteral(`r"hello world!"d`));
@@ -107,6 +109,8 @@ unittest
 	assert(!isStringLiteral(`"\\\"`));
 	assert(isStringLiteral(`"\\\\"`));
 	assert(isStringLiteral(`"a\\\\"`));
+	assert(!isStringLiteral(`"ñ\"`));
+	assert(isStringLiteral(`"ñ\\"`));
 	assert(isStringLiteral(`""`));
 	assert(isStringLiteral(`q""`));
 	assert(isStringLiteral(`x""`));
@@ -563,6 +567,7 @@ unittest
 	assert(unescapeDoubleQuotedContent(`hello\tworld`) == "hello\tworld");
 	assert(unescapeDoubleQuotedContent(`hello\u200bworld`) == "hello\u200bworld");
 	assert(unescapeDoubleQuotedContent(`hello \"\\ok`) == "hello \"\\ok");
+	assert(unescapeDoubleQuotedContent(`こんにちは \"\\ñ`) == "こんにちは \"\\ñ");
 }
 
 private string parseHexStringContent(
