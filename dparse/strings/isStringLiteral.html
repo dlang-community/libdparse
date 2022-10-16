@@ -148,6 +148,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 <section><h2>Example</h2>
 
 <pre class="code"><code class="lang-d"><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"hello"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"ñ"`</span><span class="pun">));
 </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"hello world!"`</span><span class="pun">));
 </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`r"hello world!"c`</span><span class="pun">));
 </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`r"hello world!"d`</span><span class="pun">));
@@ -157,6 +158,8 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 </span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"\\\"`</span><span class="pun">));
 </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"\\\\"`</span><span class="pun">));
 </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"a\\\\"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(!</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"ñ\"`</span><span class="pun">));
+</span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`"ñ\\"`</span><span class="pun">));
 </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`""`</span><span class="pun">));
 </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`q""`</span><span class="pun">));
 </span><span class="kwd">assert</span><span class="pun">(</span><span class="pln">isStringLiteral</span><span class="pun">(</span><span class="str">`x""`</span><span class="pun">));
