@@ -2399,7 +2399,7 @@ class Parser
         foreach (B; BasicTypes) { case B: }
         type:
             Type t = parseType();
-            if (t is null || !currentIs(tok!"identifier"))
+            if (t is null || !currentIsOneOf(tok!"identifier", tok!":"))
             {
                 if (t)
                     error("no identifier for declarator");
@@ -2554,6 +2554,7 @@ class Parser
      * $(GRAMMAR $(RULEDEF declarator):
      *       $(LITERAL Identifier)
      *     | $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer)
+     *     | $(LITERAL ':') $(RULE bitfieldWidth)
      *     | $(LITERAL Identifier) $(LITERAL ':') $(RULE bitfieldWidth)
      *     | $(LITERAL Identifier) $(LITERAL ':') $(RULE bitfieldWidth) $(LITERAL '=') $(RULE initializer)
      *     | $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE initializer)
@@ -2564,35 +2565,43 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         Declarator node = allocator.make!Declarator;
-        const id = expect(tok!"identifier");
-        mixin (nullCheck!`id`);
-        node.name = *id;
-        if (currentIs(tok!"[")) // dmd doesn't accept pointer after identifier
+        if (currentIs(tok!":"))
         {
-            warn("C-style array declaration.");
-            StackBuffer typeSuffixes;
-            while (moreTokens() && currentIs(tok!"["))
-                if (!typeSuffixes.put(parseTypeSuffix()))
-                    return null;
-            ownArray(node.cstyle, typeSuffixes);
-        }
-        if (currentIs(tok!"("))
-        {
-            mixin (nullCheck!`(node.templateParameters = parseTemplateParameters())`);
-            mixin(tokenCheck!"=");
-            mixin (nullCheck!`(node.initializer = parseInitializer())`);
+            advance();
+            mixin(parseNodeQ!(`node.bitfieldWidth`, `BitfieldWidth`));
         }
         else
         {
-            if (currentIs(tok!":"))
+            const id = expect(tok!"identifier");
+            mixin (nullCheck!`id`);
+            node.name = *id;
+            if (currentIs(tok!"[")) // dmd doesn't accept pointer after identifier
             {
-                advance();
-                mixin(parseNodeQ!(`node.bitfieldWidth`, `BitfieldWidth`));
+                warn("C-style array declaration.");
+                StackBuffer typeSuffixes;
+                while (moreTokens() && currentIs(tok!"["))
+                    if (!typeSuffixes.put(parseTypeSuffix()))
+                        return null;
+                ownArray(node.cstyle, typeSuffixes);
             }
-            if (currentIs(tok!"="))
+            if (currentIs(tok!"("))
             {
-                advance();
-                mixin(parseNodeQ!(`node.initializer`, `Initializer`));
+                mixin (nullCheck!`(node.templateParameters = parseTemplateParameters())`);
+                mixin(tokenCheck!"=");
+                mixin (nullCheck!`(node.initializer = parseInitializer())`);
+            }
+            else
+            {
+                if (currentIs(tok!":"))
+                {
+                    advance();
+                    mixin(parseNodeQ!(`node.bitfieldWidth`, `BitfieldWidth`));
+                }
+                if (currentIs(tok!"="))
+                {
+                    advance();
+                    mixin(parseNodeQ!(`node.initializer`, `Initializer`));
+                }
             }
         }
         node.tokens = tokens[startIndex .. index];
