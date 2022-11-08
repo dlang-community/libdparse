@@ -31,7 +31,7 @@ test_fail() {
 }
 
 # if tester segfaults, it's most likely due to a stack overflow
-# check the max stack size in tester.d in that case
+# check the maxStackSize variable in tester.d in that case
 # (increasing it should be avoided if it's possible to implement tail recursion or other stack saving techniques)
 
 for i in $PASS_FILES; do
@@ -116,9 +116,9 @@ fi
 echo
 find . -name "*.lst" -exec rm -f {} \;
 echo -en "Generating coverage reports... "
-${DMD} tester.d -cov -unittest $SOURCE_FILES $IMPORT_PATHS
+${DMD} tester.d -debug -cov -unittest $SOURCE_FILES $IMPORT_PATHS
 # if tester segfaults, it's most likely due to a stack overflow
-# check the max stack size in tester.d in that case
+# check the maxStackSize variable in tester.d in that case
 # (increasing it should be avoided if it's possible to implement tail recursion or other stack saving techniques)
 ./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES ast_checks/*.d &> /dev/null || true
 rm -rf coverage/
