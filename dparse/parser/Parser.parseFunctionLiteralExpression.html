@@ -114,14 +114,14 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 					</code>
 				</div>
 				<section><p>functionLiteralExpression:
-     | 'delegate' 'ref'? type? (parameters functionAttribute*)? specifiedFunctionBody
-     | 'function' 'ref'? type? (parameters functionAttribute*)? specifiedFunctionBody
-     | 'ref'? parameters functionAttribute* specifiedFunctionBody
+     | 'delegate' 'auto')? LITERAL 'ref'? type? (parameters functionAttribute*)? specifiedFunctionBody
+     | 'function' 'auto')? LITERAL 'ref'? type? (parameters functionAttribute*)? specifiedFunctionBody
+     | 'auto')? LITERAL 'ref'? parameters functionAttribute* specifiedFunctionBody
      | specifiedFunctionBody
      | Identifier '=&gt;' assignExpression
-     | 'function' 'ref'? type? parameters functionAttribute* '=&gt;' assignExpression
-     | 'delegate' 'ref'? type? parameters functionAttribute* '=&gt;' assignExpression
-     | 'ref'? parameters functionAttribute* '=&gt;' assignExpression
+     | 'function' 'auto')? LITERAL 'ref'? type? parameters functionAttribute* '=&gt;' assignExpression
+     | 'delegate' 'auto')? LITERAL 'ref'? type? parameters functionAttribute* '=&gt;' assignExpression
+     | 'auto')? LITERAL 'ref'? parameters functionAttribute* '=&gt;' assignExpression
      ;
 </p>
 </section>
