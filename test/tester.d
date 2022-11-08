@@ -307,11 +307,13 @@ int main(string[] args)
     printer.output = stdout;
     bool done;
 
+    // increase stack size in case of segfault:
+    // stack usage in debug / non-optimized mode is _much_ higher
     version (D_Coverage)
-        enum maxStackSize = 128 * 4096;
+        enum maxStackSize = 256 * 4096;
     else debug
-        enum maxStackSize = 128 * 4096;
-    else // increase stack size in case of segfault:
+        enum maxStackSize = 256 * 4096;
+    else
         enum maxStackSize = 40 * 4096;
 
     // use a fiber to limit stack size
