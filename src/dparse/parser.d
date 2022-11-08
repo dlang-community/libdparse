@@ -2554,6 +2554,8 @@ class Parser
      * $(GRAMMAR $(RULEDEF declarator):
      *       $(LITERAL Identifier)
      *     | $(LITERAL Identifier) $(LITERAL '=') $(RULE initializer)
+     *     | $(LITERAL Identifier) $(LITERAL ':') $(RULE bitfieldWidth)
+     *     | $(LITERAL Identifier) $(LITERAL ':') $(RULE bitfieldWidth) $(LITERAL '=') $(RULE initializer)
      *     | $(LITERAL Identifier) $(RULE templateParameters) $(LITERAL '=') $(RULE initializer)
      *     ;)
      */
@@ -2580,10 +2582,18 @@ class Parser
             mixin(tokenCheck!"=");
             mixin (nullCheck!`(node.initializer = parseInitializer())`);
         }
-        else if (currentIs(tok!"="))
+        else
         {
-            advance();
-            mixin(parseNodeQ!(`node.initializer`, `Initializer`));
+            if (currentIs(tok!":"))
+            {
+                advance();
+                mixin(parseNodeQ!(`node.bitfieldWidth`, `BitfieldWidth`));
+            }
+            if (currentIs(tok!"="))
+            {
+                advance();
+                mixin(parseNodeQ!(`node.initializer`, `Initializer`));
+            }
         }
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -2615,6 +2625,22 @@ class Parser
                 break;
         }
         ownArray(node.identifiers, identifiers);
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
+     * Parses a BitfieldWidth
+     *
+     * $(GRAMMAR $(RULEDEF bitfieldWidth):
+     *     $(RULE ternaryExpression)
+     *     ;)
+     */
+    BitfieldWidth parseBitfieldWidth()
+    {
+        auto node = allocator.make!BitfieldWidth;
+        auto startIndex = index;
+        mixin(parseNodeQ!(`node.expression`, `TernaryExpression`));
         node.tokens = tokens[startIndex .. index];
         return node;
     }

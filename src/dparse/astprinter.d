@@ -178,6 +178,13 @@ class XMLPrinter : ASTVisitor
 			output.writeln("<breakStatement label=\"", breakStatement.label.text, "\"/>");
 	}
 
+	override void visit(const BitfieldWidth bitfieldWidth)
+	{
+		output.writeln("<bitfieldWidth>");
+		bitfieldWidth.accept(this);
+		output.writeln("</bitfieldWidth>");
+	}
+
 	override void visit(const CaseRangeStatement caseRangeStatement)
 	{
 		output.writeln("<caseRangeStatement>");

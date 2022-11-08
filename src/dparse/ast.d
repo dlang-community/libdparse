@@ -195,6 +195,7 @@ abstract class ASTVisitor
     /** */ void visit(const BreakStatement breakStatement) { breakStatement.accept(this); }
     /** */ void visit(const BaseClass baseClass) { baseClass.accept(this); }
     /** */ void visit(const BaseClassList baseClassList) { baseClassList.accept(this); }
+    /** */ void visit(const BitfieldWidth bitfieldWidth) { bitfieldWidth.accept(this); }
     /** */ void visit(const CaseRangeStatement caseRangeStatement) { caseRangeStatement.accept(this); }
     /** */ void visit(const CaseStatement caseStatement) { caseStatement.accept(this); }
     /** */ void visit(const CastExpression castExpression) { castExpression.accept(this); }
@@ -1393,13 +1394,25 @@ final class Declarator : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(templateParameters, initializer));
+        mixin (visitIfNotNull!(templateParameters, bitfieldWidth, initializer));
     }
     /** */ Token name;
     /** */ TemplateParameters templateParameters;
+    /** */ BitfieldWidth bitfieldWidth;
     /** */ Initializer initializer;
     /** */ TypeSuffix[] cstyle;
     /** */ string comment;
+    mixin OpEquals;
+}
+
+///
+final class BitfieldWidth : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(expression));
+    }
+    /** */ ExpressionNode expression;
     mixin OpEquals;
 }
 
