@@ -16,7 +16,7 @@ struct StackBuffer
             if (t is null)
                 return false;
 
-        if (_length == 0)
+        if (_length == 0 && arr is null)
             arr = stackSpace[];
 
         static if (is(T == class))
@@ -83,6 +83,11 @@ struct StackBuffer
     }
 
     alias opDollar = length;
+
+    void clear()
+    {
+        _length = 0;
+    }
 
 private:
 

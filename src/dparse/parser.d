@@ -128,6 +128,7 @@ class Parser
      */
     ExpressionNode parseAddExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AddExpression, MulExpression,
             tok!"+", tok!"-", tok!"~")();
@@ -178,7 +179,8 @@ class Parser
             if (currentIs(tok!"("))
             {
                 mixin(parseNodeQ!(`node.parameters`, `Parameters`));
-                StackBuffer memberFunctionAttributes;
+                alias memberFunctionAttributes = storageClasses;
+                memberFunctionAttributes.clear();
                 while (moreTokens() && currentIsMemberFunctionAttribute())
                     if (!memberFunctionAttributes.put(parseMemberFunctionAttribute()))
                         return null;
@@ -264,7 +266,8 @@ class Parser
             if (currentIs(tok!"("))
             {
                 mixin (parseNodeQ!(`node.parameters`, `Parameters`));
-                StackBuffer memberFunctionAttributes;
+                alias memberFunctionAttributes = storageClasses;
+                memberFunctionAttributes.clear();
                 while (moreTokens() && currentIsMemberFunctionAttribute())
                     if (!memberFunctionAttributes.put(parseMemberFunctionAttribute()))
                         return null;
@@ -326,6 +329,7 @@ class Parser
      */
     ExpressionNode parseAndAndExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AndAndExpression, OrExpression,
             tok!"&&")();
@@ -341,6 +345,7 @@ class Parser
      */
     ExpressionNode parseAndExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AndExpression, CmpExpression,
             tok!"&")();
@@ -509,6 +514,7 @@ class Parser
      */
     ExpressionNode parseAsmAddExp()
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmAddExp, AsmMulExp,
             tok!"+", tok!"-")();
@@ -524,6 +530,7 @@ class Parser
      */
     ExpressionNode parseAsmAndExp()
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmAndExp, AsmEqualExp, tok!"&");
     }
@@ -587,6 +594,7 @@ class Parser
      */
     ExpressionNode parseAsmEqualExp()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmEqualExp, AsmRelExp, tok!"==", tok!"!=")();
     }
@@ -699,6 +707,7 @@ class Parser
      */
     ExpressionNode parseAsmLogAndExp()
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmLogAndExp, AsmOrExp, tok!"&&");
     }
@@ -713,6 +722,7 @@ class Parser
      */
     ExpressionNode parseAsmLogOrExp()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmLogOrExp, AsmLogAndExp, tok!"||")();
     }
@@ -727,6 +737,7 @@ class Parser
      */
     ExpressionNode parseAsmMulExp()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmMulExp, AsmBrExp, tok!"*", tok!"/", tok!"%")();
     }
@@ -741,6 +752,7 @@ class Parser
      */
     ExpressionNode parseAsmOrExp()
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmOrExp, AsmXorExp, tok!"|")();
     }
@@ -806,6 +818,7 @@ class Parser
      */
     ExpressionNode parseAsmRelExp()
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmRelExp, AsmShiftExp, tok!"<",
             tok!"<=", tok!">", tok!">=")();
@@ -821,6 +834,7 @@ class Parser
      */
     ExpressionNode parseAsmShiftExp()
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmShiftExp, AsmAddExp, tok!"<<",
             tok!">>", tok!">>>");
@@ -857,7 +871,8 @@ class Parser
         const instrStart = allocator.setCheckpoint();
         const instrStartIdx = index;
 
-        StackBuffer instructions;
+        alias instructions = functionAttributes;
+        instructions.clear();
 
         while (moreTokens() && !currentIs(tok!"}"))
         {
@@ -1029,6 +1044,7 @@ class Parser
      */
     ExpressionNode parseAsmXorExp()
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(AsmXorExp, AsmAndExp, tok!"^")();
     }
@@ -1340,7 +1356,9 @@ class Parser
             if (!storageClasses.put(parseStorageClass()))
                 return null;
         ownArray(node.storageClasses, storageClasses);
-        StackBuffer parts;
+
+        alias parts = storageClasses;
+        parts.clear();
         do
         {
             if (!parts.put(parseAutoDeclarationPart()))
@@ -1478,6 +1496,7 @@ class Parser
      */
     BaseClassList parseBaseClassList()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseCommaSeparatedRule!(BaseClassList, BaseClass)();
     }
@@ -1879,7 +1898,9 @@ class Parser
             return node;
         }
 
-        StackBuffer falseDeclarations;
+        trueDeclarations.clear();
+        alias falseDeclarations = trueDeclarations;
+
         if (currentIs(tok!":") || currentIs(tok!"{"))
         {
             immutable bool brace = currentIs(tok!"{");
@@ -2223,7 +2244,8 @@ class Parser
                 return null;
             }
             advance();
-            StackBuffer declarations;
+            alias declarations = attributes;
+            declarations.clear();
             while (moreTokens() && !currentIs(tok!"}"))
             {
                 auto c = allocator.setCheckpoint();
@@ -3090,6 +3112,7 @@ class Parser
      */
     Expression parseExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         if (suppressedErrorCount > MAX_ERRORS)
             return null;
@@ -3389,6 +3412,7 @@ class Parser
      */
     ForeachTypeList parseForeachTypeList()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseCommaSeparatedRule!(ForeachTypeList, ForeachType)();
     }
@@ -3790,6 +3814,7 @@ class Parser
      */
     GccAsmOperandList parseGccAsmOperandList()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseCommaSeparatedRule!(GccAsmOperandList, GccAsmOperand)();
     }
@@ -4992,6 +5017,7 @@ class Parser
      */
     ExpressionNode parseMulExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(MulExpression, PowExpression,
             tok!"*", tok!"/", tok!"%")();
@@ -5006,6 +5032,7 @@ class Parser
      */
     NamespaceList parseNamespaceList()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseCommaSeparatedRule!(NamespaceList, TernaryExpression)(true);
     }
@@ -5179,6 +5206,7 @@ class Parser
      */
     ExpressionNode parseOrExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(OrExpression, XorExpression,
             tok!"|")();
@@ -5194,6 +5222,7 @@ class Parser
      */
     ExpressionNode parseOrOrExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(OrOrExpression, AndAndExpression,
             tok!"||")();
@@ -5303,7 +5332,8 @@ class Parser
             }
             else if (currentIs(tok!"["))
             {
-                StackBuffer typeSuffixes;
+                alias typeSuffixes = parameterAttributes;
+                typeSuffixes.clear();
                 while(moreTokens() && currentIs(tok!"["))
                     if (!typeSuffixes.put(parseTypeSuffix()))
                         return null;
@@ -5551,6 +5581,7 @@ class Parser
      */
     ExpressionNode parsePowExpression()
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(PowExpression, UnaryExpression,
             tok!"^^")();
@@ -5867,6 +5898,7 @@ class Parser
      */
     ExpressionNode parseRelExpression(ExpressionNode shift)
     {
+        pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(RelExpression, ShiftExpression,
             tok!"<", tok!"<=", tok!">", tok!">=", tok!"!<>=", tok!"!<>",
@@ -5968,6 +6000,7 @@ class Parser
      */
     ExpressionNode parseShiftExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(ShiftExpression, AddExpression,
             tok!"<<", tok!">>", tok!">>>")();
@@ -6783,6 +6816,7 @@ class Parser
      */
     TemplateArgumentList parseTemplateArgumentList()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseCommaSeparatedRule!(TemplateArgumentList, TemplateArgument)(true);
     }
@@ -6950,6 +6984,7 @@ class Parser
      */
     TemplateParameterList parseTemplateParameterList()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseCommaSeparatedRule!(TemplateParameterList, TemplateParameter)(true);
     }
@@ -7171,6 +7206,8 @@ class Parser
      */
     ExpressionNode parseTernaryExpression()
     {
+        pragma(inline, true);
+
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
 
@@ -7913,7 +7950,8 @@ class Parser
         node.comment = comment;
         comment = null;
 
-        StackBuffer declarators;
+        alias declarators = storageClasses;
+        declarators.clear();
         Declarator last;
         while (true)
         {
@@ -8095,6 +8133,7 @@ class Parser
      */
     ExpressionNode parseXorExpression()
     {
+        pragma(inline, true);
         mixin(traceEnterAndExit!(__FUNCTION__));
         return parseLeftAssocBinaryExpression!(XorExpression, AndExpression,
             tok!"^")();
