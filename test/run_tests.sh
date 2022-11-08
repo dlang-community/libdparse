@@ -15,7 +15,7 @@ SOURCE_FILES="../src/std/experimental/*.d ../src/dparse/*.d "
 IMPORT_PATHS="-I../src/"
 
 echo -en "Compiling parse tester... "
-${DMD} tester.d $SOURCE_FILES -g $IMPORT_PATHS
+${DMD} tester.d -debug $SOURCE_FILES -g $IMPORT_PATHS
 echo -e "${GREEN}DONE${NORMAL}"
 
 test_fail() {
@@ -29,6 +29,10 @@ test_fail() {
 		return 1
 	fi
 }
+
+# if tester segfaults, it's most likely due to a stack overflow
+# check the max stack size in tester.d in that case
+# (increasing it should be avoided if it's possible to implement tail recursion or other stack saving techniques)
 
 for i in $PASS_FILES; do
 	echo -en "Parsing $i..."
@@ -113,6 +117,9 @@ echo
 find . -name "*.lst" -exec rm -f {} \;
 echo -en "Generating coverage reports... "
 ${DMD} tester.d -cov -unittest $SOURCE_FILES $IMPORT_PATHS
+# if tester segfaults, it's most likely due to a stack overflow
+# check the max stack size in tester.d in that case
+# (increasing it should be avoided if it's possible to implement tail recursion or other stack saving techniques)
 ./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES ast_checks/*.d &> /dev/null || true
 rm -rf coverage/
 mkdir coverage/

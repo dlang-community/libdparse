@@ -1,12 +1,13 @@
+import core.thread;
+import dparse.ast;
+import dparse.astprinter;
+import dparse.lexer;
+import dparse.parser;
 import std.array;
 import std.exception;
 import std.file;
 import std.getopt;
 import std.stdio;
-import dparse.ast;
-import dparse.lexer;
-import dparse.parser;
-import dparse.astprinter;
 
 int errorCount = 0;
 int warningCount = 0;
@@ -304,22 +305,36 @@ int main(string[] args)
     enforce(args.length > 1, "Must specifiy at least one D file");
     auto printer = new XMLPrinter;
     printer.output = stdout;
-    foreach (arg; args[1 .. $])
-    {
-        auto f = File(arg);
-        immutable ulong fileSize = f.size();
-        ubyte[] fileBytes = new ubyte[](fileSize);
-        enforce(f.rawRead(fileBytes).length == fileSize);
-        StringCache cache = StringCache(fileSize.optimalBucketCount);
-        LexerConfig config;
-        config.stringBehavior = StringBehavior.source;
-        config.fileName = arg;
-        const(Token)[] tokens = getTokensForParser(fileBytes, config, &cache);
-        RollbackAllocator rba;
-        auto mod = parseModule(ParserConfig(tokens, arg, &rba, &messageFunction));
-        if (ast && mod !is null)
-            printer.visit(mod);
-    }
+    bool done;
+
+    version (D_Coverage)
+        enum maxStackSize = 128 * 4096;
+    else debug
+        enum maxStackSize = 128 * 4096;
+    else // increase stack size in case of segfault:
+        enum maxStackSize = 40 * 4096;
+
+    // use a fiber to limit stack size
+    new Fiber({
+        foreach (arg; args[1 .. $])
+        {
+            auto f = File(arg);
+            immutable ulong fileSize = f.size();
+            ubyte[] fileBytes = new ubyte[](fileSize);
+            enforce(f.rawRead(fileBytes).length == fileSize);
+            StringCache cache = StringCache(fileSize.optimalBucketCount);
+            LexerConfig config;
+            config.stringBehavior = StringBehavior.source;
+            config.fileName = arg;
+            const(Token)[] tokens = getTokensForParser(fileBytes, config, &cache);
+            RollbackAllocator rba;
+            auto mod = parseModule(ParserConfig(tokens, arg, &rba, &messageFunction));
+            if (ast && mod !is null)
+                printer.visit(mod);
+        }
+        done = true;
+    }, maxStackSize).call();
+    assert(done);
     if (!ast)
         writefln("Finished parsing with %d errors and %d warnings.",
                 errorCount, warningCount);
