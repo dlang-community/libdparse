@@ -4269,6 +4269,7 @@ do
     testFormatNode!(Declaration)(q{int i : 8;});
     testFormatNode!(Declaration)(q{int x : 3, y : 2;});
     testFormatNode!(Declaration)(q{int : 3, y : 2;});
+    testFormatNode!(Declaration)(q{int : 3, : 2;});
     testFormatNode!(FunctionDeclaration)(q{void someFunction()
 {
     foo(a, throw b, c);
