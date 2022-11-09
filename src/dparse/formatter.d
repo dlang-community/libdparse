@@ -1043,6 +1043,12 @@ class Formatter(Sink)
         foreach(suffix; declarator.cstyle)
             format(suffix);
 
+        if (declarator.bitfieldWidth)
+        {
+            put(declarator.name is Token.init ? ": " : " : ");
+            format(declarator.bitfieldWidth.expression);
+        }
+
         if (declarator.templateParameters)
             format(declarator.templateParameters);
 
@@ -4255,6 +4261,15 @@ do
 }`
 );
     testFormatNode!(Declaration)(q{int i = throw new Ex();});
+    testFormatNode!(Declaration)(q{int i : 4 = 1;});
+    testFormatNode!(Declaration)(q{int i : (4 * 2) = 1;});
+    testFormatNode!(Declaration)(q{int i : (4 * 2);});
+    testFormatNode!(Declaration)(q{int i : coolTemplate!(4);});
+    testFormatNode!(Declaration)(q{int i : justAFunction(4);});
+    testFormatNode!(Declaration)(q{int i : 8;});
+    testFormatNode!(Declaration)(q{int x : 3, y : 2;});
+    testFormatNode!(Declaration)(q{int : 3, y : 2;});
+    testFormatNode!(Declaration)(q{int : 3, : 2;});
     testFormatNode!(FunctionDeclaration)(q{void someFunction()
 {
     foo(a, throw b, c);
