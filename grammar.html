@@ -380,10 +380,16 @@
 <pre class="grammar"><b><span class="ddoc_anchor" id="declarator"></span> declarator</b>:
        <span class="string_literal"><i>Identifier</i></span>
      | <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#initializer"><b>initializer</b></a>
+     | <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#bitfieldWidth"><b>bitfieldWidth</b></a>
+     | <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#bitfieldWidth"><b>bitfieldWidth</b></a>
+     | <span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#bitfieldWidth"><b>bitfieldWidth</b></a> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#initializer"><b>initializer</b></a>
      | <span class="string_literal"><i>Identifier</i></span> <a href="#templateParameters"><b>templateParameters</b></a> <span class="string_literal"><i>&#39;=&#39;</i></span> <a href="#initializer"><b>initializer</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="declaratorIdentifierList"></span> declaratorIdentifierList</b>:
      <span class="string_literal"><i>Identifier</i></span> (<span class="string_literal"><i>&#39;,&#39;</i></span> <span class="string_literal"><i>Identifier</i></span>)*
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="bitfieldWidth"></span> bitfieldWidth</b>:
+     <a href="#ternaryExpression"><b>ternaryExpression</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="defaultStatement"></span> defaultStatement</b>:
      <span class="string_literal"><i>&#39;default&#39;</i></span> <span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#declarationsAndStatements"><b>declarationsAndStatements</b></a>

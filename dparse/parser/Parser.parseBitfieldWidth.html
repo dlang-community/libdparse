@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Parser.parseDeclarator</title>
+		<title>Function Parser.parseBitfieldWidth</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -104,22 +104,17 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.parseDeclarator</h1><p>Parses a Declarator
+				<h1>Function Parser.parseBitfieldWidth</h1><p>Parses a BitfieldWidth
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<a href="../../dparse/ast/Declarator.html"><span class="typ">Declarator</span></a> <span class="pln">parseDeclarator</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
+				<a href="../../dparse/ast/BitfieldWidth.html"><span class="typ">BitfieldWidth</span></a> <span class="pln">parseBitfieldWidth</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				<section><p>declarator:
-       Identifier
-     | Identifier '=' initializer
-     | ':' bitfieldWidth
-     | Identifier ':' bitfieldWidth
-     | Identifier ':' bitfieldWidth '=' initializer
-     | Identifier templateParameters '=' initializer
+				<section><p>bitfieldWidth:
+     ternaryExpression
      ;
 </p>
 </section>

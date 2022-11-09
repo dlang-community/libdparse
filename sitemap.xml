@@ -412,6 +412,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AtAttribute.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AtAttribute.accept.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AtAttribute.argumentList.html</loc></url>
@@ -464,6 +465,10 @@
 <url><loc>http://127.0.0.1/dparse/ast/BinaryExpressionBody.left.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BinaryExpressionBody.line.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BinaryExpressionBody.right.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/BitfieldWidth.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/BitfieldWidth.accept.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/BitfieldWidth.expression.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BlockStatement.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BlockStatement.accept.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BlockStatement.declarationsAndStatements.html</loc></url>
@@ -662,6 +667,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/Declarator.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/Declarator.accept.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/Declarator.bitfieldWidth.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/Declarator.comment.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/Declarator.cstyle.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/Declarator.initializer.html</loc></url>
@@ -1817,6 +1823,7 @@
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
@@ -2209,6 +2216,7 @@
 <url><loc>http://127.0.0.1/dparse/parser/Parser.parseAutoDeclarationPart.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.parseBaseClass.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.parseBaseClassList.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/parser/Parser.parseBitfieldWidth.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.parseBlockStatement.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.parseBreakStatement.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.parseBuiltinType.html</loc></url>
