@@ -418,7 +418,9 @@ template generateOpEquals(T)
         {
             enum opEqualsPart = opEqualsPart!(p[0 .. $/2]) ~ opEqualsPart!(p[$/2 .. $]);
         }
-        else static if (p.length && !isSomeFunction!(typeof(__traits(getMember, T, p[0])))
+        else static if (p.length
+            && !__traits(isDeprecated, __traits(getMember, T, p[0]))
+            && !isSomeFunction!(typeof(__traits(getMember, T, p[0])))
             && !p[0].among("comment", "line", "column", "endLocation", "startLocation", "index", "dotLocation"))
         {
             static if (isDynamicArray!(typeof(__traits(getMember, T, p[0]))))
@@ -1971,6 +1973,34 @@ final class IfStatement : BaseNode
     /** */ size_t line;
     /** */ size_t column;
     mixin OpEquals;
+
+    deprecated("use condition.typeCtors") inout(IdType[]) typeCtors() inout @property
+    {
+        if (!condition)
+            return null;
+        return condition.typeCtors;
+    }
+
+    deprecated("use condition.type") inout(Type) type() inout @property
+    {
+        if (!condition)
+            return null;
+        return condition.type;
+    }
+
+    deprecated("use condition.identifier") inout(Token) identifier() inout @property
+    {
+        if (!condition)
+            return Token.init;
+        return condition.identifier;
+    }
+
+    deprecated("use condition.expression") inout(Expression) expression() inout @property
+    {
+        if (!condition)
+            return null;
+        return condition.expression;
+    }
 }
 
 /**
@@ -3515,6 +3545,13 @@ final class WhileStatement : BaseNode
     /** */ DeclarationOrStatement declarationOrStatement;
     /** */ size_t startIndex;
     mixin OpEquals;
+
+    deprecated("use condition.expression") inout(Expression) expression() inout @property
+    {
+        if (!condition)
+            return null;
+        return condition.expression;
+    }
 }
 
 ///
