@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Parser.peekNIsOneOf</title>
+		<title>Function IfStatement.typeCtors</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -27,7 +27,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 				<ul class="tree-view">
 					<li>
-						<div class="module ">
+						<div class="module selected">
 							<a href="../../dparse/ast.html">ast</a>
 						</div>
 					</li>
@@ -52,7 +52,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../dparse/parser.html">parser</a>
 						</div>
 					</li>
@@ -104,34 +104,28 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.peekNIsOneOf</h1><p></p>
+				<h1>Function IfStatement.typeCtors</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">final </span><span class="typ">bool</span> <span class="pln">peekNIsOneOf</span>
-				<span class="pun">(</span>
-				<br/>
-				&nbsp;&nbsp;<span class="typ">ulong</span> <span class="pln">offset</span><span class="pun">,</span>
-				<br/>
-				&nbsp;&nbsp;<span class="kwd">scope </span><span class="typ">ubyte</span><span class="pun">[]</span> <span class="pln">types</span><span class="pun">...</span>
-				<br/>
-				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc @safe const</span><span class="pun">;</span>
+				<span class="kwd">deprecated inout </span><span class="kwd">inout</span><span class="pun">(</span><span class="typ">ubyte</span><span class="pun">[]</span><span class="pun">)</span> <span class="pln">typeCtors</span><span class="pun">(</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">@property</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
 				
-				<section><h2>Returns</h2>
-<p><code class="lang-d"><span class="kwd">true</span></code> if there is a token <code class="lang-d"><a href="../../dparse/parser/Parser.peekNIsOneOf.html#offset"><span class="pln">offset</span></a></code> tokens after the current one
- and its type is one of the given <code class="lang-d"><a href="../../dparse/parser/Parser.peekNIsOneOf.html#types"><span class="pln">types</span></a></code>.
-</p>
-</section>
-
+				
 			</div>
 			<footer>
 				<div id="license-info">
-					
-					
-					
+					<p>Brian Schott
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
 				</div>
 			</footer>
 		</div>

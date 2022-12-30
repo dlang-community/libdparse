@@ -911,9 +911,13 @@
 <url><loc>http://127.0.0.1/dparse/ast/IfStatement.column.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/IfStatement.condition.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/IfStatement.elseStatement.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/IfStatement.expression.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/IfStatement.identifier.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/IfStatement.line.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/IfStatement.startIndex.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/IfStatement.thenStatement.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/IfStatement.type.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/IfStatement.typeCtors.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ImportBind.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ImportBind.accept.html</loc></url>
@@ -1606,6 +1610,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/WhileStatement.accept.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/WhileStatement.condition.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/WhileStatement.declarationOrStatement.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/WhileStatement.expression.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/WhileStatement.startIndex.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/WithStatement.html</loc></url>
