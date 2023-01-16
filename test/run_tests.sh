@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-PASS_FILES=$(find pass_files -name "*.d")
-FAIL_FILES=$(find fail_files -name "*.d")
+PASS_FILES=$(find pass_files -name "*.d" | sort)
+FAIL_FILES=$(find fail_files -name "*.d" | sort)
 PASS_COUNT=0
 FAIL_COUNT=0
 NORMAL="\033[01;0m"
@@ -18,25 +18,37 @@ echo -en "Compiling parse tester... "
 ${DMD} tester.d $SOURCE_FILES -g $IMPORT_PATHS
 echo -e "${GREEN}DONE${NORMAL}"
 
+test_fail() {
+	set +e
+	./tester "$@"
+	test_fail_status=$?
+	set -e
+	if [ $test_fail_status -eq 1 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
 for i in $PASS_FILES; do
 	echo -en "Parsing $i..."
 	if ./tester "$i" 2>/dev/null 1>/dev/null; then
-		echo -e "${GREEN}PASS${NORMAL}"
+		echo -e "\t${GREEN}PASS${NORMAL}"
 		((PASS_COUNT=PASS_COUNT+1))
 	else
-		echo -e "${RED}FAIL${NORMAL}"
+		echo -e "\t${RED}FAIL${NORMAL}"
 		((FAIL_COUNT=FAIL_COUNT+1))
 	fi
 done
 
 for i in $FAIL_FILES; do
 	echo -en "Parsing $i..."
-	if ./tester "$i" 2>/dev/null 1>/dev/null; then
-		echo -e "${RED}FAIL${NORMAL}"
-		((FAIL_COUNT=FAIL_COUNT+1))
-	else
-		echo -e "${GREEN}PASS${NORMAL}"
+	if test_fail "$i" 2>/dev/null 1>/dev/null; then
+		echo -e "\t${GREEN}PASS${NORMAL}"
 		((PASS_COUNT=PASS_COUNT+1))
+	else
+		echo -e "\t${RED}FAIL${NORMAL}"
+		((FAIL_COUNT=FAIL_COUNT+1))
 	fi
 done
 
@@ -110,7 +122,7 @@ find . -name "*.lst" | while read -r i; do
 done
 echo -e "${GREEN}DONE${NORMAL}"
 for i in coverage/*.lst; do
-	tail "$i" -n1
+	tail -n1 "$i"
 done
 
 rm -f tester.o
