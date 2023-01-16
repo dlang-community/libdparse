@@ -1048,7 +1048,10 @@ class Parser
         if (currentIs(tok!","))
             advance();
         if (currentIs(tok!")"))
+        {
+            node.tokens = tokens[startIndex .. index];
             return node;
+        }
         mixin(parseNodeQ!(`node.message`, `AssignExpression`));
         if (currentIs(tok!","))
             advance();
@@ -1129,6 +1132,7 @@ class Parser
             node.tokens = tokens[startIndex .. index];
             return node;
         }
+        ternary.tokens = tokens[startIndex .. index];
         return ternary;
     }
 
@@ -3929,6 +3933,7 @@ class Parser
             if (node.indexer is null)
             {
                 goToBookmark(b);
+                node.tokens = tokens[startIndex .. index];
                 return node;
             }
             // indexer followed by ".." -> sliceExp -> type suffix
@@ -3937,6 +3942,7 @@ class Parser
                 allocator.rollback(cp);
                 node.indexer = null;
                 goToBookmark(b);
+                node.tokens = tokens[startIndex .. index];
                 return node;
             }
             // otherwise either the index of a type list or a dim
@@ -4093,6 +4099,7 @@ class Parser
     IfCondition parseIfCondition()
     {
         IfCondition node = allocator.make!IfCondition;
+        auto startIndex = index;
         const b = setBookmark();
 
         // ex. case:
@@ -4164,6 +4171,7 @@ class Parser
         {
             error("expression or declaration expected");
         }
+        node.tokens = tokens[startIndex .. index];
         return node;
     }
 
