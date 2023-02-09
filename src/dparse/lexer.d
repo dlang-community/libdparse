@@ -1401,7 +1401,7 @@ private pure nothrow @safe:
     {
         Token ident;
         lexIdentifier(ident);
-        if (isNewline())
+        if (!(range.index >= range.bytes.length) && isNewline())
             popFrontWhitespaceAware();
         else
             error("Newline expected");
@@ -1426,14 +1426,15 @@ private pure nothrow @safe:
                 range.popFront();
             }
         }
+        IdType type;
         if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '"')
         {
+            type = tok!"stringLiteral";
+            lexStringSuffix(type);
             range.popFront();
         }
         else
             error("`\"` expected");
-        IdType type = tok!"stringLiteral";
-        lexStringSuffix(type);
         token = Token(type, cache.intern(range.slice(mark)), line, column, index);
     }
 
@@ -2504,6 +2505,9 @@ void main() {
 
     checkInvalidTrailingString(getTokensForParser(`x = "foo`, cf, &ca));
     checkInvalidTrailingString(getTokensForParser(`x = r"foo`, cf, &ca));
+    checkInvalidTrailingString(getTokensForParser(`x = x"00`, cf, &ca));
     checkInvalidTrailingString(getTokensForParser("x = `foo", cf, &ca));
     checkInvalidTrailingString(getTokensForParser("x = q{foo", cf, &ca));
+    checkInvalidTrailingString(getTokensForParser(`x = q"foo`, cf, &ca));
+    checkInvalidTrailingString(getTokensForParser("x = '", cf, &ca));
 }
