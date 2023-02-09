@@ -1208,8 +1208,7 @@ private pure nothrow @safe:
         {
             if (range.index >= range.bytes.length)
             {
-                error("Error: unterminated string literal");
-                token = Token(tok!"");
+                error(token, "Error: unterminated string literal");
                 return;
             }
             version (X86_64)
@@ -1254,8 +1253,7 @@ private pure nothrow @safe:
             {
                 if (range.index >= range.bytes.length)
                 {
-                    error("Error: unterminated string literal");
-                    token = Token(tok!"");
+                    error(token, "Error: unterminated string literal");
                     return;
                 }
                 version (X86_64)
@@ -1280,8 +1278,7 @@ private pure nothrow @safe:
             range.popFront();
             if (range.index >= range.bytes.length)
             {
-                error("Error: unterminated string literal");
-                token = Token(tok!"");
+                error(token, "Error: unterminated string literal");
                 return;
             }
             range.popFront();
@@ -1289,8 +1286,7 @@ private pure nothrow @safe:
             {
                 if (range.index >= range.bytes.length)
                 {
-                    error("Error: unterminated string literal");
-                    token = Token(tok!"");
+                    error(token, "Error: unterminated string literal");
                     return;
                 }
                 else if (range.bytes[range.index] == '"')
@@ -1388,8 +1384,7 @@ private pure nothrow @safe:
                     }
                     else
                     {
-                        error("Error: `\"` expected to end delimited string literal");
-                        token = Token(tok!"");
+                        error(token, "Error: `\"` expected to end delimited string literal");
                         return;
                     }
                 }
@@ -1464,6 +1459,13 @@ private pure nothrow @safe:
         }
 
         advance(_front);
+
+        if (range.index >= range.bytes.length)
+        {
+            error(token, "Error: unterminated token string literal");
+            return;
+        }
+
         while (depth > 0 && !empty)
         {
             auto t = front();
@@ -1503,8 +1505,7 @@ private pure nothrow @safe:
         {
             if (range.index >= range.bytes.length)
             {
-                error("Error: unterminated hex string literal");
-                token = Token(tok!"");
+                error(token, "Error: unterminated hex string literal");
                 return;
             }
             else if (isWhitespace())
@@ -1520,8 +1521,7 @@ private pure nothrow @safe:
                 range.popFront();
                 break loop;
             default:
-                error("Error: invalid character in hex string");
-                token = Token(tok!"");
+                error(token, "Error: invalid character in hex string");
                 return;
             }
         }
@@ -1706,8 +1706,7 @@ private pure nothrow @safe:
         else
         {
     err:
-            error("Error: Expected `'` to end character literal");
-            token = Token(tok!"");
+            error(token, "Error: Expected `'` to end character literal");
         }
     }
 
@@ -1847,6 +1846,12 @@ private pure nothrow @safe:
         size_t line = range.line;
         auto mark = range.mark();
     };
+
+    void error(ref Token token, string message)
+    {
+        token.type = tok!"";
+        error(message);
+    }
 
     void error(string message)
     {
@@ -2448,4 +2453,57 @@ unittest
     immutable t1 = e1.tok;
     immutable t2 = e2.tok;
     immutable t3 = e3.tok;
+}
+
+/// empty '' is invalid syntax, but should still get parsed properly, with an
+/// error token and proper location info
+unittest
+{
+    import std.conv : to;
+    import std.exception : enforce;
+
+    static immutable src = `module foo.bar;
+
+void main() {
+    x = '';
+}
+`;
+
+    LexerConfig cf;
+    StringCache ca = StringCache(16);
+
+    const tokens = getTokensForParser(src, cf, &ca);
+
+    int i;
+    assert(tokens[i++].type == tok!"module");
+    assert(tokens[i++].type == tok!"identifier");
+    assert(tokens[i++].type == tok!".");
+    assert(tokens[i++].type == tok!"identifier");
+    assert(tokens[i++].type == tok!";");
+    assert(tokens[i++].type == tok!"void");
+    assert(tokens[i++].type == tok!"identifier");
+    assert(tokens[i++].type == tok!"(");
+    assert(tokens[i++].type == tok!")");
+    assert(tokens[i++].type == tok!"{");
+    assert(tokens[i++].type == tok!"identifier");
+    assert(tokens[i++].type == tok!"=");
+    assert(tokens[i].type == tok!"");
+    assert(tokens[i].line == tokens[i - 1].line);
+    assert(tokens[i].column == tokens[i - 1].column + 2);
+    i++;
+    assert(tokens[i++].type == tok!";");
+    assert(tokens[i++].type == tok!"}");
+
+    void checkInvalidTrailingString(const Token[] tokens)
+    {
+        assert(tokens.length == 3);
+        assert(tokens[2].index != 0);
+        assert(tokens[2].column >= 4);
+        assert(tokens[2].type == tok!"");
+    }
+
+    checkInvalidTrailingString(getTokensForParser(`x = "foo`, cf, &ca));
+    checkInvalidTrailingString(getTokensForParser(`x = r"foo`, cf, &ca));
+    checkInvalidTrailingString(getTokensForParser("x = `foo", cf, &ca));
+    checkInvalidTrailingString(getTokensForParser("x = q{foo", cf, &ca));
 }
