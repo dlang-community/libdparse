@@ -401,43 +401,50 @@ mixin template OpEquals(bool print = false)
 {
     override bool opEquals(Object other) const
     {
-        static if (print)
-            pragma(msg, generateOpEquals!(typeof(this)));
-        mixin (generateOpEquals!(typeof(this)));
+        if (auto obj = cast(typeof(this)) other)
+        {
+            foreach (i, field; this.tupleof)
+            {
+                if (typeof(this).tupleof[i].stringof.among(
+                    "comment", "line", "column", "endLocation", "startLocation",
+                    "index", "dotLocation"
+                ))
+                    continue;
+
+                if (field != obj.tupleof[i])
+                    return false;
+            }
+            return true;
+        }
+        return false;
     }
 }
 
-template generateOpEquals(T)
+unittest
 {
-    template opEqualsPart(p ...)
-    {
-        import std.traits : isSomeFunction, isDynamicArray;
-        import std.algorithm : among;
+    auto lhs = new AddExpression();
+    auto rhs = new AddExpression();
+    assert(lhs == rhs);
+    lhs.line = 4;
+    assert(lhs == rhs);
+    lhs.operator = tok!"-";
+    assert(lhs != rhs);
+    rhs.operator = tok!"-";
+    assert(lhs == rhs);
+}
 
-        static if (p.length > 1)
-        {
-            enum opEqualsPart = opEqualsPart!(p[0 .. $/2]) ~ opEqualsPart!(p[$/2 .. $]);
-        }
-        else static if (p.length
-            && !__traits(isDeprecated, __traits(getMember, T, p[0]))
-            && !isSomeFunction!(typeof(__traits(getMember, T, p[0])))
-            && !p[0].among("comment", "line", "column", "endLocation", "startLocation", "index", "dotLocation"))
-        {
-            static if (isDynamicArray!(typeof(__traits(getMember, T, p[0]))))
-            {
-                enum opEqualsPart = "\tif (obj." ~ p[0] ~ ".length != " ~ p[0] ~ ".length) return false;\n"
-                    ~ "\tforeach (i; 0 .. " ~ p[0]  ~ ".length)\n"
-                    ~ "\t\tif (" ~ p[0] ~ "[i] != obj." ~ p[0] ~ "[i]) return false;\n";
-            }
-            else
-                enum opEqualsPart = "\tif (obj." ~ p[0] ~ " != " ~ p[0] ~ ") return false;\n";
-        }
-        else
-            enum opEqualsPart = "";
-    }
-    enum generateOpEquals = "if (auto obj = cast(" ~ T.stringof ~ ") other){\n"
-        ~ opEqualsPart!(__traits(derivedMembers, T))
-        ~ "\treturn true;\n}\nreturn false;";
+unittest
+{
+    auto lhs = new AssertArguments();
+    auto rhs = new AssertArguments();
+    lhs.assertion = new AddExpression();
+    rhs.assertion = new AddExpression();
+    lhs.messageParts = [new NewExpression(), new AddExpression()];
+    rhs.messageParts = [new NewExpression(), new AddExpression()];
+    assert(lhs == rhs);
+    lhs.messageParts = [new NewExpression(), new AddExpression()];
+    rhs.messageParts = [new AddExpression(), new NewExpression()];
+    assert(lhs != rhs);
 }
 
 abstract class BaseNode : ASTNode
