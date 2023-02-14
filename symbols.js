@@ -533,7 +533,6 @@ var symbols = [
 {name: 'dparse.ast.GccAsmOperandList', kind: "classdeclaration", path: './dparse/ast/GccAsmOperandList.html', attributes: []},
 {name: 'dparse.ast.GccAsmOperandList.accept', kind: "functiondeclaration", path: './dparse/ast/GccAsmOperandList.accept.html', attributes: ["override", "const"]},
 {name: 'dparse.ast.GccAsmOperandList.items', kind: "variabledeclaration", path: './dparse/ast/GccAsmOperandList.items.html', attributes: []},
-{name: 'dparse.ast.generateOpEquals', kind: "enummemberdeclaration", path: './dparse/ast/generateOpEquals.html', attributes: []},
 {name: 'dparse.ast.GotoStatement', kind: "classdeclaration", path: './dparse/ast/GotoStatement.html', attributes: []},
 {name: 'dparse.ast.GotoStatement.accept', kind: "functiondeclaration", path: './dparse/ast/GotoStatement.accept.html', attributes: ["override", "const"]},
 {name: 'dparse.ast.GotoStatement.expression', kind: "variabledeclaration", path: './dparse/ast/GotoStatement.expression.html', attributes: []},

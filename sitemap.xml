@@ -877,7 +877,6 @@
 <url><loc>http://127.0.0.1/dparse/ast/GccAsmOperandList.accept.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/GccAsmOperandList.items.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
-<url><loc>http://127.0.0.1/dparse/ast/generateOpEquals.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/GotoStatement.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/GotoStatement.accept.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/GotoStatement.expression.html</loc></url>
