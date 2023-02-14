@@ -44,7 +44,7 @@
      | <a href="#andExpression"><b>andExpression</b></a> <span class="string_literal"><i>&#39;&amp;&#39;</i></span> <a href="#cmpExpression"><b>cmpExpression</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="argumentList"></span> argumentList</b>:
-     <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>?)*
+     <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>?)* <span class="string_literal"><i>&#39;,&#39;</i></span>?
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="arguments"></span> arguments</b>:
      <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#argumentList"><b>argumentList</b></a>? <span class="string_literal"><i>&#39;)&#39;</i></span>
@@ -150,7 +150,7 @@
      | <a href="#asmXorExp"><b>asmXorExp</b></a> <span class="string_literal"><i>&#39;^&#39;</i></span> <a href="#asmAndExp"><b>asmAndExp</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="assertArguments"></span> assertArguments</b>:
-     <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>)? <span class="string_literal"><i>&#39;,&#39;</i></span>?
+     <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>)* <span class="string_literal"><i>&#39;,&#39;</i></span>?
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="assertExpression"></span> assertExpression</b>:
      <span class="string_literal"><i>&#39;assert&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assertArguments"><b>assertArguments</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Parser.parseArgumentList</title>
+		<title>Function AssertArguments.firstMessage</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -27,7 +27,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 				<ul class="tree-view">
 					<li>
-						<div class="module ">
+						<div class="module selected">
 							<a href="../../dparse/ast.html">ast</a>
 						</div>
 					</li>
@@ -52,7 +52,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../dparse/parser.html">parser</a>
 						</div>
 					</li>
@@ -104,28 +104,29 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.parseArgumentList</h1><p>Parses an ArgumentList.
+				<h1>Function AssertArguments.firstMessage</h1><p>Returns <code class="lang-d"><a href="../../dparse/ast/AssertArguments.messageParts.html"><span class="pln">messageParts</span></a><span class="pun">[</span><span class="lit">0</span><span class="pun">]</span></code> or <code class="lang-d"><span class="kwd">null</span></code> if no messageParts.
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<a href="../../dparse/ast/ArgumentList.html"><span class="typ">ArgumentList</span></a> <span class="pln">parseArgumentList</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
+				<span class="kwd">inout </span><span class="kwd">inout</span><span class="pun">(</span><a href="../../dparse/ast/ExpressionNode.html"><span class="typ">ExpressionNode</span></a><span class="pun">)</span> <span class="pln">firstMessage</span><span class="pun">(</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc @safe</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				<section><p>argumentList:
-     assignExpression (',' assignExpression?)* ','?
-     ;
-</p>
-</section>
-
+				
 				
 			</div>
 			<footer>
 				<div id="license-info">
-					
-					
-					
+					<p>Brian Schott
+</p>
+
+					<p>Brian Schott 2013
+</p>
+
+					<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
 				</div>
 			</footer>
 		</div>

@@ -171,7 +171,9 @@
 <url><loc>http://127.0.0.1/dparse/ast/AssertArguments.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AssertArguments.accept.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AssertArguments.assertion.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/AssertArguments.firstMessage.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AssertArguments.message.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/AssertArguments.messageParts.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AssertExpression.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AssertExpression.accept.html</loc></url>
