@@ -406,18 +406,13 @@ class Formatter(Sink)
     {
         debug(verbose) writeln("AssertExpression");
 
-        /**
-        AssignExpression assertion;
-        AssignExpression message;
-        **/
-
         with(assertArguments)
         {
             format(assertion);
-            if (message)
+            foreach (part; messageParts)
             {
                 put(", ");
-                format(message);
+                format(part);
             }
         }
     }

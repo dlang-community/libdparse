@@ -874,11 +874,21 @@ final class AssertArguments : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(assertion, message));
+        mixin (visitIfNotNull!(assertion, messageParts));
     }
+
     /** */ ExpressionNode assertion;
-    /** */ ExpressionNode message;
+    /** */ ExpressionNode[] messageParts;
     mixin OpEquals;
+
+    deprecated("use firstMessage or process all messageParts instead")
+    alias message = firstMessage;
+
+    /// Returns `messageParts[0]` or `null` if no messageParts.
+    inout(ExpressionNode) firstMessage() inout nothrow pure @nogc @safe
+    {
+        return messageParts.length ? messageParts[0] : null;
+    }
 }
 
 ///
