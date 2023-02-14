@@ -350,7 +350,7 @@ class Parser
      * Parses an ArgumentList.
      *
      * $(GRAMMAR $(RULEDEF argumentList):
-     *     $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression)?)*
+     *     $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression)?)* $(LITERAL ',')?
      *     ;)
      */
     ArgumentList parseArgumentList()
@@ -1037,7 +1037,7 @@ class Parser
      * Parses an AssertArguments
      *
      * $(GRAMMAR $(RULEDEF assertArguments):
-     *     $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))? $(LITERAL ',')?
+     *     $(RULE assignExpression) ($(LITERAL ',') $(RULE assignExpression))* $(LITERAL ',')?
      *     ;)
      */
     AssertArguments parseAssertArguments()
@@ -1045,16 +1045,17 @@ class Parser
         auto startIndex = index;
         auto node = allocator.make!AssertArguments;
         mixin(parseNodeQ!(`node.assertion`, `AssignExpression`));
-        if (currentIs(tok!","))
-            advance();
-        if (currentIs(tok!")"))
+
+        StackBuffer items;
+        while (currentIs(tok!","))
         {
-            node.tokens = tokens[startIndex .. index];
-            return node;
-        }
-        mixin(parseNodeQ!(`node.message`, `AssignExpression`));
-        if (currentIs(tok!","))
             advance();
+            if (currentIs(tok!")"))
+                break;
+            if (!items.put(parseAssignExpression()))
+                return null;
+        }
+        ownArray(node.messageParts, items);
         node.tokens = tokens[startIndex .. index];
         return node;
     }
