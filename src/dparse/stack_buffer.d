@@ -70,7 +70,7 @@ struct StackBuffer
         }
     }
 
-    void[] opSlice()
+    inout(void[]) opSlice() inout pure nothrow @nogc @safe return scope
     {
         return arr[0 .. _length];
     }
@@ -120,4 +120,42 @@ unittest
 
     B d = new D;
     sb.put(d);
+}
+
+package struct TypedStackBuffer(T)
+if (__traits(isPOD, T))
+{
+    void push(T value) @trusted
+    {
+        sb.put(value);
+    }
+
+    void opOpAssign(string op : "~")(T value)
+    {
+        push(value);
+    }
+
+    ref inout(T) back() inout pure nothrow @nogc @safe @property
+    {
+        return (cast(inout(T)[])sb.opSlice[$ - T.sizeof .. $])[0];
+    }
+
+    void popBack() pure nothrow @nogc @safe @property
+    {
+        assert(!empty);
+        sb._length -= T.sizeof;
+    }
+
+    bool empty() const pure nothrow @nogc @safe @property
+    {
+        return sb.length == 0;
+    }
+
+    uint length() const pure nothrow @nogc @safe @property
+    {
+        return sb.length / T.sizeof;
+    }
+
+private:
+    StackBuffer sb;
 }
