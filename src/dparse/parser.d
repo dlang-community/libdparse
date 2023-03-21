@@ -8651,7 +8651,11 @@ protected: final:
                 stderr.writefln("%s(%d:%d)[error]: %s", fileName, line, column, message);
         }
         else
-            ++suppressMessages[$ - 1];
+        {
+            import std.checkedint;
+
+            ++suppressMessages.back.checked;
+        }
         while (shouldAdvance && moreTokens())
         {
             if (currentIsOneOf(tok!";", tok!"}",
@@ -9160,7 +9164,7 @@ protected: final:
         return suppressMessages.empty ? 0 : suppressMessages.back();
     }
 
-    uint[] suppressMessages;
+    TypedStackBuffer!uint suppressMessages;
     size_t index;
     int _traceDepth;
     string comment;

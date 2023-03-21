@@ -134,9 +134,9 @@ mixin template TokenTriviaFields()
      *
      * Contains: `comment`, `whitespace`, `specialTokenSequence`
      */
-    immutable(typeof(this))[] leadingTrivia;
+    immutable(TriviaToken)[] leadingTrivia;
     /// ditto
-    immutable(typeof(this))[] trailingTrivia;
+    immutable(TriviaToken)[] trailingTrivia;
 
     string memoizedLeadingComment = null;
     string memoizedTrailingComment = null;
@@ -171,10 +171,30 @@ mixin template TokenTriviaFields()
 
 // mixin in from dparse.lexer to make error messages more managable size as the
 // entire string is dumped when there is a type mismatch.
-private enum extraFields = "import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;";
+private enum extraFields = "import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;";
+private enum extraFieldsBare = "
+    import dparse.lexer : Token;
+
+    this(Token token) pure nothrow @safe @nogc {
+        this(token.type, token.text, token.line, token.column, token.index);
+    }
+
+    int opCmp(size_t i) const pure nothrow @safe @nogc {
+        if (index < i) return -1;
+        if (index > i) return 1;
+        return 0;
+    }
+
+    int opCmp(ref const typeof(this) other) const pure nothrow @safe @nogc {
+        return opCmp(other.index);
+    }
+";
 
 /// The token type in the D lexer
 public alias Token = std.experimental.lexer.TokenStructure!(IdType, extraFields);
+
+/// Same as Token, but doesn't contain child TriviaTokens
+public alias TriviaToken = std.experimental.lexer.TokenStructure!(IdType, extraFieldsBare);
 
 /**
  * Configure whitespace handling
@@ -472,9 +492,9 @@ if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
     config.whitespaceBehavior = WhitespaceBehavior.include;
     config.commentBehavior = CommentBehavior.noIntern;
 
-    auto leadingTriviaAppender = appender!(Token[])();
+    auto leadingTriviaAppender = appender!(TriviaToken[])();
     leadingTriviaAppender.reserve(128);
-    auto trailingTriviaAppender = appender!(Token[])();
+    auto trailingTriviaAppender = appender!(TriviaToken[])();
     trailingTriviaAppender.reserve(128);
 
     auto output = appender!(typeof(return))();
@@ -485,9 +505,9 @@ if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
     case tok!"whitespace":
     case tok!"comment":
         if (!output.data.empty && lexer.front.line == output.data[$ - 1].line)
-            trailingTriviaAppender.put(lexer.front);
+            trailingTriviaAppender.put(TriviaToken(lexer.front));
         else
-            leadingTriviaAppender.put(lexer.front);
+            leadingTriviaAppender.put(TriviaToken(lexer.front));
         lexer.popFront();
         break;
     case tok!"__EOF__":

@@ -516,7 +516,7 @@ unittest
 
 /// Extracts and combines ddoc comments from trivia comments.
 string extractDdocFromTrivia(Tokens)(Tokens tokens) pure nothrow @safe
-    if (isInputRange!Tokens && is(ElementType!Tokens : Token))
+    if (isInputRange!Tokens && (is(ElementType!Tokens : Token) || is(ElementType!Tokens : TriviaToken)))
 {
     bool hasDoc;
     auto ret = appender!string;
