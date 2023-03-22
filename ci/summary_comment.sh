@@ -46,4 +46,4 @@ cat dub.json
 sed -E -i 's/"libdparse":\s*"[^"]+"/"libdparse": {"path":".."}/' dub.selections.json
 cat dub.selections.json
 
-./ci/summary_comment.sh
+./ci/summary_comment.sh 2>&1 | grep -E "^STAT:|DCD BUILD FAILED"
