@@ -16,10 +16,11 @@
 module dparse.ast;
 
 import dparse.lexer;
-import std.traits;
 import std.algorithm;
 import std.array;
 import std.string;
+import std.sumtype;
+import std.traits;
 
 private immutable uint[TypeInfo] typeMap;
 
@@ -392,6 +393,8 @@ template visitIfNotNull(fields ...)
             immutable visitIfNotNull = "if (" ~ fields[0].stringof ~ " !is null) visitor.visit(" ~ fields[0].stringof ~ ");\n";
         else static if (is(Unqual!(typeof(fields[0])) == Token))
             immutable visitIfNotNull = "if (" ~ fields[0].stringof ~ ` != tok!""` ~ ") visitor.visit(" ~ fields[0].stringof ~ ");\n";
+        else static if (isSumType!(typeof(fields[0])))
+            immutable visitIfNotNull = fields[0].stringof ~ ".match!((typeof(null)) {}, v => visitor.visit(v));\n";
         else
             immutable visitIfNotNull = "visitor.visit(" ~ fields[0].stringof ~ ");\n";
     }
@@ -1290,32 +1293,15 @@ final class DebugSpecification : BaseNode
 ///
 final class Declaration : BaseNode
 {
-
     override void accept(ASTVisitor visitor) const
     {
-
-        foreach (attr; attributes)
-            visitor.visit(attr);
-        foreach (dec; declarations)
-            visitor.visit(dec);
-        foreach (Type; DeclarationTypes)
-        {
-            const(Type)* value = storage.peek!Type;
-            if (value !is null)
-            {
-                static if (isArray!Type)
-                    foreach (item; *(cast(Type*) value))
-                        visitor.visit(item);
-                else if (*value !is null)
-                    visitor.visit(*(cast(Type*) value));
-            }
-        }
+        mixin (visitIfNotNull!(attributes, declarations, unionType));
     }
 
-    private import std.variant:Algebraic;
-    private import std.typetuple:TypeTuple;
+    private import std.meta : AliasSeq;
 
-    alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasAssign, AliasThisDeclaration,
+    alias DeclarationTypes = AliasSeq!(typeof(null),
+        AliasDeclaration, AliasAssign, AliasThisDeclaration,
         AnonymousEnumDeclaration, AttributeDeclaration,
         ClassDeclaration, ConditionalDeclaration, Constructor, DebugSpecification,
         Destructor, EnumDeclaration, EponymousTemplateDeclaration,
@@ -1326,58 +1312,152 @@ final class Declaration : BaseNode
         TemplateDeclaration, UnionDeclaration, Unittest, VariableDeclaration,
         VersionSpecification, StaticForeachDeclaration);
 
-    private Algebraic!(DeclarationTypes) storage;
-
-    private static string generateProperty(string type, string name)
-    {
-        return "const(" ~ type ~ ") " ~ name ~ "() const @property { auto p = storage.peek!" ~ type ~ "; return p is null? null : *p;}\n"
-            ~ "const(" ~ type ~ ") " ~ name ~ "(" ~ type ~ " node) @property { storage = node; return node; }";
-    }
+    /// Use `std.sumtype : match` on this type if you want to check multiple
+    /// options at once, or use one of the properties below to access single
+    /// types that return null if they are not of the requested type.
+    SumType!(DeclarationTypes) unionType;
 
     /** */ Attribute[] attributes;
     /** */ Declaration[] declarations;
 
-    mixin(generateProperty("AliasDeclaration", "aliasDeclaration"));
-    mixin(generateProperty("AliasAssign", "aliasAssign"));
-    mixin(generateProperty("AliasThisDeclaration", "aliasThisDeclaration"));
-    mixin(generateProperty("AnonymousEnumDeclaration", "anonymousEnumDeclaration"));
-    mixin(generateProperty("AttributeDeclaration", "attributeDeclaration"));
-    mixin(generateProperty("ClassDeclaration", "classDeclaration"));
-    mixin(generateProperty("ConditionalDeclaration", "conditionalDeclaration"));
-    mixin(generateProperty("Constructor", "constructor"));
-    mixin(generateProperty("DebugSpecification", "debugSpecification"));
-    mixin(generateProperty("Destructor", "destructor"));
-    mixin(generateProperty("EnumDeclaration", "enumDeclaration"));
-    mixin(generateProperty("EponymousTemplateDeclaration", "eponymousTemplateDeclaration"));
-    mixin(generateProperty("FunctionDeclaration", "functionDeclaration"));
-    mixin(generateProperty("ImportDeclaration", "importDeclaration"));
-    mixin(generateProperty("InterfaceDeclaration", "interfaceDeclaration"));
-    mixin(generateProperty("Invariant", "invariant_"));
-    mixin(generateProperty("MixinDeclaration", "mixinDeclaration"));
-    mixin(generateProperty("MixinTemplateDeclaration", "mixinTemplateDeclaration"));
-    mixin(generateProperty("Postblit", "postblit"));
-    mixin(generateProperty("PragmaDeclaration", "pragmaDeclaration"));
-    mixin(generateProperty("SharedStaticConstructor", "sharedStaticConstructor"));
-    mixin(generateProperty("SharedStaticDestructor", "sharedStaticDestructor"));
-    mixin(generateProperty("StaticAssertDeclaration", "staticAssertDeclaration"));
-    mixin(generateProperty("StaticConstructor", "staticConstructor"));
-    mixin(generateProperty("StaticDestructor", "staticDestructor"));
-    mixin(generateProperty("StructDeclaration", "structDeclaration"));
-    mixin(generateProperty("TemplateDeclaration", "templateDeclaration"));
-    mixin(generateProperty("UnionDeclaration", "unionDeclaration"));
-    mixin(generateProperty("Unittest", "unittest_"));
-    mixin(generateProperty("VariableDeclaration", "variableDeclaration"));
-    mixin(generateProperty("VersionSpecification", "versionSpecification"));
-    mixin(generateProperty("StaticForeachDeclaration", "staticForeachDeclaration"));
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(AliasDeclaration) aliasDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
 
-    override bool opEquals(Object other) const
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(AliasAssign) aliasAssign() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(AliasThisDeclaration) aliasThisDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(AnonymousEnumDeclaration) anonymousEnumDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(AttributeDeclaration) attributeDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ClassDeclaration) classDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ConditionalDeclaration) conditionalDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(Constructor) constructor() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(DebugSpecification) debugSpecification() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(Destructor) destructor() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(EnumDeclaration) enumDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(EponymousTemplateDeclaration) eponymousTemplateDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(FunctionDeclaration) functionDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ImportDeclaration) importDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(InterfaceDeclaration) interfaceDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(Invariant) invariant_() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(MixinDeclaration) mixinDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(MixinTemplateDeclaration) mixinTemplateDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(Postblit) postblit() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(PragmaDeclaration) pragmaDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(SharedStaticConstructor) sharedStaticConstructor() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(SharedStaticDestructor) sharedStaticDestructor() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(StaticAssertDeclaration) staticAssertDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(StaticConstructor) staticConstructor() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(StaticDestructor) staticDestructor() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(StructDeclaration) structDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(TemplateDeclaration) templateDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(UnionDeclaration) unionDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(Unittest) unittest_() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(VariableDeclaration) variableDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(VersionSpecification) versionSpecification() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(StaticForeachDeclaration) staticForeachDeclaration() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    mixin OpEquals;
+
+    ///
+    T setUnionType(T)(T value)
     {
-        auto otherDeclaration = cast(Declaration) other;
-        if (otherDeclaration is null)
-            return false;
-        return attributes == otherDeclaration.attributes
-            && declarations == otherDeclaration.declarations
-            && storage == otherDeclaration.storage;
+        if (value)
+            unionType = value;
+        else
+            unionType = null;
+        return value;
     }
 }
 
@@ -2482,43 +2562,154 @@ final class StatementNoCaseNoDefault : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(labeledStatement, blockStatement, ifStatement,
-            whileStatement, doStatement, forStatement, foreachStatement,
-            switchStatement, finalSwitchStatement, continueStatement,
-            breakStatement, returnStatement, gotoStatement, withStatement,
-            synchronizedStatement, tryStatement,
-            scopeGuardStatement, asmStatement, pragmaStatement,
-            conditionalStatement, staticAssertStatement, versionSpecification,
-            debugSpecification, expressionStatement, staticForeachStatement));
+        mixin (visitIfNotNull!(unionType));
     }
-    /** */ LabeledStatement labeledStatement;
-    /** */ BlockStatement blockStatement;
-    /** */ IfStatement ifStatement;
-    /** */ WhileStatement whileStatement;
-    /** */ DoStatement doStatement;
-    /** */ ForStatement forStatement;
-    /** */ ForeachStatement foreachStatement;
-    /** */ StaticForeachStatement staticForeachStatement;
-    /** */ SwitchStatement switchStatement;
-    /** */ FinalSwitchStatement finalSwitchStatement;
-    /** */ ContinueStatement continueStatement;
-    /** */ BreakStatement breakStatement;
-    /** */ ReturnStatement returnStatement;
-    /** */ GotoStatement gotoStatement;
-    /** */ WithStatement withStatement;
-    /** */ SynchronizedStatement synchronizedStatement;
-    /** */ TryStatement tryStatement;
-    /** */ ScopeGuardStatement scopeGuardStatement;
-    /** */ AsmStatement asmStatement;
-    /** */ PragmaStatement pragmaStatement;
-    /** */ ConditionalStatement conditionalStatement;
-    /** */ StaticAssertStatement staticAssertStatement;
-    /** */ VersionSpecification versionSpecification;
-    /** */ DebugSpecification debugSpecification;
-    /** */ ExpressionStatement expressionStatement;
+
+    /// Use `std.sumtype : match` on this type if you want to check multiple
+    /// options at once, or use one of the properties below to access single
+    /// types that return null if they are not of the requested type.
+    SumType!(
+        typeof(null),
+        LabeledStatement,
+        BlockStatement,
+        IfStatement,
+        WhileStatement,
+        DoStatement,
+        ForStatement,
+        ForeachStatement,
+        StaticForeachStatement,
+        SwitchStatement,
+        FinalSwitchStatement,
+        ContinueStatement,
+        BreakStatement,
+        ReturnStatement,
+        GotoStatement,
+        WithStatement,
+        SynchronizedStatement,
+        TryStatement,
+        ScopeGuardStatement,
+        AsmStatement,
+        PragmaStatement,
+        ConditionalStatement,
+        StaticAssertStatement,
+        VersionSpecification,
+        DebugSpecification,
+        ExpressionStatement
+    ) unionType;
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(LabeledStatement) labeledStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(BlockStatement) blockStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(IfStatement) ifStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(WhileStatement) whileStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(DoStatement) doStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ForStatement) forStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ForeachStatement) foreachStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(StaticForeachStatement) staticForeachStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(SwitchStatement) switchStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(FinalSwitchStatement) finalSwitchStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ContinueStatement) continueStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(BreakStatement) breakStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ReturnStatement) returnStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(GotoStatement) gotoStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(WithStatement) withStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(SynchronizedStatement) synchronizedStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(TryStatement) tryStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ScopeGuardStatement) scopeGuardStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(AsmStatement) asmStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(PragmaStatement) pragmaStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ConditionalStatement) conditionalStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(StaticAssertStatement) staticAssertStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(VersionSpecification) versionSpecification() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(DebugSpecification) debugSpecification() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(ExpressionStatement) expressionStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
     /** */ size_t startLocation;
     /** */ size_t endLocation;
     mixin OpEquals;
+
+    ///
+    T setUnionType(T)(T value)
+    {
+        if (value)
+            unionType = value;
+        else
+            unionType = null;
+        return value;
+    }
 }
 
 ///
@@ -2868,14 +3059,46 @@ final class Statement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(statementNoCaseNoDefault, caseStatement,
-            caseRangeStatement, defaultStatement));
+        mixin (visitIfNotNull!(unionType));
     }
-    /** */ StatementNoCaseNoDefault statementNoCaseNoDefault;
-    /** */ CaseStatement caseStatement;
-    /** */ CaseRangeStatement caseRangeStatement;
-    /** */ DefaultStatement defaultStatement;
+
+    /// Use `std.sumtype : match` on this type if you want to check multiple
+    /// options at once, or use one of the properties below to access single
+    /// types that return null if they are not of the requested type.
+    SumType!(
+        typeof(null),
+        StatementNoCaseNoDefault,
+        CaseStatement,
+        CaseRangeStatement,
+        DefaultStatement
+    ) unionType;
     mixin OpEquals;
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(StatementNoCaseNoDefault) statementNoCaseNoDefault() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(CaseStatement) caseStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(CaseRangeStatement) caseRangeStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    /// Getter if this class is of this type. To set, use `setUnionType`
+    inout(DefaultStatement) defaultStatement() inout @safe nothrow pure @nogc
+    { alias T = typeof(return); return unionType.match!((T ret) => ret, _ => null); }
+
+    ///
+    T setUnionType(T)(T value)
+    {
+        if (value)
+            unionType = value;
+        else
+            unionType = null;
+        return value;
+    }
 }
 
 ///

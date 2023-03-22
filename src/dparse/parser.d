@@ -2158,7 +2158,7 @@ class Parser
             }
             if (currentIs(tok!":"))
             {
-                node.attributeDeclaration = parseAttributeDeclaration(attr);
+                node.setUnionType = parseAttributeDeclaration(attr);
                 mixin(nullCheck!`node.attributeDeclaration`);
                 ownArray(node.attributes, attributes);
                 node.tokens = tokens[startIndex .. index];
@@ -2179,13 +2179,13 @@ class Parser
         {
             if (isAuto == DecType.autoVar)
             {
-                mixin(nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, true)`);
+                mixin(nullCheck!`node.setUnionType = parseVariableDeclaration(null, true)`);
                 node.tokens = tokens[startIndex .. index];
                 return node;
             }
             else if (isAuto == DecType.autoFun)
             {
-                mixin(nullCheck!`node.functionDeclaration = parseFunctionDeclaration(null, true)`);
+                mixin(nullCheck!`node.setUnionType = parseFunctionDeclaration(null, true)`);
                 node.tokens = tokens[startIndex .. index];
                 return node;
             }
@@ -2238,12 +2238,12 @@ class Parser
             break;
         case tok!"alias":
             if (startsWith(tok!"alias", tok!"identifier", tok!"this"))
-                mixin(parseNodeQ!(`node.aliasThisDeclaration`, `AliasThisDeclaration`));
+                mixin(parseNodeQ!(`node.setUnionType`, `AliasThisDeclaration`));
             else
-                mixin(parseNodeQ!(`node.aliasDeclaration`, `AliasDeclaration`));
+                mixin(parseNodeQ!(`node.setUnionType`, `AliasDeclaration`));
             break;
         case tok!"class":
-            mixin(parseNodeQ!(`node.classDeclaration`, `ClassDeclaration`));
+            mixin(parseNodeQ!(`node.setUnionType`, `ClassDeclaration`));
             break;
         case tok!"this":
             if (!mustBeDeclaration && peekIs(tok!"("))
@@ -2256,12 +2256,12 @@ class Parser
                     return null;
             }
             if (startsWith(tok!"this", tok!"(", tok!"this", tok!")"))
-                mixin(parseNodeQ!(`node.postblit`, `Postblit`));
+                mixin(parseNodeQ!(`node.setUnionType`, `Postblit`));
             else
-                mixin(parseNodeQ!(`node.constructor`, `Constructor`));
+                mixin(parseNodeQ!(`node.setUnionType`, `Constructor`));
             break;
         case tok!"~":
-            mixin(parseNodeQ!(`node.destructor`, `Destructor`));
+            mixin(parseNodeQ!(`node.setUnionType`, `Destructor`));
             break;
         case tok!"enum":
             immutable b = setBookmark();
@@ -2269,7 +2269,7 @@ class Parser
             if (currentIsOneOf(tok!":", tok!"{"))
             {
                 goToBookmark(b);
-                mixin(parseNodeQ!(`node.anonymousEnumDeclaration`, `AnonymousEnumDeclaration`));
+                mixin(parseNodeQ!(`node.setUnionType`, `AnonymousEnumDeclaration`));
             }
             else if (currentIs(tok!"identifier"))
             {
@@ -2282,43 +2282,43 @@ class Parser
                     if (!currentIs(tok!"="))
                     {
                         goToBookmark(b);
-                        node.functionDeclaration = parseFunctionDeclaration(null, true, node.attributes);
+                        node.setUnionType = parseFunctionDeclaration(null, true, node.attributes);
                         mixin (nullCheck!`node.functionDeclaration`);
                     }
                     else
                     {
                         goToBookmark(b);
-                        mixin(parseNodeQ!(`node.eponymousTemplateDeclaration`, `EponymousTemplateDeclaration`));
+                        mixin(parseNodeQ!(`node.setUnionType`, `EponymousTemplateDeclaration`));
                     }
                 }
                 else if (currentIsOneOf(tok!":", tok!"{", tok!";"))
                 {
                     goToBookmark(b);
-                    mixin(parseNodeQ!(`node.enumDeclaration`, `EnumDeclaration`));
+                    mixin(parseNodeQ!(`node.setUnionType`, `EnumDeclaration`));
                 }
                 else
                 {
                     immutable bool eq = currentIs(tok!"=");
                     goToBookmark(b);
-                    mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, eq)`);
+                    mixin (nullCheck!`node.setUnionType = parseVariableDeclaration(null, eq)`);
                 }
             }
             else
             {
                 immutable bool s = isStorageClass();
                 goToBookmark(b);
-                mixin (nullCheck!`node.variableDeclaration = parseVariableDeclaration(null, s)`);
+                mixin (nullCheck!`node.setUnionType = parseVariableDeclaration(null, s)`);
             }
             break;
         case tok!"import":
-            mixin(parseNodeQ!(`node.importDeclaration`, `ImportDeclaration`));
+            mixin(parseNodeQ!(`node.setUnionType`, `ImportDeclaration`));
             break;
         case tok!"interface":
-            mixin(parseNodeQ!(`node.interfaceDeclaration`, `InterfaceDeclaration`));
+            mixin(parseNodeQ!(`node.setUnionType`, `InterfaceDeclaration`));
             break;
         case tok!"mixin":
             if (peekIs(tok!"template"))
-                mixin(parseNodeQ!(`node.mixinTemplateDeclaration`, `MixinTemplateDeclaration`));
+                mixin(parseNodeQ!(`node.setUnionType`, `MixinTemplateDeclaration`));
             else
             {
                 immutable b = setBookmark();
@@ -2329,7 +2329,7 @@ class Parser
                     if (t !is null && t.type == tok!";")
                     {
                         goToBookmark(b);
-                        mixin(parseNodeQ!(`node.mixinDeclaration`, `MixinDeclaration`));
+                        mixin(parseNodeQ!(`node.setUnionType`, `MixinDeclaration`));
                     }
                     else
                     {
@@ -2341,54 +2341,54 @@ class Parser
                 else
                 {
                     goToBookmark(b);
-                    mixin(parseNodeQ!(`node.mixinDeclaration`, `MixinDeclaration`));
+                    mixin(parseNodeQ!(`node.setUnionType`, `MixinDeclaration`));
                 }
             }
             break;
         case tok!"pragma":
-            mixin(parseNodeQ!(`node.pragmaDeclaration`, `PragmaDeclaration`));
+            mixin(parseNodeQ!(`node.setUnionType`, `PragmaDeclaration`));
             break;
         case tok!"shared":
             if (startsWith(tok!"shared", tok!"static", tok!"this"))
-                mixin(parseNodeQ!(`node.sharedStaticConstructor`, `SharedStaticConstructor`));
+                mixin(parseNodeQ!(`node.setUnionType`, `SharedStaticConstructor`));
             else if (startsWith(tok!"shared", tok!"static", tok!"~"))
-                mixin(parseNodeQ!(`node.sharedStaticDestructor`, `SharedStaticDestructor`));
+                mixin(parseNodeQ!(`node.setUnionType`, `SharedStaticDestructor`));
             else
                 goto type;
             break;
         case tok!"static":
             if (peekIs(tok!"this"))
-                mixin(parseNodeQ!(`node.staticConstructor`, `StaticConstructor`));
+                mixin(parseNodeQ!(`node.setUnionType`, `StaticConstructor`));
             else if (peekIs(tok!"~"))
-                mixin(parseNodeQ!(`node.staticDestructor`, `StaticDestructor`));
+                mixin(parseNodeQ!(`node.setUnionType`, `StaticDestructor`));
             else if (peekIs(tok!"if"))
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
+                mixin (nullCheck!`node.setUnionType = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
             else if (peekIs(tok!"assert"))
-                mixin(parseNodeQ!(`node.staticAssertDeclaration`, `StaticAssertDeclaration`));
+                mixin(parseNodeQ!(`node.setUnionType`, `StaticAssertDeclaration`));
             else if (peekIs(tok!"foreach") || peekIs(tok!"foreach_reverse"))
-                mixin(nullCheck!(`node.staticForeachDeclaration = parseStaticForeachDeclaration(inTemplateDeclaration)`));
+                mixin(nullCheck!(`node.setUnionType = parseStaticForeachDeclaration(inTemplateDeclaration)`));
             else
                 goto type;
             break;
         case tok!"struct":
-            mixin(parseNodeQ!(`node.structDeclaration`, `StructDeclaration`));
+            mixin(parseNodeQ!(`node.setUnionType`, `StructDeclaration`));
             break;
         case tok!"template":
-            mixin(parseNodeQ!(`node.templateDeclaration`, `TemplateDeclaration`));
+            mixin(parseNodeQ!(`node.setUnionType`, `TemplateDeclaration`));
             break;
         case tok!"union":
-            mixin(parseNodeQ!(`node.unionDeclaration`, `UnionDeclaration`));
+            mixin(parseNodeQ!(`node.setUnionType`, `UnionDeclaration`));
             break;
         case tok!"invariant":
-            mixin(parseNodeQ!(`node.invariant_`, `Invariant`));
+            mixin(parseNodeQ!(`node.setUnionType`, `Invariant`));
             break;
         case tok!"unittest":
-            mixin(parseNodeQ!(`node.unittest_`, `Unittest`));
+            mixin(parseNodeQ!(`node.setUnionType`, `Unittest`));
             break;
         case tok!"identifier":
             if (inTemplateDeclaration && peekIs(tok!"="))
             {
-                mixin(parseNodeQ!(`node.aliasAssign`, `AliasAssign`));
+                mixin(parseNodeQ!(`node.setUnionType`, `AliasAssign`));
                 break;
             }
             else
@@ -2412,13 +2412,13 @@ class Parser
             }
             const b2 = setBookmark();
             auto savedComment = comment;
-            node.variableDeclaration = parseVariableDeclaration(t, false);
+            node.setUnionType = parseVariableDeclaration(t, false);
             if (node.variableDeclaration is null)
             {
                 goToBookmark(b2);
                 if (savedComment && comment is null)
                     comment = savedComment;
-                node.functionDeclaration = parseFunctionDeclaration(t, false);
+                node.setUnionType = parseFunctionDeclaration(t, false);
             }
             else abandonBookmark(b2);
             if (!node.variableDeclaration && !node.functionDeclaration)
@@ -2429,9 +2429,9 @@ class Parser
             break;
         case tok!"version":
             if (peekIs(tok!"("))
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
+                mixin (nullCheck!`node.setUnionType = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
             else if (peekIs(tok!"="))
-                mixin(parseNodeQ!(`node.versionSpecification`, `VersionSpecification`));
+                mixin(parseNodeQ!(`node.setUnionType`, `VersionSpecification`));
             else
             {
                 error("`=` or `(` expected following `version`");
@@ -2440,9 +2440,9 @@ class Parser
             break;
         case tok!"debug":
             if (peekIs(tok!"="))
-                mixin(parseNodeQ!(`node.debugSpecification`, `DebugSpecification`));
+                mixin(parseNodeQ!(`node.setUnionType`, `DebugSpecification`));
             else
-                mixin (nullCheck!`node.conditionalDeclaration = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
+                mixin (nullCheck!`node.setUnionType = parseConditionalDeclaration(strict, inTemplateDeclaration)`);
             break;
         default:
             error("Declaration expected");
@@ -6097,15 +6097,15 @@ class Parser
             if (argumentList is null)
                 return null;
             if (argumentList.items.length == 1 && startsWith(tok!":", tok!".."))
-                node.caseRangeStatement = parseCaseRangeStatement(argumentList.items[0]);
+                node.setUnionType = parseCaseRangeStatement(argumentList.items[0]);
             else
-                node.caseStatement = parseCaseStatement(argumentList);
+                node.setUnionType = parseCaseStatement(argumentList);
             break;
         case tok!"default":
-            mixin(parseNodeQ!(`node.defaultStatement`, `DefaultStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `DefaultStatement`));
             break;
         default:
-            mixin(parseNodeQ!(`node.statementNoCaseNoDefault`, `StatementNoCaseNoDefault`));
+            mixin(parseNodeQ!(`node.setUnionType`, `StatementNoCaseNoDefault`));
             break;
         }
         node.tokens = tokens[startIndex .. index];
@@ -6153,61 +6153,61 @@ class Parser
         switch (current.type)
         {
         case tok!"{":
-            mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `BlockStatement`));
             break;
         case tok!"if":
-            mixin(parseNodeQ!(`node.ifStatement`, `IfStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `IfStatement`));
             break;
         case tok!"while":
-            mixin(parseNodeQ!(`node.whileStatement`, `WhileStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `WhileStatement`));
             break;
         case tok!"do":
-            mixin(parseNodeQ!(`node.doStatement`, `DoStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `DoStatement`));
             break;
         case tok!"for":
-            mixin(parseNodeQ!(`node.forStatement`, `ForStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `ForStatement`));
             break;
         case tok!"foreach":
         case tok!"foreach_reverse":
-            mixin(parseNodeQ!(`node.foreachStatement`, `ForeachStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `ForeachStatement`));
             break;
         case tok!"switch":
-            mixin(parseNodeQ!(`node.switchStatement`, `SwitchStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `SwitchStatement`));
             break;
         case tok!"continue":
-            mixin(parseNodeQ!(`node.continueStatement`, `ContinueStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `ContinueStatement`));
             break;
         case tok!"break":
-            mixin(parseNodeQ!(`node.breakStatement`, `BreakStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `BreakStatement`));
             break;
         case tok!"return":
-            mixin(parseNodeQ!(`node.returnStatement`, `ReturnStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `ReturnStatement`));
             break;
         case tok!"goto":
-            mixin(parseNodeQ!(`node.gotoStatement`, `GotoStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `GotoStatement`));
             break;
         case tok!"with":
-            mixin(parseNodeQ!(`node.withStatement`, `WithStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `WithStatement`));
             break;
         case tok!"synchronized":
-            mixin(parseNodeQ!(`node.synchronizedStatement`, `SynchronizedStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `SynchronizedStatement`));
             break;
         case tok!"try":
-            mixin(parseNodeQ!(`node.tryStatement`, `TryStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `TryStatement`));
             break;
         case tok!"scope":
-            mixin(parseNodeQ!(`node.scopeGuardStatement`, `ScopeGuardStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `ScopeGuardStatement`));
             break;
         case tok!"asm":
-            mixin(parseNodeQ!(`node.asmStatement`, `AsmStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `AsmStatement`));
             break;
         case tok!"pragma":
-            mixin(parseNodeQ!(`node.pragmaStatement`, `PragmaStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `PragmaStatement`));
             break;
         case tok!"final":
             if (peekIs(tok!"switch"))
             {
-                mixin(parseNodeQ!(`node.finalSwitchStatement`, `FinalSwitchStatement`));
+                mixin(parseNodeQ!(`node.setUnionType`, `FinalSwitchStatement`));
                 break;
             }
             else
@@ -6217,23 +6217,23 @@ class Parser
             }
         case tok!"debug":
             if (peekIs(tok!"="))
-                mixin(parseNodeQ!(`node.debugSpecification`, `DebugSpecification`));
+                mixin(parseNodeQ!(`node.setUnionType`, `DebugSpecification`));
             else
-                mixin(parseNodeQ!(`node.conditionalStatement`, `ConditionalStatement`));
+                mixin(parseNodeQ!(`node.setUnionType`, `ConditionalStatement`));
             break;
         case tok!"version":
             if (peekIs(tok!"="))
-                mixin(parseNodeQ!(`node.versionSpecification`, `VersionSpecification`));
+                mixin(parseNodeQ!(`node.setUnionType`, `VersionSpecification`));
             else
-                mixin(parseNodeQ!(`node.conditionalStatement`, `ConditionalStatement`));
+                mixin(parseNodeQ!(`node.setUnionType`, `ConditionalStatement`));
             break;
         case tok!"static":
             if (peekIs(tok!"if"))
-                mixin(parseNodeQ!(`node.conditionalStatement`, `ConditionalStatement`));
+                mixin(parseNodeQ!(`node.setUnionType`, `ConditionalStatement`));
             else if (peekIs(tok!"assert"))
-                mixin(parseNodeQ!(`node.staticAssertStatement`, `StaticAssertStatement`));
+                mixin(parseNodeQ!(`node.setUnionType`, `StaticAssertStatement`));
             else if (peekIs(tok!"foreach") || peekIs(tok!"foreach_reverse"))
-                mixin(parseNodeQ!(`node.staticForeachStatement`, `StaticForeachStatement`));
+                mixin(parseNodeQ!(`node.setUnionType`, `StaticForeachStatement`));
             else
             {
                 error("`if`, `assert`, `foreach` or `foreach_reverse` expected.");
@@ -6243,14 +6243,14 @@ class Parser
         case tok!"identifier":
             if (peekIs(tok!":"))
             {
-                mixin(parseNodeQ!(`node.labeledStatement`, `LabeledStatement`));
+                mixin(parseNodeQ!(`node.setUnionType`, `LabeledStatement`));
                 break;
             }
             goto default;
         case tok!"delete":
         case tok!"assert":
         default:
-            mixin(parseNodeQ!(`node.expressionStatement`, `ExpressionStatement`));
+            mixin(parseNodeQ!(`node.setUnionType`, `ExpressionStatement`));
             break;
         }
         node.endLocation = tokens[index - 1].index;
@@ -6354,7 +6354,7 @@ class Parser
      *     | $(LITERAL 'override')
      *     | $(LITERAL 'pure')
      *     | $(LITERAL 'ref')
-     *     | $(LITERAL '___gshared')
+     *     | $(LITERAL '__gshared')
      *     | $(LITERAL 'scope')
      *     | $(LITERAL 'static')
      *     | $(LITERAL 'synchronized')
