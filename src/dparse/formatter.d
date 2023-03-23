@@ -689,7 +689,7 @@ class Formatter(Sink)
         /**
         Type type;
         CastQualifier castQualifier;
-        UnaryExpression unaryExpression;
+        UnaryExpressionNode unaryExpression;
         **/
 
         with(castExpression)
@@ -1335,7 +1335,7 @@ class Formatter(Sink)
         else if (cast(TraitsExpression) n) format(cast(TraitsExpression) n);
         else if (cast(TypeidExpression) n) format(cast(TypeidExpression) n);
         else if (cast(TypeofExpression) n) format(cast(TypeofExpression) n);
-        else if (cast(UnaryExpression) n) format(cast(UnaryExpression) n);
+        else if (cast(UnaryExpressionNode) n) format(cast(UnaryExpressionNode) n);
         else if (cast(XorExpression) n) format(cast(XorExpression) n);
     }
 
@@ -1507,7 +1507,7 @@ class Formatter(Sink)
 
         /**
         Type type;
-        UnaryExpression unaryExpression;
+        UnaryExpressionNode unaryExpression;
         TemplateArguments templateArguments;
         Arguments arguments;
         **/
@@ -1891,7 +1891,7 @@ class Formatter(Sink)
         debug(verbose) writeln("IndexExpression");
 
         /**
-        UnaryExpression unaryExpression;
+        UnaryExpressionNode unaryExpression;
         ArgumentList argumentList;
         **/
 
@@ -3611,59 +3611,115 @@ class Formatter(Sink)
         put(")");
     }
 
-    void format(const UnaryExpression unary)
+    void format(const UnaryExpressionNode unary)
     {
-        debug(verbose) writeln("UnaryExpression(");
+        debug(verbose) writeln("UnaryExpressionNode(");
 
-        /**
-        Type type;
-        PrimaryExpression primaryExpression;
-        Token prefix;
-        Token suffix;
-        UnaryExpression unaryExpression;
-        NewExpression newExpression;
-        DeleteExpression deleteExpression;
-        CastExpression castExpression;
-        FunctionCallExpression functionCallExpression;
-        ArgumentList argumentList;
-        IdentifierOrTemplateInstance identifierOrTemplateInstance;
-        AssertExpression assertExpression;
-        SliceExpression sliceExpression;
-        IndexExpression indexExpression;
-        **/
-
-        with(unary)
-        {
-            if (prefix != tok!"") format(prefix);
-
-            if (type && identifierOrTemplateInstance)
-            {
-                // handle things like (void*).sizeof
-                put("(");
-                format(type);
-                put(")");
-            }
-
-            if (primaryExpression) format(primaryExpression);
-            if (newExpression) format(newExpression);
-            if (deleteExpression) format(deleteExpression);
-            if (castExpression) format(castExpression);
-            if (functionCallExpression) format(functionCallExpression);
-            if (assertExpression) format(assertExpression);
-            if (throwExpression) format(throwExpression);
-            if (indexExpression) format(indexExpression);
-
-            if (unaryExpression) format(unaryExpression);
-            if (suffix != tok!"") format(suffix);
-
-            if (identifierOrTemplateInstance)
-            {
-                put(".");
-                format(identifierOrTemplateInstance);
-            }
-        }
+        if (auto p = cast(RefPrefixUnaryExpression) unary) format(p);
+        else if (auto p = cast(NotPrefixUnaryExpression) unary) format(p);
+        else if (auto p = cast(DerefPrefixUnaryExpression) unary) format(p);
+        else if (auto p = cast(PlusPrefixUnaryExpression) unary) format(p);
+        else if (auto p = cast(MinusPrefixUnaryExpression) unary) format(p);
+        else if (auto p = cast(TildePrefixUnaryExpression) unary) format(p);
+        else if (auto p = cast(PlusPlusPrefixUnaryExpression) unary) format(p);
+        else if (auto p = cast(MinusMinusPrefixUnaryExpression) unary) format(p);
+        else if (auto p = cast(PlusPlusPostfixUnaryExpression) unary) format(p);
+        else if (auto p = cast(MinusMinusPostfixUnaryExpression) unary) format(p);
+        else if (auto p = cast(UnaryDotIdentifierExpression) unary) format(p);
+        else if (auto p = cast(UnaryDotNewExpression) unary) format(p);
+        else if (auto p = cast(TypeDotIdentifierExpression) unary) format(p);
+        else if (auto p = cast(AssertExpression) unary) format(p);
+        else if (auto p = cast(CastExpression) unary) format(p);
+        else if (auto p = cast(DeleteExpression) unary) format(p);
+        else if (auto p = cast(FunctionCallExpression) unary) format(p);
+        else if (auto p = cast(IndexExpression) unary) format(p);
+        else if (auto p = cast(NewExpression) unary) format(p);
+        else if (auto p = cast(PrimaryExpression) unary) format(p);
+        else if (auto p = cast(ThrowExpression) unary) format(p);
 
         debug(verbose) writeln(")");
+    }
+
+    void format(const RefPrefixUnaryExpression unary)
+    {
+        put("&");
+        format(unary.unaryExpression);
+    }
+
+    void format(const NotPrefixUnaryExpression unary)
+    {
+        put("!");
+        format(unary.unaryExpression);
+    }
+
+    void format(const DerefPrefixUnaryExpression unary)
+    {
+        put("*");
+        format(unary.unaryExpression);
+    }
+
+    void format(const PlusPrefixUnaryExpression unary)
+    {
+        put("+");
+        format(unary.unaryExpression);
+    }
+
+    void format(const MinusPrefixUnaryExpression unary)
+    {
+        put("-");
+        format(unary.unaryExpression);
+    }
+
+    void format(const TildePrefixUnaryExpression unary)
+    {
+        put("~");
+        format(unary.unaryExpression);
+    }
+
+    void format(const PlusPlusPrefixUnaryExpression unary)
+    {
+        put("++");
+        format(unary.unaryExpression);
+    }
+
+    void format(const MinusMinusPrefixUnaryExpression unary)
+    {
+        put("--");
+        format(unary.unaryExpression);
+    }
+
+    void format(const PlusPlusPostfixUnaryExpression unary)
+    {
+        format(unary.unaryExpression);
+        put("++");
+    }
+
+    void format(const MinusMinusPostfixUnaryExpression unary)
+    {
+        format(unary.unaryExpression);
+        put("--");
+    }
+
+    void format(const UnaryDotIdentifierExpression unary)
+    {
+        format(unary.unaryExpression);
+        put(".");
+        format(unary.identifierOrTemplateInstance);
+    }
+
+    void format(const UnaryDotNewExpression unary)
+    {
+        format(unary.unaryExpression);
+        put(".");
+        format(unary.newExpression);
+    }
+
+    void format(const TypeDotIdentifierExpression unary)
+    {
+        put("(");
+        format(unary.type);
+        put(").");
+        format(unary.identifierOrTemplateInstance);
     }
 
     void format(const UnionDeclaration decl, const Attribute[] attrs = null)
@@ -4183,6 +4239,9 @@ unittest
     testFormatNode!(VariableDeclaration)(`T!(0)[] t;`);
     testFormatNode!(VariableDeclaration)(`T!(0)[dim] t;`);
     testFormatNode!(VariableDeclaration)(`const shared t = [0, 1];`);
+    testFormatNode!(VariableDeclaration)(`auto x = foo();`);
+    testFormatNode!(VariableDeclaration)(`auto x = foo("bar");`);
+    testFormatNode!(VariableDeclaration)(`auto x = foo(baz: "bar");`);
 
     testFormatNode!(OutStatement)(
 `

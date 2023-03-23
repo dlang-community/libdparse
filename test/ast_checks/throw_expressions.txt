@@ -1,8 +1,8 @@
 //functionDeclaration[name = 'main']
-//functionCallExpression/unaryExpression/primaryExpression/identifierOrTemplateInstance[identifier='foo']
-//functionCallExpression/arguments/namedArgumentList/namedArgument[1]/unaryExpression/throwExpression//*[identifier='someThrowable']
-//functionCallExpression/arguments/namedArgumentList/namedArgument[2]/unaryExpression/primaryExpression/*[identifier='bar']
+//functionCallExpression/primaryExpression/identifierOrTemplateInstance[identifier='foo']
+//functionCallExpression/arguments/namedArgumentList/namedArgument[1]/throwExpression//*[identifier='someThrowable']
+//functionCallExpression/arguments/namedArgumentList/namedArgument[2]/primaryExpression/*[identifier='bar']
 //ternaryExpression/*[1]//*[identifier='foo']
 //ternaryExpression/*[2]//*[identifier='bar']
-//ternaryExpression/*[3]/throwExpression/unaryExpression/newExpression/type[@pretty='Exception']
-//ternaryExpression/*[3]/throwExpression/unaryExpression/newExpression/arguments//stringLiteral
+//ternaryExpression/*[3]/newExpression/type[@pretty='Exception']
+//ternaryExpression/*[3]/newExpression/arguments//stringLiteral
