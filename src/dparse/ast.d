@@ -92,11 +92,32 @@ enum DeclarationListStyle : ubyte
  */
 abstract class ASTVisitor
 {
-
-    /** */
+    deprecated("Don't use or override visit(ExpressionNode). For usage: dynamicDispatch(ExpressionNode) is equivalent; "
+        ~ "for overriding: you should probably override more specific cases. If you need to override to inject some "
+        ~ "before/after code for all cases, make sure to call `super.dynamicDispatch(n)` instead of `n.accept(this)`!")
     void visit(const ExpressionNode n)
     {
-        switch (typeMap[typeid(n)])
+        dynamicDispatch(n);
+    }
+
+    /**
+     * Looks at the runtime type of `n`, then calls the appropriate `visit`
+     * method at runtime.
+     *
+     * Rule of thumb: when the type is an abstract class, use `dynamicDispatch`,
+     * otherwise use `visit`.
+     *
+     * For templated calls:
+     * ---
+     * static if (__traits(isAbstractClass, typeof(node)))
+     *   visitor.dynamicDispatch(node);
+     * else
+     *   visitor.visit(node);
+     * ---
+     */
+    void dynamicDispatch(const ExpressionNode n)
+    {
+        switch (typeMap.get(typeid(n), 0))
         {
         case 1: visit(cast(AddExpression) n); break;
         case 2: visit(cast(AndAndExpression) n); break;
@@ -383,11 +404,15 @@ template visitIfNotNull(fields ...)
     {
         static if (typeof(fields[0]).stringof[$ - 2 .. $] == "[]")
         {
-            static if (__traits(hasMember, typeof(fields[0][0]), "classinfo"))
+            static if (__traits(isAbstractClass, typeof(fields[0][0])))
+                immutable visitIfNotNull = "foreach (i; " ~ fields[0].stringof ~ ") if (i !is null) visitor.dynamicDispatch(i);\n";
+            else static if (__traits(hasMember, typeof(fields[0][0]), "classinfo"))
                 immutable visitIfNotNull = "foreach (i; " ~ fields[0].stringof ~ ") if (i !is null) visitor.visit(i);\n";
             else
                 immutable visitIfNotNull = "foreach (i; " ~ fields[0].stringof ~ ") visitor.visit(i);\n";
         }
+        else static if (__traits(isAbstractClass, typeof(fields[0])))
+            immutable visitIfNotNull = "if (" ~ fields[0].stringof ~ " !is null) visitor.dynamicDispatch(" ~ fields[0].stringof ~ ");\n";
         else static if (__traits(hasMember, typeof(fields[0]), "classinfo"))
             immutable visitIfNotNull = "if (" ~ fields[0].stringof ~ " !is null) visitor.visit(" ~ fields[0].stringof ~ ");\n";
         else static if (is(Unqual!(typeof(fields[0])) == Token))
