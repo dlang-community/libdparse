@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Class ASTVisitor</title>
+		<title>Function ASTVisitor.dynamicDispatch</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -104,64 +104,33 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Class ASTVisitor</h1><p>Implements the <a href="http://en.wikipedia.org/wiki/Visitor_pattern">Visitor Pattern</a>
- for the various AST classes
+				<h1>Function ASTVisitor.dynamicDispatch</h1><p>Looks at the runtime type of <code class="lang-d"><a href="../../dparse/ast/ASTVisitor.dynamicDispatch.html#n"><span class="pln">n</span></a></code>, then calls the appropriate <code class="lang-d"><a href="../../dparse/ast/ASTVisitor.visit.html"><span class="pln">visit</span></a></code>
+ method at runtime.
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">class</span> <span class="typ">ASTVisitor</span>
-				<span class="pun">;</span>
+				<span class="typ">void</span> <span class="pln">dynamicDispatch</span>
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/ExpressionNode.html"><span class="typ">ExpressionNode</span></a><span class="pun">)</span> <span class="pln">n</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				
-				<section><h2>Methods</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/ASTVisitor.dynamicDispatch.html" class="public">
-									<code>dynamicDispatch</code>
-								</a>
-								<span class="tableEntryAnnotation">(n)</span>
-							</td>
-							<td>Looks at the runtime type of <code class="lang-d"><a href="../../dparse/ast/ASTVisitor.dynamicDispatch.html#n"><span class="pln">n</span></a></code>, then calls the appropriate <code class="lang-d"><a href="../../dparse/ast/ASTVisitor.visit.html"><span class="pln">visit</span></a></code>
- method at runtime.
-</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/ASTVisitor.visit.html" class="public">
-									<code>visit</code>
-								</a>
-								<span class="tableEntryAnnotation">(withStatement)</span>
-							</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/ASTVisitor.visit.html" class="public">
-									<code>visit</code>
-								</a>
-								<span class="tableEntryAnnotation">(n)</span>
-							</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/ASTVisitor.visit.html" class="public">
-									<code>visit</code>
-								</a>
-								<span class="tableEntryAnnotation">(importDeclaration)</span>
-							</td>
-							<td></td>
-						</tr>
-					</table>
-				</section>
+				<section><p>Rule of thumb: when the type is an abstract class, use <code class="lang-d"><span class="pln">dynamicDispatch</span></code>,
+ otherwise use <code class="lang-d"><a href="../../dparse/ast/ASTVisitor.visit.html"><span class="pln">visit</span></a></code>.
+</p>
+
+<p> For templated calls:
+</p>
+<pre class="code"><code class="lang-d"><span class="kwd">static if </span><span class="pun">(</span><span class="kwd">__traits</span><span class="pun">(</span><span class="pln">isAbstractClass</span><span class="pun">, </span><span class="kwd">typeof</span><span class="pun">(</span><span class="pln">node</span><span class="pun">)))
+  </span><span class="pln">visitor<wbr/></span><span class="pun">.</span><span class="pln">dynamicDispatch</span><span class="pun">(</span><span class="pln">node</span><span class="pun">);
+</span><span class="kwd">else
+  </span><span class="pln">visitor<wbr/></span><span class="pun">.</span><span class="pln">visit</span><span class="pun">(</span><span class="pln">node</span><span class="pun">);</span></code></pre>
+</section>
+
 				
 			</div>
 			<footer>

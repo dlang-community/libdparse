@@ -196,6 +196,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/ASTNode.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTNode.accept.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.dynamicDispatch.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
@@ -1830,6 +1831,7 @@
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.dynamicDispatch.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>

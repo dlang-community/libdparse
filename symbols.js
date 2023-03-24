@@ -160,6 +160,7 @@ var symbols = [
 {name: 'dparse.ast.ASTNode', kind: "interfacedeclaration", path: './dparse/ast/ASTNode.html', attributes: []},
 {name: 'dparse.ast.ASTNode.accept', kind: "functiondeclaration", path: './dparse/ast/ASTNode.accept.html', attributes: ["abstract", "const"]},
 {name: 'dparse.ast.ASTVisitor', kind: "classdeclaration", path: './dparse/ast/ASTVisitor.html', attributes: []},
+{name: 'dparse.ast.ASTVisitor.dynamicDispatch', kind: "functiondeclaration", path: './dparse/ast/ASTVisitor.dynamicDispatch.html', attributes: []},
 {name: 'dparse.ast.ASTVisitor.visit', kind: "functiondeclaration", path: './dparse/ast/ASTVisitor.visit.html', attributes: []},
 {name: 'dparse.ast.AtAttribute', kind: "classdeclaration", path: './dparse/ast/AtAttribute.html', attributes: []},
 {name: 'dparse.ast.AtAttribute.accept', kind: "functiondeclaration", path: './dparse/ast/AtAttribute.accept.html', attributes: ["override", "const"]},
