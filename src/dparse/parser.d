@@ -8924,7 +8924,7 @@ protected: final:
 
     alias Bookmark = size_t;
 
-    Bookmark setBookmark() pure nothrow @safe
+    Bookmark setBookmark() nothrow @safe // not pure since we allocate memory
     {
 //        mixin(traceEnterAndExit!(__FUNCTION__));
         suppressMessages ~= suppressedErrorCount();
