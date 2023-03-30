@@ -2487,6 +2487,7 @@
 <url><loc>http://127.0.0.1/dparse/rollback_allocator/RollbackAllocator.setCheckpoint.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.clear.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.length.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.opDollar.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.opSlice.html</loc></url>

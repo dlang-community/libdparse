@@ -1609,6 +1609,7 @@ var symbols = [
 {name: 'dparse.rollback_allocator.RollbackAllocator.setCheckpoint', kind: "functiondeclaration", path: './dparse/rollback_allocator/RollbackAllocator.setCheckpoint.html', attributes: ["nothrow", "nogc", "const"]},
 {name: 'dparse.stack_buffer', kind: "module", path: './dparse/stack_buffer.html', attributes: []},
 {name: 'dparse.stack_buffer.StackBuffer', kind: "structdeclaration", path: './dparse/stack_buffer/StackBuffer.html', attributes: []},
+{name: 'dparse.stack_buffer.StackBuffer.clear', kind: "functiondeclaration", path: './dparse/stack_buffer/StackBuffer.clear.html', attributes: []},
 {name: 'dparse.stack_buffer.StackBuffer.length', kind: "functiondeclaration", path: './dparse/stack_buffer/StackBuffer.length.html', attributes: ["pure", "nothrow", "property", "nogc", "safe", "const"]},
 {name: 'dparse.stack_buffer.StackBuffer.opDollar', kind: "aliasdeclaration", path: './dparse/stack_buffer/StackBuffer.opDollar.html', attributes: []},
 {name: 'dparse.stack_buffer.StackBuffer.opSlice', kind: "functiondeclaration", path: './dparse/stack_buffer/StackBuffer.opSlice.html', attributes: ["pure", "nothrow", "nogc", "return", "scope", "safe", "inout"]},
