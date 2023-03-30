@@ -116,7 +116,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				<br/>
 				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @safe</span>
 				<br/>
-				<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isInputRange</span><span class="pun">!</span><span class="typ">Tokens </span><span class="pun">&amp;&amp; </span><span class="kwd">is</span><span class="pun">(</span><span class="typ">ElementType</span><span class="pun">!</span><span class="typ">Tokens </span><span class="pun">: </span><span class="typ">Token</span><span class="pun">)</span><span class="pun">);</span>
+				<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isInputRange</span><span class="pun">!</span><span class="typ">Tokens </span><span class="pun">&amp;&amp; (</span><span class="kwd">is</span><span class="pun">(</span><span class="typ">ElementType</span><span class="pun">!</span><span class="typ">Tokens </span><span class="pun">: </span><span class="typ">Token</span><span class="pun">) || </span><span class="kwd">is</span><span class="pun">(</span><span class="typ">ElementType</span><span class="pun">!</span><span class="typ">Tokens </span><span class="pun">: </span><span class="typ">TriviaToken</span><span class="pun">))</span><span class="pun">);</span>
 						</div>
 					</code>
 				</div>

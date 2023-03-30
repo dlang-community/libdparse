@@ -169,7 +169,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<a href="../../dparse/parser/Parser.tokens.html" class="public"><code>tokens</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")<span class="pun">)</span><span class="pun">[]</span></code></td><td>Tokens to parse
+							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")<span class="pun">)</span><span class="pun">[]</span></code></td><td>Tokens to parse
 </td>
 						</tr>
 						<tr>
@@ -219,7 +219,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<a href="../../dparse/parser/Parser.suppressMessages.html" class="protected"><code>suppressMessages</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">uint</span><span class="pun">[]</span></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="pln">dparse<wbr/></span><span class="pun">.</span><span class="pln">stack_buffer<wbr/></span><span class="pun">.</span><span class="typ">TypedStackBuffer</span>!(uint)</code></td><td></td>
 						</tr>
 					</table>
 				</section>
@@ -233,13 +233,13 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<a href="../../dparse/parser/Parser.current.html" class="protected property"><code>current</code></a><span class="tableEntryAnnotation">[get]</span>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")</code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")</code></td><td></td>
 						</tr>
 						<tr>
 							<td>
 								<a href="../../dparse/parser/Parser.previous.html" class="protected property"><code>previous</code></a><span class="tableEntryAnnotation">[get]</span>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")</code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")</code></td><td></td>
 						</tr>
 					</table>
 				</section>

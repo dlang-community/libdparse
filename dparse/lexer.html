@@ -515,9 +515,21 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								</a>
 							</td>
 							<td>
-								<code class="prettyprint lang-d"><a href="../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields; mixin TokenTriviaFields;")</code>
+								<code class="prettyprint lang-d"><a href="../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")</code>
 							</td>
 							<td>The token type in the D lexer
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a id="TriviaToken" class="public" href="../dparse/lexer/TriviaToken.html">
+									<code>TriviaToken</code>
+								</a>
+							</td>
+							<td>
+								<code class="prettyprint lang-d"><a href="../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"\x0a    import dparse.lexer : Token;\x0a\x0a    this(Token token) pure nothrow @safe @nogc {\x0a        this(token.type, token.text, token.line, token.column, token.index);\x0a    }\x0a\x0a    int opCmp(size_t i) const pure nothrow @safe @nogc {\x0a        if (index < i) return -1;\x0a        if (index > i) return 1;\x0a        return 0;\x0a    }\x0a\x0a    int opCmp(ref const typeof(this) other) const pure nothrow @safe @nogc {\x0a        return opCmp(other.index);\x0a    }\x0a")</code>
+							</td>
+							<td>Same as Token, but doesn't contain child TriviaTokens
 </td>
 						</tr>
 					</table>

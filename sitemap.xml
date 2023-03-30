@@ -2167,6 +2167,7 @@
 <url><loc>http://127.0.0.1/dparse/lexer/TokenTriviaFields.opCmp.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/lexer/TokenTriviaFields.trailingComment.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/lexer/TokenTriviaFields.trailingTrivia.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/lexer/TriviaToken.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/lexer/WhitespaceBehavior.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/MessageDelegate.html</loc></url>
