@@ -9174,3 +9174,12 @@ protected: final:
     bool[typeof(Token.index)] cachedAAChecks;
     bool[typeof(Token.index)] cachedTypeChecks;
 }
+
+private void profileGCLinkerErrorWorkaround()
+{
+    // This works around `dub build --build=profile-gc --config=server` failing
+    // with a linker error in DCD with dmd 2.102.2.
+    // Root cause should eventually be looked up.
+    uint[] workaround;
+    workaround ~= 1;
+}
