@@ -8652,7 +8652,10 @@ protected: final:
         }
         else
         {
-            import std.checkedint;
+            static if (__VERSION__ >= 2099)
+                import std.checkedint;
+            else
+                import std.experimental.checkedint;
 
             ++suppressMessages.back.checked;
         }
