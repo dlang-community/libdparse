@@ -8401,7 +8401,7 @@ protected: final:
         immutable b = setBookmark();
         scope(exit) goToBookmark(b);
         advance();
-        immutable bool result = !currentIs(tok!"]") && parseExpression() !is null && currentIs(tok!":");
+        immutable bool result = !currentIs(tok!"]") && parseAssignExpression() !is null && currentIs(tok!":");
         cachedAAChecks[currentIndex] = result;
         return result;
     }
