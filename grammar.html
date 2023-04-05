@@ -43,11 +43,17 @@
        <a href="#cmpExpression"><b>cmpExpression</b></a>
      | <a href="#andExpression"><b>andExpression</b></a> <span class="string_literal"><i>&#39;&amp;&#39;</i></span> <a href="#cmpExpression"><b>cmpExpression</b></a>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="namedArgument"></span> namedArgument</b>:
+     (<a href="#identifer"><b>identifer</b></a> <span class="string_literal"><i>&#39;:&#39;</i></span>)? <a href="#assignExpression"><b>assignExpression</b></a>
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="namedArgumentList"></span> namedArgumentList</b>:
+     <a href="#namedArgument"><b>namedArgument</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#namedArgument"><b>namedArgument</b></a>?)*
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="argumentList"></span> argumentList</b>:
      <a href="#assignExpression"><b>assignExpression</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#assignExpression"><b>assignExpression</b></a>?)* <span class="string_literal"><i>&#39;,&#39;</i></span>?
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="arguments"></span> arguments</b>:
-     <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#argumentList"><b>argumentList</b></a>? <span class="string_literal"><i>&#39;)&#39;</i></span>
+     <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#namedArgumentList"><b>namedArgumentList</b></a>? <span class="string_literal"><i>&#39;)&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="arrayInitializer"></span> arrayInitializer</b>:
        <span class="string_literal"><i>&#39;[&#39;</i></span> <span class="string_literal"><i>&#39;]&#39;</i></span>
@@ -921,12 +927,19 @@
 <pre class="grammar"><b><span class="ddoc_anchor" id="templateAliasParameter"></span> templateAliasParameter</b>:
      <span class="string_literal"><i>&#39;alias&#39;</i></span> <a href="#type"><b>type</b></a>? <span class="string_literal"><i>Identifier</i></span> (<span class="string_literal"><i>&#39;:&#39;</i></span> (<a href="#type"><b>type</b></a> | <a href="#assignExpression"><b>assignExpression</b></a>))? (<span class="string_literal"><i>&#39;=&#39;</i></span> (<a href="#type"><b>type</b></a> | <a href="#assignExpression"><b>assignExpression</b></a>))?
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="namedTemplateArgument"></span> namedTemplateArgument</b>:
+       (<span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#34;:&#34;</i></span>)? <a href="#type"><b>type</b></a>
+     | (<span class="string_literal"><i>Identifier</i></span> <span class="string_literal"><i>&#34;:&#34;</i></span>)? <a href="#assignExpression"><b>assignExpression</b></a>
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="templateArgument"></span> templateArgument</b>:
        <a href="#type"><b>type</b></a>
      | <a href="#assignExpression"><b>assignExpression</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="templateArgumentList"></span> templateArgumentList</b>:
      <a href="#templateArgument"><b>templateArgument</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#templateArgument"><b>templateArgument</b></a>?)*
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="templateArgumentList"></span> templateArgumentList</b>:
+     <a href="#namedTemplateArgument"><b>namedTemplateArgument</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#namedTemplateArgument"><b>namedTemplateArgument</b></a>?)*
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="templateArguments"></span> templateArguments</b>:
      <span class="string_literal"><i>&#39;!&#39;</i></span> (<span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#templateArgumentList"><b>templateArgumentList</b></a>? <span class="string_literal"><i>&#39;)&#39;</i></span>) | <a href="#templateSingleArgument"><b>templateSingleArgument</b></a>
