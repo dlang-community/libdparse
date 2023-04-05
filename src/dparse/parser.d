@@ -12,6 +12,7 @@ import std.conv;
 import std.algorithm;
 import std.array;
 import std.string : format;
+import std.typecons : Flag;
 
 // Uncomment this if you want ALL THE OUTPUT
 // Caution: generates 180 megabytes of logging for std.datetime
@@ -118,6 +119,9 @@ Module parseModule(F)(const(Token)[] tokens, string fileName, RollbackAllocator*
  */
 class Parser
 {
+    /// Flag type for some parsing arguments
+    alias FromUnary = Flag!"fromUnary";
+
     /**
      * Parses an AddExpression.
      *
@@ -3557,11 +3561,11 @@ class Parser
      */
     FunctionCallExpression parseFunctionCallExpression()
     {
-        return parseFunctionCallExpression(null, false);
+        return parseFunctionCallExpression(null, FromUnary.no);
     }
 
     /// ditto
-    FunctionCallExpression parseFunctionCallExpression(UnaryExpressionNode unary, bool fromUnary = true)
+    FunctionCallExpression parseFunctionCallExpression(UnaryExpressionNode unary, FromUnary fromUnary = FromUnary.yes)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
