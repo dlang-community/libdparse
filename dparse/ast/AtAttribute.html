@@ -104,7 +104,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Class AtAttribute</h1><p></p>
+				<h1>Class AtAttribute</h1><p>User-defined <code class="lang-d"><span class="pun">@</span><span class="pln">attribute</span></code> attributes. Also includes <code class="lang-d"><span class="kwd">@disable</span></code>, <code class="lang-d"><span class="kwd">@nogc</span></code>,
+<code class="lang-d"><span class="pun">@</span><span class="pln">live</span></code>, etc. by simply having them be regular identifiers.
+</p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
@@ -125,7 +127,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<a href="../../dparse/ast/AtAttribute.argumentList.html" class="public"><code>argumentList</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/ArgumentList.html"><span class="typ">ArgumentList</span></a></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/ArgumentList.html"><span class="typ">ArgumentList</span></a></code></td><td>Set for all of <code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.identifier.html"></span><span class="pln">identifier</span></a><span class="pun">(</span><span class="pln">argumentList</span><span class="pun">)</span></code>,
+<code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.templateInstance.html"></span><span class="pln">templateInstance</span></a><span class="pun">!</span><span class="pln">T</span><span class="pun">(</span><span class="pln">argumentList</span><span class="pun">)</span></code> and <code class="lang-d"><span class="pun">@(</span><span class="pln">argumentListInParens</span><span class="pun">)</span></code>.
+</td>
 						</tr>
 						<tr>
 							<td>
@@ -137,7 +141,10 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<a href="../../dparse/ast/AtAttribute.identifier.html" class="public"><code>identifier</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")</code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")</code></td><td>For <code class="lang-d"><span class="pun">@</span><span class="pln">identifier</span></code>, the identifier part.
+Not set for <code class="lang-d"><span class="pun">@</span><span class="pln">identifer</span><span class="pun">!</span><span class="pln">templateArgs</span></code>, see templateInstance for that.
+This is however set for <code class="lang-d"><span class="pun">@</span><span class="pln">identifier</span><span class="pun">(</span><span class="pln">regularArguments</span><span class="pun">)</span></code>.
+</td>
 						</tr>
 						<tr>
 							<td>
@@ -149,13 +156,28 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 							<td>
 								<a href="../../dparse/ast/AtAttribute.templateInstance.html" class="public"><code>templateInstance</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/TemplateInstance.html"><span class="typ">TemplateInstance</span></a></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/TemplateInstance.html"><span class="typ">TemplateInstance</span></a></code></td><td>When there is at least one template argument (<code class="lang-d"><span class="pun">@</span><span class="pln">id</span><span class="pun">!</span><span class="pln">T</span></code> or <code class="lang-d"><span class="pun">@</span><span class="pln">id</span><span class="pun">!(</span><span class="pln">T</span><span class="pun">, </span><span class="pln">U</span><span class="pun">)</span></code>,
+etc.), this is set instead of identifier.
+For regular <code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.identifier.html"></span><span class="pln">identifier</span></a></code> or <code class="lang-d"><span class="pun">@</span><span class="pln">fn</span><span class="pun">(</span><span class="pln">args</span><span class="pun">)</span></code> UDAs without template arguments,
+<code class="lang-d"><a href="../../dparse/ast/AtAttribute.identifier.html"><span class="pln">identifier</span></a></code> is set instead.
+</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/AtAttribute.templateSingleArgument.html" class="public"><code>templateSingleArgument</code></a>
+							</td>
+							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/TemplateSingleArgument.html"><span class="typ">TemplateSingleArgument</span></a></code></td><td>For <code class="lang-d"><span class="pun">@</span><span class="typ">int</span></code> or <code class="lang-d"><span class="pun">@</span><span class="lit">5</span></code>, the part after the <code class="lang-d"><span class="pun">@</span></code>. May only be a single token,
+may not be identifier (see identifier for that).
+Introduced with DMD 2.104.0
+</td>
 						</tr>
 						<tr>
 							<td>
 								<a href="../../dparse/ast/AtAttribute.useParen.html" class="public"><code>useParen</code></a>
 							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span></code></td><td></td>
+							<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span></code></td><td>True for <code class="lang-d"><span class="pun">@(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code> code, as well as
+<code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.templateInstance.html"></span><span class="pln">templateInstance</span></a><span class="pun">!</span><span class="pln">T</span><span class="pun">(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code> and <code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.identifier.html"></span><span class="pln">identifier</span></a><span class="pun">(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code>.
+</td>
 						</tr>
 						<tr>
 							<td>
@@ -180,6 +202,17 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 								<span class="tableEntryAnnotation">(visitor)</span>
 							</td>
 							<td></td>
+						</tr>
+						<tr>
+							<td>
+								<a href="../../dparse/ast/AtAttribute.token.html" class="public">
+									<code>token</code>
+								</a>
+								<span class="tableEntryAnnotation">()</span>
+							</td>
+							<td>Returns either identifier or templateSingleArgument,
+whichever is set, otherwise <code class="lang-d"><span class="typ">Token<wbr/></span><span class="pun">.</span><span class="pln">init</span></code>.
+</td>
 						</tr>
 					</table>
 				</section>

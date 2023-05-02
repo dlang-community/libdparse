@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Variable AtAttribute.useParen</title>
+		<title>Variable AtAttribute.templateSingleArgument</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -104,8 +104,9 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Variable AtAttribute.useParen</h1><p>True for <code class="lang-d"><span class="pun">@(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code> code, as well as
-<code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.templateInstance.html"></span><span class="pln">templateInstance</span></a><span class="pun">!</span><span class="pln">T</span><span class="pun">(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code> and <code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.identifier.html"></span><span class="pln">identifier</span></a><span class="pun">(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code>.
+				<h1>Variable AtAttribute.templateSingleArgument</h1><p>For <code class="lang-d"><span class="pun">@</span><span class="typ">int</span></code> or <code class="lang-d"><span class="pun">@</span><span class="lit">5</span></code>, the part after the <code class="lang-d"><span class="pun">@</span></code>. May only be a single token,
+may not be identifier (see identifier for that).
+Introduced with DMD 2.104.0
 </p>
 				<div class="prototype">
 					<code class="lang-d">
@@ -118,7 +119,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 				</span>
 				&nbsp;&nbsp;<span class="com">// ...</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">useParen</span>
+				&nbsp;&nbsp;<a href="../../dparse/ast/TemplateSingleArgument.html"><span class="typ">TemplateSingleArgument</span></a> <span class="pln">templateSingleArgument</span>
 				<span class="pun">;</span>
 				<br/>
 				&nbsp;&nbsp;<span class="com">// ...</span>

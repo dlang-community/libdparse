@@ -169,6 +169,8 @@ var symbols = [
 {name: 'dparse.ast.AtAttribute.identifier', kind: "variabledeclaration", path: './dparse/ast/AtAttribute.identifier.html', attributes: []},
 {name: 'dparse.ast.AtAttribute.startLocation', kind: "variabledeclaration", path: './dparse/ast/AtAttribute.startLocation.html', attributes: []},
 {name: 'dparse.ast.AtAttribute.templateInstance', kind: "variabledeclaration", path: './dparse/ast/AtAttribute.templateInstance.html', attributes: []},
+{name: 'dparse.ast.AtAttribute.templateSingleArgument', kind: "variabledeclaration", path: './dparse/ast/AtAttribute.templateSingleArgument.html', attributes: []},
+{name: 'dparse.ast.AtAttribute.token', kind: "functiondeclaration", path: './dparse/ast/AtAttribute.token.html', attributes: ["pure", "nothrow", "nogc", "scope", "safe", "const"]},
 {name: 'dparse.ast.AtAttribute.useParen', kind: "variabledeclaration", path: './dparse/ast/AtAttribute.useParen.html', attributes: []},
 {name: 'dparse.ast.Attribute', kind: "classdeclaration", path: './dparse/ast/Attribute.html', attributes: []},
 {name: 'dparse.ast.Attribute.accept', kind: "functiondeclaration", path: './dparse/ast/Attribute.accept.html', attributes: ["override", "const"]},

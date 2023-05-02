@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Variable AtAttribute.useParen</title>
+		<title>Function AtAttribute.token</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -104,30 +104,24 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Variable AtAttribute.useParen</h1><p>True for <code class="lang-d"><span class="pun">@(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code> code, as well as
-<code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.templateInstance.html"></span><span class="pln">templateInstance</span></a><span class="pun">!</span><span class="pln">T</span><span class="pun">(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code> and <code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.identifier.html"></span><span class="pln">identifier</span></a><span class="pun">(<a href="../../dparse/ast/AtAttribute.argumentList.html"></span><span class="pln">argumentList</span></a><span class="pun">)</span></code>.
+				<h1>Function AtAttribute.token</h1><p>Returns either identifier or templateSingleArgument,
+whichever is set, otherwise <code class="lang-d"><span class="typ">Token<wbr/></span><span class="pun">.</span><span class="pln">init</span></code>.
 </p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">class</span> <a href="../../dparse/ast/AtAttribute.html"><span class="typ">AtAttribute</span></a>
-				<br/>
-				<span class="pun">
-					{
-					<br/>
-				</span>
-				&nbsp;&nbsp;<span class="com">// ...</span>
-				<br/>
-				&nbsp;&nbsp;<span class="typ">bool</span> <span class="pln">useParen</span>
-				<span class="pun">;</span>
-				<br/>
-				&nbsp;&nbsp;<span class="com">// ...</span>
-				<br/>
-				<span class="pun">}</span>
+				<a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;") <span class="pln">token</span><span class="pun">(</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc scope @safe const</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				
+				<section><p>This is the single token after the <code class="lang-d"><span class="pun">@</span></code> for <code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.identifier.html"></span><span class="pln">identifier</span></a></code>, <code class="lang-d"><span class="pun">@</span><span class="lit">5</span></code>,
+<code class="lang-d"><span class="pun">@</span><span class="str">"string literal"</span></code>, etc.
+</p>
+
+<p>Not set if parens are used, e.g. not set for <code class="lang-d"><span class="pun">@(</span><span class="str">"string in parens"</span><span class="pun">)</span></code>.
+</p>
+</section>
+
 				
 			</div>
 			<footer>

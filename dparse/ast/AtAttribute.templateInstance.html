@@ -104,7 +104,11 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Variable AtAttribute.templateInstance</h1><p></p>
+				<h1>Variable AtAttribute.templateInstance</h1><p>When there is at least one template argument (<code class="lang-d"><span class="pun">@</span><span class="pln">id</span><span class="pun">!</span><span class="pln">T</span></code> or <code class="lang-d"><span class="pun">@</span><span class="pln">id</span><span class="pun">!(</span><span class="pln">T</span><span class="pun">, </span><span class="pln">U</span><span class="pun">)</span></code>,
+etc.), this is set instead of identifier.
+For regular <code class="lang-d"><span class="pun">@<a href="../../dparse/ast/AtAttribute.identifier.html"></span><span class="pln">identifier</span></a></code> or <code class="lang-d"><span class="pun">@</span><span class="pln">fn</span><span class="pun">(</span><span class="pln">args</span><span class="pun">)</span></code> UDAs without template arguments,
+<code class="lang-d"><a href="../../dparse/ast/AtAttribute.identifier.html"><span class="pln">identifier</span></a></code> is set instead.
+</p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">

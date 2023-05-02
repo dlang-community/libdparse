@@ -427,6 +427,8 @@
 <url><loc>http://127.0.0.1/dparse/ast/AtAttribute.identifier.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AtAttribute.startLocation.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AtAttribute.templateInstance.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/AtAttribute.templateSingleArgument.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/AtAttribute.token.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AtAttribute.useParen.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/Attribute.html</loc></url>
