@@ -993,7 +993,8 @@ final class AssocArrayLiteral : BaseNode
     mixin OpEquals;
 }
 
-///
+/// User-defined `@attribute` attributes. Also includes `@disable`, `@nogc`,
+/// `@live`, etc. by simply having them be regular identifiers.
 final class AtAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
