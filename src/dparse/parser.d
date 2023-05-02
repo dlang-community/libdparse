@@ -1227,6 +1227,7 @@ class Parser
      *     | $(LITERAL '@') $(LITERAL Identifier) $(LITERAL '$(LPAREN)') $(RULE argumentList)? $(LITERAL '$(RPAREN)')
      *     | $(LITERAL '@') $(LITERAL '$(LPAREN)') $(RULE argumentList) $(LITERAL '$(RPAREN)')
      *     | $(LITERAL '@') $(RULE templateInstance)
+     *     | $(LITERAL '@') $(RULE templateSingleArgument)
      *     ;)
      */
     AtAttribute parseAtAttribute()
@@ -1238,7 +1239,7 @@ class Parser
         mixin (nullCheck!`start`);
         if (!moreTokens)
         {
-            error("`(`, or identifier expected");
+            error("`(`, identifier or single template argument expected");
             return null;
         }
         node.startLocation = start.index;
@@ -1265,8 +1266,8 @@ class Parser
             expect(tok!")");
             break;
         default:
-            error("`(`, or identifier expected");
-            return null;
+            mixin(parseNodeQ!(`node.templateSingleArgument`, `TemplateSingleArgument`));
+            break;
         }
         if (moreTokens) node.endLocation = current().index;
         node.tokens = tokens[startIndex .. index];

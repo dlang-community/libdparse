@@ -1000,13 +1000,46 @@ final class AtAttribute : BaseNode
     {
         mixin (visitIfNotNull!(templateInstance, argumentList));
     }
-    /** */ ArgumentList argumentList;
-    /** */ TemplateInstance templateInstance;
-    /** */ Token identifier;
-    /** */ bool useParen;
+
+    /// Set for all of `@identifier(argumentList)`,
+    /// `@templateInstance!T(argumentList)` and `@(argumentListInParens)`.
+    ArgumentList argumentList;
+    /// When there is at least one template argument (`@id!T` or `@id!(T, U)`,
+    /// etc.), this is set instead of $(LREF identifier).
+    /// For regular `@identifier` or `@fn(args)` UDAs without template arguments,
+    /// `identifier` is set instead.
+    TemplateInstance templateInstance;
+    /// True for `@(argumentList)` code, as well as
+    /// `@templateInstance!T(argumentList)` and `@identifier(argumentList)`.
+    bool useParen;
+    /// For `@identifier`, the identifier part.
+    /// Not set for `@identifer!templateArgs`, see $(LREF templateInstance) for that.
+    /// This is however set for `@identifier(regularArguments)`.
+    Token identifier;
+    /// For `@int` or `@5`, the part after the `@`. May only be a single token,
+    /// may not be identifier (see $(LREF identifier) for that).
+    /// Introduced with DMD 2.104.0
+    TemplateSingleArgument templateSingleArgument;
+
     /** */ size_t startLocation;
     /** */ size_t endLocation;
     mixin OpEquals;
+
+    /// Returns either $(LREF identifier) or $(LREF templateSingleArgument),
+    /// whichever is set, otherwise `Token.init`.
+    ///
+    /// This is the single token after the `@` for `@identifier`, `@5`,
+    /// `@"string literal"`, etc.
+    ///
+    /// Not set if parens are used, e.g. not set for `@("string in parens")`.
+    Token token() const nothrow pure @nogc @safe scope
+    {
+        return identifier != tok!""
+            ? identifier
+            : templateSingleArgument
+                ? templateSingleArgument.token
+                : Token.init;
+    }
 }
 
 ///
