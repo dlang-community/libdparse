@@ -998,7 +998,7 @@ final class AtAttribute : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(templateInstance, argumentList));
+        mixin (visitIfNotNull!(templateInstance, argumentList, templateSingleArgument));
     }
 
     /// Set for all of `@identifier(argumentList)`,

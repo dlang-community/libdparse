@@ -504,8 +504,13 @@ class Formatter(Sink)
         with(atAttribute)
         {
             put("@");
-            format(identifier);
+            format(token);
+            if (templateInstance) format(templateInstance);
+            if (useParen)
+                put("(");
             if(argumentList) format(argumentList);
+            if (useParen)
+                put(")");
         }
     }
 
@@ -4310,6 +4315,14 @@ do
     foo(a, throw b, c);
     return throw new Exception("", "");
 }});
+    testFormatNode!(Declaration)(q{@true long x;});
+    testFormatNode!(Declaration)(q{@(true) long x;});
+    testFormatNode!(Declaration)(q{@f(true) long x;});
+    testFormatNode!(Declaration)(q{@f long x;});
+    testFormatNode!(Declaration)(q{@f() long x;});
+    testFormatNode!(Declaration)(q{@f!T(true) long x;});
+    testFormatNode!(Declaration)(q{@f!T long x;});
+    testFormatNode!(Declaration)(q{@(f!T) long x;});
 
     testFormatNode!(IfCondition)(q{void foo()
 {
