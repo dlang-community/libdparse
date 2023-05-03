@@ -1,0 +1,6 @@
+INCLUDES_PARSE_ERROR
+//functionDeclaration[name = 'foo']//outContractExpression/assertArguments/cmpExpression
+//versionSpecification[intLiteral = '1']
+//functionDeclaration[name = 'bar']/functionBody//doStatement
+//functionDeclaration[name = 'baz']/functionBody//importDeclaration/singleImport/identifierChain[identifier = 'a']
+//functionDeclaration[name = 'baz']/functionBody//importDeclaration/singleImport/identifierChain[identifier = 'b']

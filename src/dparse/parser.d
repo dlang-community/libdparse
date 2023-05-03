@@ -2860,7 +2860,10 @@ class Parser
         mixin(tokenCheck!"(");
         mixin(parseNodeQ!(`node.expression`, `Expression`));
         mixin(tokenCheck!")");
-        mixin(tokenCheck!";");
+        if (currentIs(tok!";"))
+            advance();
+        else
+            error("Expected semicolon `;` after do-while loop", false, true);
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -4362,7 +4365,13 @@ class Parser
             ownArray(node.singleImports, singleImports);
         }
         node.endIndex = (moreTokens() ? current() : previous()).index + 1;
-        mixin(tokenCheck!";");
+        // handle missing semicolon following import (if there is another import
+        // immediately afterwards)
+        if (currentIs(tok!"import"))
+            error("Expected semicolon `;` before next import declaration", false);
+        else
+            mixin(tokenCheck!";");
+
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -5297,9 +5306,33 @@ class Parser
         mixin(nullCheck!`o`);
         node.outTokenLocation = o.index;
         mixin(tokenCheck!"(");
-        if (currentIs(tok!"identifier"))
-            node.parameter = advance();
-        mixin(tokenCheck!";");
+        if (currentIs(tok!";"))
+            advance();
+        else
+        {
+            // auto-recover `out(nonIdentifier; foo > 4)` to `out(; foo > 4)`
+            if (peekIs(tok!";"))
+            {
+                if (currentIs(tok!"identifier"))
+                {
+                    node.parameter = advance();
+                    advance();
+                }
+                else
+                {
+                    error("Expected identifier for `out` contract identifier name", false, true);
+                    advance(); // non-identifier
+                    advance(); // `;`
+                }
+            }
+            else
+            {
+                // auto-recover `out(foo > 4)` to `out(; foo > 4)`
+                if (!currentIs(tok!";"))
+                    error("Expected semicolon `;` inside out contract, either "
+                        ~ "`out(; condition)` or `out(identifier; condition)`", false, true);
+            }
+        }
         mixin(parseNodeQ!(`node.assertArguments`, `AssertArguments`));
         mixin(tokenCheck!")");
         node.tokens = tokens[startIndex .. index];
@@ -8160,7 +8193,12 @@ class Parser
             return null;
         }
         node.token = advance();
-        mixin(tokenCheck!";");
+        if (currentIs(tok!";"))
+            advance();
+        else if (node.token == tok!"identifier" && (currentIs(tok!"(") || currentIs(tok!"!")))
+            error("Expected semicolon `;` after version specification - CTFE is not possible here", false, true);
+        else
+            error("Expected semicolon `;` after version specification", false, true);
         node.tokens = tokens[startIndex .. index];
         return node;
     }

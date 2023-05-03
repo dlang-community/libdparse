@@ -42,6 +42,7 @@ for i in $PASS_FILES; do
 	else
 		echo -e "\t${RED}FAIL${NORMAL}"
 		((FAIL_COUNT=FAIL_COUNT+1))
+		./tester "$i"
 	fi
 done
 
@@ -77,19 +78,45 @@ if [[ ${BUILDKITE:-} != "true" ]]; then
 		checkCount=1
 		currentPasses=0
 		currentFailures=0
+		expectParseFailure=0
+		set +e
+		AST="$(./tester --ast "$file" 2>/dev/null)"
+		test_fail_status=$?
+		set -e
 		while read -r line || [ -n "$line" ]; do
-			if ./tester --ast "$file" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
+			if [[ "$line" == "INCLUDES_PARSE_ERROR" ]]; then
+				expectParseFailure=1
+			elif echo "$AST" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
 				((currentPasses=currentPasses+1))
+				((checkCount=checkCount+1))
 			else
 				echo
 				echo -e "    ${RED}Check on line $checkCount of $queryFile failed.${NORMAL}"
 				((currentFailures=currentFailures+1))
+				((checkCount=checkCount+1))
 			fi
-			((checkCount=checkCount+1))
 		done < "$queryFile"
+
+		if [[ $expectParseFailure -eq 0 ]]; then
+			if [[ $test_fail_status -ne 0 ]]; then
+				echo -e "    ${RED}D parsing of $queryFile failed in general.${NORMAL}"
+				./tester --ast "$file" >/dev/null
+				((currentFailures=currentFailures+1))
+				((checkCount=checkCount+1))
+			fi
+		fi
+
 		if [[ $currentFailures -gt 0 ]]; then
 			echo -e "    ${RED}${currentPasses} check(s) passed and ${currentFailures} check(s) failed${NORMAL}"
 			((FAIL_COUNT=FAIL_COUNT+1))
+
+			if [ -z "${VERBOSE:-}" ]; then
+				echo -e "    Run with VERBOSE=1 to print AST XML"
+			else
+				echo
+				./tester --ast "$file" | xmllint --format -
+				echo
+			fi
 		else
 			echo -e " ${GREEN}${currentPasses} check(s) passed and ${currentFailures} check(s) failed${NORMAL}"
 			((PASS_COUNT=PASS_COUNT+1))
