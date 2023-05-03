@@ -8772,7 +8772,7 @@ protected: final:
             stderr.writefln("%s(%d:%d)[warn]: %s", fileName, line, column, message);
     }
 
-    void error(string message, bool shouldAdvance = true)
+    void error(string message, bool shouldAdvance = true, bool includeCurrentToken = false)
     {
         import std.stdio : stderr;
         if (suppressMessages.empty)
@@ -8780,6 +8780,20 @@ protected: final:
             ++errorCount;
             auto column = index < tokens.length ? tokens[index].column : tokens[$ - 1].column;
             auto line = index < tokens.length ? tokens[index].line : tokens[$ - 1].line;
+
+            if (includeCurrentToken)
+            {
+                if (index < tokens.length)
+                {
+                    if (tokens[index].text is null)
+                        message ~= text(" (found token `", str(tokens[index].type), "`)");
+                    else
+                        message ~= text(" (found ", str(tokens[index].type), " `", tokens[index].text, "`)");
+                }
+                else
+                    message ~= " (found EOF)";
+            }
+
             if (messageDelegate !is null)
                 messageDelegate(fileName, line, column, message, true);
             else if (messageFunction !is null)
