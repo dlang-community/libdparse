@@ -710,7 +710,7 @@ class Parser
                 node.identifierOrIntegerOrOpcode = advance();
                 if (!currentIs(tok!";"))
                 {
-                    error("`;` expected.");
+                    error("`;` expected after ASM align instruction.", true, true);
                     if (moreTokens())
                         advance();
                     return null;
@@ -718,7 +718,7 @@ class Parser
             }
             else
             {
-                error("Identifier or integer literal expected.");
+                error("Identifier or integer literal expected.", true, true);
                 return null;
             }
         }
@@ -853,7 +853,7 @@ class Parser
                 mixin(parseNodeQ!(`node.identifierChain`, `IdentifierChain`));
             break;
         default:
-            error("Float literal, integer literal, `$`, `this` or identifier expected.");
+            error("Float literal, integer literal, `$`, `this` or identifier expected.", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -910,7 +910,7 @@ class Parser
         {
             if (!functionAttributes.put(parseFunctionAttribute()))
             {
-                error("Function attribute or `{` expected");
+                error("Function attribute or `{` expected", true, true);
                 return null;
             }
         }
@@ -1009,7 +1009,7 @@ class Parser
             case "qword":
                 break;
             default:
-                error("ASM type node expected");
+                error("ASM type node expected", true, true);
                 return null;
             }
             if (currentIs(tok!"identifier") && current().text == "ptr")
@@ -1017,7 +1017,7 @@ class Parser
             node.tokens = tokens[startIndex .. index];
             return node;
         default:
-            error("Expected an identifier, `byte`, `short`, `int`, `float`, `double`, or `real`");
+            error("Expected an identifier, `byte`, `short`, `int`, `float`, `double`, or `real`", true, true);
             return null;
         }
     }
@@ -1239,7 +1239,7 @@ class Parser
         mixin (nullCheck!`start`);
         if (!moreTokens)
         {
-            error("`(`, identifier or single template argument expected");
+            error("`(`, identifier or single template argument expected instead of EOF");
             return null;
         }
         node.startLocation = start.index;
@@ -1506,7 +1506,7 @@ class Parser
             advance();
             break;
         default:
-            error("Identifier or semicolon expected following `break`");
+            error("Identifier or semicolon expected following `break`", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -1702,7 +1702,7 @@ class Parser
             node.first = advance();
             break;
         default:
-            error("`const`, `immutable`, `inout`, or `shared` expected");
+            error("`const`, `immutable`, `inout`, or `shared` expected", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -1881,7 +1881,7 @@ class Parser
             mixin(parseNodeQ!(`node.staticIfCondition`, `StaticIfCondition`));
             break;
         default:
-            error("`version`, `debug`, or `static` expected");
+            error("`version`, `debug`, or `static` expected", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -2090,7 +2090,7 @@ class Parser
             advance();
             break;
         default:
-            error("Identifier or semicolon expected following `continue`");
+            error("Identifier or semicolon expected following `continue`", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -2121,7 +2121,7 @@ class Parser
                 node.identifierOrInteger = advance();
             else
             {
-                error(`Integer literal or identifier expected`);
+                error(`Integer literal or identifier expected`, true, true);
                 return null;
             }
             mixin(tokenCheck!")");
@@ -2148,7 +2148,7 @@ class Parser
             node.identifierOrInteger = advance();
         else
         {
-            error("Integer literal or identifier expected");
+            error("Integer literal or identifier expected", true, true);
             return null;
         }
         mixin(tokenCheck!";");
@@ -2509,7 +2509,7 @@ class Parser
                 mixin(parseNodeQ!(`node.versionSpecification`, `VersionSpecification`));
             else
             {
-                error("`=` or `(` expected following `version`");
+                error("`=` or `(` expected following `version`", true, true);
                 return null;
             }
             break;
@@ -2816,7 +2816,7 @@ class Parser
         mixin(tokenCheck!"~");
         if (!moreTokens)
         {
-            error("`this` expected");
+            error("`this` expected instead of EOF");
             return null;
         }
         node.index = current.index;
@@ -2911,7 +2911,7 @@ class Parser
                 }
                 else
                 {
-                    error("`,` or `}` expected");
+                    error("`,` or `}` expected", true, true);
                     if (currentIs(tok!"}"))
                         break;
                 }
@@ -3124,7 +3124,7 @@ class Parser
         auto startIndex = index;
         auto node = allocator.make!EponymousTemplateDeclaration;
         node.comment = current.comment;
-        advance(); // enum
+        mixin(tokenCheck!"enum");
         const ident = expect(tok!"identifier");
         mixin (nullCheck!`ident`);
         node.name = *ident;
@@ -3334,7 +3334,7 @@ class Parser
             node.type = advance().type;
         else
         {
-            error("`foreach` or `foreach_reverse` expected");
+            error("`foreach` or `foreach_reverse` expected", true, true);
             return null;
         }
         if (moreTokens)
@@ -3497,7 +3497,7 @@ class Parser
             break;
         default:
             if (validate)
-                error("`@`attribute, `pure`, or `nothrow` expected");
+                error("`@`attribute, `pure`, or `nothrow` expected", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -3610,7 +3610,7 @@ class Parser
         {
             error(allowStatement
                 ? "`{` or `(` expected"
-                : "`(` expected");
+                : "`(` expected", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -3668,7 +3668,7 @@ class Parser
         mixin(tokenCheck!(`node.name`, "identifier"));
         if (!currentIs(tok!"("))
         {
-            error("`(` expected");
+            error("`(` expected", true, true);
             return null;
         }
         const p = peekPastParens();
@@ -3941,7 +3941,7 @@ class Parser
                 mixin(parseNodeQ!(`node.expression`, `Expression`));
             break;
         default:
-            error("Identifier, `default`, or `case` expected");
+            error("identifier, `default`, or `case` expected", true, true);
             return null;
         }
         mixin(tokenCheck!";");
@@ -4857,7 +4857,7 @@ class Parser
             node.tokenType = advance().type;
             break;
         default:
-            error(`Member function attribute expected`);
+            error(`Member function attribute expected`, true, true);
         }
         node.tokens = tokens[startIndex .. index];
         return node;
@@ -4914,7 +4914,7 @@ class Parser
             mixin(parseNodeQ!(`node.mixinExpression`, `MixinExpression`));
         else
         {
-            error("`(` or identifier expected");
+            error("`(` or identifier expected", true, true);
             return null;
         }
         mixin(tokenCheck!";");
@@ -5498,7 +5498,7 @@ class Parser
             return node;
         default:
             if (validate)
-                error("Parameter attribute expected");
+                error("Parameter attribute expected", true, true);
             return null;
         }
     }
@@ -5618,7 +5618,7 @@ class Parser
 
         if (!currentIsOneOf(tok!"const", tok!"immutable", tok!"shared", tok!"scope", tok!"return"))
         {
-            error("`const`, `immutable`, `shared`, `scope` or `return` expected");
+            error("`const`, `immutable`, `shared`, `scope` or `return` expected", true, true);
             return null;
         }
 
@@ -6179,7 +6179,7 @@ class Parser
         }
         if (requireDo)
         {
-            error("`do` expected after InStatement or OutStatement");
+            error("`do` expected after InStatement or OutStatement", true, true);
             return null;
         }
 
@@ -6331,7 +6331,7 @@ class Parser
             }
             else
             {
-                error("`switch` expected");
+                error("`switch` expected after `final` here");
                 return null;
             }
         case tok!"debug":
@@ -6355,7 +6355,7 @@ class Parser
                 mixin(parseNodeQ!(`node.staticForeachStatement`, `StaticForeachStatement`));
             else
             {
-                error("`if`, `assert`, `foreach` or `foreach_reverse` expected.");
+                error("`if`, `assert`, `foreach` or `foreach_reverse` expected.", true, true);
                 return null;
             }
             break;
@@ -6524,7 +6524,7 @@ class Parser
             node.token = advance();
             break;
         default:
-            error(`Storage class expected`);
+            error(`Storage class expected`, true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -6549,7 +6549,7 @@ class Parser
         {
             if (!currentIs(tok!"stringLiteral"))
             {
-                error("Expected `stringLiteral` instead of `" ~ current.text ~ '`');
+                error("Expected string literal", true, true);
                 return null;
             }
 
@@ -6634,7 +6634,7 @@ class Parser
             advance();
         else
         {
-            error("Template Parameters, Struct Body, or Semicolon expected");
+            error("Template Parameters, Struct Body, or Semicolon expected", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -6749,7 +6749,7 @@ class Parser
                 mixin(parseNodeQ!(`node.statement`, `Statement`));
             }
         }
-        else error("Error, expression expected after `switch(`", false);
+        else error("Expression expected after `switch(`", false);
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -7564,7 +7564,7 @@ class Parser
             break;
         default:
             error("Basic type, type constructor, symbol, `typeof`, `__traits`, " ~
-                "`__vector` or `mixin` expected");
+                "`__vector` or `mixin` expected", true, true);
             return null;
         }
         node.tokens = tokens[startIndex .. index];
@@ -7595,7 +7595,8 @@ class Parser
             goto default;
         default:
             if (validate)
-                error("`const`, `immutable`, `inout`, or `shared` expected");
+                error("`const`, `immutable`, `inout`, or `shared` expected",
+                    true, true);
             return tok!"";
         }
     }
@@ -7749,7 +7750,7 @@ class Parser
             node.tokens = tokens[startIndex .. index];
             return node;
         default:
-            error("`*`, `[`, `delegate`, or `function` expected.");
+            error("`*`, `[`, `delegate`, or `function` expected.", true, true);
             return null;
         }
     }
@@ -7950,7 +7951,7 @@ class Parser
             // see https://github.com/dlang-community/DCD/issues/405
             if (peekIs(tok!"}"))
             {
-                error("Error, expected parameters or `)`", false);
+                error("Error, expected parameters or `)`", false, true);
                 advance();
                 if (newUnary) newUnary.tokens = tokens[startIndex .. index];
                 return newUnary;
@@ -8165,7 +8166,8 @@ class Parser
             node.token = advance();
         else
         {
-            error("Expected an integer literal, an identifier, `assert`, or `unittest`");
+            error("Expected an integer literal, an identifier, `assert`, or `unittest`",
+                true, true);
             return null;
         }
         mixin(tokenCheck!")");
@@ -8189,7 +8191,7 @@ class Parser
         mixin(tokenCheck!"=");
         if (!currentIsOneOf(tok!"identifier", tok!"intLiteral"))
         {
-            error("Identifier or integer literal expected");
+            error("Identifier or integer literal expected", true, true);
             return null;
         }
         node.token = advance();
@@ -9319,7 +9321,7 @@ protected: final:
                     goto emptyBody;
                 else
                 {
-                    error("Struct body or `;` expected");
+                    error("Struct body or `;` expected", true, true);
                     return null;
                 }
             }
