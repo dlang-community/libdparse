@@ -1,6 +1,21 @@
 INCLUDES_PARSE_ERROR
-//functionDeclaration[name = 'foo']//outContractExpression/assertArguments/cmpExpression
-//versionSpecification[intLiteral = '1']
-//functionDeclaration[name = 'bar']/functionBody//doStatement
-//functionDeclaration[name = 'baz']/functionBody//importDeclaration/singleImport/identifierChain[identifier = 'a']
-//functionDeclaration[name = 'baz']/functionBody//importDeclaration/singleImport/identifierChain[identifier = 'b']
+./module/declaration/functionDeclaration[name = 'asm1']
+./module/declaration/functionDeclaration[name = 'asm2']
+./module/declaration/functionDeclaration[name = 'randomContinue']
+./module/declaration/functionDeclaration[name = 'randomBreak']
+./module/declaration/functionDeclaration[name = 'randomGoto']
+./module/declaration/functionDeclaration[name = 'randomDebug']
+./module/declaration/functionDeclaration[name = 'randomDebug2']
+./module/declaration/functionDeclaration[name = 'brokenSwitch']
+./module/declaration/functionDeclaration[name = 'brokenCall']
+./module/declaration/functionDeclaration[name = 'randomVersion']
+./module/declaration/functionDeclaration[name = 'randomVersion2']
+./module/declaration/functionDeclaration[name = 'afterClass']
+./module/declaration/functionDeclaration[name = 'versionWorks']
+./module/declaration/functionDeclaration[name = 'mixinWorks']
+./module/declaration/functionDeclaration[name = 'foo']//outContractExpression/assertArguments/cmpExpression
+./module/declaration/functionDeclaration[name = 'foo2']//outContractExpression/assertArguments/cmpExpression
+./module/declaration/versionSpecification[intLiteral = '1']
+./module/declaration/functionDeclaration[name = 'bar']/functionBody//doStatement
+./module/declaration/functionDeclaration[name = 'baz']/functionBody//importDeclaration/singleImport/identifierChain[identifier = 'a']
+./module/declaration/functionDeclaration[name = 'baz']/functionBody//importDeclaration/singleImport/identifierChain[identifier = 'b']

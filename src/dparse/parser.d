@@ -711,8 +711,6 @@ class Parser
                 if (!currentIs(tok!";"))
                 {
                     error("`;` expected after ASM align instruction.", true, true);
-                    if (moreTokens())
-                        advance();
                     return null;
                 }
             }
@@ -4914,7 +4912,7 @@ class Parser
             mixin(parseNodeQ!(`node.mixinExpression`, `MixinExpression`));
         else
         {
-            error("`(` or identifier expected", true, true);
+            error("`(`, identifier, `typeof` or `.` expected", true, true);
             return null;
         }
         mixin(tokenCheck!";");
@@ -7951,7 +7949,7 @@ class Parser
             // see https://github.com/dlang-community/DCD/issues/405
             if (peekIs(tok!"}"))
             {
-                error("Error, expected parameters or `)`", false, true);
+                error("Expected parameters or `)`", false, true);
                 advance();
                 if (newUnary) newUnary.tokens = tokens[startIndex .. index];
                 return newUnary;
