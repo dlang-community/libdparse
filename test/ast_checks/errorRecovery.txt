@@ -13,6 +13,7 @@ INCLUDES_PARSE_ERROR
 ./module/declaration/functionDeclaration[name = 'afterClass']
 ./module/declaration/functionDeclaration[name = 'versionWorks']
 ./module/declaration/functionDeclaration[name = 'mixinWorks']
+./module/declaration/functionDeclaration[name = 'discardedVersion']
 ./module/declaration/functionDeclaration[name = 'foo']//outContractExpression/assertArguments/cmpExpression
 ./module/declaration/functionDeclaration[name = 'foo2']//outContractExpression/assertArguments/cmpExpression
 ./module/declaration/versionSpecification[intLiteral = '1']
