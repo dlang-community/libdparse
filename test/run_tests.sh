@@ -75,7 +75,7 @@ if [[ ${BUILDKITE:-} != "true" ]]; then
 		# with a txt extension. It contains XPath expressions, one per line, that
 		# must match nodes in the generated AST.
 		queryFile=ast_checks/$(basename "$file" .d).txt
-		checkCount=1
+		lineCount=1
 		currentPasses=0
 		currentFailures=0
 		expectParseFailure=0
@@ -88,13 +88,12 @@ if [[ ${BUILDKITE:-} != "true" ]]; then
 				expectParseFailure=1
 			elif echo "$AST" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
 				((currentPasses=currentPasses+1))
-				((checkCount=checkCount+1))
 			else
 				echo
-				echo -e "    ${RED}Check on line $checkCount of $queryFile failed.${NORMAL}"
+				echo -e "    ${RED}Check on line $lineCount of $queryFile failed.${NORMAL}"
 				((currentFailures=currentFailures+1))
-				((checkCount=checkCount+1))
 			fi
+			((lineCount=lineCount+1))
 		done < "$queryFile"
 
 		if [[ $expectParseFailure -eq 0 ]]; then
@@ -102,7 +101,6 @@ if [[ ${BUILDKITE:-} != "true" ]]; then
 				echo -e "    ${RED}D parsing of $queryFile failed in general.${NORMAL}"
 				./tester --ast "$file" >/dev/null
 				((currentFailures=currentFailures+1))
-				((checkCount=checkCount+1))
 			fi
 		fi
 
