@@ -49,7 +49,10 @@ jobs:
       - name: Install GDC
         if: ${{ matrix.compiler == 'gdc-latest' }}
         run: |
-          sudo apt-get install gdc gdmd -y
+          sudo apt-get install gdc-12 gdmd -y
+          # hack:
+          sudo rm /usr/bin/gdc
+          sudo ln -s /usr/bin/gdc-12 /usr/bin/gdc
           gdc --version
 
       # Execute all other tests (parsing, XPath, ...)
