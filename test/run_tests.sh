@@ -145,7 +145,7 @@ ${DMD} tester.d -debug -cov -unittest $SOURCE_FILES $IMPORT_PATHS
 # if tester segfaults, it's most likely due to a stack overflow
 # check the maxStackSize variable in tester.d in that case
 # (increasing it should be avoided if it's possible to implement tail recursion or other stack saving techniques)
-./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES ast_checks/*.d &> /dev/null || true
+./tester --ast --DRT-testmode=run-main $PASS_FILES $FAIL_FILES ast_checks/*.d > /dev/null
 rm -rf coverage/
 mkdir coverage/
 find . -name "*.lst" | while read -r i; do

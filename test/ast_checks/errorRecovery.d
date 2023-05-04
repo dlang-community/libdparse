@@ -78,6 +78,10 @@ mixin = 4;
 
 void mixinWorks() {}
 
+version = true;
+
+void discardedVersion() {}
+
 // things that test that they abort properly and emit partial or corrected AST:
 
 void foo() out(x > 4) {}
