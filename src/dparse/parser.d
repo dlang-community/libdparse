@@ -9044,9 +9044,11 @@ protected: final:
                 || tokens[index].type == tok!";"
                 || tokens[index].type == tok!"}");
             auto token = (index < tokens.length
-                ? (tokens[index].text is null ? str(tokens[index].type) : tokens[index].text)
+                ? (tokens[index].text is null
+                    ? '`' ~ str(tokens[index].type) ~ '`'
+                    : str(tokens[index].type) ~ " `" ~ tokens[index].text ~ '`')
                 : "EOF");
-            error("Expected `" ~  tokenString ~ "` instead of `" ~ token ~ "`",
+            error("Expected `" ~  tokenString ~ "` instead of " ~ token,
                 !shouldNotAdvance);
             return null;
         }
