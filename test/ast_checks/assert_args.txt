@@ -1,4 +1,4 @@
-./module/declaration/staticAssertDeclaration//assertArguments/unaryExpression[1]//identifierOrTemplateInstance/identifier[text()="foo"]
-./module/declaration/staticAssertDeclaration//assertArguments/unaryExpression[2]/primaryExpression/stringLiteral[text()='"a"']
-./module/declaration/staticAssertDeclaration//assertArguments/unaryExpression[3]//identifierOrTemplateInstance/identifier[text()="b"]
-./module/declaration/staticAssertDeclaration//assertArguments/unaryExpression[4]/primaryExpression/stringLiteral[text()='"c"']
+./module/declaration/staticAssertDeclaration//assertArguments/primaryExpression[1]/identifierOrTemplateInstance/identifier[text()="foo"]
+./module/declaration/staticAssertDeclaration//assertArguments/primaryExpression[2]/stringLiteral[text()='"a"']
+./module/declaration/staticAssertDeclaration//assertArguments/primaryExpression[3]/identifierOrTemplateInstance/identifier[text()="b"]
+./module/declaration/staticAssertDeclaration//assertArguments/primaryExpression[4]/stringLiteral[text()='"c"']

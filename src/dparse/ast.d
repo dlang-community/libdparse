@@ -22,6 +22,7 @@ import std.array;
 import std.string;
 
 private immutable uint[TypeInfo] typeMap;
+private immutable uint[TypeInfo] unaryExpressionTypeMap;
 
 shared static this()
 {
@@ -71,8 +72,47 @@ shared static this()
     typeMap[typeid(TraitsExpression)] = 44;
     typeMap[typeid(TypeidExpression)] = 45;
     typeMap[typeid(TypeofExpression)] = 46;
-    typeMap[typeid(UnaryExpression)] = 47;
+    typeMap[typeid(UnaryExpressionNode)] = 47;
     typeMap[typeid(XorExpression)] = 48;
+    typeMap[typeid(RefPrefixUnaryExpression)] = 49;
+    typeMap[typeid(NotPrefixUnaryExpression)] = 50;
+    typeMap[typeid(DerefPrefixUnaryExpression)] = 51;
+    typeMap[typeid(PlusPrefixUnaryExpression)] = 52;
+    typeMap[typeid(MinusPrefixUnaryExpression)] = 53;
+    typeMap[typeid(TildePrefixUnaryExpression)] = 54;
+    typeMap[typeid(PlusPlusPrefixUnaryExpression)] = 55;
+    typeMap[typeid(MinusMinusPrefixUnaryExpression)] = 56;
+    typeMap[typeid(PlusPlusPostfixUnaryExpression)] = 57;
+    typeMap[typeid(MinusMinusPostfixUnaryExpression)] = 58;
+    typeMap[typeid(UnaryDotIdentifierExpression)] = 59;
+    typeMap[typeid(UnaryDotNewExpression)] = 60;
+    typeMap[typeid(TypeDotIdentifierExpression)] = 61;
+    typeMap[typeid(CastExpression)] = 62;
+    typeMap[typeid(ThrowExpression)] = 63;
+    typeMap[typeid(DummyUnaryExpression)] = 64;
+
+    unaryExpressionTypeMap[typeid(RefPrefixUnaryExpression)] = 1;
+    unaryExpressionTypeMap[typeid(NotPrefixUnaryExpression)] = 2;
+    unaryExpressionTypeMap[typeid(DerefPrefixUnaryExpression)] = 3;
+    unaryExpressionTypeMap[typeid(PlusPrefixUnaryExpression)] = 4;
+    unaryExpressionTypeMap[typeid(MinusPrefixUnaryExpression)] = 5;
+    unaryExpressionTypeMap[typeid(TildePrefixUnaryExpression)] = 6;
+    unaryExpressionTypeMap[typeid(PlusPlusPrefixUnaryExpression)] = 7;
+    unaryExpressionTypeMap[typeid(MinusMinusPrefixUnaryExpression)] = 8;
+    unaryExpressionTypeMap[typeid(PlusPlusPostfixUnaryExpression)] = 9;
+    unaryExpressionTypeMap[typeid(MinusMinusPostfixUnaryExpression)] = 10;
+    unaryExpressionTypeMap[typeid(UnaryDotIdentifierExpression)] = 12;
+    unaryExpressionTypeMap[typeid(UnaryDotNewExpression)] = 13;
+    unaryExpressionTypeMap[typeid(TypeDotIdentifierExpression)] = 14;
+    unaryExpressionTypeMap[typeid(AssertExpression)] = 15;
+    unaryExpressionTypeMap[typeid(CastExpression)] = 16;
+    unaryExpressionTypeMap[typeid(DeleteExpression)] = 17;
+    unaryExpressionTypeMap[typeid(FunctionCallExpression)] = 18;
+    unaryExpressionTypeMap[typeid(IndexExpression)] = 19;
+    unaryExpressionTypeMap[typeid(NewExpression)] = 20;
+    unaryExpressionTypeMap[typeid(PrimaryExpression)] = 21;
+    unaryExpressionTypeMap[typeid(ThrowExpression)] = 22;
+    unaryExpressionTypeMap[typeid(DummyUnaryExpression)] = 23;
 }
 
 /// Describes which syntax was used in a list of declarations in the containing AST node
@@ -165,10 +205,64 @@ abstract class ASTVisitor
         case 44: visit(cast(TraitsExpression) n); break;
         case 45: visit(cast(TypeidExpression) n); break;
         case 46: visit(cast(TypeofExpression) n); break;
-        case 47: visit(cast(UnaryExpression) n); break;
+        case 47: dynamicDispatch(cast(UnaryExpressionNode) n); break;
         case 48: visit(cast(XorExpression) n); break;
-        default: assert(false, __MODULE__ ~ " has a bug");
+        case 49: visit(cast(RefPrefixUnaryExpression) n); break;
+        case 50: visit(cast(NotPrefixUnaryExpression) n); break;
+        case 51: visit(cast(DerefPrefixUnaryExpression) n); break;
+        case 52: visit(cast(PlusPrefixUnaryExpression) n); break;
+        case 53: visit(cast(MinusPrefixUnaryExpression) n); break;
+        case 54: visit(cast(TildePrefixUnaryExpression) n); break;
+        case 55: visit(cast(PlusPlusPrefixUnaryExpression) n); break;
+        case 56: visit(cast(MinusMinusPrefixUnaryExpression) n); break;
+        case 57: visit(cast(PlusPlusPostfixUnaryExpression) n); break;
+        case 58: visit(cast(MinusMinusPostfixUnaryExpression) n); break;
+        case 59: visit(cast(UnaryDotIdentifierExpression) n); break;
+        case 60: visit(cast(UnaryDotNewExpression) n); break;
+        case 61: visit(cast(TypeDotIdentifierExpression) n); break;
+        case 62: visit(cast(CastExpression) n); break;
+        case 63: visit(cast(ThrowExpression) n); break;
+        case 64: visit(cast(DummyUnaryExpression) n); break;
+        default: assert(false, __MODULE__ ~ " has a bug: " ~ typeid(n).toString);
         }
+    }
+
+    /// ditto
+    void dynamicDispatch(const UnaryExpressionNode n)
+    {
+        switch (unaryExpressionTypeMap.get(typeid(n), 0))
+        {
+        case 1: visit(cast(RefPrefixUnaryExpression) n); break;
+        case 2: visit(cast(NotPrefixUnaryExpression) n); break;
+        case 3: visit(cast(DerefPrefixUnaryExpression) n); break;
+        case 4: visit(cast(PlusPrefixUnaryExpression) n); break;
+        case 5: visit(cast(MinusPrefixUnaryExpression) n); break;
+        case 6: visit(cast(TildePrefixUnaryExpression) n); break;
+        case 7: visit(cast(PlusPlusPrefixUnaryExpression) n); break;
+        case 8: visit(cast(MinusMinusPrefixUnaryExpression) n); break;
+        case 9: visit(cast(PlusPlusPostfixUnaryExpression) n); break;
+        case 10: visit(cast(MinusMinusPostfixUnaryExpression) n); break;
+        case 12: visit(cast(UnaryDotIdentifierExpression) n); break;
+        case 13: visit(cast(UnaryDotNewExpression) n); break;
+        case 14: visit(cast(TypeDotIdentifierExpression) n); break;
+        case 15: visit(cast(AssertExpression) n); break;
+        case 16: visit(cast(CastExpression) n); break;
+        case 17: visit(cast(DeleteExpression) n); break;
+        case 18: visit(cast(FunctionCallExpression) n); break;
+        case 19: visit(cast(IndexExpression) n); break;
+        case 20: visit(cast(NewExpression) n); break;
+        case 21: visit(cast(PrimaryExpression) n); break;
+        case 22: visit(cast(ThrowExpression) n); break;
+        case 23: visit(cast(DummyUnaryExpression) n); break;
+        default: assert(false, __MODULE__ ~ " has a bug: " ~ typeid(n).toString);
+        }
+    }
+
+    /// ditto
+    void dynamicDispatch(const TokenUnaryExpression n)
+    {
+        // unary expression handles all cases
+        dynamicDispatch(cast(UnaryExpressionNode) n);
     }
 
     /** */ void visit(const AddExpression addExpression) { addExpression.accept(this); }
@@ -383,7 +477,20 @@ abstract class ASTVisitor
     /** */ void visit(const TypeSuffix typeSuffix) { typeSuffix.accept(this); }
     /** */ void visit(const TypeidExpression typeidExpression) { typeidExpression.accept(this); }
     /** */ void visit(const TypeofExpression typeofExpression) { typeofExpression.accept(this); }
-    /** */ void visit(const UnaryExpression unaryExpression) { unaryExpression.accept(this); }
+    /** */ void visit(const RefPrefixUnaryExpression refPrefixUnaryExpression) { refPrefixUnaryExpression.accept(this); }
+    /** */ void visit(const NotPrefixUnaryExpression notPrefixUnaryExpression) { notPrefixUnaryExpression.accept(this); }
+    /** */ void visit(const DerefPrefixUnaryExpression derefPrefixUnaryExpression) { derefPrefixUnaryExpression.accept(this); }
+    /** */ void visit(const PlusPrefixUnaryExpression plusPrefixUnaryExpression) { plusPrefixUnaryExpression.accept(this); }
+    /** */ void visit(const MinusPrefixUnaryExpression minusPrefixUnaryExpression) { minusPrefixUnaryExpression.accept(this); }
+    /** */ void visit(const TildePrefixUnaryExpression tildePrefixUnaryExpression) { tildePrefixUnaryExpression.accept(this); }
+    /** */ void visit(const PlusPlusPrefixUnaryExpression plusPlusPrefixUnaryExpression) { plusPlusPrefixUnaryExpression.accept(this); }
+    /** */ void visit(const MinusMinusPrefixUnaryExpression minusMinusPrefixUnaryExpression) { minusMinusPrefixUnaryExpression.accept(this); }
+    /** */ void visit(const PlusPlusPostfixUnaryExpression plusPlusPostfixUnaryExpression) { plusPlusPostfixUnaryExpression.accept(this); }
+    /** */ void visit(const MinusMinusPostfixUnaryExpression minusMinusPostfixUnaryExpression) { minusMinusPostfixUnaryExpression.accept(this); }
+    /** */ void visit(const UnaryDotIdentifierExpression unaryDotIdentifierExpression) { unaryDotIdentifierExpression.accept(this); }
+    /** */ void visit(const UnaryDotNewExpression unaryDotNewExpression) { unaryDotNewExpression.accept(this); }
+    /** */ void visit(const TypeDotIdentifierExpression typeDotIdentifierExpression) { typeDotIdentifierExpression.accept(this); }
+    /** */ void visit(const DummyUnaryExpression dummyUnaryExpression) { dummyUnaryExpression.accept(this); }
     /** */ void visit(const UnionDeclaration unionDeclaration) { unionDeclaration.accept(this); }
     /** */ void visit(const Unittest unittest_) { unittest_.accept(this); }
     /** */ void visit(const VariableDeclaration variableDeclaration) { variableDeclaration.accept(this); }
@@ -955,7 +1062,7 @@ final class AssertArguments : BaseNode
 }
 
 ///
-final class AssertExpression : ExpressionNode
+final class AssertExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1186,7 +1293,7 @@ final class CaseStatement: BaseNode
 }
 
 ///
-final class CastExpression: BaseNode
+final class CastExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -1194,7 +1301,7 @@ final class CastExpression: BaseNode
     }
     /** */ Type type;
     /** */ CastQualifier castQualifier;
-    /** */ UnaryExpression unaryExpression;
+    /** */ UnaryExpressionNode unaryExpression;
     mixin OpEquals;
 }
 
@@ -1549,13 +1656,13 @@ final class DefaultStatement : BaseNode
 }
 
 ///
-final class DeleteExpression : ExpressionNode
+final class DeleteExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(unaryExpression));
     }
-    /** */ UnaryExpression unaryExpression;
+    /** */ UnaryExpressionNode unaryExpression;
     /** */ size_t line;
     /** */ size_t column;
     mixin OpEquals;
@@ -1864,14 +1971,14 @@ final class FunctionBody : BaseNode
 }
 
 ///
-final class FunctionCallExpression : ExpressionNode
+final class FunctionCallExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(type, unaryExpression, templateArguments, arguments));
     }
     /** */ Type type;
-    /** */ UnaryExpression unaryExpression;
+    /** */ UnaryExpressionNode unaryExpression;
     /** */ TemplateArguments templateArguments;
     /** */ Arguments arguments;
     mixin OpEquals;
@@ -2140,7 +2247,7 @@ final class IfCondition : BaseNode
     /**
     In an assignment-condition, this is the part after the equals sign.
     Otherwise this is any other expression that is evaluated to be a boolean.
-    (e.g. UnaryExpression, AndAndExpression, CmpExpression, etc.)
+    (e.g. UnaryExpressionNode, AndAndExpression, CmpExpression, etc.)
     */
     Expression expression;
     mixin OpEquals;
@@ -2208,13 +2315,13 @@ final class Index : BaseNode
 }
 
 ///
-final class IndexExpression : ExpressionNode
+final class IndexExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
         mixin (visitIfNotNull!(unaryExpression, indexes));
     }
-    /** */ UnaryExpression unaryExpression;
+    /** */ UnaryExpressionNode unaryExpression;
     /** */ Index[] indexes;
     mixin OpEquals;
 }
@@ -2533,7 +2640,7 @@ final class NamespaceList : BaseNode
         mixin (visitIfNotNull!(items));
     }
     mixin OpEquals;
-    /** */ TernaryExpression[] items;
+    /** */ ExpressionNode[] items;
 }
 
 ///
@@ -2552,7 +2659,7 @@ final class NewAnonClassExpression : ExpressionNode
 }
 
 ///
-final class NewExpression : ExpressionNode
+final class NewExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -2790,7 +2897,7 @@ final class PragmaStatement : BaseNode
 }
 
 ///
-final class PrimaryExpression : ExpressionNode
+final class PrimaryExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3427,7 +3534,7 @@ deprecated("Replaced by ExpressionStatement + ThrowExpression")
 alias ThrowStatement = ThrowExpression;
 
 ///
-final class ThrowExpression: ExpressionNode
+final class ThrowExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
@@ -3555,31 +3662,194 @@ final class TypeofExpression : ExpressionNode
 }
 
 ///
-final class UnaryExpression : ExpressionNode
+abstract class UnaryExpressionNode : ExpressionNode
+{
+}
+
+///
+final class DummyUnaryExpression : UnaryExpressionNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        // TODO prefix, postfix, unary
-        mixin (visitIfNotNull!(primaryExpression, newExpression, deleteExpression,
-            castExpression, functionCallExpression, unaryExpression,
-            type, identifierOrTemplateInstance, assertExpression, throwExpression,
-            indexExpression));
     }
 
-    /** */ Type type;
-    /** */ PrimaryExpression primaryExpression;
-    /** */ Token prefix;
-    /** */ Token suffix;
-    /** */ UnaryExpression unaryExpression;
-    /** */ NewExpression newExpression;
-    /** */ DeleteExpression deleteExpression;
-    /** */ CastExpression castExpression;
-    /** */ FunctionCallExpression functionCallExpression;
-    /** */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
-    /** */ AssertExpression assertExpression;
-    /** */ ThrowExpression throwExpression;
-    /** */ IndexExpression indexExpression;
-    /** */ size_t dotLocation;
+    // empty, only used as compatibility for now, may be removed in the future.
+}
+
+///
+abstract class TokenUnaryExpression : UnaryExpressionNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(unaryExpression));
+    }
+
+    /// Returns the operator token (including source index) before the unary
+    /// expression or Token.init if constructed manually. Use `tokenType` to
+    /// always get a valid `IdType`.
+    final Token token() const @property @safe nothrow pure @nogc
+    {
+        return tokens[0];
+    }
+
+    abstract IdType tokenType() const @property @safe nothrow pure @nogc;
+
+    /// The unary expression that is affected
+    UnaryExpressionNode unaryExpression;
+}
+
+/// `&unaryExpression`
+final class RefPrefixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"&";
+    }
+
+    mixin OpEquals;
+}
+
+/// `!unaryExpression`
+final class NotPrefixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"!";
+    }
+
+    mixin OpEquals;
+}
+
+/// `*unaryExpression`
+final class DerefPrefixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"*";
+    }
+
+    mixin OpEquals;
+}
+
+/// `+unaryExpression`
+final class PlusPrefixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"+";
+    }
+
+    mixin OpEquals;
+}
+
+/// `-unaryExpression`
+final class MinusPrefixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"-";
+    }
+
+    mixin OpEquals;
+}
+
+/// `~unaryExpression`
+final class TildePrefixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"~";
+    }
+
+    mixin OpEquals;
+}
+
+/// `++unaryExpression`
+final class PlusPlusPrefixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"++";
+    }
+
+    mixin OpEquals;
+}
+
+/// `--unaryExpression`
+final class MinusMinusPrefixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"--";
+    }
+
+    mixin OpEquals;
+}
+
+/// `unaryExpression++`
+final class PlusPlusPostfixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"++";
+    }
+
+    mixin OpEquals;
+}
+
+/// `unaryExpression--`
+final class MinusMinusPostfixUnaryExpression : TokenUnaryExpression
+{
+    override IdType tokenType() const @property @safe nothrow pure @nogc
+    {
+        return tok!"--";
+    }
+
+    mixin OpEquals;
+}
+
+/// `unaryExpression.identifierOrTemplateInstance`
+final class UnaryDotIdentifierExpression : UnaryExpressionNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(unaryExpression, identifierOrTemplateInstance));
+    }
+
+    /** lhs */ UnaryExpressionNode unaryExpression;
+    /** dot */ size_t dotLocation;
+    /** rhs */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
+
+    mixin OpEquals;
+}
+
+/// `unaryExpression.new(...)`
+final class UnaryDotNewExpression : UnaryExpressionNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(unaryExpression, newExpression));
+    }
+
+    /** lhs */ UnaryExpressionNode unaryExpression;
+    /** dot */ size_t dotLocation;
+    /** rhs */ NewExpression newExpression;
+
+    mixin OpEquals;
+}
+
+/// `(Type).identifier`
+final class TypeDotIdentifierExpression : UnaryExpressionNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(type, identifierOrTemplateInstance));
+    }
+
+    /** lhs */ Type type;
+    /** dot */ size_t dotLocation;
+    /** rhs */ IdentifierOrTemplateInstance identifierOrTemplateInstance;
+
     mixin OpEquals;
 }
 
@@ -3978,8 +4248,8 @@ unittest // issue #398: Support extern(C++, <string expressions...>)
                 assert(!namespaces);
                 foreach (const entry; list.items)
                 {
-                    const prim = cast(PrimaryExpression) entry.expression;
-                    assert(prim);
+                    const prim = cast(PrimaryExpression) entry;
+                    assert(prim, (entry ? typeid(entry).toString : "null") ~ " is not PrimaryExpression!");
                     namespaces ~= prim;
                 }
             }
@@ -4120,9 +4390,9 @@ unittest // Support GCC-sytle asm statements
                 assert(constraint.type == tok!"stringLiteral");
                 assert(constraint.text == `"=r"`);
 
-                auto una = cast(UnaryExpression) expression;
-                assert(una);
-                assert(una.primaryExpression.identifierOrTemplateInstance.identifier.text == "var1");
+                auto primary = cast(PrimaryExpression) expression;
+                assert(primary);
+                assert(primary.identifierOrTemplateInstance.identifier.text == "var1");
             }
         }
     }
@@ -4145,9 +4415,9 @@ unittest // Support GCC-sytle asm statements
                 assert(constraint.type == tok!"stringLiteral");
                 assert(constraint.text == `"=w"`);
 
-                auto una = cast(UnaryExpression) expression;
-                assert(una);
-                assert(una.primaryExpression.identifierOrTemplateInstance.identifier.text == "var2");
+                auto primary = cast(PrimaryExpression) expression;
+                assert(primary);
+                assert(primary.identifierOrTemplateInstance.identifier.text == "var2");
             }
 
             with (inputOperands.items[1])
@@ -4155,9 +4425,9 @@ unittest // Support GCC-sytle asm statements
                 assert(constraint.type == tok!"stringLiteral");
                 assert(constraint.text == `"g"`);
 
-                auto una = cast(UnaryExpression) expression;
-                assert(una);
-                assert(una.primaryExpression.identifierOrTemplateInstance.identifier.text == "var3");
+                auto primary = cast(PrimaryExpression) expression;
+                assert(primary);
+                assert(primary.identifierOrTemplateInstance.identifier.text == "var3");
             }
         }
     }

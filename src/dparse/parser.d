@@ -12,6 +12,7 @@ import std.conv;
 import std.algorithm;
 import std.array;
 import std.string : format;
+import std.typecons : Flag;
 
 // Uncomment this if you want ALL THE OUTPUT
 // Caution: generates 180 megabytes of logging for std.datetime
@@ -118,6 +119,9 @@ Module parseModule(F)(const(Token)[] tokens, string fileName, RollbackAllocator*
  */
 class Parser
 {
+    /// Flag type for some parsing arguments
+    alias FromUnary = Flag!"fromUnary";
+
     /**
      * Parses an AddExpression.
      *
@@ -1657,7 +1661,7 @@ class Parser
                 mixin(parseNodeQ!(`node.type`, `Type`));
         }
         mixin(tokenCheck!")");
-        mixin(parseNodeQ!(`node.unaryExpression`, `UnaryExpression`));
+        mixin(parseNodeQ!(`node.unaryExpression`, `UnaryExpressionNode`));
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -2769,7 +2773,7 @@ class Parser
         node.line = current.line;
         node.column = current.column;
         mixin(tokenCheck!"delete");
-        mixin(parseNodeQ!(`node.unaryExpression`, `UnaryExpression`));
+        mixin(parseNodeQ!(`node.unaryExpression`, `UnaryExpressionNode`));
         node.tokens = tokens[startIndex .. index];
         return node;
     }
@@ -3556,7 +3560,13 @@ class Parser
      *     | $(RULE type) $(RULE arguments)
      *     ;)
      */
-    FunctionCallExpression parseFunctionCallExpression(UnaryExpression unary = null)
+    FunctionCallExpression parseFunctionCallExpression()
+    {
+        return parseFunctionCallExpression(null, FromUnary.no);
+    }
+
+    /// ditto
+    FunctionCallExpression parseFunctionCallExpression(UnaryExpressionNode unary, FromUnary fromUnary = FromUnary.yes)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
@@ -3574,13 +3584,13 @@ class Parser
             mixin(parseNodeQ!(`node.arguments`, `Arguments`));
             break;
         default:
-            if (unary !is null)
+            if (fromUnary)
                 node.unaryExpression = unary;
             else
-                mixin(parseNodeQ!(`node.unaryExpression`, `UnaryExpression`));
+                mixin(parseNodeQ!(`node.unaryExpression`, `UnaryExpressionNode`));
             if (currentIs(tok!"!"))
                 mixin(parseNodeQ!(`node.templateArguments`, `TemplateArguments`));
-            if (unary !is null)
+            if (fromUnary)
                 mixin(parseNodeQ!(`node.arguments`, `Arguments`));
         }
         node.tokens = tokens[startIndex .. index];
@@ -4420,12 +4430,18 @@ class Parser
      *     ;
      * )
      */
-    IndexExpression parseIndexExpression(UnaryExpression unaryExpression = null)
+    IndexExpression parseIndexExpression()
+    {
+        return parseIndexExpression(null, false);
+    }
+
+    /// ditto
+    IndexExpression parseIndexExpression(UnaryExpressionNode unaryExpression, bool fromUnary = true)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!IndexExpression;
-        mixin(nullCheck!`node.unaryExpression = unaryExpression is null ? parseUnaryExpression() : unaryExpression`);
+        mixin(nullCheck!`node.unaryExpression = fromUnary ? unaryExpression : parseUnaryExpressionNode()`);
         mixin(tokenCheck!"[");
         StackBuffer indexes;
         while (true)
@@ -5667,7 +5683,7 @@ class Parser
     {
         pragma(inline, true);
         mixin (traceEnterAndExit!(__FUNCTION__));
-        return parseLeftAssocBinaryExpression!(PowExpression, UnaryExpression,
+        return parseLeftAssocBinaryExpression!(PowExpression, UnaryExpressionNode,
             tok!"^^")();
     }
 
@@ -7809,7 +7825,7 @@ class Parser
     }
 
     /**
-     * Parses a UnaryExpression
+     * Parses a UnaryExpression (flattened from parsed child)
      *
      * $(GRAMMAR $(RULEDEF unaryExpression):
      *       $(RULE primaryExpression)
@@ -7835,13 +7851,13 @@ class Parser
      *     | $(RULE unaryExpression) $(LITERAL '++')
      *     ;)
      */
-    UnaryExpression parseUnaryExpression()
+    UnaryExpressionNode parseUnaryExpressionNode()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         if (!moreTokens())
             return null;
-        auto node = allocator.make!UnaryExpression;
+        UnaryExpressionNode node;
         switch (current.type)
         {
         case tok!"const":
@@ -7864,33 +7880,70 @@ class Parser
         case tok!"scope":
         case tok!"pure":
         case tok!"nothrow":
-            mixin(parseNodeQ!(`node.functionCallExpression`, `FunctionCallExpression`));
+            mixin(parseNodeQ!(`node`, `FunctionCallExpression`));
             break;
         case tok!"&":
+            advance();
+            auto n = allocator.make!RefPrefixUnaryExpression;
+            mixin(parseNodeQ!(`n.unaryExpression`, `UnaryExpressionNode`));
+            node = n;
+            break;
         case tok!"!":
+            advance();
+            auto n = allocator.make!NotPrefixUnaryExpression;
+            mixin(parseNodeQ!(`n.unaryExpression`, `UnaryExpressionNode`));
+            node = n;
+            break;
         case tok!"*":
+            advance();
+            auto n = allocator.make!DerefPrefixUnaryExpression;
+            mixin(parseNodeQ!(`n.unaryExpression`, `UnaryExpressionNode`));
+            node = n;
+            break;
         case tok!"+":
+            advance();
+            auto n = allocator.make!PlusPrefixUnaryExpression;
+            mixin(parseNodeQ!(`n.unaryExpression`, `UnaryExpressionNode`));
+            node = n;
+            break;
         case tok!"-":
+            advance();
+            auto n = allocator.make!MinusPrefixUnaryExpression;
+            mixin(parseNodeQ!(`n.unaryExpression`, `UnaryExpressionNode`));
+            node = n;
+            break;
         case tok!"~":
+            advance();
+            auto n = allocator.make!TildePrefixUnaryExpression;
+            mixin(parseNodeQ!(`n.unaryExpression`, `UnaryExpressionNode`));
+            node = n;
+            break;
         case tok!"++":
+            advance();
+            auto n = allocator.make!PlusPlusPrefixUnaryExpression;
+            mixin(parseNodeQ!(`n.unaryExpression`, `UnaryExpressionNode`));
+            node = n;
+            break;
         case tok!"--":
-            node.prefix = advance();
-            mixin(parseNodeQ!(`node.unaryExpression`, `UnaryExpression`));
+            advance();
+            auto n = allocator.make!MinusMinusPrefixUnaryExpression;
+            mixin(parseNodeQ!(`n.unaryExpression`, `UnaryExpressionNode`));
+            node = n;
             break;
         case tok!"new":
-            mixin(parseNodeQ!(`node.newExpression`, `NewExpression`));
+            mixin(parseNodeQ!(`node`, `NewExpression`));
             break;
         case tok!"delete":
-            mixin(parseNodeQ!(`node.deleteExpression`, `DeleteExpression`));
+            mixin(parseNodeQ!(`node`, `DeleteExpression`));
             break;
         case tok!"cast":
-            mixin(parseNodeQ!(`node.castExpression`, `CastExpression`));
+            mixin(parseNodeQ!(`node`, `CastExpression`));
             break;
         case tok!"assert":
-            mixin(parseNodeQ!(`node.assertExpression`, `AssertExpression`));
+            mixin(parseNodeQ!(`node`, `AssertExpression`));
             break;
         case tok!"throw":
-            mixin(parseNodeQ!(`node.throwExpression`, `ThrowExpression`));
+            mixin(parseNodeQ!(`node`, `ThrowExpression`));
             break;
         case tok!"(":
             // handle (type).identifier
@@ -7909,10 +7962,13 @@ class Parser
                     goto default;
                 }
                 abandonBookmark(b2);
-                node.type = t;
+                auto n = allocator.make!TypeDotIdentifierExpression;
+                n.type = t;
                 advance(); // )
+                n.dotLocation = current.index;
                 advance(); // .
-                mixin(parseNodeQ!(`node.identifierOrTemplateInstance`, `IdentifierOrTemplateInstance`));
+                mixin(parseNodeQ!(`n.identifierOrTemplateInstance`, `IdentifierOrTemplateInstance`));
+                node = n;
                 break;
             }
             else
@@ -7922,7 +7978,7 @@ class Parser
                 goto default;
             }
         default:
-            mixin(parseNodeQ!(`node.primaryExpression`, `PrimaryExpression`));
+            mixin(parseNodeQ!(`node`, `PrimaryExpression`));
             break;
         }
 
@@ -7944,46 +8000,60 @@ class Parser
             else
                 break loop;
         case tok!"(":
-            auto newUnary = allocator.make!UnaryExpression();
             // Allows DCD to get the call tips
             // see https://github.com/dlang-community/DCD/issues/405
             if (peekIs(tok!"}"))
             {
                 error("Expected parameters or `)`", false, true);
                 advance();
-                if (newUnary) newUnary.tokens = tokens[startIndex .. index];
-                return newUnary;
+                node = allocator.make!DummyUnaryExpression;
+                node.tokens = tokens[startIndex .. index];
+                return node;
             }
-            mixin (nullCheck!`newUnary.functionCallExpression = parseFunctionCallExpression(node)`);
-            node = newUnary;
+            mixin (nullCheck!`node = parseFunctionCallExpression(node)`);
             break;
         case tok!"++":
-        case tok!"--":
-            auto n = allocator.make!UnaryExpression();
+            advance();
+            auto n = allocator.make!PlusPlusPostfixUnaryExpression;
             n.unaryExpression = node;
-            n.suffix = advance();
+            node = n;
+            break;
+        case tok!"--":
+            advance();
+            auto n = allocator.make!MinusMinusPostfixUnaryExpression;
+            n.unaryExpression = node;
             node = n;
             break;
         case tok!"[":
-            auto n = allocator.make!UnaryExpression;
-            n.indexExpression = parseIndexExpression(node);
-            node = n;
+            node = parseIndexExpression(node);
             break;
         case tok!".":
-            node.dotLocation = current.index;
-            advance();
-            auto n = allocator.make!UnaryExpression();
-            n.unaryExpression = node;
-            if (currentIs(tok!"new"))
-                mixin(parseNodeQ!(`node.newExpression`, `NewExpression`));
+            if (peekIs(tok!"new"))
+            {
+                auto n = allocator.make!UnaryDotNewExpression();
+                n.dotLocation = current.index;
+                advance();
+                n.unaryExpression = node;
+                mixin(parseNodeQ!(`n.newExpression`, `NewExpression`));
+                node = n;
+            }
             else
+            {
+                auto n = allocator.make!UnaryDotIdentifierExpression();
+                n.dotLocation = current.index;
+                advance();
+                n.unaryExpression = node;
                 n.identifierOrTemplateInstance = parseIdentifierOrTemplateInstance();
-            node = n;
+                node = n;
+            }
             break;
         default:
             break loop;
         }
-        node.tokens = tokens[startIndex .. index];
+        if (node)
+            node.tokens = tokens[startIndex .. index];
+        else
+            error("Expected UnaryExpression", false);
         return node;
     }
 
@@ -8373,7 +8443,7 @@ protected: final:
         immutable b = setBookmark();
         scope(exit) goToBookmark(b);
         advance();
-        immutable bool result = !currentIs(tok!"]") && parseExpression() !is null && currentIs(tok!":");
+        immutable bool result = !currentIs(tok!"]") && parseAssignExpression() !is null && currentIs(tok!":");
         cachedAAChecks[currentIndex] = result;
         return result;
     }
@@ -8773,6 +8843,12 @@ protected: final:
             node.line = current.line;
             node.column = current.column;
         }
+        static assert(is(immutable typeof(node.items[0]) == immutable typeof(mixin("parse" ~ ItemType.stringof ~ "()"))),
+            "cannot use parseCommaSeparatedRule on " ~ ListType.stringof
+            ~ " with function parse" ~ ItemType.stringof ~ ", since it expects "
+            ~ "items of type " ~ typeof(node.items[0]).stringof
+            ~ ", but the parse function returns "
+            ~ typeof(mixin("parse" ~ ItemType.stringof ~ "()")).stringof);
         StackBuffer items;
         while (moreTokens())
         {

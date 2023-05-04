@@ -986,28 +986,6 @@ class XMLPrinter : ASTVisitor
 		}
 	}
 
-	override void visit(const UnaryExpression unaryExpression)
-	{
-		output.writeln("<unaryExpression>");
-		if (unaryExpression.prefix != tok!"")
-		{
-			output.writeln("<prefix>", xmlEscape(str(unaryExpression.prefix.type)), "</prefix>");
-			unaryExpression.unaryExpression.accept(this);
-		}
-		else
-		{
-			if (unaryExpression.suffix != tok!"")
-			{
-				assert(unaryExpression.suffix.text == "");
-				unaryExpression.unaryExpression.accept(this);
-				output.writeln("<suffix>", str(unaryExpression.suffix.type), "</suffix>");
-			}
-			else
-				unaryExpression.accept(this);
-		}
-		output.writeln("</unaryExpression>");
-	}
-
 	override void visit(const UnionDeclaration unionDeclaration)
 	{
 		output.writeln("<unionDeclaration line=\"", unionDeclaration.name.line, "\">");
@@ -1208,6 +1186,20 @@ class XMLPrinter : ASTVisitor
 	override void visit(const WhileStatement whileStatement) { mixin (tagAndAccept!"whileStatement"); }
 	override void visit(const WithStatement withStatement) { mixin (tagAndAccept!"withStatement"); }
 	override void visit(const TypeidExpression typeidExpression) { mixin (tagAndAccept!"typeidExpression"); }
+	// unary expressions
+	override void visit(const RefPrefixUnaryExpression refPrefixUnaryExpression) { mixin (tagAndAccept!"refPrefixUnaryExpression"); }
+	override void visit(const NotPrefixUnaryExpression notPrefixUnaryExpression) { mixin (tagAndAccept!"notPrefixUnaryExpression"); }
+	override void visit(const DerefPrefixUnaryExpression derefPrefixUnaryExpression) { mixin (tagAndAccept!"derefPrefixUnaryExpression"); }
+	override void visit(const PlusPrefixUnaryExpression plusPrefixUnaryExpression) { mixin (tagAndAccept!"plusPrefixUnaryExpression"); }
+	override void visit(const MinusPrefixUnaryExpression minusPrefixUnaryExpression) { mixin (tagAndAccept!"minusPrefixUnaryExpression"); }
+	override void visit(const TildePrefixUnaryExpression tildePrefixUnaryExpression) { mixin (tagAndAccept!"tildePrefixUnaryExpression"); }
+	override void visit(const PlusPlusPrefixUnaryExpression plusPlusPrefixUnaryExpression) { mixin (tagAndAccept!"plusPlusPrefixUnaryExpression"); }
+	override void visit(const MinusMinusPrefixUnaryExpression minusMinusPrefixUnaryExpression) { mixin (tagAndAccept!"minusMinusPrefixUnaryExpression"); }
+	override void visit(const PlusPlusPostfixUnaryExpression plusPlusPostfixUnaryExpression) { mixin (tagAndAccept!"plusPlusPostfixUnaryExpression"); }
+	override void visit(const MinusMinusPostfixUnaryExpression minusMinusPostfixUnaryExpression) { mixin (tagAndAccept!"minusMinusPostfixUnaryExpression"); }
+	override void visit(const UnaryDotIdentifierExpression unaryDotIdentifierExpression) { mixin (tagAndAccept!"unaryDotIdentifierExpression"); }
+	override void visit(const UnaryDotNewExpression unaryDotNewExpression) { mixin (tagAndAccept!"unaryDotNewExpression"); }
+	override void visit(const TypeDotIdentifierExpression typeDotIdentifierExpression) { mixin (tagAndAccept!"typeDotIdentifierExpression"); }
 	// dfmt on
 
 	alias visit = ASTVisitor.visit;

@@ -360,9 +360,9 @@ int main(string[] args)
     // increase stack size in case of segfault:
     // stack usage in debug / non-optimized mode is _much_ higher
     version (D_Coverage)
-        enum maxStackSize = 256 * 4096;
+        enum maxStackSize = 512 * 4096;
     else debug
-        enum maxStackSize = 256 * 4096;
+        enum maxStackSize = 512 * 4096;
     else
         enum maxStackSize = 40 * 4096;
 
