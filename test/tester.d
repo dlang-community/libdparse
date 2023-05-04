@@ -390,5 +390,9 @@ int main(string[] args)
     if (!ast)
         writefln("Finished parsing with %d errors and %d warnings.",
                 errorCount, warningCount);
-    return errorCount == 0 ? 0 : 1;
+
+    version (D_Coverage)
+        return 0; // we don't care about error count in coverage mode
+    else
+        return errorCount == 0 ? 0 : 1;
 }
