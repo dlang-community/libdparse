@@ -1382,6 +1382,7 @@ class Parser
         auto startIndex = index;
         auto node = allocator.make!AttributeDeclaration;
         node.line = current.line;
+        moveStartIndexBefore(startIndex, attribute);
         node.attribute = attribute is null ? parseAttribute() : attribute;
         mixin(tokenCheck!":");
         node.tokens = tokens[startIndex .. index];
@@ -1593,10 +1594,11 @@ class Parser
      *     $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(LITERAL '...') $(LITERAL 'case') $(RULE assignExpression) $(LITERAL ':') $(RULE declarationsAndStatements)
      *     ;)
      */
-    CaseRangeStatement parseCaseRangeStatement(ExpressionNode low)
+    CaseRangeStatement parseCaseRangeStatement(ExpressionNode low, size_t startIndex = -1)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto startIndex = index;
+        if (startIndex == -1)
+            startIndex = index;
         auto node = allocator.make!CaseRangeStatement;
         assert (low !is null);
         node.low = low;
@@ -1620,10 +1622,11 @@ class Parser
      *     $(LITERAL 'case') $(RULE _argumentList) $(LITERAL ':') $(RULE declarationsAndStatements)
      *     ;)
      */
-    CaseStatement parseCaseStatement(ArgumentList argumentList = null)
+    CaseStatement parseCaseStatement(ArgumentList argumentList = null, size_t startIndex = -1)
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        auto startIndex = index;
+        if (startIndex == -1)
+            startIndex = index;
         auto node = allocator.make!CaseStatement;
         node.argumentList = argumentList;
         const colon = expect(tok!":");
@@ -3148,6 +3151,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!EqualExpression;
+        moveStartIndexBefore(startIndex, shift);
         node.left = shift is null ? parseShiftExpression() : shift;
         mixin (nullCheck!`node.left`);
         if (currentIsOneOf(tok!"==", tok!"!="))
@@ -3190,6 +3194,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!ExpressionStatement;
+        moveStartIndexBefore(startIndex, expression);
         node.expression = expression is null ? parseExpression() : expression;
         if (node.expression is null || expect(tok!";") is null)
             return null;
@@ -3575,7 +3580,10 @@ class Parser
             break;
         default:
             if (unary !is null)
+            {
+                moveStartIndexBefore(startIndex, unary);
                 node.unaryExpression = unary;
+            }
             else
                 mixin(parseNodeQ!(`node.unaryExpression`, `UnaryExpression`));
             if (currentIs(tok!"!"))
@@ -3633,6 +3641,8 @@ class Parser
         comment = null;
         StackBuffer memberFunctionAttributes;
         node.attributes = attributes;
+        foreach (attr; attributes)
+            moveStartIndexBefore(startIndex, attr);
 
         if (isAuto)
         {
@@ -3660,7 +3670,10 @@ class Parser
             if (type is null)
                 mixin(parseNodeQ!(`node.returnType`, `Type`));
             else
+            {
+                moveStartIndexBefore(startIndex, type);
                 node.returnType = type;
+            }
         }
 
         mixin(tokenCheck!(`node.name`, "identifier"));
@@ -4117,6 +4130,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!IdentityExpression;
+        moveStartIndexBefore(startIndex, shift);
         mixin(nullCheck!`node.left = shift is null ? parseShiftExpression() : shift`);
         if (currentIs(tok!"!"))
         {
@@ -4291,6 +4305,7 @@ class Parser
     {
         auto startIndex = index;
         auto node = allocator.make!ImportBindings;
+        moveStartIndexBefore(startIndex, singleImport);
         mixin(nullCheck!`node.singleImport = singleImport is null ? parseSingleImport() : singleImport`);
         mixin(tokenCheck!":");
         StackBuffer importBinds;
@@ -4425,6 +4440,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!IndexExpression;
+        moveStartIndexBefore(startIndex, unaryExpression);
         mixin(nullCheck!`node.unaryExpression = unaryExpression is null ? parseUnaryExpression() : unaryExpression`);
         mixin(tokenCheck!"[");
         StackBuffer indexes;
@@ -4484,6 +4500,7 @@ class Parser
         mixin(traceEnterAndExit!(__FUNCTION__));
         auto startIndex = index;
         auto node = allocator.make!InExpression;
+        moveStartIndexBefore(startIndex, shift);
         mixin(nullCheck!`node.left = shift is null ? parseShiftExpression() : shift`);
         if (currentIs(tok!"!"))
         {
@@ -6214,9 +6231,9 @@ class Parser
             if (argumentList is null)
                 return null;
             if (argumentList.items.length == 1 && startsWith(tok!":", tok!".."))
-                node.caseRangeStatement = parseCaseRangeStatement(argumentList.items[0]);
+                node.caseRangeStatement = parseCaseRangeStatement(argumentList.items[0], startIndex);
             else
-                node.caseStatement = parseCaseStatement(argumentList);
+                node.caseStatement = parseCaseStatement(argumentList, startIndex);
             break;
         case tok!"default":
             mixin(parseNodeQ!(`node.defaultStatement`, `DefaultStatement`));
@@ -7954,6 +7971,8 @@ class Parser
                 if (newUnary) newUnary.tokens = tokens[startIndex .. index];
                 return newUnary;
             }
+            if (node !is null)
+                node.tokens = tokens[startIndex .. index]; // for parseFunctionCallExpression to inherit
             mixin (nullCheck!`newUnary.functionCallExpression = parseFunctionCallExpression(node)`);
             node = newUnary;
             break;
@@ -7966,6 +7985,8 @@ class Parser
             break;
         case tok!"[":
             auto n = allocator.make!UnaryExpression;
+            if (node !is null)
+                node.tokens = tokens[startIndex .. index]; // for parseIndexExpression to inherit
             n.indexExpression = parseIndexExpression(node);
             node = n;
             break;
@@ -8076,6 +8097,7 @@ class Parser
                 return null;
         ownArray(node.storageClasses, storageClasses);
 
+        moveStartIndexBefore(startIndex, type);
         node.type = type is null ? parseType() : type;
         node.comment = comment;
         comment = null;
@@ -8733,6 +8755,27 @@ protected: final:
         }
     }
 
+    void moveStartIndexBefore(ref size_t startIndex, const BaseNode child, string func = __FUNCTION__)
+    {
+        if (child !is null)
+        {
+            debug
+            {
+                assert(child.tokens.length,
+                    "AST parameter must be finalized or receive early tokens slice before calling "
+                    ~ func);
+            }
+            else
+            {
+                if (!child.tokens.length)
+                    return;
+            }
+
+            startIndex = min(startIndex, &child.tokens[0] - &tokens[0]);
+            assert(startIndex >= 0 && startIndex < tokens.length);
+        }
+    }
+
     bool currentIsMemberFunctionAttribute() const
     {
         return moreTokens && isMemberFunctionAttribute(current.type);
@@ -8743,6 +8786,7 @@ protected: final:
     {
         ExpressionNode node;
         auto startIndex = index;
+        moveStartIndexBefore(startIndex, part);
         mixin ("node = part is null ? parse" ~ ExpressionPartType.stringof ~ "() : part;");
         if (node is null)
             return null;
