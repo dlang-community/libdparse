@@ -2474,6 +2474,7 @@
 <url><loc>http://127.0.0.1/dparse/parser/Parser.isType.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.isTypeCtor.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.MAX_ERRORS.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/parser/Parser.moveStartIndexBefore.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.nullCheck.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.ownArray.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.parseCommaSeparatedRule.html</loc></url>

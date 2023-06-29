@@ -1582,6 +1582,7 @@ var symbols = [
 {name: 'dparse.parser.Parser.isType', kind: "functiondeclaration", path: './dparse/parser/Parser.isType.html', attributes: ["final"]},
 {name: 'dparse.parser.Parser.isTypeCtor', kind: "functiondeclaration", path: './dparse/parser/Parser.isTypeCtor.html', attributes: ["static", "final", "pure", "nothrow", "nogc", "safe"]},
 {name: 'dparse.parser.Parser.MAX_ERRORS', kind: "enummemberdeclaration", path: './dparse/parser/Parser.MAX_ERRORS.html', attributes: []},
+{name: 'dparse.parser.Parser.moveStartIndexBefore', kind: "functiondeclaration", path: './dparse/parser/Parser.moveStartIndexBefore.html', attributes: ["final"]},
 {name: 'dparse.parser.Parser.nullCheck', kind: "enummemberdeclaration", path: './dparse/parser/Parser.nullCheck.html', attributes: []},
 {name: 'dparse.parser.Parser.ownArray', kind: "functiondeclaration", path: './dparse/parser/Parser.ownArray.html', attributes: []},
 {name: 'dparse.parser.Parser.parseCommaSeparatedRule', kind: "functiondeclaration", path: './dparse/parser/Parser.parseCommaSeparatedRule.html', attributes: []},

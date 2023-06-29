@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Parser.abandonBookmark</title>
+		<title>Function Parser.moveStartIndexBefore</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -104,16 +104,20 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.abandonBookmark</h1><p></p>
+				<h1>Function Parser.moveStartIndexBefore</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">final </span><span class="typ">void</span> <span class="pln">abandonBookmark</span>
+				<span class="kwd">final </span><span class="typ">void</span> <span class="pln">moveStartIndexBefore</span>
 				<span class="pun">(</span>
 				<br/>
-				&nbsp;&nbsp;<span class="typ">ulong</span> <span class="pln">__param_0</span>
+				&nbsp;&nbsp;<span class="kwd">ref </span><span class="typ">ulong</span> <span class="pln">startIndex</span><span class="pun">,</span>
 				<br/>
-				<span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc @safe</span><span class="pun">;</span>
+				&nbsp;&nbsp;<span class="kwd">const</span><span class="pun">(</span><a href="../../dparse/ast/BaseNode.html"><span class="typ">BaseNode</span></a><span class="pun">)</span> <span class="pln">child</span><span class="pun">,</span>
+				<br/>
+				&nbsp;&nbsp;<span class="typ">string</span> <span class="pln">func</span> <span class="pun">=</span> <span class="kwd">__FUNCTION__</span>
+				<br/>
+				<span class="pun">)</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
