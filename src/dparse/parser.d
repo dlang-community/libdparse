@@ -2410,8 +2410,7 @@ class Parser
                     else
                     {
                         goToBookmark(b);
-                        error("Declaration expected");
-                        return null;
+                        goto type;
                     }
                 }
                 else
