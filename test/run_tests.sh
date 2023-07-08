@@ -86,6 +86,8 @@ if [[ ${BUILDKITE:-} != "true" ]]; then
 		while read -r line || [ -n "$line" ]; do
 			if [[ "$line" == "INCLUDES_PARSE_ERROR" ]]; then
 				expectParseFailure=1
+			elif [[ "$line" =~ ^# ]]; then
+				true # comment line
 			elif echo "$AST" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
 				((currentPasses=currentPasses+1))
 			else

@@ -1,0 +1,7 @@
+./module/declaration[1]/functionDeclaration/name[text()="foo"]
+./module/declaration[1]/functionDeclaration//scopeGuardStatement/declarationOrStatement/declaration/variableDeclaration
+./module/declaration[2]/functionDeclaration/name[text()="bar"]
+./module/declaration[2]/functionDeclaration//switchStatement/statement//declarationOrStatement[1]/statement/caseStatement//intLiteral[text()="1"]
+./module/declaration[2]/functionDeclaration//switchStatement/statement//declarationOrStatement[2]/statement/caseStatement//intLiteral[text()="2"]
+# scope (exit) becomes part of `case 2:`, which may be wrong, since DMD doesn't handle it like so, but the grammar is specified like so
+./module/declaration[2]/functionDeclaration//switchStatement/statement//declarationOrStatement[2]/statement/caseStatement//scopeGuardStatement
