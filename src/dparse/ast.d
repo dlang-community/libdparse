@@ -2864,11 +2864,20 @@ final class ScopeGuardStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(identifier, statementNoCaseNoDefault));
+        mixin (visitIfNotNull!(identifier, declarationOrStatement));
     }
     /** */ Token identifier;
-    /** */ StatementNoCaseNoDefault statementNoCaseNoDefault;
+    /** */ DeclarationOrStatement declarationOrStatement;
     mixin OpEquals;
+
+    deprecated("Scope guards may also contain declarations")
+    inout(StatementNoCaseNoDefault) statementNoCaseNoDefault() inout @safe pure nothrow @nogc
+    {
+        if (!declarationOrStatement || !declarationOrStatement.statement)
+            return null;
+
+        return declarationOrStatement.statement.statementNoCaseNoDefault;
+    }
 }
 
 ///

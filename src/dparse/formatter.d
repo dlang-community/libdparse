@@ -2639,7 +2639,7 @@ class Formatter(Sink)
 
         /**
         Token identifier;
-        StatementNoCaseNoDefault statementNoCaseNoDefault;
+        DeclarationOrStatement declarationOrStatement;
         **/
 
         with(scopeGuardStatement)
@@ -2648,7 +2648,7 @@ class Formatter(Sink)
             format(identifier);
             put(")");
             indent();
-            format(statementNoCaseNoDefault);
+            format(declarationOrStatement);
             outdent();
         }
     }

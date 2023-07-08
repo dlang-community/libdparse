@@ -6034,7 +6034,7 @@ class Parser
      * Parses a ScopeGuardStatement
      *
      * $(GRAMMAR $(RULEDEF scopeGuardStatement):
-     *     $(LITERAL 'scope') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)') $(RULE statementNoCaseNoDefault)
+     *     $(LITERAL 'scope') $(LITERAL '$(LPAREN)') $(LITERAL Identifier) $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement)
      *     ;)
      */
     ScopeGuardStatement parseScopeGuardStatement()
@@ -6048,7 +6048,7 @@ class Parser
         mixin(nullCheck!`ident`);
         node.identifier = *ident;
         mixin(tokenCheck!")");
-        mixin(parseNodeQ!(`node.statementNoCaseNoDefault`, `StatementNoCaseNoDefault`));
+        mixin(parseNodeQ!(`node.declarationOrStatement`, `DeclarationOrStatement`));
         node.tokens = tokens[startIndex .. index];
         return node;
     }
