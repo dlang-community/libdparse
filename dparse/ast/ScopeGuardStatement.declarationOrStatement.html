@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Class ScopeGuardStatement</title>
+		<title>Variable ScopeGuardStatement.declarationOrStatement</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -104,70 +104,28 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Class ScopeGuardStatement</h1><p></p>
+				<h1>Variable ScopeGuardStatement.declarationOrStatement</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">class</span> <span class="typ">ScopeGuardStatement</span>
-				<br>&nbsp;&nbsp;: <a href="../../dparse/ast/BaseNode.html"><span class="typ">BaseNode</span></a>
+				<span class="kwd">class</span> <a href="../../dparse/ast/ScopeGuardStatement.html"><span class="typ">ScopeGuardStatement</span></a>
+				<br/>
+				<span class="pun">
+					{
+					<br/>
+				</span>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				&nbsp;&nbsp;<a href="../../dparse/ast/DeclarationOrStatement.html"><span class="typ">DeclarationOrStatement</span></a> <span class="pln">declarationOrStatement</span>
 				<span class="pun">;</span>
+				<br/>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				<span class="pun">}</span>
 						</div>
 					</code>
 				</div>
 				
-				<section><h2>Fields</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Type</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/ScopeGuardStatement.declarationOrStatement.html" class="public"><code>declarationOrStatement</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/DeclarationOrStatement.html"><span class="typ">DeclarationOrStatement</span></a></code></td><td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/ScopeGuardStatement.identifier.html" class="public"><code>identifier</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")</code></td><td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/BaseNode.tokens.html" class="public inherited"><code>tokens</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")<span class="pun">)</span><span class="pun">[]</span></code></td><td>List of tokens consumed by this AST node
-</td>
-						</tr>
-					</table>
-				</section>
-				<section><h2>Methods</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/ScopeGuardStatement.accept.html" class="public">
-									<code>accept</code>
-								</a>
-								<span class="tableEntryAnnotation">(visitor)</span>
-							</td>
-							<td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/ScopeGuardStatement.statementNoCaseNoDefault.html" class="public">
-									<code>statementNoCaseNoDefault</code>
-								</a>
-								<span class="tableEntryAnnotation">()</span>
-							</td>
-							<td></td>
-						</tr>
-					</table>
-				</section>
 				
 			</div>
 			<footer>

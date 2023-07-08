@@ -1248,6 +1248,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ScopeGuardStatement.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ScopeGuardStatement.accept.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/ScopeGuardStatement.declarationOrStatement.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ScopeGuardStatement.identifier.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ScopeGuardStatement.statementNoCaseNoDefault.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
