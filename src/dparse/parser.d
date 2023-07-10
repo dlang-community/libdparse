@@ -550,6 +550,7 @@ class Parser
             {
                 node.nonVoidInitializer = allocator.make!NonVoidInitializer;
                 node.nonVoidInitializer.assignExpression = assignExpression;
+                node.nonVoidInitializer.tokens = assignExpression.tokens;
             }
         }
         node.tokens = tokens[startIndex .. index];
@@ -621,6 +622,7 @@ class Parser
             brLoop: while (currentIs(tok!"["))
             {
                 AsmBrExp br = allocator.make!AsmBrExp(); // huehuehuehue
+                node.tokens = tokens[startIndex .. index];
                 br.asmBrExp = node;
                 br.line = current().line;
                 br.column = current().column;
@@ -8800,6 +8802,7 @@ protected: final:
                 advance();
             n.left = node;
             mixin (parseNodeQ!(`n.right`, ExpressionPartType.stringof));
+            n.tokens = tokens[startIndex .. index];
             node = n;
         }
         node.tokens = tokens[startIndex .. index];
