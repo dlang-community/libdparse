@@ -1024,7 +1024,12 @@ class XMLPrinter : ASTVisitor
 
 	override void visit(const Unittest unittest_)
 	{
-		output.writeln("<unittest>");
+		output.write("<unittest");
+		if (unittest_.identifier.text.length)
+			output.write(" identifier=\"",
+				xmlAttributeEscape(unittest_.identifier.text),
+				'"');
+		output.writeln(">");
 		unittest_.accept(this);
 		output.writeln("</unittest>");
 	}

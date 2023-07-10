@@ -3615,12 +3615,33 @@ final class Unittest : BaseNode
     {
         mixin (visitIfNotNull!(blockStatement));
     }
+    /// For `unittest a {}` this is the `a`
+    Token identifier;
     /** */ BlockStatement blockStatement;
     /** */ string comment;
-    /** */ size_t location;
-    /** */ size_t line;
-    /** */ size_t column;
     mixin OpEquals;
+
+    /// The `unittest` token
+    Token unittestToken() const @property @safe nothrow @nogc pure
+    {
+        assert(tokens.length && tokens[0] == tok!"unittest");
+        return tokens[0];
+    }
+
+    size_t location() const @property @safe nothrow @nogc pure
+    {
+        return unittestToken.index;
+    }
+
+    size_t line() const @property @safe nothrow @nogc pure
+    {
+        return unittestToken.line;
+    }
+
+    size_t column() const @property @safe nothrow @nogc pure
+    {
+        return unittestToken.column;
+    }
 }
 
 ///

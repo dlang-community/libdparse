@@ -3706,6 +3706,11 @@ class Formatter(Sink)
         putComment(unittest_.comment);
         putAttrs(attrs);
         put("unittest");
+        if (unittest_.identifier.text.length)
+        {
+            put(" ");
+            put(unittest_.identifier.text);
+        }
         format(unittest_.blockStatement);
     }
 

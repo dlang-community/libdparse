@@ -8059,13 +8059,22 @@ class Parser
      * Parses a Unittest
      *
      * $(GRAMMAR $(RULEDEF unittest):
-     *     $(LITERAL 'unittest') $(RULE blockStatement)
+     *     $(LITERAL 'unittest') $(RULE identifier)? $(RULE blockStatement)
      *     ;)
      */
     Unittest parseUnittest()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
-        mixin (simpleParse!(Unittest, tok!"unittest", "blockStatement|parseBlockStatement"));
+        auto startIndex = index;
+        auto node = allocator.make!Unittest;
+        node.comment = comment;
+        comment = null;
+        mixin(tokenCheck!"unittest");
+        if (currentIs(tok!"identifier"))
+            node.identifier = advance();
+        mixin(parseNodeQ!(`node.blockStatement`, `BlockStatement`));
+        node.tokens = tokens[startIndex .. index];
+        return node;
     }
 
     /**
