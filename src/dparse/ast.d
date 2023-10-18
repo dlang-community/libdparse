@@ -3147,11 +3147,18 @@ final class SwitchStatement : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(expression, statement));
+        mixin (visitIfNotNull!(condition, statement));
     }
-    /** */ Expression expression;
+    /** */ IfCondition condition;
     /** */ Statement statement;
     mixin OpEquals;
+
+    deprecated("use condition.expression") inout(Expression) expression() inout @property
+    {
+        if (!condition)
+            return null;
+        return condition.expression;
+    }
 }
 
 ///

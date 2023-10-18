@@ -6755,17 +6755,13 @@ class Parser
         // DCD #453
         // with just `switch(stuff` returns a non null node,
         // which allows DCD to gives completion on `stuff`.
-        if (auto e = parseExpression())
+        mixin(parseNodeQ!(`node.condition`, `IfCondition`));
+        if (currentIs(tok!")"))
         {
-            node.expression = e;
-            if (currentIs(tok!")"))
-            {
-                advance();
-                // returns null only from here.
-                mixin(parseNodeQ!(`node.statement`, `Statement`));
-            }
+            advance();
+            // returns null only from here.
+            mixin(parseNodeQ!(`node.statement`, `Statement`));
         }
-        else error("Expression expected after `switch(`", false);
         node.tokens = tokens[startIndex .. index];
         return node;
     }
