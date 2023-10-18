@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Class SwitchStatement</title>
+		<title>Variable SwitchStatement.condition</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -104,75 +104,28 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Class SwitchStatement</h1><p></p>
+				<h1>Variable SwitchStatement.condition</h1><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<span class="kwd">class</span> <span class="typ">SwitchStatement</span>
-				<br>&nbsp;&nbsp;: <a href="../../dparse/ast/BaseNode.html"><span class="typ">BaseNode</span></a>
+				<span class="kwd">class</span> <a href="../../dparse/ast/SwitchStatement.html"><span class="typ">SwitchStatement</span></a>
+				<br/>
+				<span class="pun">
+					{
+					<br/>
+				</span>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				&nbsp;&nbsp;<a href="../../dparse/ast/IfCondition.html"><span class="typ">IfCondition</span></a> <span class="pln">condition</span>
 				<span class="pun">;</span>
+				<br/>
+				&nbsp;&nbsp;<span class="com">// ...</span>
+				<br/>
+				<span class="pun">}</span>
 						</div>
 					</code>
 				</div>
 				
-				<section><h2>Fields</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Type</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/SwitchStatement.condition.html" class="public"><code>condition</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/IfCondition.html"><span class="typ">IfCondition</span></a></code></td><td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/SwitchStatement.statement.html" class="public"><code>statement</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><a href="../../dparse/ast/Statement.html"><span class="typ">Statement</span></a></code></td><td></td>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/BaseNode.tokens.html" class="public inherited"><code>tokens</code></a>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")<span class="pun">)</span><span class="pun">[]</span></code></td><td>List of tokens consumed by this AST node
-</td>
-						</tr>
-					</table>
-				</section>
-				<section><h2>Properties</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Type</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/SwitchStatement.expression.html" class="public property"><code>expression</code></a><span class="tableEntryAnnotation">[get]</span>
-							</td>
-							<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">inout</span><span class="pun">(</span><a href="../../dparse/ast/Expression.html"><span class="typ">Expression</span></a><span class="pun">)</span></code></td><td></td>
-						</tr>
-					</table>
-				</section>
-				<section><h2>Methods</h2>
-					<table>
-						<col class="caption"/>
-						<tr>
-							<th>Name</th><th>Description</th>
-						</tr>
-						<tr>
-							<td>
-								<a href="../../dparse/ast/SwitchStatement.accept.html" class="public">
-									<code>accept</code>
-								</a>
-								<span class="tableEntryAnnotation">(visitor)</span>
-							</td>
-							<td></td>
-						</tr>
-					</table>
-				</section>
 				
 			</div>
 			<footer>

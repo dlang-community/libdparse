@@ -1405,6 +1405,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/SwitchStatement.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/SwitchStatement.accept.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/SwitchStatement.condition.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/SwitchStatement.expression.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/SwitchStatement.statement.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
