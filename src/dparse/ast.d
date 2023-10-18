@@ -3153,7 +3153,7 @@ final class SwitchStatement : BaseNode
     /** */ Statement statement;
     mixin OpEquals;
 
-    deprecated("use condition.expression") inout(Expression) expression() inout @property
+    deprecated("use condition.expression") inout(Expression) expression() inout @property @safe nothrow @nogc pure
     {
         if (!condition)
             return null;
