@@ -2958,7 +2958,7 @@ class Formatter(Sink)
         debug(verbose) writeln("SwitchStatement");
 
         /**
-        Expression expression;
+        IfCondition condition;
         Statement statement;
         **/
 
@@ -2966,7 +2966,7 @@ class Formatter(Sink)
         {
             newThing(What.other);
             isFinal ? put(" final switch(") : put("switch(");
-            format(expression);
+            format(condition);
             put(")");
 
             bool needBlock = statement.statementNoCaseNoDefault &&
