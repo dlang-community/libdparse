@@ -285,10 +285,10 @@ struct TokenStructure(IdType, string extraFields = "")
         * Params:
         *     type = the token type
         *     text = the text of the token, which may be null
-        *     line = the line number at which this token occurs
-        *     column = the column number at which this token occurs
+        *     line = the line number at which this token occurs, 1-based
+        *     column = the column number at which this token occurs, 1-based
         *     index = the byte offset from the beginning of the input at which this
-        *         token occurs
+        *         token occurs, 0-based
         */
         this(IdType type, string text, size_t line, size_t column, size_t index)
         {
@@ -300,24 +300,26 @@ struct TokenStructure(IdType, string extraFields = "")
         }
 
         /**
-        * The _text of the token.
+        * The text of the token for dynamic tokens. May be `null`, e.g. for
+        * static tokens.
         */
         string text;
 
         /**
-        * The _line number at which this token occurs.
+        * 1-based line number at which the start of this token occurs.
         */
         size_t line;
 
         /**
-        * The _column number at which this token occurs. This is measured in bytes
-        * and may not be correct when tab characters are involved.
+        * 1-based column number at which the start of this token occurs.
+        * This is measured in bytes and may not be correct when tab characters
+        * are involved.
         */
         size_t column;
 
         /**
-        * The byte offset from the beginning of the input at which this token
-        * occurs.
+        * 0-based byte offset from the beginning of the input at which the start
+        * of this token occurs.
         */
         size_t index;
 
