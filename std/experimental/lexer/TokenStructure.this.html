@@ -165,10 +165,10 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 <table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
 <tr><td id="type">type</td><td> the token type</td></tr>
 <tr><td id="text">text</td><td> the text of the token, which may be null</td></tr>
-<tr><td id="line">line</td><td> the line number at which this token occurs</td></tr>
-<tr><td id="column">column</td><td> the column number at which this token occurs</td></tr>
+<tr><td id="line">line</td><td> the line number at which this token occurs, 1-based</td></tr>
+<tr><td id="column">column</td><td> the column number at which this token occurs, 1-based</td></tr>
 <tr><td id="index">index</td><td> the byte offset from the beginning of the input at which this
-         token occurs</td></tr>
+         token occurs, 0-based</td></tr>
 </table>
 </section>
 
