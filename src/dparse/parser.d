@@ -4490,6 +4490,23 @@ class Parser
     }
 
     /**
+     * Parses an InterpolatedStringLiteral
+     *
+     * $(GRAMMAR $(RULEDEF InterpolatedStringLiteral):
+     *     $(LITERAL istringLiteral)
+     *     ;)
+     */
+    InterpolatedStringLiteral parseInterpolatedStringLiteral()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto startIndex = index;
+        auto node = allocator.make!InterpolatedStringLiteral;
+        expect(tok!"istringLiteral");
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
      * Parses an InExpression
      *
      * $(GRAMMAR $(RULEDEF inExpression):
@@ -5801,6 +5818,7 @@ class Parser
      *     | $(LITERAL FloatLiteral)
      *     | $(LITERAL StringLiteral)+
      *     | $(LITERAL CharacterLiteral)
+     *     | $(LITERAL InterpolatedStringLiteral)
      *     ;)
      */
     PrimaryExpression parsePrimaryExpression()
@@ -5918,6 +5936,9 @@ class Parser
             break;
         case tok!"import":
             mixin(parseNodeQ!(`node.importExpression`, `ImportExpression`));
+            break;
+        case tok!"istringLiteral":
+            mixin(parseNodeQ!(`node.interpolatedStringLiteral`, `InterpolatedStringLiteral`));
             break;
         case tok!"this":
         case tok!"super":

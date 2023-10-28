@@ -47,7 +47,7 @@ private immutable dynamicTokens = [
     "whitespace", "doubleLiteral", "floatLiteral", "idoubleLiteral",
     "ifloatLiteral", "intLiteral", "longLiteral", "realLiteral",
     "irealLiteral", "uintLiteral", "ulongLiteral", "characterLiteral",
-    "dstringLiteral", "stringLiteral", "wstringLiteral"
+    "dstringLiteral", "stringLiteral", "wstringLiteral", "istringLiteral",
 ];
 
 private immutable pseudoTokenHandlers = [
@@ -68,6 +68,7 @@ private immutable pseudoTokenHandlers = [
     "7", "lexDecimal",
     "8", "lexDecimal",
     "9", "lexDecimal",
+    "i\"", "lexInterpolatedString",
     "q\"", "lexDelimitedString",
     "q{", "lexTokenString",
     "r\"", "lexWysiwygString",
@@ -1381,6 +1382,53 @@ private pure nothrow @safe:
         }
     }
 
+    void lexInterpolatedString(ref Token token)
+    {
+        mixin (tokenStart);
+        range.popFront();
+        range.popFront();
+
+        bool lastDollar = false;
+        while (true)
+        {
+            if (range.index >= range.bytes.length)
+            {
+                error(token, "Error: unterminated interpolated string literal");
+                return;
+            }
+
+            if (lastDollar && range.front == '(')
+            {
+                range.popFront();
+                tokenStringImpl(tok!"(", tok!")");
+            }
+            else if (range.front == '"')
+            {
+                range.popFront();
+                break;
+            }
+            else if (range.front == '\\')
+            {
+                if (!lexEscapeSequence())
+                {
+                    token = Token.init;
+                    return;
+                }
+            }
+            else
+            {
+                if (range.front == '$')
+                    lastDollar = true;
+                popFrontWhitespaceAware();
+            }
+        }
+
+        IdType charType;
+        lexStringSuffix(charType);
+        token = Token(tok!"istringLiteral", cache.intern(range.slice(mark)), line,
+            column, index);
+    }
+
     void lexNormalDelimitedString(ref Token token, size_t mark, size_t line, size_t column,
         size_t index, ubyte open, ubyte close)
     {
@@ -1458,15 +1506,14 @@ private pure nothrow @safe:
         token = Token(type, cache.intern(range.slice(mark)), line, column, index);
     }
 
-    void lexTokenString(ref Token token)
+    /// Pops from the source input range, nesting at tokens with the
+    /// type of `open` / `close`. Once a token with `close` type is reached,
+    /// eats that token and terminates, or when end of input is reached.
+    /// Assumes one opening token was already read beforehand and appended to
+    /// the string, e.g. `q{`.
+    /// Returns: false on unterminated string.
+    bool tokenStringImpl(IdType open, IdType close)
     {
-        mixin (tokenStart);
-        assert (range.bytes[range.index] == 'q');
-        range.popFront();
-        assert (range.bytes[range.index] == '{');
-        range.popFront();
-        auto app = appender!string();
-        app.put("q{");
         int depth = 1;
 
         immutable WhitespaceBehavior oldWhitespace = config.whitespaceBehavior;
@@ -1482,25 +1529,18 @@ private pure nothrow @safe:
         advance(_front);
 
         if (range.index >= range.bytes.length)
-        {
-            error(token, "Error: unterminated token string literal");
-            return;
-        }
+            return false;
 
         while (depth > 0 && !empty)
         {
             auto t = front();
-            if (t.text is null)
-                app.put(str(t.type));
-            else
-                app.put(t.text);
-            if (t.type == tok!"}")
+            if (t.type == close)
             {
                 depth--;
                 if (depth > 0)
                 popFront();
             }
-            else if (t.type == tok!"{")
+            else if (t.type == open)
             {
                 depth++;
                 popFront();
@@ -1508,11 +1548,27 @@ private pure nothrow @safe:
             else
                 popFront();
         }
+
+        return depth == 0;
+    }
+
+    void lexTokenString(ref Token token)
+    {
+        mixin (tokenStart);
+        assert (range.bytes[range.index] == 'q');
+        range.popFront();
+        assert (range.bytes[range.index] == '{');
+        range.popFront();
+
+        if (!tokenStringImpl(tok!"{", tok!"}"))
+        {
+            error(token, "Error: unterminated token string literal");
+            return;
+        }
+
         IdType type = tok!"stringLiteral";
         auto b = lexStringSuffix(type);
-        if (b != 0)
-            app.put(b);
-        token = Token(type, cache.intern(cast(const(ubyte)[]) app.data), line,
+        token = Token(type, cache.intern(range.slice(mark)), line,
             column, index);
     }
 
@@ -1583,6 +1639,7 @@ private pure nothrow @safe:
         case '\'':
         case '"':
         case '?':
+        case '$':
         case '\\':
         case 'a':
         case 'b':
@@ -1816,16 +1873,16 @@ private pure nothrow @safe:
             && (range.peek(2) == "\u2028" || range.peek(2) == "\u2029");
     }
 
-    bool isSeparating(size_t offset) @nogc
+    public static bool isIdentifierSeparating(scope const(char)[] code, size_t offset) @nogc
     {
         enum : ubyte
         {
             n, y, m // no, yes, maybe
         }
 
-        if (range.index + offset >= range.bytes.length)
+        if (offset >= code.length)
             return true;
-        auto c = range.bytes[range.index + offset];
+        auto c = code[offset];
         static immutable ubyte[256] LOOKUP_TABLE = [
             y, y, y, y, y, y, y, y, y, y, y, y, y, y, y, y,
             y, y, y, y, y, y, y, y, y, y, y, y, y, y, y, y,
@@ -1851,15 +1908,21 @@ private pure nothrow @safe:
             return true;
         if (result == m)
         {
-            auto r = range;
-            range.popFrontN(offset);
-            return (r.canPeek(2) && (r.peek(2) == "\u2028"
-                || r.peek(2) == "\u2029"));
+            return (offset + 2 <= code.length) && (
+                code[offset .. offset + 2] == "\u2028" ||
+                code[offset .. offset + 2] == "\u2029"
+            );
         }
         assert (false);
     }
 
-
+    bool isSeparating(size_t offset) @nogc
+    {
+        return isIdentifierSeparating(
+            cast(const(char)[]) range.bytes,
+            range.index + offset
+        );
+    }
 
     enum tokenStart = q{
         size_t index = range.index;
@@ -2530,4 +2593,32 @@ void main() {
     checkInvalidTrailingString(getTokensForParser("x = q{foo", cf, &ca));
     checkInvalidTrailingString(getTokensForParser(`x = q"foo`, cf, &ca));
     checkInvalidTrailingString(getTokensForParser("x = '", cf, &ca));
+}
+
+unittest
+{
+    void checkExactlyOneToken(string srcAndDst)
+    {
+        import std.conv;
+
+        LexerConfig cf;
+        StringCache ca = StringCache(16);
+
+        auto l = DLexer(srcAndDst, cf, &ca);
+        assert(l.front().type == tok!"istringLiteral", str(l.front.type));
+        assert(l.front().text == srcAndDst, l.front.text);
+        l.popFront();
+        assert(l.messages.empty);
+        assert(l.empty);
+    }
+
+    checkExactlyOneToken(`i"hello"`);
+    checkExactlyOneToken(`i"$(i"world")"`);
+    checkExactlyOneToken(`i"$(i")")"`);
+    checkExactlyOneToken(`i"$(i"(")"`);
+    checkExactlyOneToken(`i"$(i"\"")"`);
+    checkExactlyOneToken(`i"\\$(i"\"")"`);
+    checkExactlyOneToken(`i"$$(i"\"")"`);
+    checkExactlyOneToken(`i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"$(i"")")")")")")")")")")")")")")")")")")")")")")")")"`);
+    checkExactlyOneToken(`i"$(i"i")$("i")"`);
 }

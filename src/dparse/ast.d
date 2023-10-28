@@ -73,6 +73,9 @@ shared static this()
     typeMap[typeid(TypeofExpression)] = 46;
     typeMap[typeid(UnaryExpression)] = 47;
     typeMap[typeid(XorExpression)] = 48;
+    typeMap[typeid(InterpolatedStringLiteralExpression)] = 49;
+    typeMap[typeid(InterpolatedStringLiteralPlain)] = 50;
+    typeMap[typeid(InterpolatedStringLiteralVariable)] = 51;
 }
 
 /// Describes which syntax was used in a list of declarations in the containing AST node
@@ -167,6 +170,19 @@ abstract class ASTVisitor
         case 46: visit(cast(TypeofExpression) n); break;
         case 47: visit(cast(UnaryExpression) n); break;
         case 48: visit(cast(XorExpression) n); break;
+        // skip 49, 50, 51 (used for InterpolatedStringLiteralPart)
+        default: assert(false, __MODULE__ ~ " has a bug");
+        }
+    }
+
+    /// ditto
+    void dynamicDispatch(const InterpolatedStringLiteralPart n)
+    {
+        switch (typeMap.get(typeid(n), 0))
+        {
+        case 49: visit(cast(InterpolatedStringLiteralExpression) n); break;
+        case 50: visit(cast(InterpolatedStringLiteralPlain) n); break;
+        case 51: visit(cast(InterpolatedStringLiteralVariable) n); break;
         default: assert(false, __MODULE__ ~ " has a bug");
         }
     }
@@ -289,6 +305,10 @@ abstract class ASTVisitor
     /** */ void visit(const Initialize initialize) { initialize.accept(this); }
     /** */ void visit(const Initializer initializer) { initializer.accept(this); }
     /** */ void visit(const InterfaceDeclaration interfaceDeclaration) { interfaceDeclaration.accept(this); }
+    /** */ void visit(const InterpolatedStringLiteral interpolatedStringLiteral) { interpolatedStringLiteral.accept(this); }
+    /** */ void visit(const InterpolatedStringLiteralExpression interpolatedStringLiteralExpression) { interpolatedStringLiteralExpression.accept(this); }
+    /** */ void visit(const InterpolatedStringLiteralPlain interpolatedStringLiteralPlain) { interpolatedStringLiteralPlain.accept(this); }
+    /** */ void visit(const InterpolatedStringLiteralVariable interpolatedStringLiteralVariable) { interpolatedStringLiteralVariable.accept(this); }
     /** */ void visit(const Invariant invariant_) { invariant_.accept(this); }
     /** */ void visit(const IsExpression isExpression) { isExpression.accept(this); }
     /** */ void visit(const KeyValuePair keyValuePair) { keyValuePair.accept(this); }
@@ -2319,6 +2339,90 @@ final class InterfaceDeclaration : BaseNode
 }
 
 ///
+final class InterpolatedStringLiteral : BaseNode
+{
+    import dparse.parser : ParserConfig;
+
+    /// no-op, if you want to visit the nested expressions, use `acceptExpressions`
+    /// Note that those will have a different source `tokens` array and thus
+    /// will have different indices and such. Code accessing token neighbors by
+    /// pointer manipulation will break.
+    override void accept(ASTVisitor visitor) const
+    {
+    }
+
+    /// Dynamically parses the interpolated string and calls the visitor on all
+    /// of its parts. Note that all the AST nodes visited from this function
+    /// will have a different `tokens` source array, so offsetting the pointers
+    /// past the array boundaries may cause out-of-bounds memory reads if you
+    /// don't check for them beforehand.
+    void acceptExpressions(
+        ParserConfig parserConfig,
+        LexerConfig lexerConfig,
+        StringCache* stringCache,
+        ASTVisitor visitor
+    ) const
+    {
+        import dparse.istring : parseIStringParts;
+
+        foreach (part; parseIStringParts(parserConfig, lexerConfig, stringCache, literal.text))
+        {
+            assert(part !is null);
+            visitor.dynamicDispatch(part);
+        }
+    }
+
+    /// The raw token
+    inout(Token) literal() inout @safe pure nothrow @nogc return
+    {
+        if (!tokens.length)
+            return Token.init;
+        return tokens[0];
+    }
+
+    mixin OpEquals;
+}
+
+///
+abstract class InterpolatedStringLiteralPart : BaseNode
+{
+    /// Index within the istringLiteral, so the value is always at least the
+    /// `istringLiteral` token index + 2, since interpolated strings start with
+    /// `i"` and all parts indices are within the quotes.
+    size_t index;
+}
+
+///
+final class InterpolatedStringLiteralPlain : InterpolatedStringLiteralPart
+{
+    override void accept(ASTVisitor visitor) const
+    {
+    }
+
+    /** */ string sourceText;
+}
+
+///
+final class InterpolatedStringLiteralVariable : InterpolatedStringLiteralPart
+{
+    override void accept(ASTVisitor visitor) const
+    {
+    }
+
+    /** */ string identifier;
+}
+
+///
+final class InterpolatedStringLiteralExpression : InterpolatedStringLiteralPart
+{
+    override void accept(ASTVisitor visitor) const
+    {
+    }
+
+    /** */ Expression expression;
+}
+
+///
 final class Invariant : BaseNode
 {
     override void accept(ASTVisitor visitor) const
@@ -2798,7 +2902,7 @@ final class PrimaryExpression : ExpressionNode
                 typeofExpression, typeidExpression, arrayLiteral, assocArrayLiteral,
                 expression, dot, identifierOrTemplateInstance, isExpression,
                 functionLiteralExpression,traitsExpression, mixinExpression,
-                importExpression, vector, arguments));
+                importExpression, vector, arguments, interpolatedStringLiteral));
     }
     /** */ Token dot;
     /** */ Token primary;
@@ -2818,6 +2922,7 @@ final class PrimaryExpression : ExpressionNode
     /** */ Type type;
     /** */ Token typeConstructor;
     /** */ Arguments arguments;
+    /** */ InterpolatedStringLiteral interpolatedStringLiteral;
     mixin OpEquals;
 }
 
