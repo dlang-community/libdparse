@@ -14,15 +14,19 @@ import dparse.rollback_allocator;
 /// - `InterpolatedStringLiteralExpression` a `$(...)` expression
 ///
 /// Params:
-///     istringText = the token text of an istring such as `i"hello $name"`
+///     parserConfig = uses the allocator to create the returned class instances,
+///         also used in whole for controlling the parser of embedded expressions.
+///     lexerConfig = for embedded expressions, lexer config
+///     stringCache = for embedded expressions, string cache
+///     istring = the `tok!"istringLiteral"` token containing e.g. `i"hello $name"`
 InterpolatedStringLiteralPart[] parseIStringParts(
     ParserConfig parserConfig,
     LexerConfig lexerConfig,
     StringCache* stringCache,
-    return string istringText
+    return Token istring
 )
 {
-    auto tokens = tokenizeIString(istringText);
+    auto tokens = tokenizeIString(istring);
     auto ret = new typeof(return)(tokens.length);
 
     auto allocator = parserConfig.allocator;
@@ -73,10 +77,13 @@ InterpolatedStringLiteralPart[] parseIStringParts(
 /// - tok!"identifier"(index:9, text:"name")
 /// - tok!"stringLiteral"(index:13, text:" ")
 /// - tok!"specialTokenSequence"(index:16, text:"something + 2")
-Token[] tokenizeIString(return string istringText)
-in (istringText.startsWith(`i"`))
-in (istringText.endsWith(`"`))
+/// all tokens are offset by the input `istring.{index, line, column}`
+Token[] tokenizeIString(return Token istring)
+in (istring.text.startsWith(`i"`))
+in (istring.text.endsWith(`"`))
 {
+    import std.experimental.lexer : LexerRange;
+
     enum State
     {
         plain,
@@ -86,45 +93,95 @@ in (istringText.endsWith(`"`))
         expression
     }
 
-    istringText = istringText[0 .. $ - 1]; // remove trailing `"`
+    auto indexOffset = istring.index;
+
+    auto bytes = cast(const(ubyte)[]) istring.text[0 .. $ - 1]; // remove trailing `"`
+    auto range = LexerRange(bytes, 0, istring.column, istring.line);
+    // skip `i"`
+    range.popFront();
+    range.popFront();
+
+    void popFrontWhitespaceAware()
+    {
+        switch (range.bytes[range.index])
+        {
+        case '\r':
+            range.popFront();
+            if (!(range.index >= range.bytes.length) && range.bytes[range.index] == '\n')
+            {
+                range.popFront();
+                range.incrementLine();
+            }
+            else
+                range.incrementLine();
+            return;
+        case '\n':
+            range.popFront();
+            range.incrementLine();
+            return;
+        case 0xe2:
+            auto lookahead = range.peek(3);
+            if (lookahead.length == 3 && lookahead[1] == 0x80
+                && (lookahead[2] == 0xa8 || lookahead[2] == 0xa9))
+            {
+                range.index+=3;
+                range.column+=3;
+                range.incrementLine();
+                return;
+            }
+            else
+            {
+                range.popFront();
+                return;
+            }
+        default:
+            range.popFront();
+            return;
+        }
+    }
 
     State state;
     int depth;
     auto ret = appender!(Token[]);
+    auto startMark = range;
 
-    // i = 2, to skip the starting `i"`
-    size_t lastEnd = 2;
-    for (size_t i = lastEnd; i < istringText.length; i++)
+    while (!range.empty)
     {
-        char c = istringText[i];
+        char c = cast(char) range.front;
         final switch (state)
         {
         case State.dollar:
-            auto dollarIndex = i - 1;
+            auto dollarIndex = range.index - 1;
+            bool skipConsume = false;
             if (c == '(')
             {
                 state = State.expression;
                 depth = 1;
             }
-            else if (DLexer.isIdentifierSeparating(istringText, i)
+            else if (DLexer.isIdentifierSeparating(istring.text, range.index)
                 || (c >= '0' && c <= '9'))
                 goto case State.plain;
             else
             {
                 state = State.identifier;
-                i--;
+                skipConsume = true;
             }
 
-            if (lastEnd != dollarIndex)
+            if (startMark.index != dollarIndex)
             {
                 Token t;
                 t.type = tok!"stringLiteral";
-                t.text = istringText[lastEnd .. dollarIndex];
-                t.index = t.column = lastEnd;
+                t.text = istring.text[startMark.index .. dollarIndex];
+                t.index = startMark.index + indexOffset;
+                t.column = startMark.column;
+                t.line = startMark.line;
                 ret ~= t;
             }
-            lastEnd = i + 1;
-            break;
+
+            if (!skipConsume)
+                popFrontWhitespaceAware();
+            startMark = range;
+            continue;
         case State.plain:
             if (c == '\\')
                 state = State.escape;
@@ -137,13 +194,15 @@ in (istringText.endsWith(`"`))
             state = State.plain;
             break;
         case State.identifier:
-            if (!DLexer.isIdentifierSeparating(istringText, i))
+            if (!DLexer.isIdentifierSeparating(istring.text, range.index))
                 break;
             Token t;
             t.type = tok!"identifier";
-            t.text = istringText[lastEnd .. i];
-            t.index = t.column = lastEnd;
-            lastEnd = i;
+            t.text = istring.text[startMark.index .. range.index];
+            t.index = startMark.index + indexOffset;
+            t.column = startMark.column;
+            t.line = startMark.line;
+            startMark = range;
             ret ~= t;
             goto case State.plain;
         case State.expression:
@@ -156,15 +215,21 @@ in (istringText.endsWith(`"`))
                 {
                     Token t;
                     t.type = tok!"specialTokenSequence";
-                    t.text = istringText[lastEnd .. i];
-                    t.index = t.column = lastEnd;
-                    lastEnd = i + 1;
+                    t.text = istring.text[startMark.index .. range.index];
+                    t.index = startMark.index + indexOffset;
+                    t.column = startMark.column;
+                    t.line = startMark.line;
+                    range.popFront();
+                    startMark = range;
                     ret ~= t;
                     state = State.plain;
+                    continue;
                 }
             }
             break;
         }
+
+        popFrontWhitespaceAware();
     }
 
     final switch (state)
@@ -172,26 +237,32 @@ in (istringText.endsWith(`"`))
     case State.dollar:
     case State.plain:
     case State.escape:
-        if (lastEnd == istringText.length)
+        if (startMark.index == bytes.length)
             break;
         Token t;
         t.type = tok!"stringLiteral";
-        t.text = istringText[lastEnd .. $];
-        t.index = t.column = lastEnd;
+        t.text = istring.text[startMark.index .. bytes.length];
+        t.index = startMark.index + indexOffset;
+        t.column = startMark.column;
+        t.line = startMark.line;
         ret ~= t;
         break;
     case State.identifier:
         Token t;
         t.type = tok!"identifier";
-        t.text = istringText[lastEnd .. $];
-        t.index = t.column = lastEnd;
+        t.text = istring.text[startMark.index .. bytes.length];
+        t.index = startMark.index + indexOffset;
+        t.column = startMark.column;
+        t.line = startMark.line;
         ret ~= t;
         break;
     case State.expression:
         Token t;
         t.type = tok!"specialTokenSequence";
-        t.text = istringText[lastEnd .. $];
-        t.index = t.column = lastEnd;
+        t.text = istring.text[startMark.index .. bytes.length];
+        t.index = startMark.index + indexOffset;
+        t.column = startMark.column;
+        t.line = startMark.line;
         ret ~= t;
         break;
     }
@@ -202,93 +273,98 @@ in (istringText.endsWith(`"`))
 ///
 unittest
 {
-    auto tokens = tokenizeIString(`i"hello $name $(something + 2)"`);
+    import std.conv;
 
-    assert(tokens.length == 4);
+    Token input;
+    input.text = `i"hello $name $(something + 2)"`;
+    input.line = 5;
+    input.column = 10;
+    input.index = 100;
+    auto tokens = tokenizeIString(input);
 
-    assert(tokens[0].type == tok!"stringLiteral");
-    assert(tokens[0].index == 2);
-    assert(tokens[0].text == "hello ");
+    auto all = "tokens:\n" ~ tokens.to!(string[]).join("\n");
 
-    assert(tokens[1].type == tok!"identifier");
-    assert(tokens[1].index == 9);
-    assert(tokens[1].text == "name");
+    assert(tokens.length == 4, all);
 
-    assert(tokens[2].type == tok!"stringLiteral");
-    assert(tokens[2].index == 13);
-    assert(tokens[2].text == " ");
+    assert(tokens[0].type == tok!"stringLiteral", all);
+    assert(tokens[0].index == 102, all);
+    assert(tokens[0].column == 12, all);
+    assert(tokens[0].line == 5, all);
+    assert(tokens[0].text == "hello ", all);
 
-    assert(tokens[3].type == tok!"specialTokenSequence");
-    assert(tokens[3].index == 16);
-    assert(tokens[3].text == "something + 2");
+    assert(tokens[1].type == tok!"identifier", all);
+    assert(tokens[1].index == 109, all);
+    assert(tokens[1].column == 19, all);
+    assert(tokens[1].line == 5, all);
+    assert(tokens[1].text == "name", all);
+
+    assert(tokens[2].type == tok!"stringLiteral", all);
+    assert(tokens[2].index == 113, all);
+    assert(tokens[2].column == 23, all);
+    assert(tokens[2].line == 5, all);
+    assert(tokens[2].text == " ", all);
+
+    assert(tokens[3].type == tok!"specialTokenSequence", all);
+    assert(tokens[3].index == 116, all);
+    assert(tokens[3].column == 26, all);
+    assert(tokens[3].line == 5, all);
+    assert(tokens[3].text == "something + 2", all);
 }
 
 unittest
 {
-    auto tokens = tokenizeIString(`i"$name"`);
-    assert(tokens.length == 1);
-    assert(tokens[0].type == tok!"identifier");
-    assert(tokens[0].index == 3);
-    assert(tokens[0].text == "name");
+    auto test(string content)
+    {
+        Token input;
+        input.text = content;
+        input.line = 1;
+        input.column = 1;
+        input.index = 0;
+        auto tokens = tokenizeIString(input);
+        char[] ret = new char[content.length];
+        ret[] = ' ';
+        foreach (t; tokens)
+        {
+            assert(t.text.length);
+            ret[t.index .. t.index + t.text.length] =
+                t.type == tok!"identifier" ? 'i' :
+                t.type == tok!"stringLiteral" ? '.' :
+                t.type == tok!"specialTokenSequence" ? '*' : '?';
+        }
+        return ret;
+    }
 
-    tokens = tokenizeIString(`i"plain"`);
-    assert(tokens.length == 1);
-    assert(tokens[0].type == tok!"stringLiteral");
-    assert(tokens[0].index == 2);
-    assert(tokens[0].text == "plain");
+    // dfmt off
 
-    tokens = tokenizeIString(`i"$(expression)"`);
-    assert(tokens.length == 1);
-    assert(tokens[0].type == tok!"specialTokenSequence");
-    assert(tokens[0].index == 4);
-    assert(tokens[0].text == "expression");
+    assert(test(`i"$name"`)
+             == `   iiii `);
 
-    tokens = tokenizeIString(`i"$(expression"`);
-    assert(tokens.length == 1);
-    assert(tokens[0].type == tok!"specialTokenSequence");
-    assert(tokens[0].index == 4);
-    assert(tokens[0].text == "expression");
+    assert(test(`i"plain"`)
+             == `  ..... `);
 
-    tokens = tokenizeIString(`i"$name "`);
-    assert(tokens.length == 2);
-    assert(tokens[0].type == tok!"identifier");
-    assert(tokens[0].index == 3);
-    assert(tokens[0].text == "name");
-    assert(tokens[1].type == tok!"stringLiteral");
-    assert(tokens[1].index == 7);
-    assert(tokens[1].text == " ");
+    assert(test(`i"$(expression)"`)
+             == `    **********  `);
 
-    tokens = tokenizeIString(`i"$ plain"`);
-    assert(tokens.length == 1);
-    assert(tokens[0].type == tok!"stringLiteral");
-    assert(tokens[0].index == 2);
-    assert(tokens[0].text == "$ plain");
+    assert(test(`i"$(expression"`)
+             == `    ********** `);
 
-    tokens = tokenizeIString(`i"$0 plain"`);
-    assert(tokens.length == 1);
-    assert(tokens[0].type == tok!"stringLiteral");
-    assert(tokens[0].index == 2);
-    assert(tokens[0].text == "$0 plain");
+    assert(test(`i"$name "`)
+             == `   iiii. `);
 
-    tokens = tokenizeIString(`i"$$0 plain"`);
-    assert(tokens.length == 1);
-    assert(tokens[0].type == tok!"stringLiteral");
-    assert(tokens[0].index == 2);
-    assert(tokens[0].text == "$$0 plain");
+    assert(test(`i"$ plain"`)
+             == `  ....... `);
 
-    tokens = tokenizeIString(`i"$.1 plain"`);
-    assert(tokens.length == 1);
-    assert(tokens[0].type == tok!"stringLiteral");
-    assert(tokens[0].index == 2);
-    assert(tokens[0].text == "$.1 plain");
+    assert(test(`i"$0 plain"`)
+             == `  ........ `);
 
-    tokens = tokenizeIString(`i"I have $$money"`);
-    assert(tokens.length == 2);
-    assert(tokens[0].type == tok!"stringLiteral");
-    assert(tokens[0].index == 2);
-    assert(tokens[0].text == "I have $");
+    assert(test(`i"$$0 plain"`)
+             == `  ......... `);
 
-    assert(tokens[1].type == tok!"identifier");
-    assert(tokens[1].index == 11);
-    assert(tokens[1].text == "money");
+    assert(test(`i"$.1 plain"`)
+             == `  ......... `);
+
+    assert(test(`i"I have $$money"`)
+             == `  ........ iiiii `);
+
+    // dfmt on
 }

@@ -2365,7 +2365,7 @@ final class InterpolatedStringLiteral : BaseNode
     {
         import dparse.istring : parseIStringParts;
 
-        foreach (part; parseIStringParts(parserConfig, lexerConfig, stringCache, literal.text))
+        foreach (part; parseIStringParts(parserConfig, lexerConfig, stringCache, literal))
         {
             assert(part !is null);
             visitor.dynamicDispatch(part);
