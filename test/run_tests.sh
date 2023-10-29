@@ -88,12 +88,12 @@ if [[ ${BUILDKITE:-} != "true" ]]; then
 				expectParseFailure=1
 			elif [[ "$line" =~ ^# ]]; then
 				true # comment line
-			elif echo "$AST" | xmllint --xpath "${line}" - 2>/dev/null > /dev/null; then
-				((currentPasses=currentPasses+1))
-			else
+			elif echo "$AST" | xmllint --xpath "${line}" - 2>&1 | grep 'XPath set is empty' >/dev/null; then
 				echo
 				echo -e "    ${RED}Check on line $lineCount of $queryFile failed.${NORMAL}"
 				((currentFailures=currentFailures+1))
+			else
+				((currentPasses=currentPasses+1))
 			fi
 			((lineCount=lineCount+1))
 		done < "$queryFile"

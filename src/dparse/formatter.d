@@ -2012,6 +2012,36 @@ class Formatter(Sink)
         }
     }
 
+    void format(const InterpolatedString interpolatedString)
+    {
+        put(interpolatedString.startQuote.text);
+        foreach (part; interpolatedString.parts)
+        {
+            if (cast(InterpolatedStringText) part) format(cast(InterpolatedStringText) part);
+            else if (cast(InterpolatedStringVariable) part) format(cast(InterpolatedStringVariable) part);
+            else if (cast(InterpolatedStringExpression) part) format(cast(InterpolatedStringExpression) part);
+        }
+        put(interpolatedString.endQuote.text);
+    }
+
+    void format(const InterpolatedStringText interpolatedStringText)
+    {
+        put(interpolatedStringText.text.text);
+    }
+
+    void format(const InterpolatedStringVariable interpolatedStringVariable)
+    {
+        put("$");
+        put(interpolatedStringVariable.name.text);
+    }
+
+    void format(const InterpolatedStringExpression interpolatedStringExpression)
+    {
+        put("$(");
+        format(interpolatedStringExpression.expression);
+        put(")");
+    }
+
     void format(const Invariant invariant_, const Attribute[] attrs = null)
     {
         debug(verbose) writeln("Invariant");
@@ -2571,6 +2601,7 @@ class Formatter(Sink)
         Type type;
         Token typeConstructor;
         Arguments arguments;
+        InterpolatedString interpolatedString;
         **/
 
         with(primaryExpression)
@@ -2605,6 +2636,7 @@ class Formatter(Sink)
             else if (vector) format(vector);
             else if (type) format(type);
             else if (arguments) format(arguments);
+            else if (interpolatedString) format(interpolatedString);
         }
     }
 
@@ -4348,4 +4380,9 @@ do
     {
     }
 }}, `a == b && c == d`);
+    testFormatNode!(VariableDeclaration)(`T x = i"hello";`);
+    testFormatNode!(VariableDeclaration)(`T x = i" hello ";`);
+    testFormatNode!(VariableDeclaration)(`T x = i" hello $name ";`);
+    testFormatNode!(VariableDeclaration)(`T x = i" hello $(name) ";`);
+    testFormatNode!(VariableDeclaration)(`T x = i" hello $( name ) ";`, `T x = i" hello $(name) ";`);
 }
