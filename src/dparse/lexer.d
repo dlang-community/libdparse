@@ -555,7 +555,7 @@ public bool isLiteral(IdType type) pure nothrow @safe @nogc
  * `leadingTrivia` until there is the EOF, where it will be attached as
  * `trailingTrivia` again.
  */
-const(Token)[] getTokensForParser(R)(R sourceCode, LexerConfig config, StringCache* cache)
+Token[] getTokensForParser(R)(R sourceCode, LexerConfig config, StringCache* cache)
 if (is(Unqual!(ElementEncodingType!R) : ubyte) && isDynamicArray!R)
 {
     config.whitespaceBehavior = WhitespaceBehavior.include;
