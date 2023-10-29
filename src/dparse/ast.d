@@ -2363,7 +2363,23 @@ final class InterpolatedString : BaseNode
             : Token.init;
     }
 
-    mixin OpEquals!("startQuote.text");
+    /// '\0'/'c'/'w'/'d' for `i""`, `i""c`, `i""w` and `i""d` respectively.
+    char postfixType() inout pure nothrow @nogc @safe scope
+    {
+        auto end = endQuote.text;
+        auto endChar = end.length ? end[$ - 1] : ' ';
+        switch (endChar)
+        {
+        case 'c':
+        case 'w':
+        case 'd':
+            return endChar;
+        default:
+            return '\0';
+        }
+    }
+
+    mixin OpEquals!("startQuote.text", "postfixType");
 }
 
 ///
