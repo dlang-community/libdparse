@@ -167,12 +167,53 @@ mixin template TokenTriviaFields()
     int opCmp(ref const typeof(this) other) const pure nothrow @safe @nogc {
         return opCmp(other.index);
     }
+
+    string toString() const @safe pure
+    {
+        import std.array : appender;
+
+        auto sink = appender!string;
+        toString(sink);
+        return sink.data;
+    }
+
+    void toString(R)(auto ref R sink) const
+    {
+        import std.conv : to;
+        import dparse.lexer : str;
+
+        sink.put("tok!\"");
+        sink.put(str(type));
+        sink.put("\"(");
+        sink.put("text: ");
+        sink.put([text].to!string[1 .. $ - 1]); // escape hack
+        sink.put(", index: ");
+        sink.put(index.to!string);
+        sink.put(", line: ");
+        sink.put(line.to!string);
+        sink.put(", column: ");
+        sink.put(column.to!string);
+        sink.put(", trivia: { leading: [");
+        foreach (i, tok; leadingTrivia)
+        {
+            if (i != 0) sink.put(", ");
+            tok.toString(sink);
+        }
+        sink.put("], trailing: [");
+        foreach (i, tok; trailingTrivia)
+        {
+            if (i != 0) sink.put(", ");
+            tok.toString(sink);
+        }
+        sink.put("]}");
+        sink.put(")");
+    }
 }
 
 // mixin in from dparse.lexer to make error messages more managable size as the
 // entire string is dumped when there is a type mismatch.
 private immutable extraFields = "import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;";
-private immutable extraFieldsBare = "
+private immutable extraFieldsBare = q{
     import dparse.lexer : Token;
 
     this(Token token) pure nothrow @safe @nogc {
@@ -188,7 +229,35 @@ private immutable extraFieldsBare = "
     int opCmp(ref const typeof(this) other) const pure nothrow @safe @nogc {
         return opCmp(other.index);
     }
-";
+
+    string toString() const @safe pure
+    {
+        import std.array : appender;
+
+        auto sink = appender!string;
+        toString(sink);
+        return sink.data;
+    }
+
+    void toString(R)(auto ref R sink) const
+    {
+        import std.conv : to;
+        import dparse.lexer : str;
+
+        sink.put("trivia!\"");
+        sink.put(str(type));
+        sink.put("\"(");
+        sink.put("text: ");
+        sink.put([text].to!string[1 .. $ - 1]); // escape hack
+        sink.put(", index: ");
+        sink.put(index.to!string);
+        sink.put(", line: ");
+        sink.put(line.to!string);
+        sink.put(", column: ");
+        sink.put(column.to!string);
+        sink.put(")");
+    }
+};
 
 /// The token type in the D lexer
 public alias Token = std.experimental.lexer.TokenStructure!(IdType, extraFields);
