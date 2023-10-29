@@ -47,7 +47,8 @@ private immutable dynamicTokens = [
     "whitespace", "doubleLiteral", "floatLiteral", "idoubleLiteral",
     "ifloatLiteral", "intLiteral", "longLiteral", "realLiteral",
     "irealLiteral", "uintLiteral", "ulongLiteral", "characterLiteral",
-    "dstringLiteral", "stringLiteral", "wstringLiteral"
+    "dstringLiteral", "stringLiteral", "wstringLiteral", "istringLiteralStart",
+    "istringLiteralText", "istringLiteralEnd"
 ];
 
 private immutable pseudoTokenHandlers = [
@@ -68,6 +69,9 @@ private immutable pseudoTokenHandlers = [
     "7", "lexDecimal",
     "8", "lexDecimal",
     "9", "lexDecimal",
+    "i\"", "lexInterpolatedString",
+    "i`", "lexInterpolatedString",
+    "iq{", "lexInterpolatedString",
     "q\"", "lexDelimitedString",
     "q{", "lexTokenString",
     "r\"", "lexWysiwygString",
@@ -642,10 +646,31 @@ public struct DLexer
     ///
     public void popFront()() pure nothrow @safe
     {
-        do
-            _popFront();
-        while (config.whitespaceBehavior == WhitespaceBehavior.skip
-            && _front.type == tok!"whitespace");
+        if (range.index >= range.bytes.length)
+        {
+            _front.type = _tok!"\0";
+            return;
+        }
+
+        if (istringStack.length && istringStack[$ - 1].parens == 0)
+        {
+            lexIstringContent(_front);
+        }
+        else
+        {
+            do
+                _popFront();
+            while (config.whitespaceBehavior == WhitespaceBehavior.skip
+                && _front.type == tok!"whitespace");
+
+            if (istringStack.length)
+            {
+                if (_front.type == tok!"(")
+                    istringStack[$ - 1].parens++;
+                else if (_front.type == tok!")")
+                    istringStack[$ - 1].parens--;
+            }
+        }
     }
 
     /**
@@ -1392,6 +1417,12 @@ private pure nothrow @safe:
             index);
     }
 
+    private ubyte lexStringSuffix() pure nothrow @safe
+    {
+        IdType t;
+        return lexStringSuffix(t);
+    }
+
     private ubyte lexStringSuffix(ref IdType type) pure nothrow @safe
     {
         if (range.index >= range.bytes.length)
@@ -1409,6 +1440,134 @@ private pure nothrow @safe:
             default: type = tok!"stringLiteral"; return 0;
             }
         }
+    }
+
+    void lexInterpolatedString(ref Token token)
+    {
+        mixin (tokenStart);
+        IstringState.Type type;
+        range.popFront();
+        switch (range.bytes[range.index])
+        {
+        case '"': type = IstringState.type.quote; break;
+        case '`': type = IstringState.type.backtick; break;
+        case 'q':
+            type = IstringState.type.tokenString;
+            range.popFront();
+            break;
+        default:
+            assert(false);
+        }
+        range.popFront();
+        token = Token(tok!"istringLiteralStart", cache.intern(range.slice(mark)), line, column, index);
+        istringStack ~= IstringState(0, 0, type);
+    }
+
+    void lexIstringContent(ref Token token)
+    {
+        mixin (tokenStart);
+
+        assert(istringStack.length > 0);
+        assert(istringStack[$ - 1].parens == 0);
+
+        if (istringStack[$ - 1].dollar)
+        {
+            istringStack[$ - 1].dollar = false;
+            if (range.front == '(')
+            {
+                istringStack[$ - 1].parens++;
+                range.popFront();
+                token = Token(tok!"(", null, line, column, index);
+            }
+            else
+                lexIdentifier(token);
+            return;
+        }
+
+        switch (range.front)
+        {
+        case '$':
+            if (isAtIstringExpression)
+            {
+                istringStack[$ - 1].dollar = true;
+                range.popFront();
+                token = Token(tok!"$", null, line, column, index);
+                break;
+            }
+            else
+                goto default;
+        case '}':
+        case '"':
+        case '`':
+            if (range.front != istringStack[$ - 1].type || istringStack[$ - 1].braces)
+                goto default;
+
+            istringStack.length--;
+            range.popFront();
+            lexStringSuffix();
+            token = Token(tok!"istringLiteralEnd", cache.intern(range.slice(mark)), line,
+                column, index);
+            break;
+        default:
+            lexIstringPlain(token);
+            break;
+        }
+    }
+
+    void lexIstringPlain(ref Token token)
+    {
+        mixin (tokenStart);
+        Loop: while (!range.empty)
+        {
+            char c = range.bytes[range.index];
+            switch (c)
+            {
+            case '\\':
+                if (istringStack[$ - 1].type == IstringState.Type.quote)
+                    lexEscapeSequence();
+                else
+                    goto default;
+                break;
+            case '$':
+                if (isAtIstringExpression)
+                    break Loop;
+                else
+                    goto default;
+            case '{':
+                if (istringStack[$ - 1].type == IstringState.Type.tokenString)
+                    istringStack[$ - 1].braces++;
+                goto default;
+            case '}':
+                if (istringStack[$ - 1].type == IstringState.Type.tokenString)
+                {
+                    assert(istringStack[$ - 1].braces > 0);
+                    istringStack[$ - 1].braces--;
+                }
+                goto default;
+            case '"':
+            case '`':
+                if (c == istringStack[$ - 1].type)
+                    break Loop;
+                goto default;
+            default:
+                popFrontWhitespaceAware();
+                break;
+            }
+        }
+        token = Token(tok!"istringLiteralText", cache.intern(range.slice(mark)),
+            line, column, index);
+    }
+
+    bool isAtIstringExpression()
+    {
+        if (range.index + 1 >= range.bytes.length)
+            return false;
+        auto c = range.bytes[range.index + 1];
+        if (c == '(')
+            return true;
+        if (c >= '0' && c <= '9')
+            return false;
+        return !isSeparating(1);
     }
 
     void lexDelimitedString(ref Token token)
@@ -1548,7 +1707,7 @@ private pure nothrow @safe:
             config.stringBehavior = oldString;
         }
 
-        advance(_front);
+        popFront();
 
         if (range.index >= range.bytes.length)
         {
@@ -1652,6 +1811,7 @@ private pure nothrow @safe:
         case '\'':
         case '"':
         case '?':
+        case '$':
         case '\\':
         case 'a':
         case 'b':
@@ -1958,6 +2118,22 @@ private pure nothrow @safe:
     StringCache* cache;
     LexerConfig config;
     bool haveSSE42;
+    IstringState[] istringStack;
+
+    static struct IstringState
+    {
+        enum Type : ubyte
+        {
+            quote = '"',
+            backtick = '`',
+            tokenString = '}',
+        }
+
+        ushort parens;
+        ushort braces;
+        Type type;
+        bool dollar;
+    }
 }
 
 /**
@@ -2260,11 +2436,62 @@ private extern(C) void free(void*) nothrow pure @nogc @trusted;
 
 unittest
 {
-    auto source = cast(ubyte[]) q{ import std.stdio;}c;
-    auto tokens = getTokensForParser(source, LexerConfig(),
-        new StringCache(StringCache.defaultBucketCount));
-    assert (tokens.map!"a.type"().equal([tok!"import", tok!"identifier", tok!".",
-        tok!"identifier", tok!";"]));
+    import std.conv;
+    auto tokens(string source)
+    {
+        auto tokens = getTokensForParser(cast(ubyte[]) source, LexerConfig(),
+            new StringCache(StringCache.defaultBucketCount));
+        return tokens;
+    }
+    assert (tokens(q{ import std.stdio;}c).map!"a.type"().equal(
+        [tok!"import", tok!"identifier", tok!".", tok!"identifier", tok!";"]));
+
+    assert (tokens(`i"hello".foo`).map!"a.type"().equal(
+        [
+            tok!"istringLiteralStart",
+            tok!"istringLiteralText",
+            tok!"istringLiteralEnd",
+            tok!".",
+            tok!"identifier"
+        ]), tokens(`i"hello".foo`).to!string);
+
+    assert (tokens(`i"hello $name".foo`).map!"a.type"().equal(
+        [
+            tok!"istringLiteralStart",
+            tok!"istringLiteralText",
+            tok!"$",
+            tok!"identifier",
+            tok!"istringLiteralEnd",
+            tok!".",
+            tok!"identifier"
+        ]));
+
+    assert (tokens(`i"hello $name".foo`).map!"a.type"().equal(
+        [
+            tok!"istringLiteralStart",
+            tok!"istringLiteralText",
+            tok!"$",
+            tok!"identifier",
+            tok!"istringLiteralEnd",
+            tok!".",
+            tok!"identifier"
+        ]));
+
+    assert (tokens(`i"hello $(x + "hello $(world)") bar".foo`).map!"a.type"().equal(
+        [
+            tok!"istringLiteralStart",
+            tok!"istringLiteralText",
+            tok!"$",
+            tok!"(",
+            tok!"identifier",
+            tok!"+",
+            tok!"stringLiteral",
+            tok!")",
+            tok!"istringLiteralText",
+            tok!"istringLiteralEnd",
+            tok!".",
+            tok!"identifier"
+        ]));
 }
 
 /// Test \x char sequence
@@ -2584,12 +2811,12 @@ void main() {
     assert(tokens[i++].type == tok!";");
     assert(tokens[i++].type == tok!"}");
 
-    void checkInvalidTrailingString(const Token[] tokens)
+    void checkInvalidTrailingString(const Token[] tokens, int expected = 3)
     {
-        assert(tokens.length == 3);
-        assert(tokens[2].index != 0);
-        assert(tokens[2].column >= 4);
-        assert(tokens[2].type == tok!"");
+        assert(tokens.length == expected);
+        assert(tokens[$ - 1].index != 0);
+        assert(tokens[$ - 1].column >= 4);
+        assert(tokens[$ - 1].type == tok!"");
     }
 
     checkInvalidTrailingString(getTokensForParser(`x = "foo`, cf, &ca));
@@ -2599,4 +2826,83 @@ void main() {
     checkInvalidTrailingString(getTokensForParser("x = q{foo", cf, &ca));
     checkInvalidTrailingString(getTokensForParser(`x = q"foo`, cf, &ca));
     checkInvalidTrailingString(getTokensForParser("x = '", cf, &ca));
+    checkInvalidTrailingString(getTokensForParser(`i"$("`, cf, &ca), 4);
+    checkInvalidTrailingString(getTokensForParser(`i"$("foo`, cf, &ca), 4);
+    checkInvalidTrailingString(getTokensForParser(`i"$(q{`, cf, &ca), 4);
+    checkInvalidTrailingString(getTokensForParser(`i"$(q{foo`, cf, &ca), 4);
+}
+
+unittest
+{
+    import std.conv;
+
+    auto test(string content, bool debugPrint = false)
+    {
+        LexerConfig cf;
+        StringCache ca = StringCache(16);
+
+        const tokens = getTokensForParser(content, cf, &ca);
+        if (debugPrint)
+            return tokens.to!(char[][]).join("\n");
+
+        char[] ret = new char[content.length];
+        ret[] = ' ';
+        foreach_reverse (t; tokens)
+        {
+            ret[t.index .. t.index + max(1, t.text.length)] =
+                t.type == tok!"$" ? '$' :
+                t.type == tok!"(" ? '(' :
+                t.type == tok!")" ? ')' :
+                t.type == tok!"identifier" ? 'i' :
+                t.type == tok!"istringLiteralStart" ? 'S' :
+                t.type == tok!"istringLiteralText" ? '.' :
+                t.type == tok!"istringLiteralEnd" ? 'E' :
+                t.type == tok!"" ? '%' :
+                '?';
+        }
+        return ret;
+    }
+
+    // dfmt off
+
+    assert(test(`i"$name"`)
+             == `SS$iiiiE`);
+
+    assert(test(`i"\$plain\0"`)
+             == `SS.........E`);
+
+    assert(test(`i"$(expression)"w`)
+             == `SS$(iiiiiiiiii)EE`);
+
+    assert(test(`i"$(expression"c`)
+             == `SS$(iiiiiiiiii  `);
+
+    assert(test(`i"$name "`)
+             == `SS$iiii.E`);
+
+    assert(test(`i"$ {}plain"`)
+             == `SS.........E`);
+
+    assert(test("i\"$ ``plain\"")
+             == `SS.........E`);
+
+    assert(test(`i"$0 plain"`)
+             == `SS........E`);
+
+    assert(test(`i"$$0 plain"`)
+             == `SS.........E`);
+
+    assert(test(`i"$.1 plain"`)
+             == `SS.........E`);
+
+    assert(test(`i"I have $$money"`)
+             == `SS........$iiiiiE`);
+
+    assert(test("i`I \"have\" $$money`")
+             == "SS..........$iiiiiE", test("i`I \"have\" $$money`", true));
+
+    assert(test("iq{I `\"have\"` $$money}")
+             == "SSS............$iiiiiE");
+
+    // dfmt on
 }
