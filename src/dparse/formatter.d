@@ -1178,7 +1178,7 @@ class Formatter(Sink)
             if (member.comment.length)
             {
                 space();
-                put(member.comment);
+                putComment(member.comment);
             }
         }
         endBlock();
@@ -1497,6 +1497,7 @@ class Formatter(Sink)
         with(functionBody)
         {
             if (specifiedFunctionBody) format(specifiedFunctionBody);
+            if (shortenedFunctionBody) format(shortenedFunctionBody);
             if (missingFunctionBody) format(missingFunctionBody);
         }
     }
@@ -4000,7 +4001,7 @@ protected:
     {
         import std.string : splitLines;
         if (!c.length) return;
-        put(c.splitLines().join("\n" ~ getIndent()));
+        put(c.splitLines().map!((x) => "/// " ~ x).join("\n" ~ getIndent()));
         newlineIndent();
     }
 
