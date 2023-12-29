@@ -2691,7 +2691,7 @@ class Formatter(Sink)
     void format(const ShortenedFunctionBody shortenedFunctionBody)
     {
         debug(verbose) writeln("ShortenedFunctionBody");
-        put("=> ");
+        put(" => ");
         format(shortenedFunctionBody.expression);
         put(";");
     }
@@ -4349,4 +4349,22 @@ do
     {
     }
 }}, `a == b && c == d`);
+    testFormatNode!(FunctionDeclaration)(q{void foo() => writeln("Hello");});
+    testFormatNode!(VariableDeclaration)(q{/// Documentation for this variable
+/// which is even multilined.
+int x;});
+    testFormatNode!(EnumDeclaration)(q{enum Foo {
+        x, /// Documentation for x
+        y, /// Documentation for y
+        z, /// Documentation for z
+}}, "enum Foo 
+
+{
+x, /// Documentation for x
+    
+y, /// Documentation for y
+    
+z /// Documentation for z
+    
+}");
 }
