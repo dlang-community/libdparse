@@ -147,7 +147,7 @@ mixin template TokenTriviaFields()
         import dparse.trivia : extractLeadingDdoc;
         if (memoizedLeadingComment !is null)
             return memoizedLeadingComment;
-        return (cast()memoizedLeadingComment) = this.extractLeadingDdoc;
+        return (ref () @trusted => cast() memoizedLeadingComment)() = this.extractLeadingDdoc;
     }
 
     /// ditto
@@ -155,7 +155,7 @@ mixin template TokenTriviaFields()
         import dparse.trivia : extractTrailingDdoc;
         if (memoizedTrailingComment !is null)
             return memoizedTrailingComment;
-        return (cast()memoizedTrailingComment) = this.extractTrailingDdoc;
+        return (ref () @trusted => cast() memoizedLeadingComment)() = this.extractTrailingDdoc;
     }
 
     int opCmp(size_t i) const pure nothrow @safe @nogc {
