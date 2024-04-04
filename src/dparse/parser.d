@@ -6954,7 +6954,7 @@ class Parser
     /**
      * Parses a NamedTemplateArgumentList
      *
-     * $(GRAMMAR $(RULEDEF templateArgumentList):
+     * $(GRAMMAR $(RULEDEF namedTemplateArgumentList):
      *     $(RULE namedTemplateArgument) ($(LITERAL ',') $(RULE namedTemplateArgument)?)*
      *     ;)
      */
