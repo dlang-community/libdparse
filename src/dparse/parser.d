@@ -8226,7 +8226,7 @@ class Parser
      * Parses a WhileStatement
      *
      * $(GRAMMAR $(RULEDEF whileStatement):
-     *     $(LITERAL 'while') $(LITERAL '$(LPAREN)') $(RULE expression) $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement)
+     *     $(LITERAL 'while') $(LITERAL '$(LPAREN)') $(RULE ifCondition) $(LITERAL '$(RPAREN)') $(RULE declarationOrStatement)
      *     ;)
      */
     WhileStatement parseWhileStatement()
