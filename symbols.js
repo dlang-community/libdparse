@@ -1307,6 +1307,7 @@ var symbols = [
 {name: 'dparse.lexer.TokenTriviaFields.memoizedLeadingComment', kind: "variabledeclaration", path: './dparse/lexer/TokenTriviaFields.memoizedLeadingComment.html', attributes: []},
 {name: 'dparse.lexer.TokenTriviaFields.memoizedTrailingComment', kind: "variabledeclaration", path: './dparse/lexer/TokenTriviaFields.memoizedTrailingComment.html', attributes: []},
 {name: 'dparse.lexer.TokenTriviaFields.opCmp', kind: "functiondeclaration", path: './dparse/lexer/TokenTriviaFields.opCmp.html', attributes: ["const", "pure", "nothrow", "nogc", "safe"]},
+{name: 'dparse.lexer.TokenTriviaFields.toString', kind: "functiondeclaration", path: './dparse/lexer/TokenTriviaFields.toString.html', attributes: ["const", "pure", "safe"]},
 {name: 'dparse.lexer.TokenTriviaFields.trailingComment', kind: "functiondeclaration", path: './dparse/lexer/TokenTriviaFields.trailingComment.html', attributes: ["const", "pure", "nothrow", "property", "safe"]},
 {name: 'dparse.lexer.TokenTriviaFields.trailingTrivia', kind: "variabledeclaration", path: './dparse/lexer/TokenTriviaFields.trailingTrivia.html', attributes: []},
 {name: 'dparse.lexer.TriviaToken', kind: "aliasdeclaration", path: './dparse/lexer/TriviaToken.html', attributes: []},

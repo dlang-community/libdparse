@@ -939,7 +939,7 @@
 <pre class="grammar"><b><span class="ddoc_anchor" id="templateArgumentList"></span> templateArgumentList</b>:
      <a href="#templateArgument"><b>templateArgument</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#templateArgument"><b>templateArgument</b></a>?)*
      ;</pre>
-<pre class="grammar"><b><span class="ddoc_anchor" id="templateArgumentList"></span> templateArgumentList</b>:
+<pre class="grammar"><b><span class="ddoc_anchor" id="namedTemplateArgumentList"></span> namedTemplateArgumentList</b>:
      <a href="#namedTemplateArgument"><b>namedTemplateArgument</b></a> (<span class="string_literal"><i>&#39;,&#39;</i></span> <a href="#namedTemplateArgument"><b>namedTemplateArgument</b></a>?)*
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="templateArguments"></span> templateArguments</b>:
@@ -1128,7 +1128,7 @@
      <span class="string_literal"><i>&#39;version&#39;</i></span> <span class="string_literal"><i>&#39;=&#39;</i></span> (<span class="string_literal"><i>Identifier</i></span> | <span class="string_literal"><i>IntegerLiteral</i></span>) <span class="string_literal"><i>&#39;;&#39;</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="whileStatement"></span> whileStatement</b>:
-     <span class="string_literal"><i>&#39;while&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#expression"><b>expression</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <a href="#declarationOrStatement"><b>declarationOrStatement</b></a>
+     <span class="string_literal"><i>&#39;while&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#ifCondition"><b>ifCondition</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <a href="#declarationOrStatement"><b>declarationOrStatement</b></a>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="withStatement"></span> withStatement</b>:
      <span class="string_literal"><i>&#39;with&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#expression"><b>expression</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <a href="#declarationOrStatement"><b>declarationOrStatement</b></a>

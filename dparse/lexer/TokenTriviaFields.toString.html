@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Parser.parseWhileStatement</title>
+		<title>TokenTriviaFields.toString - multiple declarations</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -47,12 +47,12 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module ">
+						<div class="module selected">
 							<a href="../../dparse/lexer.html">lexer</a>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../dparse/parser.html">parser</a>
 						</div>
 					</li>
@@ -104,21 +104,43 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.parseWhileStatement</h1><p>Parses a WhileStatement
-</p>
+				<h1>TokenTriviaFields.toString - multiple declarations</h1>
+				<nav class="page-nav">
+					<ul>
+						<li>
+							<a href="#0">
+								Function <code>TokenTriviaFields.toString</code>
+							</a>
+						</li>
+						<li>
+							<a href="#1">
+								Function <code>TokenTriviaFields.toString</code>
+							</a>
+						</li>
+					</ul>
+				</nav><h2 id="0">Function TokenTriviaFields.toString</h2><p></p>
 				<div class="prototype">
 					<code class="lang-d">
 						<div class="single-prototype">
-				<a href="../../dparse/ast/WhileStatement.html"><span class="typ">WhileStatement</span></a> <span class="pln">parseWhileStatement</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
+				<span class="typ">string</span> <span class="pln">toString</span><span class="pun">(</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">const pure @safe</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				<section><p>whileStatement:
-     'while' '(' ifCondition ')' declarationOrStatement
-     ;
-</p>
-</section>
-
+				
+				<h2 id="1">Function TokenTriviaFields.toString</h2><p></p>
+				<div class="prototype">
+					<code class="lang-d">
+						<div class="single-prototype">
+				<span class="typ">void</span> <span class="pln">toString</span>(R)
+				<span class="pun">(</span>
+				<br/>
+				&nbsp;&nbsp;<span class="kwd">auto ref </span><span class="pln">R</span> <span class="pln">sink</span>
+				<br/>
+				<span class="pun">)</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">;</span>
+						</div>
+					</code>
+				</div>
+				
 				
 			</div>
 			<footer>
