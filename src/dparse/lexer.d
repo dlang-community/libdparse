@@ -244,9 +244,9 @@ private immutable extraFieldsBare = q{
         import std.conv : to;
         import dparse.lexer : str;
 
-        sink.put("trivia!\"");
+        sink.put(`trivia!"`);
         sink.put(str(type));
-        sink.put("\"(");
+        sink.put(`"(`);
         sink.put("text: ");
         sink.put([text].to!string[1 .. $ - 1]); // escape hack
         sink.put(", index: ");
