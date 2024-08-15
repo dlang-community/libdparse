@@ -1928,7 +1928,7 @@ class Parser
                 if (!trueDeclarations.put(parseDeclaration(strict, true, inTemplateDeclaration)))
                 {
                     allocator.rollback(c);
-                    return null;
+                    continue;
                 }
             }
             if (brace)
