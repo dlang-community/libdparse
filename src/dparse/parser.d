@@ -4618,6 +4618,89 @@ class Parser
     }
 
     /**
+     * Parses an InterpolatedString
+     *
+     * $(GRAMMAR $(RULEDEF interpolatedString):
+     *       $(LITERAL 'i"') $(RULE InterpolatedStringPart)* $(LITERAL '"')
+     *     ;)
+     */
+    InterpolatedString parseInterpolatedString()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto startIndex = index;
+        auto node = allocator.make!InterpolatedString;
+        mixin(tokenCheck!"istringLiteralStart");
+        StackBuffer parts;
+        while (moreTokens && !currentIs(tok!"istringLiteralEnd"))
+        {
+            if (auto c = parseInterpolatedStringPart())
+                parts.put(c);
+            else
+                advance();
+        }
+        ownArray(node.parts, parts);
+        expect(tok!"istringLiteralEnd");
+
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
+     * Parses an InterpolatedStringPart
+     *
+     * $(GRAMMAR $(RULEDEF interpolatedStringPart):
+     *       $(LITERAL '$') $(RULE identifier)
+     *     | $(LITERAL '$') $(LITERAL '$(LPAREN)') $(RULE expression) $(LITERAL '$(RPAREN)')
+     *     | $(RULE stringEscapeSequence)
+     *     | $(RULE NOT:$(LPAREN)$(LITERAL '$') | $(LITERAL '"')$(RPAREN))+
+     *     ;)
+     */
+    InterpolatedStringPart parseInterpolatedStringPart()
+    {
+        mixin(traceEnterAndExit!(__FUNCTION__));
+        auto startIndex = index;
+
+        InterpolatedStringPart node;
+
+        if (currentIs(tok!"istringLiteralText"))
+        {
+            node = allocator.make!InterpolatedStringText;
+            advance();
+        }
+        else if (currentIs(tok!"$"))
+        {
+            if (peekIs(tok!"identifier"))
+            {
+                node = allocator.make!InterpolatedStringVariable;
+                advance();
+                advance();
+            }
+            else if (peekIs(tok!"("))
+            {
+                advance();
+                advance();
+                auto expNode = allocator.make!InterpolatedStringExpression;
+                expNode.expression = parseExpression();
+                node = expNode;
+                expect(tok!")");
+            }
+            else
+            {
+                error("Unexpected token after dollar inside interpolated string literal");
+                return null;
+            }
+        }
+        else
+        {
+            error("Unexpected token inside interpolated string literal");
+            return null;
+        }
+
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
+    /**
      * Parses an Invariant
      *
      * $(GRAMMAR $(RULEDEF invariant):
@@ -5801,6 +5884,7 @@ class Parser
      *     | $(LITERAL FloatLiteral)
      *     | $(LITERAL StringLiteral)+
      *     | $(LITERAL CharacterLiteral)
+     *     | $(LITERAL IstringLiteral)
      *     ;)
      */
     PrimaryExpression parsePrimaryExpression()
@@ -5918,6 +6002,9 @@ class Parser
             break;
         case tok!"import":
             mixin(parseNodeQ!(`node.importExpression`, `ImportExpression`));
+            break;
+        case tok!"istringLiteralStart":
+            mixin(parseNodeQ!(`node.interpolatedString`, `InterpolatedString`));
             break;
         case tok!"this":
         case tok!"super":
