@@ -73,6 +73,9 @@ shared static this()
     typeMap[typeid(TypeofExpression)] = 46;
     typeMap[typeid(UnaryExpression)] = 47;
     typeMap[typeid(XorExpression)] = 48;
+    typeMap[typeid(InterpolatedStringExpression)] = 49;
+    typeMap[typeid(InterpolatedStringText)] = 50;
+    typeMap[typeid(InterpolatedStringVariable)] = 51;
 }
 
 /// Describes which syntax was used in a list of declarations in the containing AST node
@@ -167,6 +170,19 @@ abstract class ASTVisitor
         case 46: visit(cast(TypeofExpression) n); break;
         case 47: visit(cast(UnaryExpression) n); break;
         case 48: visit(cast(XorExpression) n); break;
+        // skip 49, 50, 51 (used for InterpolatedStringPart)
+        default: assert(false, __MODULE__ ~ " has a bug");
+        }
+    }
+
+    /// ditto
+    void dynamicDispatch(const InterpolatedStringPart n)
+    {
+        switch (typeMap.get(typeid(n), 0))
+        {
+        case 49: visit(cast(InterpolatedStringExpression) n); break;
+        case 50: visit(cast(InterpolatedStringText) n); break;
+        case 51: visit(cast(InterpolatedStringVariable) n); break;
         default: assert(false, __MODULE__ ~ " has a bug");
         }
     }
@@ -289,6 +305,10 @@ abstract class ASTVisitor
     /** */ void visit(const Initialize initialize) { initialize.accept(this); }
     /** */ void visit(const Initializer initializer) { initializer.accept(this); }
     /** */ void visit(const InterfaceDeclaration interfaceDeclaration) { interfaceDeclaration.accept(this); }
+    /** */ void visit(const InterpolatedString interpolatedString) { interpolatedString.accept(this); }
+    /** */ void visit(const InterpolatedStringExpression interpolatedStringExpression) { interpolatedStringExpression.accept(this); }
+    /** */ void visit(const InterpolatedStringText interpolatedStringText) { interpolatedStringText.accept(this); }
+    /** */ void visit(const InterpolatedStringVariable interpolatedStringVariable) { interpolatedStringVariable.accept(this); }
     /** */ void visit(const Invariant invariant_) { invariant_.accept(this); }
     /** */ void visit(const IsExpression isExpression) { isExpression.accept(this); }
     /** */ void visit(const KeyValuePair keyValuePair) { keyValuePair.accept(this); }
@@ -426,7 +446,7 @@ template visitIfNotNull(fields ...)
     }
 }
 
-mixin template OpEquals(bool print = false)
+private mixin template OpEquals(extraFields...)
 {
     override bool opEquals(Object other) const
     {
@@ -443,6 +463,9 @@ mixin template OpEquals(bool print = false)
                 if (field != obj.tupleof[i])
                     return false;
             }
+            static foreach (field; extraFields)
+                if (mixin("this." ~ field ~ " != obj." ~ field))
+                    return false;
             return true;
         }
         return false;
@@ -2319,6 +2342,109 @@ final class InterfaceDeclaration : BaseNode
 }
 
 ///
+final class InterpolatedString : BaseNode
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(parts));
+    }
+
+    /** */ InterpolatedStringPart[] parts;
+
+    inout(Token) startQuote() inout pure nothrow @nogc @safe scope
+    {
+        return tokens.length ? tokens[0] : Token.init;
+    }
+
+    inout(Token) endQuote() inout pure nothrow @nogc @safe scope
+    {
+        return tokens.length && tokens[$ - 1].type == tok!"istringLiteralEnd"
+            ? tokens[$ - 1]
+            : Token.init;
+    }
+
+    /// '\0'/'c'/'w'/'d' for `i""`, `i""c`, `i""w` and `i""d` respectively.
+    char postfixType() inout pure nothrow @nogc @safe scope
+    {
+        auto end = endQuote.text;
+        auto endChar = end.length ? end[$ - 1] : ' ';
+        switch (endChar)
+        {
+        case 'c':
+        case 'w':
+        case 'd':
+            return endChar;
+        default:
+            return '\0';
+        }
+    }
+
+    mixin OpEquals!("startQuote.text", "postfixType");
+}
+
+///
+abstract class InterpolatedStringPart : BaseNode
+{
+}
+
+///
+final class InterpolatedStringText : InterpolatedStringPart
+{
+    override void accept(ASTVisitor visitor) const
+    {
+    }
+
+    /// The token containing the plain text part in its `.text` property.
+    inout(Token) text() inout pure nothrow @nogc @safe scope
+    {
+        return tokens.length ? tokens[0] : Token.init;
+    }
+
+    mixin OpEquals!("text.text");
+}
+
+///
+final class InterpolatedStringVariable : InterpolatedStringPart
+{
+    override void accept(ASTVisitor visitor) const
+    {
+    }
+
+    /// The dollar token.
+    inout(Token) dollar() inout pure nothrow @nogc @safe scope
+    {
+        return tokens.length == 2 ? tokens[0] : Token.init;
+    }
+
+    /// The variable name token.
+    inout(Token) name() inout pure nothrow @nogc @safe scope
+    {
+        return tokens.length == 2 ? tokens[1] : Token.init;
+    }
+
+    mixin OpEquals!("name.text");
+}
+
+///
+final class InterpolatedStringExpression : InterpolatedStringPart
+{
+    override void accept(ASTVisitor visitor) const
+    {
+        mixin (visitIfNotNull!(expression));
+    }
+
+    /** */ Expression expression;
+
+    /// The dollar token.
+    inout(Token) dollar() inout pure nothrow @nogc @safe scope
+    {
+        return tokens.length ? tokens[0] : Token.init;
+    }
+
+    mixin OpEquals;
+}
+
+///
 final class Invariant : BaseNode
 {
     override void accept(ASTVisitor visitor) const
@@ -2798,7 +2924,7 @@ final class PrimaryExpression : ExpressionNode
                 typeofExpression, typeidExpression, arrayLiteral, assocArrayLiteral,
                 expression, dot, identifierOrTemplateInstance, isExpression,
                 functionLiteralExpression,traitsExpression, mixinExpression,
-                importExpression, vector, arguments));
+                importExpression, vector, arguments, interpolatedString));
     }
     /** */ Token dot;
     /** */ Token primary;
@@ -2818,6 +2944,7 @@ final class PrimaryExpression : ExpressionNode
     /** */ Type type;
     /** */ Token typeConstructor;
     /** */ Arguments arguments;
+    /** */ InterpolatedString interpolatedString;
     mixin OpEquals;
 }
 

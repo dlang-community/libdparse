@@ -582,6 +582,33 @@ class XMLPrinter : ASTVisitor
 		output.writeln("</interfaceDeclaration>");
 	}
 
+	override void visit(const InterpolatedString interpolatedString)
+	{
+		output.writeln("<interpolatedString startQuote=\"",
+			xmlAttributeEscape(interpolatedString.startQuote.text),
+			"\" endQuote=\"",
+			xmlAttributeEscape(interpolatedString.endQuote.text),
+			"\">");
+		foreach (part; interpolatedString.parts)
+			dynamicDispatch(part);
+		output.writeln("</interpolatedString>");
+	}
+
+	override void visit(const InterpolatedStringText interpolatedStringText)
+	{
+		output.writeln("<text>", xmlEscape(interpolatedStringText.text.text), "</text>");
+	}
+
+	override void visit(const InterpolatedStringVariable interpolatedStringVariable)
+	{
+		output.writeln("<variable>", xmlEscape(interpolatedStringVariable.name.text), "</variable>");
+	}
+
+	override void visit(const InterpolatedStringExpression interpolatedStringExpression)
+	{
+		visit(interpolatedStringExpression.expression);
+	}
+
 	override void visit(const Invariant invariant_)
 	{
 		output.writeln("<invariant>");
