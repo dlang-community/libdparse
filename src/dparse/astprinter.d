@@ -599,11 +599,6 @@ class XMLPrinter : ASTVisitor
 		output.writeln("<text>", xmlEscape(interpolatedStringText.text.text), "</text>");
 	}
 
-	override void visit(const InterpolatedStringVariable interpolatedStringVariable)
-	{
-		output.writeln("<variable>", xmlEscape(interpolatedStringVariable.name.text), "</variable>");
-	}
-
 	override void visit(const InterpolatedStringExpression interpolatedStringExpression)
 	{
 		visit(interpolatedStringExpression.expression);
