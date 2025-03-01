@@ -3290,7 +3290,10 @@ class Formatter(Sink)
         **/
 
         put("!");
-        format(templateSingleArgument.token);
+        if (templateSingleArgument.istring)
+            format(templateSingleArgument.istring);
+        else
+            format(templateSingleArgument.token);
     }
 
     void format(const TemplateThisParameter templateThisParameter)
@@ -4405,5 +4408,10 @@ z /// Documentation for z
     testFormatNode!(VariableDeclaration)(`T x = i" hello $(name) ";`);
     testFormatNode!(VariableDeclaration)(`T x = i" hello $( name ) ";`, `T x = i" hello $(name) ";`);
     testFormatNode!(VariableDeclaration)(`auto a = iq{ "}" hi };`, `auto a = iq{ "}" hi };`);
-    testFormatNode!(VariableDeclaration)("T x = iq{\n};", "T x = iq{\n};");
+    testFormatNode!(VariableDeclaration)("T x = iq{\n};");
+    testFormatNode!(AliasDeclaration)(`alias expr = AliasSeq!i"$(a) $(b)";`);
+    testFormatNode!(VariableDeclaration)(q{auto thing = i"$(b) $("$" ~ ')' ~ `"`)";});
+    testFormatNode!(VariableDeclaration)("auto x = i` $(b) is $(b)!`;");
+    testFormatNode!(VariableDeclaration)("auto x = iq{ $(b) is $(b)!};");
+    testFormatNode!(VariableDeclaration)("auto x = iq{{$('$')}};");
 }
