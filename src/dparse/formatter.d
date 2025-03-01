@@ -2019,7 +2019,6 @@ class Formatter(Sink)
         foreach (part; interpolatedString.parts)
         {
             if (cast(InterpolatedStringText) part) format(cast(InterpolatedStringText) part);
-            else if (cast(InterpolatedStringVariable) part) format(cast(InterpolatedStringVariable) part);
             else if (cast(InterpolatedStringExpression) part) format(cast(InterpolatedStringExpression) part);
         }
         put(interpolatedString.endQuote.text);
@@ -2028,12 +2027,6 @@ class Formatter(Sink)
     void format(const InterpolatedStringText interpolatedStringText)
     {
         put(interpolatedStringText.text.text);
-    }
-
-    void format(const InterpolatedStringVariable interpolatedStringVariable)
-    {
-        put("$");
-        put(interpolatedStringVariable.name.text);
     }
 
     void format(const InterpolatedStringExpression interpolatedStringExpression)

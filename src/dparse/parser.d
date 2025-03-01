@@ -4674,13 +4674,7 @@ class Parser
         }
         else if (currentIs(tok!"$"))
         {
-            if (peekIs(tok!"identifier"))
-            {
-                node = allocator.make!InterpolatedStringVariable;
-                advance();
-                advance();
-            }
-            else if (peekIs(tok!"("))
+            if (peekIs(tok!"("))
             {
                 advance();
                 advance();
