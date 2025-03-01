@@ -4410,7 +4410,7 @@ z /// Documentation for z
     testFormatNode!(VariableDeclaration)(`auto a = iq{ "}" hi };`, `auto a = iq{ "}" hi };`);
     testFormatNode!(VariableDeclaration)("T x = iq{\n};");
     testFormatNode!(AliasDeclaration)(`alias expr = AliasSeq!i"$(a) $(b)";`);
-    testFormatNode!(VariableDeclaration)(q{auto thing = i"$(b) $("$" ~ ')' ~ `"`)";});
+    testFormatNode!(VariableDeclaration)("auto thing = i\"$(b) $(\"$\" ~ ')' ~ `\"`)\";");
     testFormatNode!(VariableDeclaration)("auto x = i` $(b) is $(b)!`;");
     testFormatNode!(VariableDeclaration)("auto x = iq{ $(b) is $(b)!};");
     testFormatNode!(VariableDeclaration)("auto x = iq{{$('$')}};");
