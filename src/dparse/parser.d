@@ -2,15 +2,15 @@
 
 module dparse.parser;
 
-import dparse.lexer;
 import dparse.ast;
+import dparse.lexer;
 import dparse.rollback_allocator;
 import dparse.stack_buffer;
-import std.experimental.allocator.mallocator;
-import std.experimental.allocator;
-import std.conv;
 import std.algorithm;
 import std.array;
+import std.conv;
+import std.experimental.allocator;
+import std.experimental.allocator.mallocator;
 import std.string : format;
 
 // Uncomment this if you want ALL THE OUTPUT
@@ -4635,8 +4635,13 @@ class Parser
         {
             if (auto c = parseInterpolatedStringPart())
                 parts.put(c);
-            else
+            else if (moreTokens)
                 advance();
+            else
+            {
+                error("Expected more interpolated string parts but got EOF ", false);
+                return null;
+            }
         }
         ownArray(node.parts, parts);
         expect(tok!"istringLiteralEnd");
