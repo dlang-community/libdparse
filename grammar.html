@@ -596,6 +596,15 @@
      | <span class="string_literal"><i>&#39;interface&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <a href="#templateParameters"><b>templateParameters</b></a> <a href="#constraint"><b>constraint</b></a>? (<span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#baseClassList"><b>baseClassList</b></a>)? <a href="#structBody"><b>structBody</b></a>
      | <span class="string_literal"><i>&#39;interface&#39;</i></span> <span class="string_literal"><i>Identifier</i></span> <a href="#templateParameters"><b>templateParameters</b></a> (<span class="string_literal"><i>&#39;:&#39;</i></span> <a href="#baseClassList"><b>baseClassList</b></a>)? <a href="#constraint"><b>constraint</b></a>? <a href="#structBody"><b>structBody</b></a>
      ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="interpolatedString"></span> interpolatedString</b>:
+       <span class="string_literal"><i>&#39;i&#34;&#39;</i></span> <a href="#InterpolatedStringPart"><b>InterpolatedStringPart</b></a>* <span class="string_literal"><i>&#39;&#34;&#39;</i></span>
+     ;</pre>
+<pre class="grammar"><b><span class="ddoc_anchor" id="interpolatedStringPart"></span> interpolatedStringPart</b>:
+       <span class="string_literal"><i>&#39;$&#39;</i></span> <a href="#identifier"><b>identifier</b></a>
+     | <span class="string_literal"><i>&#39;$&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#expression"><b>expression</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span>
+     | <a href="#stringEscapeSequence"><b>stringEscapeSequence</b></a>
+     | <a href="#NOT:(&lt;span class=" string_literal"=""><i>&#39;$&#39;</i> | <span class="string_literal"><i>&#39;&#34;&#39;</i></span>)&#34;&gt;<b>NOT:(<span class="string_literal"><i>&#39;$&#39;</i></span> | <span class="string_literal"><i>&#39;&#34;&#39;</i></span>)</b></a>+
+     ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="invariant"></span> invariant</b>:
        <span class="string_literal"><i>&#39;invariant&#39;</i></span> (<span class="string_literal"><i>&#39;(&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span>)? <a href="#blockStatement"><b>blockStatement</b></a>
      | <span class="string_literal"><i>&#39;invariant&#39;</i></span> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#assertArguments"><b>assertArguments</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <span class="string_literal"><i>&#39;;&#39;</i></span>
@@ -782,6 +791,7 @@
      | <span class="string_literal"><i>FloatLiteral</i></span>
      | <span class="string_literal"><i>StringLiteral</i></span>+
      | <span class="string_literal"><i>CharacterLiteral</i></span>
+     | <span class="string_literal"><i>IstringLiteral</i></span>
      ;</pre>
 <pre class="grammar"><b><span class="ddoc_anchor" id="register"></span> register</b>:
        <span class="string_literal"><i>Identifier</i></span>
@@ -974,6 +984,7 @@
      | <span class="string_literal"><i>StringLiteral</i></span>
      | <span class="string_literal"><i>IntegerLiteral</i></span>
      | <span class="string_literal"><i>FloatLiteral</i></span>
+     | <span class="string_literal"><i>InterpolatedString</i></span>
      | <span class="string_literal"><i>&#39;true&#39;</i></span>
      | <span class="string_literal"><i>&#39;false&#39;</i></span>
      | <span class="string_literal"><i>&#39;null&#39;</i></span>

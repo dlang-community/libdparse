@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Parser.parseTemplateSingleArgument</title>
+		<title>Function Parser.parseInterpolatedString</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -103,37 +103,16 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.parseTemplateSingleArgument</h1><p>Parses a TemplateSingleArgument
+				<h1>Function Parser.parseInterpolatedString</h1><p>Parses an InterpolatedString
 </p>
 				<div class="prototype">
 					<code class="lang-d">
-						<div class="single-prototype"><a href="../../dparse/ast/TemplateSingleArgument.html"><span class="typ">TemplateSingleArgument</span></a> <span class="pln">parseTemplateSingleArgument</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
+						<div class="single-prototype"><a href="../../dparse/ast/InterpolatedString.html"><span class="typ">InterpolatedString</span></a> <span class="pln">parseInterpolatedString</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				<section><p>templateSingleArgument:
-       builtinType
-     | Identifier
-     | CharacterLiteral
-     | StringLiteral
-     | IntegerLiteral
-     | FloatLiteral
-     | InterpolatedString
-     | 'true'
-     | 'false'
-     | 'null'
-     | 'this'
-     | '__DATE__'
-     | '__FILE__'
-     | '__FILE_FULL_PATH__'
-     | '__FUNCTION__'
-     | '__LINE__'
-     | '__MODULE__'
-     | '__PRETTY_FUNCTION__'
-     | '__TIME__'
-     | '__TIMESTAMP__'
-     | '__VENDOR__'
-     | '__VERSION__'
+				<section><p>interpolatedString:
+       'i"' InterpolatedStringPart* '"'
      ;
 </p>
 </section>

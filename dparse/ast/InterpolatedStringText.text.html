@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-		<title>Function Parser.parseTemplateSingleArgument</title>
+		<title>Function InterpolatedStringText.text</title>
 		<link rel="stylesheet" href="../../css/style.min.css"/>
 		<script type="text/javascript" src="../../js/script.min.js"></script>
 	</head>
@@ -27,7 +27,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 				<ul class="tree-view">
 					<li>
-						<div class="module ">
+						<div class="module selected">
 							<a href="../../dparse/ast.html">ast</a>
 						</div>
 					</li>
@@ -52,7 +52,7 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 						</div>
 					</li>
 					<li>
-						<div class="module selected">
+						<div class="module ">
 							<a href="../../dparse/parser.html">parser</a>
 						</div>
 					</li>
@@ -103,45 +103,25 @@ document.getElementById('symbolSearchPane').style.display = 'block';</script>
 		</nav>
 		<div id="main-contents">
 			<div>
-				<h1>Function Parser.parseTemplateSingleArgument</h1><p>Parses a TemplateSingleArgument
+				<h1>Function InterpolatedStringText.text</h1><p>The token containing the plain text part in its <code class="lang-d"><wbr/><span class="pun">.</span><span class="pln">text</span></code> property.
 </p>
 				<div class="prototype">
 					<code class="lang-d">
-						<div class="single-prototype"><a href="../../dparse/ast/TemplateSingleArgument.html"><span class="typ">TemplateSingleArgument</span></a> <span class="pln">parseTemplateSingleArgument</span><span class="pun">(</span><span class="pun">)</span><span class="pun">;</span>
+						<div class="single-prototype"><span class="kwd">inout </span><span class="kwd">inout</span><span class="pun">(</span><a href="../../std/experimental/lexer/TokenStructure.html"><span class="typ">TokenStructure</span></a>!(ubyte,"import dparse.lexer:TokenTriviaFields,TriviaToken; mixin TokenTriviaFields;")<span class="pun">)</span> <span class="pln">text</span><span class="pun">(</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">pure nothrow @nogc scope @safe</span><span class="pun">;</span>
 						</div>
 					</code>
 				</div>
-				<section><p>templateSingleArgument:
-       builtinType
-     | Identifier
-     | CharacterLiteral
-     | StringLiteral
-     | IntegerLiteral
-     | FloatLiteral
-     | InterpolatedString
-     | 'true'
-     | 'false'
-     | 'null'
-     | 'this'
-     | '__DATE__'
-     | '__FILE__'
-     | '__FILE_FULL_PATH__'
-     | '__FUNCTION__'
-     | '__LINE__'
-     | '__MODULE__'
-     | '__PRETTY_FUNCTION__'
-     | '__TIME__'
-     | '__TIMESTAMP__'
-     | '__VENDOR__'
-     | '__VERSION__'
-     ;
-</p>
-</section>
-
+				
 			</div>
 			<footer>
 				<div id="license-info">
-					
+					<p>Brian Schott
+</p>
+<p>Brian Schott 2013
+</p>
+<p><a href="http://www.boost.org/LICENSE_1_0.txt Boost">License 1.0</a>
+</p>
+
 				</div>
 			</footer>
 		</div>
