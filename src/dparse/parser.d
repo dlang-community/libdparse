@@ -1928,7 +1928,7 @@ class Parser
                 if (!trueDeclarations.put(parseDeclaration(strict, true, inTemplateDeclaration)))
                 {
                     allocator.rollback(c);
-                    return null;
+                    continue;
                 }
             }
             if (brace)
@@ -1964,7 +1964,7 @@ class Parser
             advance();
             while (moreTokens() && !currentIs(tok!"}"))
                 if (!falseDeclarations.put(parseDeclaration(strict, true, inTemplateDeclaration)))
-                    return null;
+                    continue;
             if (brace)
                 mixin(tokenCheck!"}");
         }
