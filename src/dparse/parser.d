@@ -7254,6 +7254,7 @@ class Parser
      *     | $(LITERAL StringLiteral)
      *     | $(LITERAL IntegerLiteral)
      *     | $(LITERAL FloatLiteral)
+     *     | $(LITERAL InterpolatedString)
      *     | $(LITERAL '_true')
      *     | $(LITERAL '_false')
      *     | $(LITERAL '_null')
@@ -7288,6 +7289,9 @@ class Parser
         foreach (B; Literals) { case B: }
         foreach (C; BasicTypes) { case C: }
             node.token = advance();
+            break;
+        case tok!"istringLiteralStart":
+            node.istring = parseInterpolatedString();
             break;
         default:
             error(`Invalid template argument. (Try enclosing in parenthesis?)`);

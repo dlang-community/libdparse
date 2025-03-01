@@ -16,10 +16,10 @@
 module dparse.ast;
 
 import dparse.lexer;
-import std.traits;
 import std.algorithm;
 import std.array;
 import std.string;
+import std.traits;
 
 private immutable uint[TypeInfo] typeMap;
 
@@ -1425,8 +1425,8 @@ final class Declaration : BaseNode
         }
     }
 
-    private import std.variant:Algebraic;
-    private import std.typetuple:TypeTuple;
+    import std.typetuple : TypeTuple;
+    import std.variant : Algebraic;
 
     alias DeclarationTypes = TypeTuple!(AliasDeclaration, AliasAssign, AliasThisDeclaration,
         AnonymousEnumDeclaration, AttributeDeclaration,
@@ -3483,9 +3483,10 @@ final class TemplateSingleArgument : BaseNode
 {
     override void accept(ASTVisitor visitor) const
     {
-        mixin (visitIfNotNull!(token));
+        mixin (visitIfNotNull!(token, istring));
     }
     /** */ Token token;
+    /** */ InterpolatedString istring;
     mixin OpEquals;
 }
 
@@ -4092,7 +4093,7 @@ unittest //#365 : used to segfault
 unittest // issue #398: Support extern(C++, <string expressions...>)
 {
     import dparse.lexer : LexerConfig;
-    import dparse.parser : ParserConfig, parseModule;
+    import dparse.parser : parseModule, ParserConfig;
     import dparse.rollback_allocator : RollbackAllocator;
 
     RollbackAllocator ra;
