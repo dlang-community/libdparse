@@ -1891,6 +1891,7 @@
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.visit.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/astprinter/XMLPrinter.~this.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.dynamicDispatch.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.dynamicDispatch.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/ASTVisitor.visit.html</loc></url>
@@ -2223,6 +2224,7 @@
 <url><loc>http://127.0.0.1/dparse/lexer/StringCache.intern.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/lexer/StringCache.this.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/lexer/StringCache.this.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/lexer/StringCache.~this.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/lexer/StringLiterals.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/lexer/tok.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/lexer/Token.html</loc></url>
@@ -2481,6 +2483,7 @@
 <url><loc>http://127.0.0.1/dparse/parser/Parser.setTokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.warningCount.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/parser/Parser.~this.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser._traceDepth.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.abandonBookmark.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/parser/Parser.advance.html</loc></url>
@@ -2562,6 +2565,7 @@
 <url><loc>http://127.0.0.1/dparse/rollback_allocator/RollbackAllocator.memoryAlignment.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/rollback_allocator/RollbackAllocator.rollback.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/rollback_allocator/RollbackAllocator.setCheckpoint.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/rollback_allocator/RollbackAllocator.~this.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.clear.html</loc></url>
@@ -2569,6 +2573,7 @@
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.opDollar.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.opSlice.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.put.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/stack_buffer/StackBuffer.~this.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/strings.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/strings/InvalidEscapeAction.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/strings/isStringLiteral.html</loc></url>
