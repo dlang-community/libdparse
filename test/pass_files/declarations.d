@@ -105,6 +105,7 @@ void foo()
 {
     __traits(getMember, Foo, "Bar") fooBar;
     immutable int twice(int x) = 2 * x;
+    alias fn = extern(C) typeof(return) function();
 }
 
 alias Mt1 = mixin("foo", ".", "bar");
