@@ -540,13 +540,19 @@ final class AliasDeclaration : BaseNode
             initializers, parameters, memberFunctionAttributes));
     }
     mixin OpEquals;
-    /** */ StorageClass[] storageClasses;
-    /** */ Type type;
-    /** */ DeclaratorIdentifierList declaratorIdentifierList;
-    /** */ AliasInitializer[] initializers;
+    /** Old syntax `storageClasses type declaratorIdentifierList` */
+    StorageClass[] storageClasses;
+    /** ditto */
+    Type type;
+    /** ditto */
+    DeclaratorIdentifierList declaratorIdentifierList;
+    /** New syntax e.g. `ident = Type` */
+    AliasInitializer[] initializers;
     /** */ string comment;
-    /** */ Parameters parameters;
-    /** */ MemberFunctionAttribute[] memberFunctionAttributes;
+    /** Old syntax `(parameters) memberFunctionAttributes` after a single identifier */
+    Parameters parameters;
+    /** ditto */
+    MemberFunctionAttribute[] memberFunctionAttributes;
 }
 
 ///
@@ -562,7 +568,12 @@ final class AliasAssign : BaseNode
     /** */ string comment;
 }
 
-///
+/**
+ * `name(templateParameters)`
+ * * `= storageClasses type`
+ * * `= storageClasses type(parameters) memberFunctionAttributes`
+ * * `= functionLiteralExpression`
+ */
 final class AliasInitializer : BaseNode
 {
     override void accept(ASTVisitor visitor) const
