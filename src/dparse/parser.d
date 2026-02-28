@@ -118,6 +118,16 @@ Module parseModule(F)(const(Token)[] tokens, string fileName, RollbackAllocator*
  */
 class Parser
 {
+    /// Is it a interface file for a C source code
+    bool importC;
+    /// Depth of extern(C) blocks we're currently inside
+    int externCDepth;
+
+    bool isInExternC() const pure nothrow @safe @nogc
+    {
+        return importC || externCDepth > 0;
+    }
+
     /**
      * Parses an AddExpression.
      *
@@ -2293,27 +2303,44 @@ class Parser
             warn("Empty declaration");
             advance();
             break;
-        case tok!"{":
-            if (node.attributes.empty)
+    case tok!"{":
+        if (node.attributes.empty)
+        {
+            error("declaration expected instead of `{`");
+            return null;
+        }
+        // Check if we're in an extern(C) block
+        bool isExternC = false;
+        foreach (attr; node.attributes)
+        {
+            if (attr.linkageAttribute !is null &&
+                attr.linkageAttribute.identifier.text == "C")
             {
-                error("declaration expected instead of `{`");
+                isExternC = true;
+                break;
+            }
+        }
+        if (isExternC)
+            externCDepth++;
+        advance();
+        alias declarations = attributes;
+        declarations.clear();
+        while (moreTokens() && !currentIs(tok!"}"))
+        {
+            auto c = allocator.setCheckpoint();
+            if (!declarations.put(parseDeclaration(strict, false, inTemplateDeclaration)))
+            {
+                allocator.rollback(c);
+                if (isExternC)
+                    externCDepth--;
                 return null;
             }
-            advance();
-            alias declarations = attributes;
-            declarations.clear();
-            while (moreTokens() && !currentIs(tok!"}"))
-            {
-                auto c = allocator.setCheckpoint();
-                if (!declarations.put(parseDeclaration(strict, false, inTemplateDeclaration)))
-                {
-                    allocator.rollback(c);
-                    return null;
-                }
-            }
-            ownArray(node.declarations, declarations);
-            mixin(tokenCheck!"}");
-            break;
+        }
+        if (isExternC)
+            externCDepth--;
+        ownArray(node.declarations, declarations);
+        mixin(tokenCheck!"}");
+        break;
         case tok!"alias":
             if (startsWith(tok!"alias", tok!"identifier", tok!"this"))
                 mixin(parseNodeQ!(`node.aliasThisDeclaration`, `AliasThisDeclaration`));
@@ -2481,7 +2508,7 @@ class Parser
         foreach (B; BasicTypes) { case B: }
         type:
             Type t = parseType();
-            if (t is null || !currentIsOneOf(tok!"identifier", tok!":"))
+            if (t is null || !(currentIs(tok!"identifier") || (isInExternC() && isKeyword(current.type)) || currentIs(tok!":")))
             {
                 if (t)
                     error("no identifier for declarator");
@@ -2654,7 +2681,17 @@ class Parser
         }
         else
         {
-            const id = expect(tok!"identifier");
+            const(Token)* id;
+            if (currentIs(tok!"identifier") || (isInExternC() && isKeyword(current.type)))
+                id = &tokens[index++];
+            else
+            {
+                error("Expected identifier instead of " ~ (index < tokens.length
+                    ? (tokens[index].text is null ? "`" ~ str(tokens[index].type) ~ "`"
+                       : str(tokens[index].type) ~ " `" ~ tokens[index].text ~ "`")
+                    : "EOF"));
+                return null;
+            }
             mixin (nullCheck!`id`);
             node.name = *id;
             if (currentIs(tok!"[")) // dmd doesn't accept pointer after identifier
