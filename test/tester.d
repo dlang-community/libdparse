@@ -313,56 +313,63 @@ void testArbitraryASTs()
     parser.messageDelegate = &msgDelegate;
     parser.allocator = &rba;
 
-    parser.tokens = getTokensForParser("struct S {}", config, &cache);
-    assert(parser.parseCompileCondition() is null);
-    assert(errors == ["`version`, `debug`, or `static` expected (found token `struct`)"]);
-    errors = null;
-
-    parser = new Parser();
-    parser.messageDelegate = &msgDelegate;
-    parser.allocator = &rba;
-    parser.tokens = getTokensForParser("~", config, &cache);
-    assert(parser.parseDestructor() is null);
-    assert(errors == ["`this` expected instead of EOF"]);
-    errors = null;
-
-    parser = new Parser();
-    parser.messageDelegate = &msgDelegate;
-    parser.allocator = &rba;
-    parser.tokens = getTokensForParser("for (x; y; z) {}", config, &cache);
-    assert(parser.parseForeach() is null);
-    assert(errors == ["`foreach` or `foreach_reverse` expected (found token `for`)"]);
-    errors = null;
-
-    parser = new Parser();
-    parser.messageDelegate = &msgDelegate;
-    parser.allocator = &rba;
-    parser.tokens = getTokensForParser("version =", config, &cache);
-    assert(parser.parseVersionSpecification() is null);
-    assert(errors == ["Identifier or integer literal expected (found EOF)"]);
-    errors = null;
-
-    parser = new Parser();
-    parser.messageDelegate = &msgDelegate;
-    parser.allocator = &rba;
-    parser.importC = false;
-    parser.tokens = getTokensForParser("extern(C) { int normal = 1; int true = 1; }", config, &cache);
-    assert(parser.parseAttribute() !is null);
-    auto b = parser.parseBlockStatement();
-    assert(b !is null);
-    assert(b.declarationsAndStatements.declarationsAndStatements.length == 1);
-    errors = null;
-
-    parser = new Parser();
-    parser.messageDelegate = &msgDelegate;
-    parser.allocator = &rba;
-    parser.importC = true;
-    parser.tokens = getTokensForParser("extern(C) { int normal = 1; int true = 1; }", config, &cache);
-    assert(parser.parseAttribute() !is null);
-    auto b = parser.parseBlockStatement();
-    assert(b !is null);
-    assert(b.declarationsAndStatements.declarationsAndStatements.length == 2);
-    errors = null;
+    {
+        parser.tokens = getTokensForParser("struct S {}", config, &cache);
+        assert(parser.parseCompileCondition() is null);
+        assert(errors == ["`version`, `debug`, or `static` expected (found token `struct`)"]);
+        errors = null;
+    }
+    {
+        parser = new Parser();
+        parser.messageDelegate = &msgDelegate;
+        parser.allocator = &rba;
+        parser.tokens = getTokensForParser("~", config, &cache);
+        assert(parser.parseDestructor() is null);
+        assert(errors == ["`this` expected instead of EOF"]);
+        errors = null;
+    }
+    {
+        parser = new Parser();
+        parser.messageDelegate = &msgDelegate;
+        parser.allocator = &rba;
+        parser.tokens = getTokensForParser("for (x; y; z) {}", config, &cache);
+        assert(parser.parseForeach() is null);
+        assert(errors == ["`foreach` or `foreach_reverse` expected (found token `for`)"]);
+        errors = null;
+    }
+    {
+        parser = new Parser();
+        parser.messageDelegate = &msgDelegate;
+        parser.allocator = &rba;
+        parser.tokens = getTokensForParser("version =", config, &cache);
+        assert(parser.parseVersionSpecification() is null);
+        assert(errors == ["Identifier or integer literal expected (found EOF)"]);
+        errors = null;
+    }
+    {
+        parser = new Parser();
+        parser.messageDelegate = &msgDelegate;
+        parser.allocator = &rba;
+        parser.importC = false;
+        parser.tokens = getTokensForParser("extern(C) { int normal = 1; int true = 1; }", config, &cache);
+        assert(parser.parseAttribute() !is null);
+        auto b = parser.parseBlockStatement();
+        assert(b !is null);
+        assert(b.declarationsAndStatements.declarationsAndStatements.length == 1);
+        errors = null;
+    }
+    {
+        parser = new Parser();
+        parser.messageDelegate = &msgDelegate;
+        parser.allocator = &rba;
+        parser.importC = true;
+        parser.tokens = getTokensForParser("extern(C) { int normal = 1; int true = 1; }", config, &cache);
+        assert(parser.parseAttribute() !is null);
+        auto b = parser.parseBlockStatement();
+        assert(b !is null);
+        assert(b.declarationsAndStatements.declarationsAndStatements.length == 2);
+        errors = null;
+    }
 
 }
 
