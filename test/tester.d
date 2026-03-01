@@ -342,6 +342,28 @@ void testArbitraryASTs()
     assert(errors == ["Identifier or integer literal expected (found EOF)"]);
     errors = null;
 
+    parser = new Parser();
+    parser.messageDelegate = &msgDelegate;
+    parser.allocator = &rba;
+    parser.importC = false;
+    parser.tokens = getTokensForParser("extern(C) { int normal = 1; int true = 1; }", config, &cache);
+    assert(parser.parseAttribute() !is null);
+    auto b = parser.parseBlockStatement();
+    assert(b !is null);
+    assert(b.declarationsAndStatements.declarationsAndStatements.length == 1);
+    errors = null;
+
+    parser = new Parser();
+    parser.messageDelegate = &msgDelegate;
+    parser.allocator = &rba;
+    parser.importC = true;
+    parser.tokens = getTokensForParser("extern(C) { int normal = 1; int true = 1; }", config, &cache);
+    assert(parser.parseAttribute() !is null);
+    auto b = parser.parseBlockStatement();
+    assert(b !is null);
+    assert(b.declarationsAndStatements.declarationsAndStatements.length == 2);
+    errors = null;
+
 }
 
 int main(string[] args)
