@@ -5532,7 +5532,7 @@ class Parser
 
         ownArray(node.parameterAttributes, parameterAttributes);
         mixin(parseNodeQ!(`node.type`, `Type`));
-        if (currentIs(tok!"identifier"))
+        if (currentIs(tok!"identifier") || (isInExternC() && isKeyword(current.type)))
         {
             node.name = advance();
             if (currentIs(tok!"..."))
