@@ -1235,6 +1235,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/PrimaryExpression.arrayLiteral.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/PrimaryExpression.assocArrayLiteral.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/PrimaryExpression.basicType.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/PrimaryExpression.builtinType.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/PrimaryExpression.dot.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/PrimaryExpression.expression.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/PrimaryExpression.functionLiteralExpression.html</loc></url>

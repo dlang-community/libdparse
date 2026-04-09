@@ -756,9 +756,9 @@
 <pre class="grammar"><b><span class="ddoc_anchor" id="primaryExpression"></span> primaryExpression</b>:
        <a href="#identifierOrTemplateInstance"><b>identifierOrTemplateInstance</b></a>
      | <span class="string_literal"><i>&#39;.&#39;</i></span> <a href="#identifierOrTemplateInstance"><b>identifierOrTemplateInstance</b></a>
-     | <a href="#typeConstructor"><b>typeConstructor</b></a> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#basicType"><b>basicType</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <span class="string_literal"><i>&#39;.&#39;</i></span> <span class="string_literal"><i>Identifier</i></span>
-     | <a href="#basicType"><b>basicType</b></a> <span class="string_literal"><i>&#39;.&#39;</i></span> <span class="string_literal"><i>Identifier</i></span>
-     | <a href="#basicType"><b>basicType</b></a> <a href="#arguments"><b>arguments</b></a>
+     | <a href="#typeConstructor"><b>typeConstructor</b></a> <span class="string_literal"><i>&#39;(&#39;</i></span> <a href="#type"><b>type</b></a> <span class="string_literal"><i>&#39;)&#39;</i></span> <span class="string_literal"><i>&#39;.&#39;</i></span> <span class="string_literal"><i>Identifier</i></span>
+     | <a href="#builtinType"><b>builtinType</b></a> <a href="#typeSuffix"><b>typeSuffix</b></a>* <span class="string_literal"><i>&#39;.&#39;</i></span> <span class="string_literal"><i>Identifier</i></span>
+     | <a href="#builtinType"><b>builtinType</b></a> <a href="#typeSuffix"><b>typeSuffix</b></a>* <a href="#arguments"><b>arguments</b></a>
      | <a href="#typeofExpression"><b>typeofExpression</b></a>
      | <a href="#typeidExpression"><b>typeidExpression</b></a>
      | <a href="#vector"><b>vector</b></a>

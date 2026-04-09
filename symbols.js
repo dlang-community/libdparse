@@ -820,6 +820,7 @@ var symbols = [
 {name: 'dparse.ast.PrimaryExpression.arrayLiteral', kind: "variabledeclaration", path: './dparse/ast/PrimaryExpression.arrayLiteral.html', attributes: []},
 {name: 'dparse.ast.PrimaryExpression.assocArrayLiteral', kind: "variabledeclaration", path: './dparse/ast/PrimaryExpression.assocArrayLiteral.html', attributes: []},
 {name: 'dparse.ast.PrimaryExpression.basicType', kind: "variabledeclaration", path: './dparse/ast/PrimaryExpression.basicType.html', attributes: []},
+{name: 'dparse.ast.PrimaryExpression.builtinType', kind: "functiondeclaration", path: './dparse/ast/PrimaryExpression.builtinType.html', attributes: ["pure", "nothrow", "property", "nogc", "safe", "inout"]},
 {name: 'dparse.ast.PrimaryExpression.dot', kind: "variabledeclaration", path: './dparse/ast/PrimaryExpression.dot.html', attributes: []},
 {name: 'dparse.ast.PrimaryExpression.expression', kind: "variabledeclaration", path: './dparse/ast/PrimaryExpression.expression.html', attributes: []},
 {name: 'dparse.ast.PrimaryExpression.functionLiteralExpression', kind: "variabledeclaration", path: './dparse/ast/PrimaryExpression.functionLiteralExpression.html', attributes: []},
