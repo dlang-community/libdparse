@@ -282,8 +282,9 @@ class Parser
      * Parses an AliasThisDeclaration.
      *
      * $(GRAMMAR $(RULEDEF aliasThisDeclaration):
-     *     $(LITERAL 'alias') $(LITERAL Identifier) $(LITERAL 'this') $(LITERAL ';')
-     *     ;)
+     * $(LITERAL 'alias') $(LITERAL Identifier) $(LITERAL 'this') $(LITERAL ';')
+     * | $(LITERAL 'alias') $(LITERAL 'this') $(LITERAL '=') $(LITERAL Identifier) $(LITERAL ';')
+     * ;)
      */
     AliasThisDeclaration parseAliasThisDeclaration()
     {
@@ -291,8 +292,17 @@ class Parser
         auto startIndex = index;
         auto node = allocator.make!AliasThisDeclaration;
         mixin(tokenCheck!"alias");
-        mixin(tokenCheck!(`node.identifier`, "identifier"));
-        mixin(tokenCheck!"this");
+        if (currentIs(tok!"this"))
+        {
+            advance();
+            mixin(tokenCheck!"=");
+            mixin(tokenCheck!(`node.identifier`, "identifier"));
+        }
+        else
+        {
+            mixin(tokenCheck!(`node.identifier`, "identifier"));
+            mixin(tokenCheck!"this");
+        }
         return attachCommentFromSemicolon(node, startIndex);
     }
 
@@ -2315,7 +2325,8 @@ class Parser
             mixin(tokenCheck!"}");
             break;
         case tok!"alias":
-            if (startsWith(tok!"alias", tok!"identifier", tok!"this"))
+            if (startsWith(tok!"alias", tok!"identifier", tok!"this")
+                || startsWith(tok!"alias", tok!"this", tok!"="))
                 mixin(parseNodeQ!(`node.aliasThisDeclaration`, `AliasThisDeclaration`));
             else
                 mixin(parseNodeQ!(`node.aliasDeclaration`, `AliasDeclaration`));
