@@ -40,6 +40,7 @@
 <url><loc>http://127.0.0.1/dparse/ast/AlignAttribute.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AlignAttribute.accept.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AlignAttribute.assignExpression.html</loc></url>
+<url><loc>http://127.0.0.1/dparse/ast/AlignAttribute.isExplicitDefault.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/BaseNode.tokens.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AndAndExpression.html</loc></url>
 <url><loc>http://127.0.0.1/dparse/ast/AndAndExpression.accept.html</loc></url>

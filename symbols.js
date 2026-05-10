@@ -35,6 +35,7 @@ var symbols = [
 {name: 'dparse.ast.AlignAttribute', kind: "classdeclaration", path: './dparse/ast/AlignAttribute.html', attributes: []},
 {name: 'dparse.ast.AlignAttribute.accept', kind: "functiondeclaration", path: './dparse/ast/AlignAttribute.accept.html', attributes: ["override", "const"]},
 {name: 'dparse.ast.AlignAttribute.assignExpression', kind: "variabledeclaration", path: './dparse/ast/AlignAttribute.assignExpression.html', attributes: []},
+{name: 'dparse.ast.AlignAttribute.isExplicitDefault', kind: "functiondeclaration", path: './dparse/ast/AlignAttribute.isExplicitDefault.html', attributes: ["pure", "nothrow", "property", "nogc", "safe", "inout"]},
 {name: 'dparse.ast.AndAndExpression', kind: "classdeclaration", path: './dparse/ast/AndAndExpression.html', attributes: []},
 {name: 'dparse.ast.AndAndExpression.accept', kind: "functiondeclaration", path: './dparse/ast/AndAndExpression.accept.html', attributes: ["override", "const"]},
 {name: 'dparse.ast.AndExpression', kind: "classdeclaration", path: './dparse/ast/AndExpression.html', attributes: []},
