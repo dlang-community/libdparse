@@ -4195,6 +4195,33 @@ unittest // issue #526
     assert(ed.type.typeSuffixes.length == 2);
 }
 
+unittest // issue #895
+{
+    import dparse.lexer, dparse.parser, dparse.rollback_allocator;
+
+    string src = q{
+        private immutable bool hasPreviewIn = ((in int[256] a) { return __traits(isRef, a); })(int[256].init);
+        private enum Foo = int[256].init;
+    };
+
+    RollbackAllocator ra;
+    auto cf = LexerConfig("", StringBehavior.source);
+    auto ca = StringCache(16);
+    uint errorCount;
+    Module m = parseModule(getTokensForParser(src, cf, &ca), "", &ra, null, &errorCount);
+
+    assert(m);
+    assert(errorCount == 0);
+    assert(m.declarations.length == 2);
+    auto decl = m.declarations[0].variableDeclaration;
+    assert(decl);
+    auto init = decl.declarators[0].initializer;
+    assert(init);
+    assert(init.nonVoidInitializer);
+    assert(init.nonVoidInitializer.assignExpression);
+    assert(m.declarations[1].variableDeclaration);
+}
+
 unittest // Differentiate between no and empty DDOC comments, e.g. for DDOC unittests
 {
     import dparse.lexer, dparse.parser, dparse.rollback_allocator;

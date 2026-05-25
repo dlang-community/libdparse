@@ -5902,6 +5902,36 @@ class Parser
      *     | $(LITERAL IstringLiteral)
      *     ;)
      */
+    Type parsePrimaryExpressionType()
+    {
+        auto startIndex = index;
+        auto node = allocator.make!Type;
+        if (!moreTokens)
+        {
+            error("type expected");
+            return null;
+        }
+        switch (current.type)
+        {
+        case tok!"const":
+        case tok!"immutable":
+        case tok!"inout":
+        case tok!"shared":
+            if (!peekIs(tok!"("))
+                mixin(parseNodeQ!(`node.typeConstructors`, `TypeConstructors`));
+            break;
+        default:
+        }
+        mixin(parseNodeQ!(`node.type2`, `Type2`));
+        StackBuffer typeSuffixes;
+        while (moreTokens() && currentIsOneOf(tok!"[", tok!"*", tok!"delegate", tok!"function"))
+            if (!typeSuffixes.put(parseTypeSuffix()))
+                return null;
+        ownArray(node.typeSuffixes, typeSuffixes);
+        node.tokens = tokens[startIndex .. index];
+        return node;
+    }
+
     PrimaryExpression parsePrimaryExpression()
     {
         mixin(traceEnterAndExit!(__FUNCTION__));
@@ -5930,7 +5960,7 @@ class Parser
             {
                 node.typeConstructor = advance();
                 mixin(tokenCheck!"(");
-                mixin(parseNodeQ!(`node.type`, `Type`));
+                mixin(parseNodeQ!(`node.type`, `PrimaryExpressionType`));
                 mixin(tokenCheck!")");
                 mixin(tokenCheck!".");
                 const ident = expect(tok!"identifier");
@@ -5940,7 +5970,7 @@ class Parser
             }
         foreach (B; BasicTypes) { case B: }
         {
-            node.type = parseType();
+            node.type = parsePrimaryExpressionType();
             if (currentIs(tok!"."))
             {
                 advance();
